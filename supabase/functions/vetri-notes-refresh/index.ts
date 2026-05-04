@@ -222,18 +222,26 @@ Deno.serve(async (req: Request) => {
         { onConflict: "video_id" },
       );
 
-      const transcript = await fetchTranscript(item.videoId);
+      let transcript = await fetchTranscript(item.videoId);
+      let source: "captions" | "description" = "captions";
       if (!transcript) {
-        await sb
-          .from("vetri_notes")
-          .update({ status: "no_transcript", error: "Captions unavailable" })
-          .eq("video_id", item.videoId);
-        results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
-        continue;
+        // Fallback: many of Sal's videos have detailed timestamped descriptions
+        // listing player takes. Use that instead of bailing.
+        if (item.description && item.description.length > 120) {
+          transcript = item.description;
+          source = "description";
+        } else {
+          await sb
+            .from("vetri_notes")
+            .update({ status: "no_transcript", error: "No captions or description available" })
+            .eq("video_id", item.videoId);
+          results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
+          continue;
+        }
       }
 
       try {
-        const distilled = await distill(item.title, transcript);
+        const distilled = await distill(item.title, transcript, source);
         if (!distilled) {
           await sb
             .from("vetri_notes")
