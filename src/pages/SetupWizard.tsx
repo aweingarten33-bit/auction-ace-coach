@@ -20,6 +20,7 @@ import { POSITIONS } from "@/lib/positions";
 import { Trash2, Plus, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
+import EspnImportButton from "@/components/EspnImportButton";
 
 const STEPS = [
   "League Basics",
@@ -98,6 +99,7 @@ export default function SetupWizard() {
         <Card className="bg-gradient-card p-5 md:p-6">
           {step === 0 && (
             <div className="space-y-4">
+              <EspnImportButton />
               <div>
                 <Label>Total Budget ($)</Label>
                 <Input
