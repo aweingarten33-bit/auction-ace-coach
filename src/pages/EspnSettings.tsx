@@ -166,9 +166,14 @@ export default function EspnSettings() {
             <Shield className="mr-1 h-3.5 w-3.5" /> Verify & list leagues
           </Button>
           {selected && (
-            <Button variant="outline" onClick={sync} disabled={busy}>
-              <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Sync league now
-            </Button>
+            <>
+              <Button variant="outline" onClick={sync} disabled={busy}>
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Sync league now
+              </Button>
+              <Button variant="outline" onClick={syncHistory} disabled={busy}>
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Pull last 3 auctions
+              </Button>
+            </>
           )}
         </div>
 
