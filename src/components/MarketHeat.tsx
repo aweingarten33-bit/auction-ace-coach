@@ -270,10 +270,8 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
         })}
       </div>
 
-      <p className="mt-2 text-[9px] leading-snug text-muted-foreground">
-        Cross-platform signal: high Sleeper add volume usually precedes ESPN
-        bidding spikes within 24–48h. Use this to front-run nominations or fade
-        the hype.
+      <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
+        💡 Tap <HelpCircle className="inline h-2.5 w-2.5" /> above if any label is confusing.
       </p>
     </Card>
   );
