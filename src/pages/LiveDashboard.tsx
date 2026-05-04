@@ -316,6 +316,14 @@ export default function LiveDashboard() {
     setPriceInput("");
     setPosition("");
     askCoach(ev);
+    refreshQueue();
+  };
+
+  const handlePickFromQueue = (t: QueueTarget) => {
+    setPlayerName(t.name);
+    setPosition(t.position);
+    setDrafter("me");
+    toast(`${t.name} loaded · max bid $${t.maxBid}`);
   };
 
   const handleFollowUp = () => {
