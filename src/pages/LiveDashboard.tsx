@@ -39,9 +39,7 @@ import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 import Watchlist from "@/components/Watchlist";
-import { computeMarketPulse, valueFor as computeValueFor, whatIfPick, knockoutBid } from "@/lib/value";
-import { readIdentity } from "@/lib/identity";
-import IdentityCard from "@/components/IdentityCard";
+import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
@@ -103,14 +101,6 @@ export default function LiveDashboard() {
   const valueFor = useMemo(
     () => (name: string, bid: number) => computeValueFor(name, bid, prices, pulse),
     [prices, pulse]
-  );
-  const knockoutFor = useMemo(
-    () => (name: string) => knockoutBid(name, prices, pulse, budget.maxBid),
-    [prices, pulse, budget.maxBid]
-  );
-  const identity = useMemo(
-    () => readIdentity(keepers, events, budget),
-    [keepers, events, budget]
   );
 
   const requiredCount = {
