@@ -296,6 +296,8 @@ export default function LiveDashboard() {
           prices,
           spendByPosition: spend,
           recentRuns: runs,
+          dismissed,
+          watchlist,
         }),
       });
       if (!resp.ok) {
@@ -306,7 +308,8 @@ export default function LiveDashboard() {
       }
       const data = await resp.json();
       if (data?.targets) {
-        setQueue(data.targets);
+        const filtered = (data.targets as QueueTarget[]).filter((t) => !dismissed.includes(t.name));
+        setQueue(filtered);
         setOpenMan(data.openMan);
       }
     } catch (e) {
