@@ -46,11 +46,13 @@ import LiveBidStrip from "@/components/LiveBidStrip";
 import LiveSyncPanel from "@/components/LiveSyncPanel";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import DraftIntelTicker from "@/components/DraftIntelTicker";
+import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
+const NOMINATIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nominations-next`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
@@ -85,6 +87,9 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
+  const [nominations, setNominations] = useState<NominationPrediction[]>([]);
+  const [roomRead, setRoomRead] = useState<string | undefined>(undefined);
+  const [nominationsLoading, setNominationsLoading] = useState(false);
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
@@ -346,6 +351,55 @@ export default function LiveDashboard() {
     }
   };
 
+  const refreshNominations = async () => {
+    setNominationsLoading(true);
+    try {
+      const resp = await fetch(NOMINATIONS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          settings: {
+            totalBudget: settings.totalBudget,
+            numTeams: settings.numTeams,
+            scoring: settings.scoring,
+            leagueType: settings.leagueType,
+            format: settings.format,
+            context: settings.context,
+          },
+          budget,
+          myRoster: myItems,
+          rosterRequired: requiredCount,
+          rosterFilled: myCount,
+          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
+          events,
+          prices,
+          spendByPosition: spend,
+          recentRuns: runs,
+          watchlist,
+        }),
+      });
+      if (!resp.ok) {
+        if (resp.status === 429) toast.error("Rate limited.");
+        else if (resp.status === 402) toast.error("AI credits exhausted.");
+        else toast.error("Forecast unavailable.");
+        return;
+      }
+      const data = await resp.json();
+      if (Array.isArray(data?.nominations)) {
+        setNominations(data.nominations);
+        setRoomRead(data.roomRead);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Forecast error");
+    } finally {
+      setNominationsLoading(false);
+    }
+  };
+
   const submitPick = () => {
     const name = playerName.trim();
     const price = parseInt(priceInput, 10);
@@ -375,6 +429,7 @@ export default function LiveDashboard() {
     setPosition("");
     askCoach(ev);
     refreshQueue();
+    refreshNominations();
   };
 
   const handlePickFromQueue = (t: QueueTarget) => {
@@ -619,6 +674,18 @@ export default function LiveDashboard() {
 
         {/* RIGHT: State + coach */}
         <section className="space-y-4">
+          <NominationForecast
+            predictions={nominations}
+            roomRead={roomRead}
+            loading={nominationsLoading}
+            onRefresh={refreshNominations}
+            onPick={(name, position) => {
+              setPlayerName(name);
+              setPosition(position);
+              setDrafter("other");
+              toast(`${name} loaded — ready to log when nominated`);
+            }}
+          />
           <UpNextQueue
             targets={queue}
             openMan={openMan}
