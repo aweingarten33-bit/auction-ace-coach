@@ -77,6 +77,7 @@ interface CoachPayload {
   latestEvent?: DraftEventPayload;
   userQuestion?: string;
   history?: { role: "user" | "assistant"; content: string }[];
+  vetriTakes?: { player: string; position: string; lean: string; tier?: string; reasoning: string }[];
 }
 
 function buildUserMessage(p: CoachPayload): string {
@@ -112,6 +113,13 @@ function buildUserMessage(p: CoachPayload): string {
         .join("\n")}`
     );
   }
+  if (p.vetriTakes?.length) {
+    parts.push(
+      `## Sal Vetri's Takes (from his recent YouTube videos — use as a contrarian/sharp signal alongside the price sheet)\n${p.vetriTakes
+        .slice(0, 40)
+        .map((t) => `[${t.lean.toUpperCase()}] ${t.player} (${t.position})${t.tier ? ` · ${t.tier}` : ""} — ${t.reasoning}`)
+        .join("\n")}`
+    );
   if (p.events?.length) {
     parts.push(
       `## Draft Log (chronological)\n${p.events
