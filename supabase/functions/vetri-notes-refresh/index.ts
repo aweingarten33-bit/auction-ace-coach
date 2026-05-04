@@ -167,6 +167,8 @@ async function transcribeWithWhisper(videoId: string): Promise<string | null> {
     return null;
   }
 }
+
+const SUMMARY_TOOL = {
   type: "function",
   function: {
     name: "emit_takes",
