@@ -205,15 +205,23 @@ export default function SetupWizard() {
                 <span className="font-bold text-primary">${settings.totalBudget - keeperSpend}</span>{" "}
                 <span className="text-muted-foreground">(${keeperSpend} spent on {keepers.length} keepers)</span>
               </p>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-[1fr_90px_80px_auto] gap-2">
                 <Input
-                  placeholder="Player Name - Cost"
-                  value={keeperInput}
-                  onChange={(e) => setKeeperInput(e.target.value)}
+                  placeholder="Player name"
+                  value={keeperName}
+                  onChange={(e) => setKeeperName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addKeeper()}
+                />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Cost $"
+                  value={keeperCost}
+                  onChange={(e) => setKeeperCost(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addKeeper()}
                 />
                 <Select value={keeperPos} onValueChange={(v) => setKeeperPos(v as Position)}>
-                  <SelectTrigger className="w-24"><SelectValue placeholder="Pos" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
                   <SelectContent>
                     {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                   </SelectContent>
