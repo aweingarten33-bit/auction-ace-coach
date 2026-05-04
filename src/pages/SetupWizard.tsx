@@ -26,7 +26,6 @@ import PriceSheetEditor from "@/components/PriceSheetEditor";
 const STEPS = [
   "League Basics",
   "Roster",
-  "Keeper Rules",
   "Keepers",
   "Player Prices",
   "League Context",
