@@ -662,8 +662,9 @@ export default function LiveDashboard() {
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Roster Needs
+                <span className="ml-2 font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE BUILD</span>
               </h2>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="font-mono text-[10px] text-muted-foreground">
                 Starters {startersFilled}/{startersTotal} · Bench {benchFilled}/{requiredCount.BENCH}
               </p>
             </div>
