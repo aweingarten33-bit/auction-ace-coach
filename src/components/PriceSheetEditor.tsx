@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,65 @@ import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
+
+/**
+ * Parse a 2D array (from CSV or XLSX) into player/price rows.
+ * Auto-detects which columns hold the player name and the price.
+ *  - Name column = column with the most string cells that look like "First Last"
+ *  - Price column = column with the most positive integers in the range $1–$300
+ * Skips header rows and blank rows.
+ */
+function parseTabular(rows: any[][]): { name: string; price: number }[] {
+  if (!rows.length) return [];
+  const width = Math.max(...rows.map((r) => r.length));
+  const looksLikeName = (v: any) =>
+    typeof v === "string" && /^[A-Za-z][A-Za-z'.\-]+\s+[A-Za-z][A-Za-z'.\-]+/.test(v.trim());
+  const toPrice = (v: any): number | null => {
+    if (typeof v === "number" && Number.isFinite(v) && v >= 1 && v <= 400) return Math.round(v);
+    if (typeof v === "string") {
+      const m = v.replace(/[$,]/g, "").trim().match(/^-?\d+(\.\d+)?$/);
+      if (m) {
+        const n = Math.round(parseFloat(m[0]));
+        if (n >= 1 && n <= 400) return n;
+      }
+    }
+    return null;
+  };
+
+  // Score each column
+  const nameScores = new Array(width).fill(0);
+  const priceScores = new Array(width).fill(0);
+  for (const row of rows) {
+    for (let c = 0; c < width; c++) {
+      if (looksLikeName(row[c])) nameScores[c]++;
+      if (toPrice(row[c]) != null) priceScores[c]++;
+    }
+  }
+  const nameCol = nameScores.indexOf(Math.max(...nameScores));
+  // Find best price col that isn't the name col
+  let priceCol = -1, best = 0;
+  for (let c = 0; c < width; c++) {
+    if (c === nameCol) continue;
+    if (priceScores[c] > best) { best = priceScores[c]; priceCol = c; }
+  }
+  if (nameCol < 0 || priceCol < 0 || nameScores[nameCol] === 0 || best === 0) return [];
+
+  const out: { name: string; price: number }[] = [];
+  const seen = new Set<string>();
+  for (const row of rows) {
+    const name = typeof row[nameCol] === "string" ? row[nameCol].trim() : "";
+    const price = toPrice(row[priceCol]);
+    if (!name || !looksLikeName(name) || price == null) continue;
+    // Strip trailing team/pos junk like "Jalen Hurts PHI QB"
+    const clean = name.replace(/\s+(QB|RB|WR|TE|K|DST|DEF|D\/ST)\b.*$/i, "")
+                      .replace(/\s+[A-Z]{2,4}$/g, "").trim();
+    const key = clean.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ name: clean, price });
+  }
+  return out;
+}
 
 interface Props {
   prices: PriceEstimate[];
@@ -25,14 +85,52 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const mergeImported = (incoming: { name: string; price: number }[], filename: string) => {
+    if (!incoming.length) {
+      toast.error("No players found in file");
+      return;
+    }
+    const map = new Map<string, PriceEstimate>();
+    for (const p of prices) map.set(p.name.toLowerCase(), p);
+    for (const p of incoming) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
+    const merged = Array.from(map.values());
+    setPrices(merged);
+    setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    toast.success(`Imported ${incoming.length} players from ${filename}`);
+  };
+
   const handleUpload = async (file: File) => {
     if (file.size > 15 * 1024 * 1024) {
       return toast.error("File too large (max 15MB)");
     }
+    const name = file.name.toLowerCase();
+    const isCsv = name.endsWith(".csv") || file.type === "text/csv";
+    const isXlsx = name.endsWith(".xlsx") || name.endsWith(".xls") || file.type.includes("spreadsheet") || file.type.includes("excel");
+
     setUploading(true);
     try {
+      // Fast path: CSV / XLSX parsed locally — no AI cost, instant
+      if (isCsv || isXlsx) {
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+        // Concatenate ALL sheets so multi-tab workbooks (e.g. one tab per position) work
+        const allRows: any[][] = [];
+        for (const sheetName of wb.SheetNames) {
+          const sheet = wb.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, defval: "", blankrows: false });
+          allRows.push(...rows);
+        }
+        const players = parseTabular(allRows);
+        if (!players.length) {
+          toast.error("Couldn't auto-detect name + price columns. Try the AI parser by uploading as PDF, or paste the data instead.");
+          return;
+        }
+        mergeImported(players, file.name);
+        return;
+      }
+
+      // PDF / image → AI parse
       const buf = await file.arrayBuffer();
-      // base64 encode in chunks to avoid stack overflow on large files
       let binary = "";
       const bytes = new Uint8Array(buf);
       const CHUNK = 0x8000;
@@ -53,18 +151,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         throw new Error(t.error || `Parse failed (${resp.status})`);
       }
       const { players } = await resp.json() as { players: { name: string; price: number }[] };
-      if (!players?.length) {
-        toast.error("No players found in file");
-        return;
-      }
-      // Merge with existing — overwrite duplicates with new prices
-      const map = new Map<string, PriceEstimate>();
-      for (const p of prices) map.set(p.name.toLowerCase(), p);
-      for (const p of players) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
-      const merged = Array.from(map.values());
-      setPrices(merged);
-      setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
-      toast.success(`Imported ${players.length} players from ${file.name}`);
+      mergeImported(players || [], file.name);
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || "Upload failed");
@@ -130,12 +217,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </Badge>
       </div>
 
-      {/* Upload PDF/image */}
+      {/* Upload CSV / XLSX / PDF / image */}
       <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3">
         <input
           ref={fileRef}
           type="file"
-          accept="application/pdf,image/png,image/jpeg,image/webp,image/heic"
+          accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf,image/png,image/jpeg,image/webp,image/heic"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -149,13 +236,13 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           disabled={uploading}
         >
           {uploading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Reading sheet with AI...</>
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> Upload PDF or screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> Upload CSV, Excel, PDF or screenshot</>
           )}
         </Button>
         <p className="mt-1.5 text-[10px] text-muted-foreground">
-          Last year's auction results, FantasyPros export, ESPN screenshot — AI extracts names + prices automatically.
+          CSV/Excel parses instantly (free). PDFs &amp; screenshots use AI. Auto-detects which columns are name and price.
         </p>
       </div>
 
