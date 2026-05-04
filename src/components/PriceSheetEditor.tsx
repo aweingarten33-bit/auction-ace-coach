@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,65 @@ import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
+
+/**
+ * Parse a 2D array (from CSV or XLSX) into player/price rows.
+ * Auto-detects which columns hold the player name and the price.
+ *  - Name column = column with the most string cells that look like "First Last"
+ *  - Price column = column with the most positive integers in the range $1–$300
+ * Skips header rows and blank rows.
+ */
+function parseTabular(rows: any[][]): { name: string; price: number }[] {
+  if (!rows.length) return [];
+  const width = Math.max(...rows.map((r) => r.length));
+  const looksLikeName = (v: any) =>
+    typeof v === "string" && /^[A-Za-z][A-Za-z'.\-]+\s+[A-Za-z][A-Za-z'.\-]+/.test(v.trim());
+  const toPrice = (v: any): number | null => {
+    if (typeof v === "number" && Number.isFinite(v) && v >= 1 && v <= 400) return Math.round(v);
+    if (typeof v === "string") {
+      const m = v.replace(/[$,]/g, "").trim().match(/^-?\d+(\.\d+)?$/);
+      if (m) {
+        const n = Math.round(parseFloat(m[0]));
+        if (n >= 1 && n <= 400) return n;
+      }
+    }
+    return null;
+  };
+
+  // Score each column
+  const nameScores = new Array(width).fill(0);
+  const priceScores = new Array(width).fill(0);
+  for (const row of rows) {
+    for (let c = 0; c < width; c++) {
+      if (looksLikeName(row[c])) nameScores[c]++;
+      if (toPrice(row[c]) != null) priceScores[c]++;
+    }
+  }
+  const nameCol = nameScores.indexOf(Math.max(...nameScores));
+  // Find best price col that isn't the name col
+  let priceCol = -1, best = 0;
+  for (let c = 0; c < width; c++) {
+    if (c === nameCol) continue;
+    if (priceScores[c] > best) { best = priceScores[c]; priceCol = c; }
+  }
+  if (nameCol < 0 || priceCol < 0 || nameScores[nameCol] === 0 || best === 0) return [];
+
+  const out: { name: string; price: number }[] = [];
+  const seen = new Set<string>();
+  for (const row of rows) {
+    const name = typeof row[nameCol] === "string" ? row[nameCol].trim() : "";
+    const price = toPrice(row[priceCol]);
+    if (!name || !looksLikeName(name) || price == null) continue;
+    // Strip trailing team/pos junk like "Jalen Hurts PHI QB"
+    const clean = name.replace(/\s+(QB|RB|WR|TE|K|DST|DEF|D\/ST)\b.*$/i, "")
+                      .replace(/\s+[A-Z]{2,4}$/g, "").trim();
+    const key = clean.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ name: clean, price });
+  }
+  return out;
+}
 
 interface Props {
   prices: PriceEstimate[];
