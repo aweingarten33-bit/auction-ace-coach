@@ -20,6 +20,7 @@ export interface LeagueSettings {
   numTeams: number;
   scoring: Scoring;
   leagueType: LeagueType;
+  format: LeagueFormat;
   roster: RosterSlots;
   keeperIncrease: string; // free-form e.g. "+4/+8/+12"
   context: string;
