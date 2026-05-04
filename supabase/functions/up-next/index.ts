@@ -79,6 +79,51 @@ Deno.serve(async (req: Request) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
     const p = await req.json();
 
+    // ---- Deterministic pre-compute so the model doesn't have to do math ----
+    const norm = (s: string) => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const draftedSet = new Set<string>(
+      [
+        ...((p.events ?? []) as any[]).map((e) => norm(e.player)),
+        ...((p.myRoster ?? []) as any[]).map((x) => norm(x.player)),
+      ].filter(Boolean),
+    );
+
+    // Market multiplier from observed paid vs sheet
+    const sheetMap = new Map<string, { price: number; pos?: string }>();
+    for (const r of (p.prices ?? []) as any[]) sheetMap.set(norm(r.name), { price: Number(r.price) || 0, pos: r.position });
+    let paidSum = 0, sheetSum = 0, n = 0;
+    for (const e of (p.events ?? []) as any[]) {
+      const ref = sheetMap.get(norm(e.player));
+      if (!ref || ref.price <= 0) continue;
+      paidSum += Number(e.price) || 0; sheetSum += ref.price; n++;
+    }
+    const marketMult = n >= 3 && sheetSum > 0 ? paidSum / sheetSum : 1;
+    const confident = n >= 8;
+
+    // Per-position fallback board: top 8 undrafted, sorted by sheet price desc, with market-adjusted "going rate"
+    const POS_LIST = ["QB", "RB", "WR", "TE", "K", "DST"] as const;
+    const fallbackByPos: Record<string, { name: string; sheet: number; going: number }[]> = {};
+    for (const pos of POS_LIST) {
+      const list = ((p.prices ?? []) as any[])
+        .filter((r) => r.position === pos && !draftedSet.has(norm(r.name)) && Number(r.price) > 0)
+        .sort((a, b) => Number(b.price) - Number(a.price))
+        .slice(0, 8)
+        .map((r) => ({
+          name: r.name,
+          sheet: Number(r.price),
+          going: Math.max(1, Math.round(Number(r.price) * marketMult)),
+        }));
+      fallbackByPos[pos] = list;
+    }
+
+    const fallbackText = POS_LIST
+      .map((pos) => {
+        const rows = fallbackByPos[pos];
+        if (!rows.length) return `${pos}: (no undrafted on sheet)`;
+        return `${pos}: ${rows.map((r) => `${r.name} sheet$${r.sheet}/going$${r.going}`).join(" | ")}`;
+      })
+      .join("\n");
+
     const userMsg = [
       `## Settings\n${JSON.stringify(p.settings)}`,
       `## Budget\n${JSON.stringify(p.budget)}`,
@@ -89,11 +134,14 @@ Deno.serve(async (req: Request) => {
       `## Draft Log\n${(p.events ?? []).map((e: any) => `${e.drafter === "me" ? "[ME]" : "[OTHER]"} ${e.player}${e.position ? ` (${e.position})` : ""} $${e.price}`).join("\n") || "(empty)"}`,
       `## Spend by Position\n${JSON.stringify(p.spendByPosition)}`,
       `## Recent Runs (last ${p.recentRuns?.window})\n${JSON.stringify(p.recentRuns?.counts)}`,
+      `## Market Multiplier (DETERMINISTIC)\nmultiplier=${marketMult.toFixed(3)} samples=${n} confident=${confident}\n(use this to convert sheet price -> going rate; "going" already pre-computed below)`,
+      `## Fallback Board (DETERMINISTIC — undrafted only, top 8 by sheet $ per position, with market-adjusted going$)\n${fallbackText}`,
       `## User Price Sheet (first 100)\n${(p.prices ?? []).slice(0, 100).map((x: any) => `${x.name} $${x.price}`).join("\n") || "(none)"}`,
       `## Watchlist (user pinned — prefer when fit is real)\n${(p.watchlist ?? []).join(", ") || "(none)"}`,
       `## Dismissed (user rejected — DO NOT suggest these)\n${(p.dismissed ?? []).join(", ") || "(none)"}`,
-      `## Task\nCall emit_queue with the 3 best targets right now. Never include any name from the Dismissed list.`,
+      `## Task\nCall emit_queue with the 3 best targets right now. Never include any name from the Dismissed list.\n\nFor each target's "worstCase": the alternative MUST be the highest-ranked name from the Fallback Board for that POS that is NOT the target itself, and the $ MUST equal that row's "going" value. The gap consequence MUST cite the actual Roster Gaps entry for that POS (severity + starterShort).\n\nFor each target's "knockoff": pull from the same Fallback Board for the same POS where going$ < target.maxBid * 0.6; use the highest-going row that satisfies that. If none qualify, pick the cheapest row on the board for that POS.`,
     ].join("\n\n");
+
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
