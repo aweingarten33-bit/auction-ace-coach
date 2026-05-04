@@ -7,30 +7,63 @@ import {
   RosterSlots,
 } from "./draft-types";
 
+/**
+ * Permissive parser — accepts almost anything a user might paste:
+ *   Jalen Hurts - 65
+ *   Jalen Hurts $65
+ *   Jalen Hurts, QB, 65
+ *   Jalen Hurts | QB | $65
+ *   Jalen Hurts\tQB\t65            (tab-sep, e.g. ESPN/FantasyPros copy-paste)
+ *   1. Jalen Hurts (PHI - QB) $65
+ *   QB1  Jalen Hurts  PHI  65
+ * Returns null when no number found.
+ */
 export function parsePlayerLine(input: string): { name: string; price: number } | null {
-  const trimmed = input.trim();
-  // Match "Name - 45" / "Name – $45" / "Name $45"
-  const m = trimmed.match(/^(.+?)\s*[-–—:]\s*\$?(\d+(?:\.\d+)?)\s*$/);
-  if (m) {
-    const price = Math.round(parseFloat(m[2]));
-    if (price <= 0) return null;
-    return { name: m[1].trim(), price };
-  }
-  const m2 = trimmed.match(/^(.+?)\s+\$?(\d+(?:\.\d+)?)\s*$/);
-  if (m2) {
-    const price = Math.round(parseFloat(m2[2]));
-    if (price <= 0) return null;
-    return { name: m2[1].trim(), price };
-  }
-  return null;
+  let line = input.trim();
+  if (!line) return null;
+
+  // Strip leading rank like "1." / "12)" / "#3"
+  line = line.replace(/^[#\d]+[.)\s]+/, "").trim();
+
+  // Find LAST number in the line — that's the price (FantasyPros puts price last)
+  const priceMatches = [...line.matchAll(/\$?(\d+(?:\.\d+)?)/g)];
+  if (!priceMatches.length) return null;
+  const last = priceMatches[priceMatches.length - 1];
+  const price = Math.round(parseFloat(last[1]));
+  if (!Number.isFinite(price) || price <= 0) return null;
+
+  // Everything before the price = name segment (may include team/pos junk)
+  let nameSegment = line.slice(0, last.index).trim();
+  // Drop common trailing separators
+  nameSegment = nameSegment.replace(/[\s,|\t\-–—:]+$/g, "").trim();
+  // Drop parenthetical team/pos like "(PHI - QB)"
+  nameSegment = nameSegment.replace(/\s*\([^)]*\)\s*/g, " ").trim();
+  // Drop leading position tag like "QB1 " or "RB - "
+  nameSegment = nameSegment.replace(/^(QB|RB|WR|TE|K|DST|DEF)\d*\s*[-,|:]?\s*/i, "").trim();
+  // If comma-or-pipe separated, take the first chunk that looks like a name
+  const chunks = nameSegment.split(/\s*[,|\t]\s*/).filter(Boolean);
+  let name = chunks[0] || nameSegment;
+  // Strip any trailing team abbreviation like "Jalen Hurts PHI"
+  name = name.replace(/\s+(?:[A-Z]{2,4})$/, "").trim();
+  // Strip a trailing position
+  name = name.replace(/\s+(QB|RB|WR|TE|K|DST|DEF)$/i, "").trim();
+
+  if (!name || name.length < 2) return null;
+  return { name, price };
 }
 
 export function parsePriceSheet(text: string): PriceEstimate[] {
-  return text
-    .split(/\r?\n/)
-    .map((l) => parsePlayerLine(l))
-    .filter(Boolean)
-    .map((p) => ({ name: p!.name, price: p!.price }));
+  const seen = new Set<string>();
+  const out: PriceEstimate[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    const p = parsePlayerLine(line);
+    if (!p) continue;
+    const key = p.name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ name: p.name, price: p.price });
+  }
+  return out;
 }
 
 export function totalRosterSize(r: RosterSlots): number {
