@@ -764,6 +764,20 @@ export default function LiveDashboard() {
 
         {/* RIGHT: State + coach */}
         <section className="space-y-4">
+          <RosterHero
+            remaining={budget.remaining}
+            slotsLeft={budget.slotsLeft}
+            slotsTotal={budget.slotsTotal}
+            maxBid={budget.maxBid}
+            rows={heroRows}
+            bestTarget={bestTarget}
+            onLoadTarget={(name, pos) => {
+              setPlayerName(name);
+              setPosition(pos);
+              setDrafter("me");
+              toast(`${name} loaded — best next target`);
+            }}
+          />
           <NominationForecast
             predictions={nominations}
             roomRead={roomRead}
