@@ -319,29 +319,35 @@ export default function LiveDashboard() {
         <section className="space-y-4">
           <Card className="bg-gradient-card p-4">
             <div className="space-y-3">
-              <div className="flex gap-2">
+              {/* Drafter toggle */}
+              <div className="grid grid-cols-2 gap-2 rounded-lg bg-secondary/40 p-1">
                 <button
                   onClick={() => setDrafter("me")}
-                  className={`flex-1 rounded-md border px-3 py-2 text-xs font-semibold transition ${
+                  className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
                     drafter === "me"
-                      ? "border-primary bg-primary/15 text-primary"
-                      : "border-border bg-secondary text-muted-foreground"
+                      ? "bg-primary text-primary-foreground shadow"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <User className="inline h-3 w-3 mr-1" /> Drafted by ME
+                  <User className="inline h-4 w-4 mr-1.5 -mt-0.5" /> My Pick
                 </button>
                 <button
                   onClick={() => setDrafter("other")}
-                  className={`flex-1 rounded-md border px-3 py-2 text-xs font-semibold transition ${
+                  className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
                     drafter === "other"
-                      ? "border-accent bg-accent/15 text-accent"
-                      : "border-border bg-secondary text-muted-foreground"
+                      ? "bg-accent text-accent-foreground shadow"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  <Users className="inline h-3 w-3 mr-1" /> Other team
+                  <Users className="inline h-4 w-4 mr-1.5 -mt-0.5" /> Other Team
                 </button>
               </div>
-              <div className="grid grid-cols-[1fr_90px_80px] gap-2">
+
+              {/* Player — full width so autocomplete has room */}
+              <div>
+                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Player
+                </label>
                 <PlayerAutocomplete
                   value={playerName}
                   onChange={setPlayerName}
@@ -353,36 +359,56 @@ export default function LiveDashboard() {
                   onEnter={submitPick}
                   autoFocus
                 />
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="Price $"
-                  value={priceInput}
-                  onChange={(e) => setPriceInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
-                  className="font-medium"
-                />
-                <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-                  <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
-                  <SelectContent>
-                    {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                  </SelectContent>
-                </Select>
               </div>
-              <div className="flex gap-2">
+
+              {/* Price + position side-by-side */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Price
+                  </label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      inputMode="numeric"
+                      placeholder="0"
+                      value={priceInput}
+                      onChange={(e) => setPriceInput(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && submitPick()}
+                      className="pl-6 font-medium"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Position
+                  </label>
+                  <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
+                    <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
+                    <SelectContent>
+                      {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-1">
                 <Button
                   onClick={submitPick}
                   disabled={streaming}
+                  size="lg"
                   className="flex-1 bg-gradient-primary text-primary-foreground"
                 >
                   <Send className="h-4 w-4 mr-2" /> Log Pick
                 </Button>
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={() => { undoEvent(); toast("Last entry undone"); }}
                   disabled={!events.length}
                 >
-                  <Undo2 className="h-4 w-4 mr-1" /> Undo
+                  <Undo2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>
