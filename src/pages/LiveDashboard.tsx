@@ -80,6 +80,7 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
+  const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
