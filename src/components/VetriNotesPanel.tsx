@@ -276,7 +276,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                     {leagueBid && tierAnchor && (
                                       <span
                                         className="rounded-sm border border-warning/50 bg-warning/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-warning"
-                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Adjusted for "${t.lean}" lean.`}
+                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Tier ${tierSource === "rank" ? "auto-derived from ESPN positional rank" : "from Sal"}. Adjusted for "${t.lean}" lean.`}
                                       >
                                         League: ~${leagueBid}
                                       </span>
@@ -287,7 +287,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                       </span>
                                     )}
                                     <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground/70">
-                                      {leagueBid ? `${historySeasons.length}yr avg · T${tierNum} ${t.position}` : `${LEAGUE_BUDGET} league`}
+                                      {leagueBid ? `T${tierNum} ${t.position}${tierSource === "rank" ? " (ESPN)" : ""} · ${historySeasons.length}yr avg` : `${LEAGUE_BUDGET} league`}
                                     </span>
                                   </div>
                                 );
