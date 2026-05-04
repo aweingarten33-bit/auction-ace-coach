@@ -149,6 +149,54 @@ export type Database = {
         }
         Relationships: []
       }
+      vetri_notes: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          positions: string[]
+          published_at: string | null
+          status: string
+          summary: string | null
+          takes: Json
+          title: string
+          transcript: string | null
+          updated_at: string
+          url: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          positions?: string[]
+          published_at?: string | null
+          status?: string
+          summary?: string | null
+          takes?: Json
+          title: string
+          transcript?: string | null
+          updated_at?: string
+          url: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          positions?: string[]
+          published_at?: string | null
+          status?: string
+          summary?: string | null
+          takes?: Json
+          title?: string
+          transcript?: string | null
+          updated_at?: string
+          url?: string
+          video_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
