@@ -44,6 +44,7 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import LiveSyncPanel from "@/components/LiveSyncPanel";
+import OpponentHeatmap from "@/components/OpponentHeatmap";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -619,6 +620,7 @@ export default function LiveDashboard() {
             valueFor={valueFor}
             maxBid={budget.maxBid}
           />
+          <OpponentHeatmap settings={settings} />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
