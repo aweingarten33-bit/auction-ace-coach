@@ -174,6 +174,54 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "Model did not return queue" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const parsed = JSON.parse(call.function.arguments);
+
+    // ---- Server-side enforcement of DHgate knockoff rules ----
+    // Knockoff MUST: come from the user's price sheet, match the target's
+    // position, not be drafted, not be the target itself, and have
+    // price < maxBid * 0.6. If the AI violates any rule we overwrite with the
+    // best deterministic candidate from fallbackByPos. If none exist we
+    // gracefully drop knockoff and set knockoffNote.
+    if (Array.isArray(parsed?.targets)) {
+      for (const t of parsed.targets) {
+        const pos = t?.position as string | undefined;
+        const maxBid = Number(t?.maxBid) || 0;
+        const ceiling = maxBid * 0.6;
+        const ceilingFloor = Math.max(0, Math.floor(ceiling));
+        const board = (pos && fallbackByPos[pos]) ? fallbackByPos[pos] : [];
+
+        const eligible = board.filter(
+          (r) =>
+            norm(r.name) !== norm(t?.name ?? "") &&
+            !draftedSet.has(norm(r.name)) &&
+            r.going > 0 &&
+            r.going < ceiling,
+        );
+
+        const ko = t?.knockoff;
+        const koValid =
+          ko &&
+          typeof ko.name === "string" &&
+          ko.position === pos &&
+          Number(ko.price) > 0 &&
+          Number(ko.price) < ceiling &&
+          norm(ko.name) !== norm(t?.name ?? "") &&
+          !draftedSet.has(norm(ko.name)) &&
+          sheetMap.has(norm(ko.name));
+
+        if (koValid) {
+          const boardRow = board.find((r) => norm(r.name) === norm(ko.name));
+          if (boardRow) ko.price = boardRow.going;
+        } else if (eligible.length > 0) {
+          const best = eligible.sort((a, b) => b.going - a.going)[0];
+          t.knockoff = { name: best.name, position: pos, price: best.going };
+          t.knockoffSource = "server-enforced";
+        } else {
+          delete t.knockoff;
+          t.knockoffNote = `No ${pos} alt under $${ceilingFloor} on your sheet`;
+        }
+      }
+    }
+
     return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("up-next error", e);
