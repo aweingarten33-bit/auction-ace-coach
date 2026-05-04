@@ -620,6 +620,7 @@ export default function LiveDashboard() {
             valueFor={valueFor}
             maxBid={budget.maxBid}
           />
+          <OpponentHeatmap settings={settings} />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
