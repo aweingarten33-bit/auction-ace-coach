@@ -168,17 +168,45 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
           const bye = byeWeekForTeam(p.team);
           const inj = p.injury_status;
 
-          // Strategy callout
-          let callout = "";
-          if (sev === "critical")
-            callout = `Critical ${pos} need — bid up to your sheet $${ref ?? "—"}`;
-          else if (sev === "need")
-            callout = `You still need a ${pos} — track price`;
-          else if (sev === "depth")
-            callout = `${pos} depth — only chase a knockoff price`;
-          else callout = `${pos} done — let the room overpay`;
+          const goingRate = ref ? Math.max(1, Math.round(ref * pulseMultiplier)) : null;
+          const affordable = goingRate != null && goingRate <= maxBid && goingRate <= remaining;
+          const stretchable = goingRate != null && goingRate <= remaining && goingRate > maxBid;
+          const needsPos = sev === "critical" || sev === "need" || sev === "depth";
 
-          if (ref && ref > maxBid) callout += ` · over your max ($${maxBid})`;
+          let tier: "TARGET" | "STRETCH" | "FADE" | "SKIP" | "UNKNOWN";
+          let tierTone = "";
+          let callout = "";
+
+          if (!ref || goingRate == null) {
+            tier = "UNKNOWN";
+            tierTone = "border-border bg-secondary/40 text-muted-foreground";
+            callout = needsPos
+              ? `${pos} need but no sheet price — set one to gauge fit`
+              : `No sheet price — informational only`;
+          } else if (sev === "done") {
+            tier = "FADE";
+            tierTone = "border-muted-foreground/30 bg-muted/20 text-muted-foreground";
+            callout = `${pos} done — let the room overpay at $${goingRate}`;
+          } else if (affordable && needsPos) {
+            tier = "TARGET";
+            tierTone = "border-success/50 bg-success/15 text-success";
+            const head = sev === "critical" ? `Critical ${pos} need`
+              : sev === "need" ? `Fills ${pos} starter`
+              : `${pos} depth play`;
+            callout = `${head} — going ~$${goingRate}, fits your $${maxBid} max`;
+          } else if (stretchable && needsPos) {
+            tier = "STRETCH";
+            tierTone = "border-warning/50 bg-warning/15 text-warning";
+            callout = `${pos} need but $${goingRate - maxBid} over max — only with knockoff plan`;
+          } else if (goingRate > remaining) {
+            tier = "SKIP";
+            tierTone = "border-destructive/50 bg-destructive/10 text-destructive";
+            callout = `Out of budget — $${goingRate} vs $${remaining} left`;
+          } else {
+            tier = "FADE";
+            tierTone = "border-muted-foreground/30 bg-muted/20 text-muted-foreground";
+            callout = `${pos} not a need — pass unless steal`;
+          }
 
           return (
             <div
@@ -190,47 +218,39 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-background text-[10px] font-bold text-warning">
                   {i + 1}
                 </span>
-                <Badge
-                  variant="outline"
-                  className={`${POS_COLORS[pos]} px-1.5 py-0 text-[10px]`}
-                >
+                <Badge variant="outline" className={`${POS_COLORS[pos]} px-1.5 py-0 text-[10px]`}>
                   {pos}
                 </Badge>
                 <span className="min-w-0 flex-1 truncate text-sm font-semibold">
                   {p.full_name}
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                  {p.team || "FA"}
-                  {bye ? ` · BYE ${bye}` : ""}
+                  {p.team || "FA"}{bye ? ` · BYE ${bye}` : ""}
                 </span>
                 {inj && (
-                  <Badge
-                    variant="outline"
-                    className="border-destructive/40 bg-destructive/10 px-1 py-0 text-[9px] text-destructive"
-                  >
+                  <Badge variant="outline" className="border-destructive/40 bg-destructive/10 px-1 py-0 text-[9px] text-destructive">
                     {inj}
                   </Badge>
                 )}
-                <span
-                  className="ml-1 flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-bold tabular-nums text-warning"
-                  title="Sleeper add count (24h)"
-                >
+                <span className="ml-1 flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-bold tabular-nums text-warning" title="Sleeper add count (24h)">
                   <Flame className="h-2.5 w-2.5" />
-                  {t.count >= 1000
-                    ? `${(t.count / 1000).toFixed(1)}k`
-                    : t.count}
+                  {t.count >= 1000 ? `${(t.count / 1000).toFixed(1)}k` : t.count}
                 </span>
               </div>
-              <p className="mt-0.5 pl-7 text-[10px] leading-snug text-muted-foreground">
-                {callout}
-                {ref ? (
-                  <span className="ml-1 font-mono text-foreground/80">
-                    · sheet ${ref}
-                  </span>
-                ) : (
-                  <span className="ml-1 italic">· no sheet price</span>
-                )}
-              </p>
+              <div className="mt-1 flex items-center gap-1.5 pl-7">
+                <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${tierTone}`}>
+                  {tier}
+                </span>
+                <p className="min-w-0 flex-1 truncate text-[10px] leading-snug text-muted-foreground">
+                  {callout}
+                  {ref && (
+                    <span className="ml-1 font-mono text-foreground/80">
+                      · sheet ${ref}
+                      {goingRate !== ref && <span className="opacity-70"> → ${goingRate}</span>}
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
           );
         })}
