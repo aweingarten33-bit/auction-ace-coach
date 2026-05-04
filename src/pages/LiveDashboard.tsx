@@ -560,9 +560,7 @@ export default function LiveDashboard() {
             onDismiss={handleDismiss}
             valueFor={valueFor}
             whatIfFor={whatIfFor}
-            knockoutFor={knockoutFor}
           />
-          <IdentityCard read={identity} />
           <Watchlist
             watchlist={watchlist}
             onUnpin={handleUnpin}
