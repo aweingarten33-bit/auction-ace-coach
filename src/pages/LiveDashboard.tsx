@@ -52,6 +52,7 @@ import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/l
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
+const NOMINATIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nominations-next`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
