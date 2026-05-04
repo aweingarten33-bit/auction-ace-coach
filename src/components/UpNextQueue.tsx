@@ -76,7 +76,7 @@ export default function UpNextQueue({
           {loading && <span className="text-muted-foreground normal-case">· tuning...</span>}
         </h2>
         <div className="flex items-center gap-1.5">
-          <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums ${pulseTone}`}>
+          <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums transition-colors duration-300 ${pulseTone} ${Math.abs(pulsePct) > 8 && pulseConfident ? "animate-pulse-soft" : ""}`}>
             <PulseIcon className="h-3 w-3" />
             Market {pulsePct >= 0 ? "+" : ""}{pulsePct}%
             {!pulseConfident && <span className="opacity-60">·early</span>}
