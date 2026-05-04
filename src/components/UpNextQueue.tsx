@@ -26,6 +26,7 @@ interface Props {
   onRefresh: () => void;
   onPick: (t: QueueTarget) => void;
   onPin: (name: string) => void;
+  onUnpin: (name: string) => void;
   onDismiss: (name: string) => void;
   valueFor: (name: string, bid: number) => ValueCall;
   whatIfFor: (pos: Position, bid: number) => WhatIf;
@@ -55,7 +56,7 @@ function verdictLabel(v: ValueCall["verdict"]) {
 
 export default function UpNextQueue({
   targets, openMan, loading, empty, pulseMultiplier, pulseConfident,
-  watchlist, onRefresh, onPick, onPin, onDismiss, valueFor, whatIfFor,
+  watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor,
 }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -174,7 +175,7 @@ export default function UpNextQueue({
                   </Button>
                   <Button
                     size="sm" variant="ghost"
-                    onClick={(e) => { e.stopPropagation(); isPinned ? onPin(t.name) : onPin(t.name); }}
+                    onClick={(e) => { e.stopPropagation(); isPinned ? onUnpin(t.name) : onPin(t.name); }}
                     className="h-6 w-6 px-0"
                     title={isPinned ? "Unpin" : "Pin to watchlist"}
                   >
