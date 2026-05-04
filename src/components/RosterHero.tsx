@@ -119,19 +119,13 @@ export default function RosterHero({
                   {r.have}/{r.need}
                 </span>
               </div>
-              <div className="mt-1 flex items-baseline justify-between">
-                <span className="font-mono text-[9px] uppercase tracking-wider opacity-80">
-                  max
-                </span>
-                <span className="font-mono text-sm font-bold tabular-nums text-foreground">
-                  ${r.maxBid}
-                </span>
-              </div>
             </div>
+
           ))}
         </div>
 
-        {/* Best next target */}
+        {/* Best next target — only when we have one */}
+        {bestTarget && (
         <div className="mt-3 flex items-stretch gap-2 rounded-md border border-primary/40 bg-primary/5 p-2.5">
           <div className="flex h-auto w-9 shrink-0 items-center justify-center rounded bg-primary/15">
             <Target className="h-4 w-4 text-primary" />
@@ -140,8 +134,6 @@ export default function RosterHero({
             <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-primary/90">
               Best Next Target
             </p>
-            {bestTarget ? (
-              <>
                 <div className="flex items-center gap-2">
                   <span className="truncate text-sm font-bold text-foreground">
                     {bestTarget.name}
@@ -159,14 +151,8 @@ export default function RosterHero({
                 <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
                   {bestTarget.reason}
                 </p>
-              </>
-            ) : (
-              <p className="text-xs text-muted-foreground">
-                Log a pick or paste a price sheet to surface a target.
-              </p>
-            )}
           </div>
-          {bestTarget && onLoadTarget && (
+          {onLoadTarget && (
             <Button
               size="sm"
               className="self-center bg-gradient-primary text-primary-foreground"
@@ -176,6 +162,7 @@ export default function RosterHero({
             </Button>
           )}
         </div>
+        )}
       </div>
     </Card>
   );
