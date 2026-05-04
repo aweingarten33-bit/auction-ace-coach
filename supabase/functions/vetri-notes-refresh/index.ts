@@ -29,12 +29,14 @@ function parseFeed(xml: string, max: number): FeedItem[] {
     const id = block.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
     const title = block.match(/<title>([^<]+)<\/title>/)?.[1];
     const published = block.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
+    const description = block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? "";
     if (id && title) {
       items.push({
         videoId: id,
         title: decodeXml(title),
         url: `https://www.youtube.com/watch?v=${id}`,
         publishedAt: published,
+        description: decodeXml(description).trim(),
       });
     }
   }
