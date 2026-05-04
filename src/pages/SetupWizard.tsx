@@ -19,6 +19,7 @@ import { Position } from "@/lib/draft-types";
 import { POSITIONS } from "@/lib/positions";
 import { Trash2, Plus, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { toast } from "sonner";
+import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 
 const STEPS = [
   "League Basics",
