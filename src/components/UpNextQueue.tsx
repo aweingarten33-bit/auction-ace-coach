@@ -240,6 +240,14 @@ export default function UpNextQueue({
                   </Button>
                   <Button
                     size="sm" variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); setDetailFor(t); }}
+                    className="h-6 w-6 px-0"
+                    title="Player details"
+                  >
+                    <Info className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm" variant="ghost"
                     onClick={(e) => { e.stopPropagation(); onDismiss(t.name); }}
                     className="h-6 w-6 px-0"
                     title="Dismiss"
