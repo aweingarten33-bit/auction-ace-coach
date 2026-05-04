@@ -346,8 +346,8 @@ export default function LiveDashboard() {
                   value={playerName}
                   onChange={setPlayerName}
                   onSelect={(p) => {
-                    if (p.position && POSITIONS.includes(p.position as Pos)) {
-                      setPosition(p.position as Pos);
+                    if (p.position && POSITIONS.includes(p.position as Position)) {
+                      setPosition(p.position as Position);
                     }
                   }}
                   onEnter={submitPick}
