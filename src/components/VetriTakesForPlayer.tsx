@@ -79,6 +79,25 @@ export default function VetriTakesForPlayer({ player, emptyText = "No Sal takes 
             <p className={`mt-1 leading-snug ${compact ? "text-[10px]" : "text-[11px]"}`}>
               {m.take.reasoning}
             </p>
+            {(() => {
+              const est = scaledEstBid(m.take.estPrice);
+              const sal = m.take.salPrice?.trim();
+              if (!est && !sal) return null;
+              return (
+                <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                  {sal && (
+                    <span className="rounded-sm border border-success/40 bg-success/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-success">
+                      Sal: {sal}
+                    </span>
+                  )}
+                  {est && (
+                    <span className="rounded-sm border border-primary/40 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-primary">
+                      Bid ~${est}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
             {!compact && (
               <p className="mt-0.5 truncate text-[9px] text-muted-foreground">📺 {m.videoTitle}</p>
             )}
