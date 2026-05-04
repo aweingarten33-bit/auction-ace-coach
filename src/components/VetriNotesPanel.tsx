@@ -9,6 +9,7 @@ import { Youtube, RefreshCw, ExternalLink, ChevronDown, ChevronUp, TrendingUp, T
 import { Input } from "@/components/ui/input";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import { toast } from "sonner";
+import { useLeagueTierPrices, parseTierLabel, priceForPositionTier } from "@/lib/league-tier-prices";
 
 export interface VetriTake {
   player: string;
@@ -63,6 +64,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
   const [refreshing, setRefreshing] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const { prices: tierPrices, seasons: historySeasons } = useLeagueTierPrices();
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -242,7 +244,19 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                               {(() => {
                                 const est = scaledEstBid(t.estPrice);
                                 const sal = t.salPrice?.trim();
-                                if (!est && !sal) return null;
+                                const tierNum = parseTierLabel(t.tier);
+                                const tierAnchor = tierNum
+                                  ? priceForPositionTier(tierPrices, t.position, tierNum)
+                                  : null;
+                                // Lean-adjusted league bid: target/breakout +15%, sleeper/value baseline, fade/avoid -25%.
+                                const leanMult: Record<string, number> = {
+                                  target: 1.15, breakout: 1.15, sleeper: 1.0,
+                                  value: 1.0, neutral: 1.0, fade: 0.75, avoid: 0.6,
+                                };
+                                const leagueBid = tierAnchor
+                                  ? Math.max(1, Math.round(tierAnchor.avg * (leanMult[t.lean] ?? 1)))
+                                  : null;
+                                if (!est && !sal && !leagueBid) return null;
                                 return (
                                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                                     {sal && (
@@ -250,13 +264,21 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                         Sal: {sal}
                                       </span>
                                     )}
-                                    {est && (
+                                    {leagueBid && tierAnchor && (
+                                      <span
+                                        className="rounded-sm border border-warning/50 bg-warning/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-warning"
+                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Adjusted for "${t.lean}" lean.`}
+                                      >
+                                        League: ~${leagueBid}
+                                      </span>
+                                    )}
+                                    {est && !leagueBid && (
                                       <span className="rounded-sm border border-primary/40 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-primary">
                                         Bid ~${est}
                                       </span>
                                     )}
                                     <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground/70">
-                                      ${LEAGUE_BUDGET} league
+                                      {leagueBid ? `${historySeasons.length}yr avg · T${tierNum} ${t.position}` : `${LEAGUE_BUDGET} league`}
                                     </span>
                                   </div>
                                 );

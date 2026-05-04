@@ -80,6 +80,19 @@ export default function EspnSettings() {
     toast.success(`Synced ${data.teams?.length ?? 0} teams from ${data.league?.name}`);
   };
 
+  const syncHistory = async () => {
+    setBusy(true);
+    const { data, error } = await supabase.functions.invoke("espn-historical-draft", {
+      body: { seasonsBack: 3 },
+    });
+    setBusy(false);
+    if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "History sync failed");
+    const ok = (data.summary ?? []).filter((s: any) => s.status === "ok");
+    const skipped = (data.summary ?? []).filter((s: any) => s.status !== "ok");
+    const totalPicks = ok.reduce((s: number, x: any) => s + x.picks, 0);
+    toast.success(`Pulled ${totalPicks} picks across ${ok.length} season(s)${skipped.length ? ` · ${skipped.length} skipped` : ""}`);
+  };
+
   const copyToken = () => {
     navigator.clipboard.writeText(token);
     toast.success("Token copied");
@@ -153,9 +166,14 @@ export default function EspnSettings() {
             <Shield className="mr-1 h-3.5 w-3.5" /> Verify & list leagues
           </Button>
           {selected && (
-            <Button variant="outline" onClick={sync} disabled={busy}>
-              <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Sync league now
-            </Button>
+            <>
+              <Button variant="outline" onClick={sync} disabled={busy}>
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Sync league now
+              </Button>
+              <Button variant="outline" onClick={syncHistory} disabled={busy}>
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Pull last 3 auctions
+              </Button>
+            </>
           )}
         </div>
 
