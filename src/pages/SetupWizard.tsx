@@ -34,7 +34,8 @@ export default function SetupWizard() {
   const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup } =
     useDraftStore();
   const [step, setStep] = useState(0);
-  const [keeperInput, setKeeperInput] = useState("");
+  const [keeperName, setKeeperName] = useState("");
+  const [keeperCost, setKeeperCost] = useState("");
   const [keeperPos, setKeeperPos] = useState<Position | "">("");
   const [pricesText, setPricesText] = useState(
     prices.map((p) => `${p.name} - ${p.price}`).join("\n")
@@ -44,21 +45,27 @@ export default function SetupWizard() {
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const addKeeper = () => {
-    const parsed = parsePlayerLine(keeperInput);
-    if (!parsed) {
-      toast.error("Format: Player Name - Cost");
+    const name = keeperName.trim();
+    const cost = parseInt(keeperCost, 10);
+    if (!name) {
+      toast.error("Enter a player name");
+      return;
+    }
+    if (!Number.isFinite(cost) || cost <= 0) {
+      toast.error("Enter a valid keeper cost");
       return;
     }
     setKeepers([
       ...keepers,
       {
         id: crypto.randomUUID(),
-        player: parsed.name,
-        cost: parsed.price,
+        player: name,
+        cost,
         position: keeperPos || undefined,
       },
     ]);
-    setKeeperInput("");
+    setKeeperName("");
+    setKeeperCost("");
     setKeeperPos("");
   };
 
