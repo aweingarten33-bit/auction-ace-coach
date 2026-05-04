@@ -57,6 +57,14 @@ Deno.serve(async (req) => {
       })),
     }));
 
+    // Infer scoring from receptions stat (statId 53). 1=PPR, 0.5=Half, 0=Standard
+    const scoringItems: any[] = settings?.scoringSettings?.scoringItems ?? [];
+    const recItem = scoringItems.find((i) => i.statId === 53);
+    const recPts = typeof recItem?.points === "number" ? recItem.points : null;
+    const scoringLabel = recPts == null
+      ? null
+      : recPts >= 0.9 ? "PPR" : recPts >= 0.4 ? "Half PPR" : "Standard";
+
     return j({
       ok: true,
       league: {
@@ -66,6 +74,8 @@ Deno.serve(async (req) => {
         size: settings.size,
         budget: acq.acquisitionBudget ?? 200,
         rosterSlots: roster.lineupSlotCounts ?? {},
+        scoring: scoringLabel,
+        receptionPoints: recPts,
         draftType: draft.type,
         draftStarted: data.draftDetail?.drafted ?? false,
       },
