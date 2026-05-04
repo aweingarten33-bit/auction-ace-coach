@@ -94,6 +94,63 @@ export default function LiveDashboard() {
     BENCH: settings.roster.BENCH,
   };
 
+  // Roster gap analysis
+  const flexNeed = requiredCount.FLEX;
+  const flexHave = Math.max(
+    0,
+    (myCount.RB - requiredCount.RB) +
+      (myCount.WR - requiredCount.WR) +
+      (myCount.TE - requiredCount.TE)
+  );
+  const flexShort = Math.max(0, flexNeed - flexHave);
+
+  const gaps = (["QB", "RB", "WR", "TE", "DST", "K"] as const)
+    .filter((p) => requiredCount[p] > 0)
+    .map((pos) => {
+      const starterHave = Math.min(myCount[pos], requiredCount[pos]);
+      const starterNeed = requiredCount[pos];
+      const starterShort = Math.max(0, starterNeed - starterHave);
+      const severity: "critical" | "need" | "depth" | "done" =
+        starterShort >= 2
+          ? "critical"
+          : starterShort === 1
+          ? "need"
+          : myCount[pos] < starterNeed + 1 && (pos === "RB" || pos === "WR")
+          ? "depth"
+          : "done";
+      return { pos, starterHave, starterNeed, starterShort, severity };
+    })
+    .sort((a, b) => {
+      const order = { critical: 0, need: 1, depth: 2, done: 3 };
+      return order[a.severity] - order[b.severity];
+    });
+
+  const startersTotal =
+    requiredCount.QB + requiredCount.RB + requiredCount.WR + requiredCount.TE +
+    requiredCount.K + requiredCount.DST + requiredCount.FLEX;
+  const startersFilled = Math.min(
+    startersTotal,
+    Math.min(myCount.QB, requiredCount.QB) +
+      Math.min(myCount.RB, requiredCount.RB) +
+      Math.min(myCount.WR, requiredCount.WR) +
+      Math.min(myCount.TE, requiredCount.TE) +
+      Math.min(myCount.K, requiredCount.K) +
+      Math.min(myCount.DST, requiredCount.DST) +
+      Math.min(flexHave, flexNeed)
+  );
+  const benchFilled = Math.max(0, myItems.length - startersFilled);
+
+  // Preview the impact of currently-typed pick
+  const previewPos = position || undefined;
+  const previewSlotImpact = (() => {
+    if (!previewPos) return "";
+    const need = (requiredCount as any)[previewPos] ?? 0;
+    if (myCount[previewPos] < need) return `starter slot (${previewPos})`;
+    if (["RB", "WR", "TE"].includes(previewPos) && flexShort > 0) return "FLEX slot";
+    return "bench slot";
+  })();
+
+
   const askCoach = async (latestEvent?: any, userQuestion?: string) => {
     setStreaming(true);
     setCoachText("");
