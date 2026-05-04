@@ -10,6 +10,7 @@ import {
   SleeperPlayer,
 } from "@/lib/sleeper";
 import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle } from "lucide-react";
+import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 
 interface Props {
   open: boolean;
