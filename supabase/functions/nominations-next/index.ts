@@ -187,6 +187,7 @@ Deno.serve(async (req: Request) => {
       `## Tier Breaks (DETERMINISTIC — large gap between #1 undrafted and #2 at this position)\n${tierBreakText}`,
       `## Fallback Board (DETERMINISTIC — top undrafted per position)\n${fallbackText}`,
       `## Watchlist (user pinned)\n${(p.watchlist ?? []).join(", ") || "(none)"}`,
+      `## User Filters (HARD CONSTRAINTS — every prediction MUST satisfy these)\npositions: ${posFilter ? Array.from(posFilter).join(",") : "any"}\ntier: ${tier ?? "any"}\nprice range (going $): ${priceMin ?? "-∞"} to ${priceMax ?? "+∞"}\nIf the Fallback Board is empty due to filters, return the closest 10 candidates that still satisfy the position/tier filter, ignoring the price band as last resort and noting it in roomRead.`,
       `## Task\nCall emit_nominations with the 10 players MOST LIKELY to be nominated next, ordered by confidence DESCENDING. For each, fill in signals.trend / signals.value / signals.rosterNeed (each 0-100) so the user can see WHY. Cite the dominant signal in reason+trigger. Predictions must be undrafted players from the Fallback Board when possible.`,
     ].join("\n\n");
 
