@@ -572,6 +572,8 @@ export default function LiveDashboard() {
             prices={prices}
             gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
             maxBid={budget.maxBid}
+            remaining={budget.remaining}
+            pulseMultiplier={pulse.multiplier}
           />
           <Watchlist
             watchlist={watchlist}
