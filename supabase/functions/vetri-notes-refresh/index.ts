@@ -95,7 +95,78 @@ async function fetchTranscript(videoId: string): Promise<string | null> {
   }
 }
 
-const SUMMARY_TOOL = {
+// ---- Whisper fallback ---------------------------------------------------
+// Extracts a direct (non-ciphered) audio stream URL from the YouTube watch
+// page and sends it to OpenAI Whisper. Returns null if no usable URL is
+// available (some videos sign their URLs and require signature deciphering,
+// which we don't implement here).
+async function fetchAudioStreamUrl(videoId: string): Promise<{ url: string; mime: string } | null> {
+  try {
+    const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
+      headers: { "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9" },
+    });
+    if (!watch.ok) return null;
+    const html = await watch.text();
+    const m = html.match(/ytInitialPlayerResponse\s*=\s*(\{[\s\S]*?\})\s*;\s*(?:var|<\/script>)/);
+    if (!m) return null;
+    let player: any;
+    try { player = JSON.parse(m[1]); } catch { return null; }
+    const formats: any[] = player?.streamingData?.adaptiveFormats ?? [];
+    // audio-only mp4 (m4a) — smallest bitrate to stay under Whisper 25MB
+    const audio = formats
+      .filter((f) => typeof f?.mimeType === "string" && f.mimeType.startsWith("audio/") && f.url)
+      .sort((a, b) => (a.bitrate ?? 0) - (b.bitrate ?? 0))[0];
+    if (!audio) return null;
+    return { url: audio.url, mime: (audio.mimeType.split(";")[0] || "audio/mp4") };
+  } catch (e) {
+    console.error("audio extract error", videoId, e);
+    return null;
+  }
+}
+
+async function transcribeWithWhisper(videoId: string): Promise<string | null> {
+  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+  if (!OPENAI_API_KEY) {
+    console.warn("OPENAI_API_KEY not set, skipping Whisper fallback");
+    return null;
+  }
+  const stream = await fetchAudioStreamUrl(videoId);
+  if (!stream) {
+    console.warn("no audio stream URL for", videoId);
+    return null;
+  }
+  try {
+    const audioResp = await fetch(stream.url, { headers: { "User-Agent": UA } });
+    if (!audioResp.ok) {
+      console.warn("audio fetch failed", videoId, audioResp.status);
+      return null;
+    }
+    const buf = await audioResp.arrayBuffer();
+    if (buf.byteLength > 25 * 1024 * 1024) {
+      console.warn("audio too large for Whisper", videoId, buf.byteLength);
+      return null;
+    }
+    const ext = stream.mime.includes("webm") ? "webm" : "m4a";
+    const form = new FormData();
+    form.append("file", new Blob([buf], { type: stream.mime }), `${videoId}.${ext}`);
+    form.append("model", "whisper-1");
+    form.append("response_format", "text");
+    const wResp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
+    });
+    if (!wResp.ok) {
+      console.error("whisper error", videoId, wResp.status, await wResp.text());
+      return null;
+    }
+    const text = (await wResp.text()).trim();
+    return text || null;
+  } catch (e) {
+    console.error("whisper exception", videoId, e);
+    return null;
+  }
+}
   type: "function",
   function: {
     name: "emit_takes",
