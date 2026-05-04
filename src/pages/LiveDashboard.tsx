@@ -52,7 +52,8 @@ export default function LiveDashboard() {
     resetAll,
   } = useDraftStore();
 
-  const [input, setInput] = useState("");
+  const [playerName, setPlayerName] = useState("");
+  const [priceInput, setPriceInput] = useState("");
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
   const [coachText, setCoachText] = useState<string>(
