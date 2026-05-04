@@ -43,6 +43,7 @@ import Watchlist from "@/components/Watchlist";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
+import LiveSyncPanel from "@/components/LiveSyncPanel";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -423,6 +424,7 @@ export default function LiveDashboard() {
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
+          <LiveSyncPanel status={espnSync.status} lastEventAt={espnSync.lastEventAt} compact />
           <Card className="bg-gradient-card p-4">
             <div className="space-y-3">
               {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
