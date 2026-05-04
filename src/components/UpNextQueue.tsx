@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListMusic, RefreshCw, Eye } from "lucide-react";
+import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
+import { ValueCall, WhatIf } from "@/lib/value";
 
 export interface QueueTarget {
   name: string;
@@ -18,8 +20,15 @@ interface Props {
   openMan?: string;
   loading: boolean;
   empty: boolean;
+  pulseMultiplier: number;
+  pulseConfident: boolean;
+  watchlist: string[];
   onRefresh: () => void;
   onPick: (t: QueueTarget) => void;
+  onPin: (name: string) => void;
+  onDismiss: (name: string) => void;
+  valueFor: (name: string, bid: number) => ValueCall;
+  whatIfFor: (pos: Position, bid: number) => WhatIf;
 }
 
 function matchTone(pct: number) {
@@ -29,7 +38,35 @@ function matchTone(pct: number) {
   return "text-muted-foreground border-border bg-secondary/40";
 }
 
-export default function UpNextQueue({ targets, openMan, loading, empty, onRefresh, onPick }: Props) {
+function verdictTone(v: ValueCall["verdict"]) {
+  switch (v) {
+    case "steal": return "text-success border-success/50 bg-success/15";
+    case "value": return "text-success border-success/40 bg-success/10";
+    case "fair": return "text-muted-foreground border-border bg-secondary/40";
+    case "reach": return "text-warning border-warning/40 bg-warning/10";
+    case "overpay": return "text-destructive border-destructive/50 bg-destructive/10";
+    default: return "text-muted-foreground border-border bg-secondary/30";
+  }
+}
+
+function verdictLabel(v: ValueCall["verdict"]) {
+  return { steal: "STEAL", value: "VALUE", fair: "FAIR", reach: "REACH", overpay: "OVER", unknown: "—" }[v];
+}
+
+export default function UpNextQueue({
+  targets, openMan, loading, empty, pulseMultiplier, pulseConfident,
+  watchlist, onRefresh, onPick, onPin, onDismiss, valueFor, whatIfFor,
+}: Props) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  const pulsePct = Math.round((pulseMultiplier - 1) * 100);
+  const pulseTone =
+    !pulseConfident ? "text-muted-foreground border-border bg-secondary/40"
+    : pulsePct > 8 ? "text-warning border-warning/40 bg-warning/10"
+    : pulsePct < -8 ? "text-success border-success/40 bg-success/10"
+    : "text-muted-foreground border-border bg-secondary/40";
+  const PulseIcon = pulsePct > 4 ? TrendingUp : pulsePct < -4 ? TrendingDown : Minus;
+
   return (
     <Card className="bg-gradient-card p-4 shadow-glow">
       <div className="mb-3 flex items-center justify-between">
@@ -37,9 +74,16 @@ export default function UpNextQueue({ targets, openMan, loading, empty, onRefres
           <ListMusic className="h-3.5 w-3.5" /> Up Next
           {loading && <span className="text-muted-foreground normal-case">· tuning...</span>}
         </h2>
-        <Button size="sm" variant="ghost" onClick={onRefresh} disabled={loading} className="h-7 px-2">
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
-        </Button>
+        <div className="flex items-center gap-1.5">
+          <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums ${pulseTone}`}>
+            <PulseIcon className="h-3 w-3" />
+            Market {pulsePct >= 0 ? "+" : ""}{pulsePct}%
+            {!pulseConfident && <span className="opacity-60">·early</span>}
+          </span>
+          <Button size="sm" variant="ghost" onClick={onRefresh} disabled={loading} className="h-7 px-2">
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+          </Button>
+        </div>
       </div>
 
       {openMan && (
@@ -60,38 +104,123 @@ export default function UpNextQueue({ targets, openMan, loading, empty, onRefres
             <div key={i} className="h-[68px] animate-pulse rounded-md border border-border bg-secondary/40" />
           ))
         )}
-        {targets.map((t, i) => (
-          <button
-            key={`${t.name}-${i}`}
-            onClick={() => onPick(t)}
-            className="group relative w-full overflow-hidden rounded-md border border-border bg-secondary/40 px-3 py-2.5 text-left transition hover:border-primary/50 hover:bg-secondary/70"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background text-[11px] font-bold text-muted-foreground">
-                {i + 1}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <Badge variant="outline" className={`${POS_COLORS[t.position]} text-[10px] px-1.5 py-0`}>
-                    {t.position}
-                  </Badge>
-                  <span className="truncate font-semibold text-sm">{t.name}</span>
+        {targets.map((t, i) => {
+          const v = valueFor(t.name, t.maxBid);
+          const isPinned = watchlist.includes(t.name);
+          const isOpen = expanded === t.name;
+          const wi = isOpen ? whatIfFor(t.position, t.maxBid) : null;
+
+          return (
+            <div
+              key={`${t.name}-${i}`}
+              className="group relative overflow-hidden rounded-md border border-border bg-secondary/40 transition hover:border-primary/50"
+            >
+              <button
+                onClick={() => onPick(t)}
+                className="block w-full px-3 py-2.5 text-left"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-background text-[11px] font-bold text-muted-foreground">
+                    {i + 1}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="outline" className={`${POS_COLORS[t.position]} text-[10px] px-1.5 py-0`}>
+                        {t.position}
+                      </Badge>
+                      <span className="truncate font-semibold text-sm">{t.name}</span>
+                      {isPinned && <Pin className="h-3 w-3 shrink-0 fill-primary text-primary" />}
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+                      {t.reason}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums ${matchTone(t.matchPct)}`}>
+                      {t.matchPct}%
+                    </span>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      ≤ <span className="font-bold text-foreground">${t.maxBid}</span>
+                    </span>
+                  </div>
                 </div>
-                <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
-                  {t.reason}
-                </p>
+              </button>
+
+              {/* Action bar */}
+              <div className="flex items-center justify-between gap-2 border-t border-border/60 bg-background/30 px-2 py-1">
+                <div className="flex items-center gap-1.5">
+                  {v.hasRef ? (
+                    <span
+                      className={`rounded border px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${verdictTone(v.verdict)}`}
+                      title={`Sheet $${v.refPrice} · Going $${v.goingRate} · Bid $${t.maxBid}`}
+                    >
+                      {verdictLabel(v.verdict)}
+                      {v.goingRate != null && <span className="ml-1 font-mono opacity-80">${v.goingRate}</span>}
+                    </span>
+                  ) : (
+                    <span className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-muted-foreground">
+                      NO REF
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-0.5">
+                  <Button
+                    size="sm" variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); setExpanded(isOpen ? null : t.name); }}
+                    className="h-6 px-2 text-[10px]"
+                  >
+                    {isOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                    What if
+                  </Button>
+                  <Button
+                    size="sm" variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); isPinned ? onPin(t.name) : onPin(t.name); }}
+                    className="h-6 w-6 px-0"
+                    title={isPinned ? "Unpin" : "Pin to watchlist"}
+                  >
+                    <Pin className={`h-3 w-3 ${isPinned ? "fill-primary text-primary" : ""}`} />
+                  </Button>
+                  <Button
+                    size="sm" variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); onDismiss(t.name); }}
+                    className="h-6 w-6 px-0"
+                    title="Dismiss"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-1">
-                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums ${matchTone(t.matchPct)}`}>
-                  {t.matchPct}% match
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground">
-                  bid ≤ <span className="font-bold text-foreground">${t.maxBid}</span>
-                </span>
-              </div>
+
+              {isOpen && wi && (
+                <div className="border-t border-border/60 bg-background/40 px-3 py-2 text-[11px]">
+                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    If you win at ${t.maxBid}
+                  </p>
+                  <div className="grid grid-cols-3 gap-2 font-mono">
+                    <div>
+                      <p className="text-[9px] uppercase text-muted-foreground">Budget</p>
+                      <p className="font-bold">${wi.after.remaining}</p>
+                      <p className="text-[9px] text-warning">{wi.budgetDelta}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase text-muted-foreground">Max bid</p>
+                      <p className="font-bold">${wi.after.maxBid}</p>
+                      <p className="text-[9px] text-warning">{wi.maxBidDelta >= 0 ? "+" : ""}{wi.maxBidDelta}</p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] uppercase text-muted-foreground">Slot</p>
+                      <p className="font-bold uppercase">{wi.fillsSlot}</p>
+                      <p className="text-[9px] text-muted-foreground">{wi.after.slotsLeft} left</p>
+                    </div>
+                  </div>
+                  <p className="mt-1.5 text-[10px] text-muted-foreground">
+                    {t.position} need after: <span className="font-semibold text-foreground">{wi.newGapSeverityForPos.toUpperCase()}</span>
+                  </p>
+                </div>
+              )}
             </div>
-          </button>
-        ))}
+          );
+        })}
       </div>
     </Card>
   );
