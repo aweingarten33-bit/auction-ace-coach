@@ -34,7 +34,8 @@ export default function SetupWizard() {
   const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup } =
     useDraftStore();
   const [step, setStep] = useState(0);
-  const [keeperInput, setKeeperInput] = useState("");
+  const [keeperName, setKeeperName] = useState("");
+  const [keeperCost, setKeeperCost] = useState("");
   const [keeperPos, setKeeperPos] = useState<Position | "">("");
   const [pricesText, setPricesText] = useState(
     prices.map((p) => `${p.name} - ${p.price}`).join("\n")
@@ -44,21 +45,27 @@ export default function SetupWizard() {
   const back = () => setStep((s) => Math.max(0, s - 1));
 
   const addKeeper = () => {
-    const parsed = parsePlayerLine(keeperInput);
-    if (!parsed) {
-      toast.error("Format: Player Name - Cost");
+    const name = keeperName.trim();
+    const cost = parseInt(keeperCost, 10);
+    if (!name) {
+      toast.error("Enter a player name");
+      return;
+    }
+    if (!Number.isFinite(cost) || cost <= 0) {
+      toast.error("Enter a valid keeper cost");
       return;
     }
     setKeepers([
       ...keepers,
       {
         id: crypto.randomUUID(),
-        player: parsed.name,
-        cost: parsed.price,
+        player: name,
+        cost,
         position: keeperPos || undefined,
       },
     ]);
-    setKeeperInput("");
+    setKeeperName("");
+    setKeeperCost("");
     setKeeperPos("");
   };
 
@@ -198,15 +205,23 @@ export default function SetupWizard() {
                 <span className="font-bold text-primary">${settings.totalBudget - keeperSpend}</span>{" "}
                 <span className="text-muted-foreground">(${keeperSpend} spent on {keepers.length} keepers)</span>
               </p>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-[1fr_90px_80px_auto] gap-2">
                 <Input
-                  placeholder="Player Name - Cost"
-                  value={keeperInput}
-                  onChange={(e) => setKeeperInput(e.target.value)}
+                  placeholder="Player name"
+                  value={keeperName}
+                  onChange={(e) => setKeeperName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addKeeper()}
+                />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Cost $"
+                  value={keeperCost}
+                  onChange={(e) => setKeeperCost(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && addKeeper()}
                 />
                 <Select value={keeperPos} onValueChange={(v) => setKeeperPos(v as Position)}>
-                  <SelectTrigger className="w-24"><SelectValue placeholder="Pos" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
                   <SelectContent>
                     {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                   </SelectContent>
