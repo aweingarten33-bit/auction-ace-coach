@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, Star, ShieldAlert, Tag, Info } from "lucide-react";
+import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
 import { ValueCall, WhatIf } from "@/lib/value";
