@@ -158,3 +158,25 @@ export function byeWeekForTeam(team?: string | null): number | undefined {
   if (!team) return undefined;
   return NFL_BYE_WEEKS_2025[team.toUpperCase()];
 }
+
+export interface TrendingAdd {
+  player_id: string;
+  count: number;
+  player?: SleeperPlayer;
+}
+
+export async function fetchTrendingAdds(
+  lookbackHours = 24,
+  limit = 25,
+): Promise<TrendingAdd[]> {
+  const [resp, players] = await Promise.all([
+    fetch(`https://api.sleeper.app/v1/players/nfl/trending/add?lookback_hours=${lookbackHours}&limit=${limit}`),
+    loadSleeperPlayers(),
+  ]);
+  if (!resp.ok) throw new Error("Sleeper trending fetch failed");
+  const raw: { player_id: string; count: number }[] = await resp.json();
+  const byId = new Map(players.map((p) => [p.player_id, p]));
+  return raw
+    .map((r) => ({ ...r, player: byId.get(r.player_id) }))
+    .filter((r) => r.player && (r.player.position && r.player.position !== "K"));
+}

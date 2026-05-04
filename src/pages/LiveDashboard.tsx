@@ -38,6 +38,7 @@ import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
+import MarketHeat from "@/components/MarketHeat";
 import Watchlist from "@/components/Watchlist";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
@@ -565,6 +566,12 @@ export default function LiveDashboard() {
             onDismiss={handleDismiss}
             valueFor={valueFor}
             whatIfFor={whatIfFor}
+          />
+          <MarketHeat
+            events={events}
+            prices={prices}
+            gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
+            maxBid={budget.maxBid}
           />
           <Watchlist
             watchlist={watchlist}
