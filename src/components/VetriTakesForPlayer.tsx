@@ -29,7 +29,7 @@ interface Props {
   compact?: boolean;
 }
 
-export default function VetriTakesForPlayer({ player, emptyText = "No Sal takes on this player yet.", compact }: Props) {
+export default function VetriTakesForPlayer({ player, emptyText = "No analyst takes on this player yet.", compact }: Props) {
   const [matches, setMatches] = useState<VetriTakeMatch[] | null>(null);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function VetriTakesForPlayer({ player, emptyText = "No Sal takes 
   }, [player]);
 
   if (matches === null) {
-    return <p className="text-[10px] italic text-muted-foreground">Loading Sal's takes…</p>;
+    return <p className="text-[10px] italic text-muted-foreground">Loading analyst takes…</p>;
   }
   if (matches.length === 0) {
     return <p className="text-[10px] italic text-muted-foreground">{emptyText}</p>;

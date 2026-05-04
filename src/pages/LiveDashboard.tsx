@@ -566,7 +566,7 @@ export default function LiveDashboard() {
                 The Auction Room
               </h1>
               <p className="font-lower-third mt-0.5 truncate text-[8px] text-accent">
-                ESPN-Style · Fantasy Focus × Vetri
+                ESPN-Style · Auction Coach
               </p>
             </div>
           </div>
@@ -758,7 +758,7 @@ export default function LiveDashboard() {
           <Tabs defaultValue="targets" className="w-full">
             <TabsList className="grid w-full grid-cols-4 h-9">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
-              <TabsTrigger value="vetri" className="text-[11px]">Vetri</TabsTrigger>
+              <TabsTrigger value="vetri" className="text-[11px]">Notes</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
               <TabsTrigger value="forecast" className="text-[11px]">Forecast</TabsTrigger>
             </TabsList>
@@ -796,7 +796,7 @@ export default function LiveDashboard() {
                   setPlayerName(name);
                   setPosition(pos);
                   setDrafter("me");
-                  toast(`${name} loaded from Vetri Notes`);
+                  toast(`${name} loaded from analyst notes`);
                 }}
               />
               <VetriTierSheet />
