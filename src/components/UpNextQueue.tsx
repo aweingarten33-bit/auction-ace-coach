@@ -141,12 +141,48 @@ export default function UpNextQueue({
                       <Badge variant="outline" className={`${POS_COLORS[t.position]} text-[10px] px-1.5 py-0`}>
                         {t.position}
                       </Badge>
-                      <span className="truncate font-semibold text-sm">{t.name}</span>
+                      {t.dossier ? (
+                        <HoverCard openDelay={150}>
+                          <HoverCardTrigger asChild>
+                            <span className="flex min-w-0 items-center gap-1 truncate font-semibold text-sm cursor-help">
+                              {t.name}
+                              <Info className="h-2.5 w-2.5 shrink-0 text-muted-foreground/70" />
+                            </span>
+                          </HoverCardTrigger>
+                          <HoverCardContent side="top" className="w-64 text-[11px] leading-snug">
+                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Dossier</p>
+                            <p>{t.dossier}</p>
+                          </HoverCardContent>
+                        </HoverCard>
+                      ) : (
+                        <span className="truncate font-semibold text-sm">{t.name}</span>
+                      )}
                       {isPinned && <Pin className="h-3 w-3 shrink-0 fill-primary text-primary" />}
+                      {t.grade != null && (
+                        <span className="ml-auto flex shrink-0 items-center gap-0.5 text-[10px] font-bold tabular-nums text-warning" title="Coach grade">
+                          <Star className="h-2.5 w-2.5 fill-warning" />{t.grade}
+                        </span>
+                      )}
                     </div>
                     <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
                       {t.reason}
                     </p>
+                    {t.worstCase && (
+                      <p className="mt-1 flex items-start gap-1 text-[10px] leading-snug text-warning/90">
+                        <ShieldAlert className="mt-0.5 h-2.5 w-2.5 shrink-0" />
+                        <span><span className="font-semibold">If you pass:</span> {t.worstCase}</span>
+                      </p>
+                    )}
+                    {t.knockoff && t.knockoff.name.toLowerCase() !== t.name.toLowerCase() && (
+                      <p className="mt-1 flex items-center gap-1 text-[10px] leading-snug text-success/90">
+                        <Tag className="h-2.5 w-2.5 shrink-0" />
+                        <span>
+                          <span className="font-semibold">Knockoff:</span> {t.knockoff.name}
+                          <span className="ml-1 font-mono">${t.knockoff.price}</span>
+                          <span className="ml-1 opacity-70">(save ${Math.max(0, t.maxBid - t.knockoff.price)})</span>
+                        </span>
+                      </p>
+                    )}
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums ${matchTone(t.matchPct)}`}>
