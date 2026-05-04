@@ -65,6 +65,40 @@ export function valueFor(
   return { hasRef: true, refPrice: ref, goingRate, delta, verdict };
 }
 
+/** Tyson — smallest "knockout" bid likely to end a war: going rate + small premium, capped by maxBid. */
+export interface Knockout {
+  bid: number | null;          // null if we can't justify (no ref or maxBid too tight)
+  premium: number;             // $ over going rate
+  confident: boolean;          // ref exists AND room is calibrated
+  reason: string;              // short copy
+}
+
+export function knockoutBid(
+  name: string,
+  prices: PriceEstimate[],
+  pulse: MarketPulse,
+  maxBid: number,
+): Knockout {
+  const map = buildPriceMap(prices);
+  const ref = map.get(norm(name));
+  if (!ref || ref <= 0 || maxBid < 2) {
+    return { bid: null, premium: 0, confident: false, reason: "no ref" };
+  }
+  const goingRate = Math.max(1, Math.round(ref * pulse.multiplier));
+  // Premium scales with going rate but stays cheap: ~12% with floor of $2.
+  const premium = Math.max(2, Math.ceil(goingRate * 0.12));
+  const target = goingRate + premium;
+  if (target > maxBid) {
+    // Best we can do without breaking budget — only worth it if we're already at/over going rate
+    if (maxBid >= goingRate + 1) {
+      return { bid: maxBid, premium: maxBid - goingRate, confident: pulse.confident, reason: "max bid KO" };
+    }
+    return { bid: null, premium: 0, confident: false, reason: "max bid too tight" };
+  }
+  return { bid: target, premium, confident: pulse.confident, reason: "ends the war" };
+}
+
+
 /** Reed Richards — preview the post-pick state if user logs this pick at this price. */
 export interface WhatIf {
   before: BudgetState;
