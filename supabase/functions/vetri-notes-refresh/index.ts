@@ -301,20 +301,26 @@ Deno.serve(async (req: Request) => {
       );
 
       let transcript = await fetchTranscript(item.videoId);
-      let source: "captions" | "description" = "captions";
+      let source: "captions" | "description" | "whisper" = "captions";
       if (!transcript) {
-        // Fallback: many of Sal's videos have detailed timestamped descriptions
-        // listing player takes. Use that instead of bailing.
+        // Fallback 1: timestamped descriptions (cheap, often present)
         if (item.description && item.description.length > 120) {
           transcript = item.description;
           source = "description";
         } else {
-          await sb
-            .from("vetri_notes")
-            .update({ status: "no_transcript", error: "No captions or description available" })
-            .eq("video_id", item.videoId);
-          results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
-          continue;
+          // Fallback 2: Whisper audio transcription (paid)
+          const whisperText = await transcribeWithWhisper(item.videoId);
+          if (whisperText && whisperText.length > 100) {
+            transcript = whisperText;
+            source = "whisper";
+          } else {
+            await sb
+              .from("vetri_notes")
+              .update({ status: "no_transcript", error: "No captions, description, or Whisper transcript available" })
+              .eq("video_id", item.videoId);
+            results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
+            continue;
+          }
         }
       }
 
