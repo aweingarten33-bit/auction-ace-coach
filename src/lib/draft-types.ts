@@ -1,6 +1,7 @@
 export type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DST";
 export type Scoring = "PPR" | "Half PPR" | "Standard";
 export type LeagueType = "Standard" | "Superflex" | "2QB";
+export type LeagueFormat = "Redraft" | "Keeper" | "Dynasty";
 
 export interface RosterSlots {
   QB: number;
