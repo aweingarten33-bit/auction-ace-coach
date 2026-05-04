@@ -335,24 +335,27 @@ const SUMMARY_TOOL = {
   },
 };
 
-async function distill(title: string, transcript: string, source: "captions" | "description" | "whisper" = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
+type Source = "captions" | "description" | "whisper" | "blog";
+
+async function distill(title: string, transcript: string, source: Source = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
-  // Cap transcript length to keep token usage sane
   const trimmed = transcript.length > 28000 ? transcript.slice(0, 28000) + " [truncated]" : transcript;
 
-  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's YouTube content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
+  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
 
   const sourceNote = source === "description"
-    ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Descriptions often contain timestamped player lists like '2:15 - Bijan Robinson (target)'. Treat each entry as Sal's stated take. If a description entry has no clear lean, use 'neutral'."
+    ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Treat each entry as Sal's stated take."
     : source === "whisper"
-    ? "## Source\nThis is a WHISPER audio transcription (no captions were available). Expect occasional misspellings of player names — normalize to the most likely real NFL player."
+    ? "## Source\nThis is a WHISPER audio transcription. Expect occasional misspellings of player names — normalize to the most likely real NFL player."
+    : source === "blog"
+    ? "## Source\nThis is Sal's WRITTEN BLOG POST mirroring the video. It is well-formatted with numbered player headers — extract every named player."
     : "";
   const expected = expectedTakeCountFromTitle(title);
   const countInstruction = expected
     ? `The title promises ${expected} players. Extract exactly ${expected} player takes if the content contains them. Do not return zero takes unless the content truly contains no player names.`
     : "Extract every clearly named player take. Do not return zero takes if specific player names are present.";
-  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic video recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
+  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
