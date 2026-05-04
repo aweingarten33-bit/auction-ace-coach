@@ -368,26 +368,29 @@ export default function LiveDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 border-b border-border bg-card/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between p-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-primary">
-              <Trophy className="h-4 w-4 text-primary-foreground" />
+      <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary">
+              <Trophy className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-sm font-bold leading-tight">Auction Draft AI Coach</h1>
-              <p className="text-[10px] text-muted-foreground leading-tight">
-                ${budget.remaining} left · {budget.slotsLeft} slots · max ${budget.maxBid}
-              </p>
-            </div>
+            <h1 className="truncate text-[13px] font-semibold leading-tight tracking-tight">Auction Coach</h1>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+          {/* Compact live budget — Awwwards single-accent emphasis on remaining */}
+          <div className="flex items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
+            <span><AnimatedNumber value={budget.remaining} prefix="$" className="font-bold text-primary" /> <span className="opacity-70">left</span></span>
+            <span className="hidden xs:inline opacity-40">·</span>
+            <span><AnimatedNumber value={budget.maxBid} prefix="$" className="font-bold text-foreground" /> <span className="opacity-70">max</span></span>
+            <span className="hidden xs:inline opacity-40">·</span>
+            <span><AnimatedNumber value={budget.slotsLeft} className="font-bold text-foreground" /><span className="opacity-70"> slots</span></span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="h-8 w-8 p-0">
               <Settings2 className="h-4 w-4" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm"><RotateCcw className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><RotateCcw className="h-4 w-4" /></Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
