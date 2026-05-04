@@ -47,6 +47,7 @@ import LiveSyncPanel from "@/components/LiveSyncPanel";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import DraftIntelTicker from "@/components/DraftIntelTicker";
 import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
+import VetriTierSheet from "@/components/VetriTierSheet";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -718,6 +719,7 @@ export default function LiveDashboard() {
             maxBid={budget.maxBid}
           />
           <OpponentHeatmap settings={settings} />
+          <VetriTierSheet />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">

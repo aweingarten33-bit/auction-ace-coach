@@ -7,6 +7,13 @@ import {
   LeagueSettings,
   PriceEstimate,
 } from "./draft-types";
+import {
+  computeTierValues,
+  mergeVetriIntoPrices,
+  VetriRanking,
+} from "./vetri-tiers";
+
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 interface DraftState {
   settings: LeagueSettings;
@@ -16,11 +23,17 @@ interface DraftState {
   setupComplete: boolean;
   watchlist: string[];      // pinned player names (Spotify "save for later")
   dismissed: string[];      // queue dismissals — filtered from next refresh
+  // Vetri tier sheet (auto-mapped to $ values feeding prices/coach)
+  vetriRankings: VetriRanking[];
+  vetriDecay: number;       // tier decay 0.4-0.8 (default 0.55)
+  vetriAutoSync: boolean;   // re-merge into prices when settings/tiers change
+  priceOverrides: string[]; // normalized player names where user manually set price (Vetri won't overwrite)
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
   setKeepers: (k: Keeper[]) => void;
   setPrices: (p: PriceEstimate[]) => void;
+  setPlayerPrice: (name: string, price: number, override?: boolean) => void;
   addEvent: (e: DraftEvent) => void;
   undoEvent: () => void;
   completeSetup: () => void;
@@ -29,11 +42,18 @@ interface DraftState {
   unpinPlayer: (name: string) => void;
   dismissPlayer: (name: string) => void;
   clearDismissed: () => void;
+  // Vetri actions
+  setVetriRankings: (r: VetriRanking[]) => void;
+  setVetriDecay: (d: number) => void;
+  setVetriAutoSync: (b: boolean) => void;
+  syncVetriToPrices: () => void;
+  clearPriceOverride: (name: string) => void;
+  clearVetri: () => void;
 }
 
 export const useDraftStore = create<DraftState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       settings: DEFAULT_SETTINGS,
       keepers: [],
       prices: [],
@@ -41,17 +61,50 @@ export const useDraftStore = create<DraftState>()(
       setupComplete: false,
       watchlist: [],
       dismissed: [],
+      vetriRankings: [],
+      vetriDecay: 0.55,
+      vetriAutoSync: true,
+      priceOverrides: [],
       setSettings: (s) =>
-        set((state) => ({ settings: { ...state.settings, ...s } })),
+        set((state) => {
+          const next = { ...state.settings, ...s };
+          // Auto-recompute Vetri values when budget/teams/scoring/leagueType change
+          if (state.vetriAutoSync && state.vetriRankings.length) {
+            const computed = computeTierValues(state.vetriRankings, next, state.vetriDecay);
+            const prices = mergeVetriIntoPrices(state.prices, computed, new Set(state.priceOverrides));
+            return { settings: next, prices };
+          }
+          return { settings: next };
+        }),
       setRoster: (key, value) =>
-        set((state) => ({
-          settings: {
+        set((state) => {
+          const settings = {
             ...state.settings,
             roster: { ...state.settings.roster, [key]: value },
-          },
-        })),
+          };
+          if (state.vetriAutoSync && state.vetriRankings.length) {
+            const computed = computeTierValues(state.vetriRankings, settings, state.vetriDecay);
+            const prices = mergeVetriIntoPrices(state.prices, computed, new Set(state.priceOverrides));
+            return { settings, prices };
+          }
+          return { settings };
+        }),
       setKeepers: (k) => set({ keepers: k }),
       setPrices: (p) => set({ prices: p }),
+      setPlayerPrice: (name, price, override = true) =>
+        set((state) => {
+          const key = norm(name);
+          const existing = state.prices.find((pp) => norm(pp.name) === key);
+          const nextPrices = existing
+            ? state.prices.map((pp) => (norm(pp.name) === key ? { ...pp, price } : pp))
+            : [...state.prices, { name, price }];
+          const overrides = override
+            ? state.priceOverrides.includes(key)
+              ? state.priceOverrides
+              : [...state.priceOverrides, key]
+            : state.priceOverrides;
+          return { prices: nextPrices, priceOverrides: overrides };
+        }),
       addEvent: (e) => set((state) => ({ events: [...state.events, e] })),
       undoEvent: () =>
         set((state) => ({ events: state.events.slice(0, -1) })),
@@ -65,6 +118,10 @@ export const useDraftStore = create<DraftState>()(
           setupComplete: false,
           watchlist: [],
           dismissed: [],
+          vetriRankings: [],
+          vetriDecay: 0.55,
+          vetriAutoSync: true,
+          priceOverrides: [],
         }),
       pinPlayer: (name) =>
         set((s) => (s.watchlist.includes(name) ? s : { watchlist: [...s.watchlist, name] })),
@@ -73,6 +130,31 @@ export const useDraftStore = create<DraftState>()(
       dismissPlayer: (name) =>
         set((s) => (s.dismissed.includes(name) ? s : { dismissed: [...s.dismissed, name] })),
       clearDismissed: () => set({ dismissed: [] }),
+      setVetriRankings: (rankings) =>
+        set((state) => {
+          if (!state.vetriAutoSync) return { vetriRankings: rankings };
+          const computed = computeTierValues(rankings, state.settings, state.vetriDecay);
+          const prices = mergeVetriIntoPrices(state.prices, computed, new Set(state.priceOverrides));
+          return { vetriRankings: rankings, prices };
+        }),
+      setVetriDecay: (decay) =>
+        set((state) => {
+          if (!state.vetriAutoSync || !state.vetriRankings.length) return { vetriDecay: decay };
+          const computed = computeTierValues(state.vetriRankings, state.settings, decay);
+          const prices = mergeVetriIntoPrices(state.prices, computed, new Set(state.priceOverrides));
+          return { vetriDecay: decay, prices };
+        }),
+      setVetriAutoSync: (b) => set({ vetriAutoSync: b }),
+      syncVetriToPrices: () => {
+        const s = get();
+        if (!s.vetriRankings.length) return;
+        const computed = computeTierValues(s.vetriRankings, s.settings, s.vetriDecay);
+        const prices = mergeVetriIntoPrices(s.prices, computed, new Set(s.priceOverrides));
+        set({ prices });
+      },
+      clearPriceOverride: (name) =>
+        set((s) => ({ priceOverrides: s.priceOverrides.filter((n) => n !== norm(name)) })),
+      clearVetri: () => set({ vetriRankings: [] }),
     }),
     { name: "auction-draft-coach-v1" }
   )
