@@ -45,7 +45,7 @@ import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import LiveSyncPanel from "@/components/LiveSyncPanel";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import QuoteTicker from "@/components/QuoteTicker";
+import DraftIntelTicker from "@/components/DraftIntelTicker";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -393,7 +393,24 @@ export default function LiveDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <QuoteTicker />
+      <DraftIntelTicker
+        remaining={budget.remaining}
+        maxBid={budget.maxBid}
+        slotsLeft={budget.slotsLeft}
+        avgPerSlot={budget.avgPerSlot}
+        events={events}
+        prices={prices}
+        pulse={pulse}
+        gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort }))}
+        spendByPosition={spend}
+        recentRuns={runs}
+        topTarget={queue[0] ? { name: queue[0].name, position: queue[0].position, maxBid: queue[0].maxBid } : null}
+        lastPickVerdict={(() => {
+          const last = events[events.length - 1];
+          if (!last) return null;
+          return { player: last.player, bid: last.price, call: valueFor(last.player, last.price) };
+        })()}
+      />
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
