@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, Zap } from "lucide-react";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
-import { ValueCall, WhatIf } from "@/lib/value";
+import { ValueCall, WhatIf, Knockout } from "@/lib/value";
 
 export interface QueueTarget {
   name: string;
