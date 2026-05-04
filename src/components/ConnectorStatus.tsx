@@ -72,10 +72,10 @@ export default function ConnectorStatus() {
       setRecent((ev as EventRow[]) ?? []);
 
       // Try to derive league name from the most recent event raw payload, falling back to ID
-      const fromEvt = (ev ?? []).find((r: any) => r?.raw?.league?.name);
+      const fromEvt = (ev ?? []).find((r: any) => r?.raw?.league?.name) as any;
       if (c?.league_id) {
         setLeague({
-          name: fromEvt?.raw?.league?.name,
+          name: fromEvt?.raw?.league?.name as string | undefined,
           id: c.league_id,
           season: c.season_id ?? undefined,
         });
