@@ -120,6 +120,7 @@ function buildUserMessage(p: CoachPayload): string {
         .map((t) => `[${t.lean.toUpperCase()}] ${t.player} (${t.position})${t.tier ? ` · ${t.tier}` : ""} — ${t.reasoning}`)
         .join("\n")}`
     );
+  }
   if (p.events?.length) {
     parts.push(
       `## Draft Log (chronological)\n${p.events
