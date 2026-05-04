@@ -245,7 +245,15 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                               {(() => {
                                 const est = scaledEstBid(t.estPrice);
                                 const sal = t.salPrice?.trim();
-                                const tierNum = parseTierLabel(t.tier);
+                                let tierNum = parseTierLabel(t.tier);
+                                let tierSource: "sal" | "rank" | null = tierNum ? "sal" : null;
+                                if (!tierNum) {
+                                  const rank = lookupPlayerRank(t.player);
+                                  if (rank?.pos_rank && rank.position) {
+                                    tierNum = tierForPosRank(rank.position, rank.pos_rank);
+                                    tierSource = "rank";
+                                  }
+                                }
                                 const tierAnchor = tierNum
                                   ? priceForPositionTier(tierPrices, t.position, tierNum)
                                   : null;
