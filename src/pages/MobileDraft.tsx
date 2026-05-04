@@ -311,24 +311,93 @@ function LogTab(props: {
             onChange={setPlayerName}
             onSelect={(p) => p.position && POSITIONS.includes(p.position as Position) && setPosition(p.position as Position)}
           />
-          <div className="grid grid-cols-[1fr_110px] gap-2">
-            <div className="relative">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-base text-muted-foreground">$</span>
-              <Input
-                type="number" inputMode="numeric" pattern="[0-9]*"
-                placeholder="Price"
-                value={priceInput}
-                onChange={(e) => setPriceInput(e.target.value)}
-                className="h-12 pl-7 text-base font-semibold"
-              />
-            </div>
-            <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-              <SelectTrigger className="h-12 text-base"><SelectValue placeholder="Pos" /></SelectTrigger>
-              <SelectContent>
-                {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-              </SelectContent>
-            </Select>
+
+          {/* Big price display + increment chips */}
+          <div className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/40 px-3 py-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Price</span>
+            <span className="font-mono text-2xl font-bold tabular-nums text-primary">
+              ${priceInput || "0"}
+            </span>
           </div>
+
+          {/* Quick increments */}
+          <div className="grid grid-cols-5 gap-1.5">
+            {[1, 5, 10, 25, 50].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => {
+                  const cur = parseInt(priceInput, 10) || 0;
+                  setPriceInput(String(cur + n));
+                }}
+                className="rounded-md border border-border/60 bg-card py-2 text-xs font-semibold tabular-nums hover:bg-secondary active:scale-95 transition"
+              >
+                +{n}
+              </button>
+            ))}
+          </div>
+
+          {/* Numeric keypad — no iOS keyboard needed */}
+          <div className="grid grid-cols-3 gap-1.5">
+            {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
+              <button
+                key={d}
+                type="button"
+                onClick={() => {
+                  // prevent leading zero / runaway length
+                  const next = (priceInput === "0" ? "" : priceInput) + d;
+                  if (next.length <= 4) setPriceInput(next);
+                }}
+                className="rounded-lg border border-border/60 bg-card py-3 text-xl font-bold tabular-nums hover:bg-secondary active:scale-95 transition"
+              >
+                {d}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setPriceInput("")}
+              className="rounded-lg border border-border/60 bg-card py-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:bg-secondary active:scale-95 transition"
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const next = (priceInput === "" ? "" : priceInput) + "0";
+                if (priceInput && next.length <= 4) setPriceInput(next);
+              }}
+              className="rounded-lg border border-border/60 bg-card py-3 text-xl font-bold tabular-nums hover:bg-secondary active:scale-95 transition"
+            >
+              0
+            </button>
+            <button
+              type="button"
+              onClick={() => setPriceInput(priceInput.slice(0, -1))}
+              className="rounded-lg border border-border/60 bg-card py-3 text-base font-bold hover:bg-secondary active:scale-95 transition"
+              aria-label="Backspace"
+            >
+              ⌫
+            </button>
+          </div>
+
+          {/* Position chips — one tap, no dropdown */}
+          <div className="grid grid-cols-6 gap-1">
+            {POSITIONS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPosition(position === p ? "" : p)}
+                className={`rounded-md border py-2 text-[11px] font-bold tracking-wide transition active:scale-95 ${
+                  position === p
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border/60 bg-card text-muted-foreground hover:bg-secondary"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+
           <Button variant="outline" className="w-full" onClick={onUndo} disabled={!events.length}>
             <Undo2 className="mr-1 h-4 w-4" /> Undo last
           </Button>
