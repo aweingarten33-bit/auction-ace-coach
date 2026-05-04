@@ -322,15 +322,18 @@ Deno.serve(async (req: Request) => {
 
     const { data: existing } = await sb
       .from("vetri_notes")
-      .select("video_id, status")
+      .select("video_id, status, takes")
       .in("video_id", items.map((i) => i.videoId));
-    const existingMap = new Map((existing ?? []).map((r) => [r.video_id, r.status]));
+    const existingMap = new Map((existing ?? []).map((r) => [r.video_id, r]));
 
     const results: { videoId: string; title: string; status: string; error?: string }[] = [];
 
     for (const item of items) {
       const prior = existingMap.get(item.videoId);
-      if (!force && prior === "ready") {
+      const priorTakeCount = Array.isArray(prior?.takes) ? prior.takes.length : 0;
+      const expected = expectedTakeCountFromTitle(item.title);
+      const hasUsefulCache = prior?.status === "ready" && priorTakeCount > 0 && (expected == null || priorTakeCount >= Math.min(expected, 3));
+      if (!force && hasUsefulCache) {
         results.push({ videoId: item.videoId, title: item.title, status: "skipped" });
         continue;
       }
