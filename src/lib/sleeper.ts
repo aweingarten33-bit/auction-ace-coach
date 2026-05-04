@@ -11,6 +11,14 @@ export interface SleeperPlayer {
   age?: number | null;
   years_exp?: number | null;
   status?: string | null;
+  injury_status?: string | null;
+  injury_notes?: string | null;
+  injury_body_part?: string | null;
+  number?: number | null;
+  height?: string | null;
+  weight?: string | null;
+  depth_chart_order?: number | null;
+  depth_chart_position?: string | null;
   fantasy_positions?: string[] | null;
   search_rank?: number | null;
 }
