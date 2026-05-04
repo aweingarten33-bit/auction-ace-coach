@@ -18,6 +18,7 @@ interface FeedItem {
   title: string;
   url: string;
   publishedAt: string | null;
+  description: string;
 }
 
 function parseFeed(xml: string, max: number): FeedItem[] {
