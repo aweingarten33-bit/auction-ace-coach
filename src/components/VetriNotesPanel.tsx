@@ -102,7 +102,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
       if (!resp.ok) {
         if (resp.status === 429) toast.error("Rate limited. Try again shortly.");
         else if (resp.status === 402) toast.error("AI credits exhausted.");
-        else toast.error("Vetri sync failed.");
+        else toast.error("Notes sync failed.");
         return;
       }
       const json = await resp.json();
@@ -113,7 +113,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
       await loadNotes();
     } catch (e) {
       console.error(e);
-      toast.error("Vetri sync error");
+      toast.error("Notes sync error");
     } finally {
       setRefreshing(false);
     }
@@ -126,7 +126,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
       <div className="mb-3 flex items-start justify-between gap-2">
         <div>
           <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-            <Youtube className="h-3.5 w-3.5 text-destructive" /> Vetri Notes
+            <Youtube className="h-3.5 w-3.5 text-destructive" /> Analyst Notes
             <span className="font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE TAKE TAPE</span>
           </h2>
           <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
@@ -151,7 +151,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search Sal's takes by player…"
+          placeholder="Search analyst takes by player…"
           className="h-8 pl-7 pr-7 text-xs"
         />
         {search && (
@@ -171,7 +171,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
           <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wide text-primary">
             Sal on "{search.trim()}"
           </p>
-          <VetriTakesForPlayer player={search.trim()} emptyText="No takes from Sal on that player yet." />
+          <VetriTakesForPlayer player={search.trim()} emptyText="No analyst takes on that player yet." />
         </div>
       )}
 
@@ -181,7 +181,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
 
       {!loading && !notes.length && (
         <p className="py-4 text-center font-mono text-[11px] text-muted-foreground">
-          No notes yet. Click "Pull videos" to fetch Sal's latest 5 uploads.
+          No notes yet. Click "Pull videos" to fetch the latest 5 uploads.
         </p>
       )}
 
@@ -276,7 +276,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                     {leagueBid && tierAnchor && (
                                       <span
                                         className="rounded-sm border border-warning/50 bg-warning/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-warning"
-                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Tier ${tierSource === "rank" ? "auto-derived from ESPN positional rank" : "from Sal"}. Adjusted for "${t.lean}" lean.`}
+                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Tier ${tierSource === "rank" ? "auto-derived from ESPN positional rank" : "from analyst"}. Adjusted for "${t.lean}" lean.`}
                                       >
                                         League: ~${leagueBid}
                                       </span>

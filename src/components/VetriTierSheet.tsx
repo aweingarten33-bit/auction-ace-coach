@@ -92,12 +92,12 @@ export default function VetriTierSheet() {
 
   const handleSync = () => {
     syncVetriToPrices();
-    toast.success("Prices re-synced from Vetri tiers");
+    toast.success("Prices re-synced from analyst tiers");
   };
 
   const handleClear = () => {
     clearVetri();
-    toast("Vetri rankings cleared");
+    toast("Analyst rankings cleared");
   };
 
   const overrideCount = priceOverrides.length;
@@ -122,7 +122,7 @@ export default function VetriTierSheet() {
           value={paste}
           onChange={(e) => setPaste(e.target.value)}
           placeholder={
-            "Paste Vetri's tier list — any of these formats:\n\n" +
+            "Paste an analyst tier list — any of these formats:\n\n" +
             "Bijan Robinson, RB, 1\n" +
             "Saquon Barkley, RB, 1, 60   ← optional $ override\n" +
             "Christian McCaffrey, RB, 1\n\n" +
@@ -177,7 +177,7 @@ export default function VetriTierSheet() {
 
           {overrideCount > 0 && (
             <p className="font-mono text-[9px] text-accent">
-              {overrideCount} manual price override{overrideCount === 1 ? "" : "s"} preserved (won't be touched by Vetri sync)
+              {overrideCount} manual price override{overrideCount === 1 ? "" : "s"} preserved (won't be touched by analyst sync)
             </p>
           )}
         </div>
@@ -230,7 +230,7 @@ export default function VetriTierSheet() {
                               {isOverride && (
                                 <span
                                   className="font-lower-third text-[8px] text-accent"
-                                  title="You set this price manually — Vetri sync skips it"
+                                  title="You set this price manually — analyst sync skips it"
                                 >
                                   PINNED
                                 </span>
