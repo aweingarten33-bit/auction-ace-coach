@@ -37,8 +37,10 @@ import { DraftEvent, Position } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
+import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
+const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
@@ -63,6 +65,9 @@ export default function LiveDashboard() {
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
   const coachRef = useRef<HTMLDivElement>(null);
+  const [queue, setQueue] = useState<QueueTarget[]>([]);
+  const [openMan, setOpenMan] = useState<string | undefined>(undefined);
+  const [queueLoading, setQueueLoading] = useState(false);
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
@@ -235,6 +240,54 @@ export default function LiveDashboard() {
     }
   };
 
+  const refreshQueue = async () => {
+    setQueueLoading(true);
+    try {
+      const resp = await fetch(UPNEXT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          settings: {
+            totalBudget: settings.totalBudget,
+            numTeams: settings.numTeams,
+            scoring: settings.scoring,
+            leagueType: settings.leagueType,
+            format: settings.format,
+            context: settings.context,
+          },
+          budget,
+          myRoster: myItems,
+          rosterRequired: requiredCount,
+          rosterFilled: myCount,
+          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
+          events,
+          prices,
+          spendByPosition: spend,
+          recentRuns: runs,
+        }),
+      });
+      if (!resp.ok) {
+        if (resp.status === 429) toast.error("Rate limited.");
+        else if (resp.status === 402) toast.error("AI credits exhausted.");
+        else toast.error("Queue unavailable.");
+        return;
+      }
+      const data = await resp.json();
+      if (data?.targets) {
+        setQueue(data.targets);
+        setOpenMan(data.openMan);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Queue error");
+    } finally {
+      setQueueLoading(false);
+    }
+  };
+
   const submitPick = () => {
     const name = playerName.trim();
     const price = parseInt(priceInput, 10);
@@ -263,6 +316,14 @@ export default function LiveDashboard() {
     setPriceInput("");
     setPosition("");
     askCoach(ev);
+    refreshQueue();
+  };
+
+  const handlePickFromQueue = (t: QueueTarget) => {
+    setPlayerName(t.name);
+    setPosition(t.position);
+    setDrafter("me");
+    toast(`${t.name} loaded · max bid $${t.maxBid}`);
   };
 
   const handleFollowUp = () => {
@@ -452,6 +513,14 @@ export default function LiveDashboard() {
 
         {/* RIGHT: State + coach */}
         <section className="space-y-4">
+          <UpNextQueue
+            targets={queue}
+            openMan={openMan}
+            loading={queueLoading}
+            empty={!queue.length}
+            onRefresh={refreshQueue}
+            onPick={handlePickFromQueue}
+          />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
