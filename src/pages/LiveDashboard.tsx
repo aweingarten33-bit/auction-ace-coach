@@ -232,25 +232,31 @@ export default function LiveDashboard() {
   };
 
   const submitPick = () => {
-    const parsed = parsePlayerLine(input);
-    if (!parsed) {
-      toast.error("Format: Player Name - Price");
+    const name = playerName.trim();
+    const price = parseInt(priceInput, 10);
+    if (!name) {
+      toast.error("Enter a player name");
       return;
     }
-    if (drafter === "me" && parsed.price > budget.maxBid) {
+    if (!Number.isFinite(price) || price <= 0) {
+      toast.error("Enter a valid price");
+      return;
+    }
+    if (drafter === "me" && price > budget.maxBid) {
       toast.error(`Over max bid. You can only spend $${budget.maxBid} on this slot.`);
       return;
     }
     const ev = {
       id: crypto.randomUUID(),
-      player: parsed.name,
-      price: parsed.price,
+      player: name,
+      price,
       position: position || undefined,
       drafter,
       ts: Date.now(),
     };
     addEvent(ev);
-    setInput("");
+    setPlayerName("");
+    setPriceInput("");
     setPosition("");
     askCoach(ev);
   };
