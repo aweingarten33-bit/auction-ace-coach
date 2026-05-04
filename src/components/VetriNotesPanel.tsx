@@ -54,6 +54,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
