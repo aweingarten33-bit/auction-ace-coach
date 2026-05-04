@@ -53,6 +53,58 @@ function decodeXml(s: string): string {
     .replace(/&#39;/g, "'");
 }
 
+function extractJsonObjectAfter(html: string, marker: string): any | null {
+  const markerIdx = html.indexOf(marker);
+  if (markerIdx < 0) return null;
+  const start = html.indexOf("{", markerIdx);
+  if (start < 0) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < html.length; i++) {
+    const ch = html[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        try {
+          return JSON.parse(html.slice(start, i + 1));
+        } catch {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function descriptionLooksActionable(description: string): boolean {
+  const text = description.trim();
+  if (text.length < 80) return false;
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const timestamped = lines.filter((l) => /(?:^|\s)(?:\d{1,2}:)?\d{1,2}:\d{2}\b/.test(l));
+  const playerish = lines.filter((l) =>
+    /\b(QB|RB|WR|TE)\b/.test(l) ||
+    /[-–—:]\s*[A-Z][a-z'.-]+\s+[A-Z][a-z'.-]+/.test(l) ||
+    /^[•*-]?\s*[A-Z][a-z'.-]+\s+[A-Z][a-z'.-]+\b/.test(l)
+  );
+  return timestamped.length >= 2 || playerish.length >= 3;
+}
+
+function expectedTakeCountFromTitle(title: string): number | null {
+  const m = title.match(/\b(\d{1,2})\s+(?:rookies|players|sleepers|breakouts|league winners|targets|fades|values)\b/i);
+  if (!m) return null;
+  const n = Number(m[1]);
+  return Number.isFinite(n) && n > 0 && n <= 15 ? n : null;
+}
+
 async function fetchTranscript(videoId: string): Promise<string | null> {
   try {
     const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
