@@ -36,6 +36,7 @@ import {
 import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 import MarketHeat from "@/components/MarketHeat";
@@ -43,14 +44,11 @@ import Watchlist from "@/components/Watchlist";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
-import LiveSyncPanel from "@/components/LiveSyncPanel";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import DraftIntelTicker from "@/components/DraftIntelTicker";
 import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import VetriTierSheet from "@/components/VetriTierSheet";
 import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
-import MobileBudgetStrip from "@/components/MobileBudgetStrip";
 import TargetedForecastButton from "@/components/TargetedForecastButton";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
@@ -557,24 +555,6 @@ export default function LiveDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <DraftIntelTicker
-        remaining={budget.remaining}
-        maxBid={budget.maxBid}
-        slotsLeft={budget.slotsLeft}
-        avgPerSlot={budget.avgPerSlot}
-        events={events}
-        prices={prices}
-        pulse={pulse}
-        gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort }))}
-        spendByPosition={spend}
-        recentRuns={runs}
-        topTarget={queue[0] ? { name: queue[0].name, position: queue[0].position, maxBid: queue[0].maxBid } : null}
-        lastPickVerdict={(() => {
-          const last = events[events.length - 1];
-          if (!last) return null;
-          return { player: last.player, bid: last.price, call: valueFor(last.player, last.price) };
-        })()}
-      />
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
@@ -632,25 +612,9 @@ export default function LiveDashboard() {
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
-        <MobileBudgetStrip
-          remaining={budget.remaining}
-          spent={budget.spent}
-          totalBudget={budget.totalBudget}
-          maxBid={budget.maxBid}
-          avgPerSlot={budget.avgPerSlot}
-          slotsLeft={budget.slotsLeft}
-          slotsTotal={budget.slotsTotal}
-          rows={POSITIONS.filter((p) => requiredCount[p] > 0).map((p) => ({
-            pos: p,
-            have: myCount[p] ?? 0,
-            need: requiredCount[p],
-            short: Math.max(0, requiredCount[p] - (myCount[p] ?? 0)),
-          }))}
-        />
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
-          <LiveSyncPanel status={espnSync.status} lastEventAt={espnSync.lastEventAt} compact />
           {/* Compact Log-a-Pick — single row, no calculator vibes */}
           <Card className="bg-card/60 backdrop-blur-sm p-2.5 border-border/60">
             <div className="flex items-center gap-1.5 mb-2">
@@ -791,223 +755,88 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
-          <div className="space-y-2">
-            <div className="flex items-center justify-end">
-              <TargetedForecastButton
-                value={forecastFilters}
-                onChange={setForecastFilters}
-                onRun={(f) => refreshNominations(f)}
-                loading={nominationsLoading}
+          <Tabs defaultValue="targets" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 h-9">
+              <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
+              <TabsTrigger value="vetri" className="text-[11px]">Vetri</TabsTrigger>
+              <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
+              <TabsTrigger value="forecast" className="text-[11px]">Forecast</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="targets" className="mt-3 space-y-4">
+              <UpNextQueue
+                targets={queue}
+                openMan={openMan}
+                loading={queueLoading}
+                empty={!queue.length}
+                pulseMultiplier={pulse.multiplier}
+                pulseConfident={pulse.confident}
+                watchlist={watchlist}
+                onRefresh={refreshQueue}
+                onPick={handlePickFromQueue}
+                onPin={handlePin}
+                onUnpin={handleUnpin}
+                onDismiss={handleDismiss}
+                valueFor={valueFor}
+                whatIfFor={whatIfFor}
               />
-            </div>
-            <NominationForecast
-              predictions={nominations}
-              roomRead={roomRead}
-              loading={nominationsLoading}
-              onRefresh={() => refreshNominations()}
-              onPick={(name, position) => {
-                setPlayerName(name);
-                setPosition(position);
-                setDrafter("other");
-                toast(`${name} loaded — ready to log when nominated`);
-              }}
-            />
-          </div>
-          <UpNextQueue
-            targets={queue}
-            openMan={openMan}
-            loading={queueLoading}
-            empty={!queue.length}
-            pulseMultiplier={pulse.multiplier}
-            pulseConfident={pulse.confident}
-            watchlist={watchlist}
-            onRefresh={refreshQueue}
-            onPick={handlePickFromQueue}
-            onPin={handlePin}
-            onUnpin={handleUnpin}
-            onDismiss={handleDismiss}
-            valueFor={valueFor}
-            whatIfFor={whatIfFor}
-          />
-          <MarketHeat
-            events={events}
-            prices={prices}
-            gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
-            maxBid={budget.maxBid}
-            remaining={budget.remaining}
-            pulseMultiplier={pulse.multiplier}
-          />
-          <Watchlist
-            watchlist={watchlist}
-            onUnpin={handleUnpin}
-            onLoad={handleLoadFromWatchlist}
-            valueFor={valueFor}
-            maxBid={budget.maxBid}
-          />
-          <OpponentHeatmap settings={settings} />
-          <VetriTierSheet />
-          <VetriNotesPanel
-            onTakesUpdate={setVetriTakes}
-            onLoadPlayer={(name, pos) => {
-              setPlayerName(name);
-              setPosition(pos);
-              setDrafter("me");
-              toast(`${name} loaded from Vetri Notes`);
-            }}
-          />
-          {/* Budget */}
-          <Card className="bg-gradient-card p-4">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Remaining</p>
-                <AnimatedNumber value={budget.remaining} prefix="$" className="block text-2xl font-bold text-primary" />
+              <Watchlist
+                watchlist={watchlist}
+                onUnpin={handleUnpin}
+                onLoad={handleLoadFromWatchlist}
+                valueFor={valueFor}
+                maxBid={budget.maxBid}
+              />
+            </TabsContent>
+
+            <TabsContent value="vetri" className="mt-3 space-y-4">
+              <VetriNotesPanel
+                onTakesUpdate={setVetriTakes}
+                onLoadPlayer={(name, pos) => {
+                  setPlayerName(name);
+                  setPosition(pos);
+                  setDrafter("me");
+                  toast(`${name} loaded from Vetri Notes`);
+                }}
+              />
+              <VetriTierSheet />
+            </TabsContent>
+
+            <TabsContent value="market" className="mt-3 space-y-4">
+              <MarketHeat
+                events={events}
+                prices={prices}
+                gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
+                maxBid={budget.maxBid}
+                remaining={budget.remaining}
+                pulseMultiplier={pulse.multiplier}
+              />
+              <OpponentHeatmap settings={settings} />
+            </TabsContent>
+
+            <TabsContent value="forecast" className="mt-3 space-y-2">
+              <div className="flex items-center justify-end">
+                <TargetedForecastButton
+                  value={forecastFilters}
+                  onChange={setForecastFilters}
+                  onRun={(f) => refreshNominations(f)}
+                  loading={nominationsLoading}
+                />
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Bid</p>
-                <AnimatedNumber value={budget.maxBid} prefix="$" className="block text-2xl font-bold" />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Slots Left</p>
-                <p className="text-2xl font-bold tabular-nums">
-                  <AnimatedNumber value={budget.slotsLeft} /><span className="text-sm text-muted-foreground">/{budget.slotsTotal}</span>
-                </p>
-              </div>
-            </div>
-            <Progress
-              value={budget.totalBudget ? (budget.spent / budget.totalBudget) * 100 : 0}
-              className="mt-3 h-1.5 transition-all duration-500 ease-out-expo"
-            />
-            <p className="mt-1 text-[10px] text-muted-foreground text-center">
-              ${budget.spent} spent · ${budget.avgPerSlot.toFixed(1)}/slot avg
-            </p>
-          </Card>
-
-          {/* Roster */}
-          <Card className="bg-gradient-card p-4">
-            <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Roster Needs
-                <span className="ml-2 font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE BUILD</span>
-              </h2>
-              <p className="font-mono text-[10px] text-muted-foreground">
-                Starters {startersFilled}/{startersTotal} · Bench {benchFilled}/{requiredCount.BENCH}
-              </p>
-            </div>
-
-            <div className="space-y-1.5">
-              {gaps.map((g) => {
-                const willFill = previewPos === g.pos && drafter === "me" && g.starterShort > 0;
-                const tone =
-                  g.severity === "critical"
-                    ? "border-destructive/60 bg-destructive/10"
-                    : g.severity === "need"
-                    ? "border-warning/50 bg-warning/10"
-                    : g.severity === "depth"
-                    ? "border-border bg-secondary/40"
-                    : "border-success/40 bg-success/10";
-                const label =
-                  g.severity === "critical"
-                    ? "CRITICAL"
-                    : g.severity === "need"
-                    ? "NEED"
-                    : g.severity === "depth"
-                    ? "DEPTH"
-                    : "DONE";
-                return (
-                  <div
-                    key={g.pos}
-                    className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs transition ${tone} ${
-                      willFill ? "ring-2 ring-primary shadow-glow" : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={`${POS_COLORS[g.pos]} text-[10px] px-1.5 py-0`}>
-                        {g.pos}
-                      </Badge>
-                      <span className="font-mono text-[11px]">
-                        {g.starterHave}/{g.starterNeed} starters
-                      </span>
-                      {willFill && (
-                        <span className="font-mono text-[11px] text-primary">
-                          → {g.starterHave + 1}/{g.starterNeed} ✓
-                        </span>
-                      )}
-                    </div>
-                    <span
-                      className={`text-[9px] font-bold tracking-wider ${
-                        g.severity === "critical"
-                          ? "text-destructive"
-                          : g.severity === "need"
-                          ? "text-warning"
-                          : g.severity === "done"
-                          ? "text-success"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                );
-              })}
-
-              {flexNeed > 0 && (
-                <div
-                  className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs ${
-                    flexShort > 0 ? "border-warning/50 bg-warning/10" : "border-success/40 bg-success/10"
-                  } ${previewPos && ["RB", "WR", "TE"].includes(previewPos) && drafter === "me" && flexShort > 0 ? "ring-2 ring-primary" : ""}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-muted text-foreground border-border text-[10px] px-1.5 py-0">
-                      FLEX
-                    </Badge>
-                    <span className="font-mono text-[11px]">
-                      {flexHave}/{flexNeed} (RB/WR/TE overflow)
-                    </span>
-                  </div>
-                  <span className={`text-[9px] font-bold tracking-wider ${flexShort > 0 ? "text-warning" : "text-success"}`}>
-                    {flexShort > 0 ? "OPEN" : "DONE"}
-                  </span>
-                </div>
-              )}
-
-              {requiredCount.BENCH > 0 && (
-                <div
-                  className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs ${
-                    benchFilled >= requiredCount.BENCH
-                      ? "border-success/40 bg-success/10"
-                      : "border-border bg-secondary/40"
-                  } ${previewPos && drafter === "me" && previewSlotImpact === "bench slot" ? "ring-2 ring-primary" : ""}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="bg-muted text-foreground border-border text-[10px] px-1.5 py-0">
-                      BENCH
-                    </Badge>
-                    <span className="font-mono text-[11px]">
-                      {benchFilled}/{requiredCount.BENCH} filled
-                    </span>
-                  </div>
-                  <span className={`text-[9px] font-bold tracking-wider ${
-                    benchFilled >= requiredCount.BENCH ? "text-success" : "text-muted-foreground"
-                  }`}>
-                    {benchFilled >= requiredCount.BENCH ? "DONE" : "DEPTH"}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {previewPos && drafter === "me" && (
-              <p className="mt-3 text-[11px] text-primary">
-                Logging this {previewPos} pick will fill a {previewSlotImpact}.
-              </p>
-            )}
-
-            {runs.window > 1 && (
-              <p className="mt-3 border-t border-border pt-2 text-[10px] text-muted-foreground">
-                Last {runs.window} picks:{" "}
-                {Object.entries(runs.counts).map(([k, v]) => `${k}×${v}`).join(" · ")}
-              </p>
-            )}
-          </Card>
+              <NominationForecast
+                predictions={nominations}
+                roomRead={roomRead}
+                loading={nominationsLoading}
+                onRefresh={() => refreshNominations()}
+                onPick={(name, position) => {
+                  setPlayerName(name);
+                  setPosition(position);
+                  setDrafter("other");
+                  toast(`${name} loaded — ready to log when nominated`);
+                }}
+              />
+            </TabsContent>
+          </Tabs>
 
           {/* Coach */}
           <Card className="bg-gradient-card p-4 shadow-glow">
