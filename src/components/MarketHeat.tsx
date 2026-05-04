@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Flame, RefreshCw, TrendingUp } from "lucide-react";
+import { Flame, HelpCircle, RefreshCw, TrendingUp } from "lucide-react";
 import { fetchTrendingAdds, TrendingAdd, byeWeekForTeam } from "@/lib/sleeper";
 import { POS_COLORS } from "@/lib/positions";
 import { Position, DraftEvent, PriceEstimate } from "@/lib/draft-types";
