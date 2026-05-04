@@ -17,12 +17,14 @@ interface Props {
   prices: PriceEstimate[];
   gaps: Gap[];
   maxBid: number;
+  remaining: number;
+  pulseMultiplier: number;
 }
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const REFRESH_MS = 5 * 60 * 1000;
 
-export default function MarketHeat({ events, prices, gaps, maxBid }: Props) {
+export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pulseMultiplier }: Props) {
   const [trending, setTrending] = useState<TrendingAdd[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
