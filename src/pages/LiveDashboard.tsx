@@ -39,6 +39,7 @@ import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 import Watchlist from "@/components/Watchlist";
+import AnimatedNumber from "@/components/AnimatedNumber";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
