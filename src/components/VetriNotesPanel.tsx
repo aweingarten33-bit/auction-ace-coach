@@ -64,6 +64,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
   const [refreshing, setRefreshing] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const { prices: tierPrices, seasons: historySeasons } = useLeagueTierPrices();
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
