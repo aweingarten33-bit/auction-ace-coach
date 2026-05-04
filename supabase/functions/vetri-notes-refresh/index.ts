@@ -351,8 +351,9 @@ Deno.serve(async (req: Request) => {
       let transcript = await fetchTranscript(item.videoId);
       let source: "captions" | "description" | "whisper" = "captions";
       if (!transcript) {
-        // Fallback 1: timestamped descriptions (cheap, often present)
-        if (item.description && item.description.length > 120) {
+        // Fallback 1: timestamped/player-list descriptions (cheap, often present).
+        // Generic sponsor/link descriptions are not content; use Whisper instead.
+        if (item.description && descriptionLooksActionable(item.description)) {
           transcript = item.description;
           source = "description";
         } else {
@@ -374,10 +375,35 @@ Deno.serve(async (req: Request) => {
 
       try {
         const distilled = await distill(item.title, transcript, source);
-        if (!distilled) {
+        const expected = expectedTakeCountFromTitle(item.title);
+        const takeCount = distilled?.takes?.length ?? 0;
+        if (!distilled || takeCount === 0 || (expected != null && takeCount < Math.min(expected, 3))) {
+          if (source !== "whisper") {
+            const whisperText = await transcribeWithWhisper(item.videoId);
+            if (whisperText && whisperText.length > 100) {
+              transcript = whisperText;
+              source = "whisper";
+              const retry = await distill(item.title, transcript, source);
+              if (retry && retry.takes?.length > 0) {
+                await sb
+                  .from("vetri_notes")
+                  .update({
+                    status: "ready",
+                    error: null,
+                    transcript,
+                    summary: retry.summary,
+                    takes: retry.takes,
+                    positions: retry.positions ?? [],
+                  })
+                  .eq("video_id", item.videoId);
+                results.push({ videoId: item.videoId, title: item.title, status: "ready" });
+                continue;
+              }
+            }
+          }
           await sb
             .from("vetri_notes")
-            .update({ status: "failed", error: "Model returned no takes", transcript })
+            .update({ status: "failed", error: expected ? `Expected player list from title, got ${takeCount} takes` : "Model returned no takes", transcript })
             .eq("video_id", item.videoId);
           results.push({ videoId: item.videoId, title: item.title, status: "failed" });
           continue;
