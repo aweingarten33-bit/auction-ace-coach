@@ -14,6 +14,8 @@ interface DraftState {
   prices: PriceEstimate[];
   events: DraftEvent[];
   setupComplete: boolean;
+  watchlist: string[];      // pinned player names (Spotify "save for later")
+  dismissed: string[];      // queue dismissals — filtered from next refresh
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -23,6 +25,10 @@ interface DraftState {
   undoEvent: () => void;
   completeSetup: () => void;
   resetAll: () => void;
+  pinPlayer: (name: string) => void;
+  unpinPlayer: (name: string) => void;
+  dismissPlayer: (name: string) => void;
+  clearDismissed: () => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -33,6 +39,8 @@ export const useDraftStore = create<DraftState>()(
       prices: [],
       events: [],
       setupComplete: false,
+      watchlist: [],
+      dismissed: [],
       setSettings: (s) =>
         set((state) => ({ settings: { ...state.settings, ...s } })),
       setRoster: (key, value) =>
@@ -55,7 +63,16 @@ export const useDraftStore = create<DraftState>()(
           prices: [],
           events: [],
           setupComplete: false,
+          watchlist: [],
+          dismissed: [],
         }),
+      pinPlayer: (name) =>
+        set((s) => (s.watchlist.includes(name) ? s : { watchlist: [...s.watchlist, name] })),
+      unpinPlayer: (name) =>
+        set((s) => ({ watchlist: s.watchlist.filter((n) => n !== name) })),
+      dismissPlayer: (name) =>
+        set((s) => (s.dismissed.includes(name) ? s : { dismissed: [...s.dismissed, name] })),
+      clearDismissed: () => set({ dismissed: [] }),
     }),
     { name: "auction-draft-coach-v1" }
   )
