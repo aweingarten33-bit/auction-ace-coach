@@ -790,18 +790,28 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
-          <NominationForecast
-            predictions={nominations}
-            roomRead={roomRead}
-            loading={nominationsLoading}
-            onRefresh={refreshNominations}
-            onPick={(name, position) => {
-              setPlayerName(name);
-              setPosition(position);
-              setDrafter("other");
-              toast(`${name} loaded — ready to log when nominated`);
-            }}
-          />
+          <div className="space-y-2">
+            <div className="flex items-center justify-end">
+              <TargetedForecastButton
+                value={forecastFilters}
+                onChange={setForecastFilters}
+                onRun={(f) => refreshNominations(f)}
+                loading={nominationsLoading}
+              />
+            </div>
+            <NominationForecast
+              predictions={nominations}
+              roomRead={roomRead}
+              loading={nominationsLoading}
+              onRefresh={() => refreshNominations()}
+              onPick={(name, position) => {
+                setPlayerName(name);
+                setPosition(position);
+                setDrafter("other");
+                toast(`${name} loaded — ready to log when nominated`);
+              }}
+            />
+          </div>
           <UpNextQueue
             targets={queue}
             openMan={openMan}
