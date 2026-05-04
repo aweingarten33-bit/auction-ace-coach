@@ -53,6 +53,57 @@ function decodeXml(s: string): string {
     .replace(/&#39;/g, "'");
 }
 
+function extractJsonObjectAfter(html: string, marker: string): any | null {
+  const markerIdx = html.indexOf(marker);
+  if (markerIdx < 0) return null;
+  const start = html.indexOf("{", markerIdx);
+  if (start < 0) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < html.length; i++) {
+    const ch = html[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        try {
+          return JSON.parse(html.slice(start, i + 1));
+        } catch {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function descriptionLooksActionable(description: string): boolean {
+  const text = description.trim();
+  if (text.length < 80) return false;
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const timestamped = lines.filter((l) => /(?:^|\s)(?:\d{1,2}:)?\d{1,2}:\d{2}\b/.test(l));
+  const footballEntries = lines.filter((l) =>
+    /\b(QB|RB|WR|TE)\b/.test(l) ||
+    /\b(target|fade|avoid|sleeper|breakout|value|rookie|draft|adp|ranking)\b/i.test(l)
+  );
+  return timestamped.length >= 2 || footballEntries.length >= 3;
+}
+
+function expectedTakeCountFromTitle(title: string): number | null {
+  const m = title.match(/\b(\d{1,2})\s+(?:rookies|players|sleepers|breakouts|league winners|targets|fades|values)\b/i);
+  if (!m) return null;
+  const n = Number(m[1]);
+  return Number.isFinite(n) && n > 0 && n <= 15 ? n : null;
+}
+
 async function fetchTranscript(videoId: string): Promise<string | null> {
   try {
     const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
@@ -60,15 +111,9 @@ async function fetchTranscript(videoId: string): Promise<string | null> {
     });
     if (!watch.ok) return null;
     const html = await watch.text();
-    const m = html.match(/"captionTracks":(\[[^\]]+\])/);
-    if (!m) return null;
-    // Parse the JSON-ish array. It's already valid JSON when extracted.
-    let tracks: any[];
-    try {
-      tracks = JSON.parse(m[1].replace(/\\u0026/g, "&"));
-    } catch {
-      return null;
-    }
+    const player = extractJsonObjectAfter(html, "ytInitialPlayerResponse");
+    const tracks: any[] = player?.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
+    if (!tracks.length) return null;
     const track = tracks.find((t) => t?.languageCode === "en") ?? tracks[0];
     if (!track?.baseUrl) return null;
     const ttResp = await fetch(track.baseUrl, {
@@ -107,10 +152,8 @@ async function fetchAudioStreamUrl(videoId: string): Promise<{ url: string; mime
     });
     if (!watch.ok) return null;
     const html = await watch.text();
-    const m = html.match(/ytInitialPlayerResponse\s*=\s*(\{[\s\S]*?\})\s*;\s*(?:var|<\/script>)/);
-    if (!m) return null;
-    let player: any;
-    try { player = JSON.parse(m[1]); } catch { return null; }
+    const player = extractJsonObjectAfter(html, "ytInitialPlayerResponse");
+    if (!player) return null;
     const formats: any[] = player?.streamingData?.adaptiveFormats ?? [];
     // audio-only mp4 (m4a) — smallest bitrate to stay under Whisper 25MB
     const audio = formats
@@ -182,9 +225,9 @@ const SUMMARY_TOOL = {
           items: { type: "string", enum: ["QB", "RB", "WR", "TE", "K", "DST"] },
           description: "Positions discussed.",
         },
-        takes: {
+          takes: {
           type: "array",
-          minItems: 0,
+          minItems: 1,
           maxItems: 12,
           items: {
             type: "object",
@@ -223,7 +266,11 @@ async function distill(title: string, transcript: string, source: "captions" | "
     : source === "whisper"
     ? "## Source\nThis is a WHISPER audio transcription (no captions were available). Expect occasional misspellings of player names — normalize to the most likely real NFL player."
     : "";
-  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. Include only players he expresses a clear opinion on. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
+  const expected = expectedTakeCountFromTitle(title);
+  const countInstruction = expected
+    ? `The title promises ${expected} players. Extract exactly ${expected} player takes if the content contains them. Do not return zero takes unless the content truly contains no player names.`
+    : "Extract every clearly named player take. Do not return zero takes if specific player names are present.";
+  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic video recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -274,15 +321,18 @@ Deno.serve(async (req: Request) => {
 
     const { data: existing } = await sb
       .from("vetri_notes")
-      .select("video_id, status")
+      .select("video_id, status, takes")
       .in("video_id", items.map((i) => i.videoId));
-    const existingMap = new Map((existing ?? []).map((r) => [r.video_id, r.status]));
+    const existingMap = new Map((existing ?? []).map((r) => [r.video_id, r]));
 
     const results: { videoId: string; title: string; status: string; error?: string }[] = [];
 
     for (const item of items) {
       const prior = existingMap.get(item.videoId);
-      if (!force && prior === "ready") {
+      const priorTakeCount = Array.isArray(prior?.takes) ? prior.takes.length : 0;
+      const expected = expectedTakeCountFromTitle(item.title);
+      const hasUsefulCache = prior?.status === "ready" && priorTakeCount > 0 && (expected == null || priorTakeCount >= Math.min(expected, 3));
+      if (!force && hasUsefulCache) {
         results.push({ videoId: item.videoId, title: item.title, status: "skipped" });
         continue;
       }
@@ -303,8 +353,9 @@ Deno.serve(async (req: Request) => {
       let transcript = await fetchTranscript(item.videoId);
       let source: "captions" | "description" | "whisper" = "captions";
       if (!transcript) {
-        // Fallback 1: timestamped descriptions (cheap, often present)
-        if (item.description && item.description.length > 120) {
+        // Fallback 1: timestamped/player-list descriptions (cheap, often present).
+        // Generic sponsor/link descriptions are not content; use Whisper instead.
+        if (item.description && descriptionLooksActionable(item.description)) {
           transcript = item.description;
           source = "description";
         } else {
@@ -326,10 +377,35 @@ Deno.serve(async (req: Request) => {
 
       try {
         const distilled = await distill(item.title, transcript, source);
-        if (!distilled) {
+        const expected = expectedTakeCountFromTitle(item.title);
+        const takeCount = distilled?.takes?.length ?? 0;
+        if (!distilled || takeCount === 0 || (expected != null && takeCount < Math.min(expected, 3))) {
+          if (source !== "whisper") {
+            const whisperText = await transcribeWithWhisper(item.videoId);
+            if (whisperText && whisperText.length > 100) {
+              transcript = whisperText;
+              source = "whisper";
+              const retry = await distill(item.title, transcript, source);
+              if (retry && retry.takes?.length > 0) {
+                await sb
+                  .from("vetri_notes")
+                  .update({
+                    status: "ready",
+                    error: null,
+                    transcript,
+                    summary: retry.summary,
+                    takes: retry.takes,
+                    positions: retry.positions ?? [],
+                  })
+                  .eq("video_id", item.videoId);
+                results.push({ videoId: item.videoId, title: item.title, status: "ready" });
+                continue;
+              }
+            }
+          }
           await sb
             .from("vetri_notes")
-            .update({ status: "failed", error: "Model returned no takes", transcript })
+            .update({ status: "failed", error: expected ? `Expected player list from title, got ${takeCount} takes` : "Model returned no takes", transcript })
             .eq("video_id", item.videoId);
           results.push({ videoId: item.videoId, title: item.title, status: "failed" });
           continue;
