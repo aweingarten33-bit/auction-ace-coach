@@ -397,12 +397,16 @@ export default function LiveDashboard() {
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary shadow-glow">
-              <Trophy className="h-3.5 w-3.5 text-primary-foreground" />
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-gradient-primary shadow-glow" style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}>
+              <Trophy className="h-4 w-4 text-primary-foreground" />
             </div>
-            <div className="min-w-0 leading-tight">
-              <h1 className="truncate text-[13px] font-semibold tracking-tight neon-text">Auction Coach</h1>
-              <p className="truncate font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground">Fantasy Focus × Vetri</p>
+            <div className="min-w-0 leading-none">
+              <h1 className="font-chyron truncate text-[18px] font-extrabold italic uppercase tracking-tight text-foreground neon-text">
+                The Auction Room
+              </h1>
+              <p className="font-lower-third mt-0.5 truncate text-[8px] text-accent">
+                ESPN-Style · Fantasy Focus × Vetri
+              </p>
             </div>
           </div>
           {/* Compact live budget — Awwwards single-accent emphasis on remaining */}
