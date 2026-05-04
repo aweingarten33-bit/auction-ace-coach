@@ -547,8 +547,23 @@ export default function LiveDashboard() {
             openMan={openMan}
             loading={queueLoading}
             empty={!queue.length}
+            pulseMultiplier={pulse.multiplier}
+            pulseConfident={pulse.confident}
+            watchlist={watchlist}
             onRefresh={refreshQueue}
             onPick={handlePickFromQueue}
+            onPin={handlePin}
+            onUnpin={handleUnpin}
+            onDismiss={handleDismiss}
+            valueFor={valueFor}
+            whatIfFor={whatIfFor}
+          />
+          <Watchlist
+            watchlist={watchlist}
+            onUnpin={handleUnpin}
+            onLoad={handleLoadFromWatchlist}
+            valueFor={valueFor}
+            maxBid={budget.maxBid}
           />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
