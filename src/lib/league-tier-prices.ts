@@ -18,6 +18,14 @@ const TIER_SIZES: Record<string, number[]> = {
   DST:[5, 7, 10],
 };
 
+
+const norm = (s: string) =>
+  s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+
+export function tierForPosRank(position: string, posRank: number): number {
+  return tierFor(position, posRank);
+}
+
 export interface TierPrice {
   position: string;
   tier: number;        // 1-based
@@ -124,3 +132,42 @@ export function useLeagueTierPrices() {
 
   return { prices, seasons, loading };
 }
+
+export interface PlayerRank {
+  espn_player_id: number;
+  player_name: string;
+  player_name_norm: string;
+  position: string | null;
+  pos_rank: number | null;
+  overall_rank: number | null;
+  auction_value: number | null;
+}
+
+export function usePlayerRanks() {
+  const [byName, setByName] = useState<Map<string, PlayerRank>>(new Map());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("espn_player_ranks")
+        .select("espn_player_id, player_name, player_name_norm, position, pos_rank, overall_rank, auction_value")
+        .order("overall_rank", { ascending: true });
+      if (cancelled) return;
+      if (error || !data) {
+        setLoading(false);
+        return;
+      }
+      const map = new Map<string, PlayerRank>();
+      for (const r of data as PlayerRank[]) map.set(r.player_name_norm, r);
+      setByName(map);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  const lookup = (name: string): PlayerRank | null => byName.get(norm(name)) ?? null;
+  return { lookup, loading, size: byName.size };
+}
+

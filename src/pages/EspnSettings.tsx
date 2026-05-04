@@ -93,6 +93,14 @@ export default function EspnSettings() {
     toast.success(`Pulled ${totalPicks} picks across ${ok.length} season(s)${skipped.length ? ` · ${skipped.length} skipped` : ""}`);
   };
 
+  const syncRanks = async () => {
+    setBusy(true);
+    const { data, error } = await supabase.functions.invoke("espn-player-ranks", {});
+    setBusy(false);
+    if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Rank sync failed");
+    toast.success(`Cached ${data.upserted} player ranks`);
+  };
+
   const copyToken = () => {
     navigator.clipboard.writeText(token);
     toast.success("Token copied");
@@ -172,6 +180,9 @@ export default function EspnSettings() {
               </Button>
               <Button variant="outline" onClick={syncHistory} disabled={busy}>
                 <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Pull last 3 auctions
+              </Button>
+              <Button variant="outline" onClick={syncRanks} disabled={busy}>
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Pull ESPN ranks
               </Button>
             </>
           )}

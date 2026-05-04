@@ -9,7 +9,7 @@ import { Youtube, RefreshCw, ExternalLink, ChevronDown, ChevronUp, TrendingUp, T
 import { Input } from "@/components/ui/input";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import { toast } from "sonner";
-import { useLeagueTierPrices, parseTierLabel, priceForPositionTier } from "@/lib/league-tier-prices";
+import { useLeagueTierPrices, parseTierLabel, priceForPositionTier, usePlayerRanks, tierForPosRank } from "@/lib/league-tier-prices";
 
 export interface VetriTake {
   player: string;
@@ -65,6 +65,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
   const [expanded, setExpanded] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const { prices: tierPrices, seasons: historySeasons } = useLeagueTierPrices();
+  const { lookup: lookupPlayerRank } = usePlayerRanks();
 
   const loadNotes = useCallback(async () => {
     setLoading(true);
@@ -244,7 +245,15 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                               {(() => {
                                 const est = scaledEstBid(t.estPrice);
                                 const sal = t.salPrice?.trim();
-                                const tierNum = parseTierLabel(t.tier);
+                                let tierNum = parseTierLabel(t.tier);
+                                let tierSource: "sal" | "rank" | null = tierNum ? "sal" : null;
+                                if (!tierNum) {
+                                  const rank = lookupPlayerRank(t.player);
+                                  if (rank?.pos_rank && rank.position) {
+                                    tierNum = tierForPosRank(rank.position, rank.pos_rank);
+                                    tierSource = "rank";
+                                  }
+                                }
                                 const tierAnchor = tierNum
                                   ? priceForPositionTier(tierPrices, t.position, tierNum)
                                   : null;
@@ -267,7 +276,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                     {leagueBid && tierAnchor && (
                                       <span
                                         className="rounded-sm border border-warning/50 bg-warning/15 px-1.5 py-0.5 font-mono text-[10px] font-bold text-warning"
-                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Adjusted for "${t.lean}" lean.`}
+                                        title={`Your league paid ~$${Math.round(tierAnchor.avg)} avg for Tier ${tierNum} ${t.position}s (n=${tierAnchor.count} across ${tierAnchor.perSeason.length} seasons). Tier ${tierSource === "rank" ? "auto-derived from ESPN positional rank" : "from Sal"}. Adjusted for "${t.lean}" lean.`}
                                       >
                                         League: ~${leagueBid}
                                       </span>
@@ -278,7 +287,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                       </span>
                                     )}
                                     <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground/70">
-                                      {leagueBid ? `${historySeasons.length}yr avg · T${tierNum} ${t.position}` : `${LEAGUE_BUDGET} league`}
+                                      {leagueBid ? `T${tierNum} ${t.position}${tierSource === "rank" ? " (ESPN)" : ""} · ${historySeasons.length}yr avg` : `${LEAGUE_BUDGET} league`}
                                     </span>
                                   </div>
                                 );
