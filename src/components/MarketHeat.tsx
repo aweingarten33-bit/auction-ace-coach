@@ -99,42 +99,55 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
 
   return (
     <Card className="bg-gradient-card p-4 shadow-glow">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-warning">
-          <Flame className="h-3.5 w-3.5" /> Market Heat
-          <span className="ml-1 text-[10px] font-normal normal-case text-muted-foreground">
-            · Sleeper adds 24h
-          </span>
+          <Flame className="h-3.5 w-3.5" /> Hot Players Right Now
         </h2>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
+          <Button
+            size="sm" variant="ghost"
+            onClick={() => setShowHelp((s) => !s)}
+            className="h-7 px-2"
+            title="What is this?"
+          >
+            <HelpCircle className="h-3.5 w-3.5" />
+          </Button>
           <span className="text-[10px] text-muted-foreground">{updatedLabel}</span>
           <Button
-            size="sm"
-            variant="ghost"
-            onClick={load}
-            disabled={loading}
-            className="h-7 px-2"
+            size="sm" variant="ghost" onClick={load} disabled={loading} className="h-7 px-2"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
       </div>
 
+      <p className="mb-3 text-[11px] leading-snug text-muted-foreground">
+        Players that <span className="font-semibold text-foreground">tons of other fantasy managers</span> just grabbed.
+        If they're hot here, expect your league to <span className="font-semibold text-warning">overpay</span> for them too.
+      </p>
+
+      {showHelp && (
+        <div className="mb-3 space-y-1.5 rounded-md border border-border bg-secondary/40 p-2.5 text-[11px] leading-relaxed">
+          <p className="font-semibold">Quick guide — what each label means:</p>
+          <p><span className="rounded border border-success/50 bg-success/15 px-1 py-0.5 text-[9px] font-bold text-success">TARGET</span> You need this position + you can afford him → <b>BID</b>.</p>
+          <p><span className="rounded border border-warning/50 bg-warning/15 px-1 py-0.5 text-[9px] font-bold text-warning">STRETCH</span> You need him but he costs more than your max → only if you have a backup plan.</p>
+          <p><span className="rounded border border-destructive/50 bg-destructive/10 px-1 py-0.5 text-[9px] font-bold text-destructive">SKIP</span> Too expensive — you don't have the money.</p>
+          <p><span className="rounded border border-muted-foreground/30 bg-muted/20 px-1 py-0.5 text-[9px] font-bold text-muted-foreground">FADE</span> You don't need him — let someone else overpay.</p>
+          <p className="pt-1 text-muted-foreground">🔥 The flame number = how many people just added him. Bigger = hotter.</p>
+        </div>
+      )}
+
       {spikes.length > 0 && (
-        <div className="mb-2 flex flex-wrap items-center gap-1.5 rounded-md border border-warning/30 bg-warning/10 px-2 py-1.5 text-[10px]">
+        <div className="mb-2 flex flex-wrap items-center gap-1.5 rounded-md border border-warning/30 bg-warning/10 px-2 py-1.5 text-[11px]">
           <TrendingUp className="h-3 w-3 text-warning" />
-          <span className="font-semibold text-warning">Position spike:</span>
+          <span className="font-semibold text-warning">Everyone's grabbing:</span>
           {spikes.map((s) => (
-            <Badge
-              key={s.pos}
-              variant="outline"
-              className={`${POS_COLORS[s.pos]} px-1.5 py-0 text-[10px]`}
-            >
-              {s.pos} ×{(s.count / 1000).toFixed(1)}k
+            <Badge key={s.pos} variant="outline" className={`${POS_COLORS[s.pos]} px-1.5 py-0 text-[10px]`}>
+              {s.pos}
             </Badge>
           ))}
           <span className="ml-1 text-muted-foreground">
-            → expect bidding inflation on next {spikes[0].pos}
+            → next {spikes[0].pos} will go for too much. Either grab one fast or skip the bidding war.
           </span>
         </div>
       )}
