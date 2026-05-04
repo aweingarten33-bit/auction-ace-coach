@@ -283,6 +283,13 @@ export default function LiveDashboard() {
       toast.error("Coach error");
     } finally {
       setStreaming(false);
+      // Persist final assistant message into thread (use the accumulator from above via setCoachText callback)
+      setCoachText((finalText) => {
+        if (finalText && finalText !== "⚠️ Coach unavailable.") {
+          setCoachHistory((h) => [...h, { role: "assistant", content: finalText }]);
+        }
+        return finalText;
+      });
     }
   };
 
