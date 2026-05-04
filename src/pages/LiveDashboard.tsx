@@ -41,6 +41,8 @@ import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 import MarketHeat from "@/components/MarketHeat";
 import Watchlist from "@/components/Watchlist";
 import AnimatedNumber from "@/components/AnimatedNumber";
+import EspnSyncStatus from "@/components/EspnSyncStatus";
+import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
