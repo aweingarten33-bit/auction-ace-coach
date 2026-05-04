@@ -97,6 +97,11 @@ export default function LiveDashboard() {
   const myCount = useMemo(() => countByPosition(myItems), [myItems]);
   const spend = useMemo(() => spendByPosition(events), [events]);
   const runs = useMemo(() => recentRuns(events, 6), [events]);
+  const pulse = useMemo(() => computeMarketPulse(events, prices), [events, prices]);
+  const valueFor = useMemo(
+    () => (name: string, bid: number) => computeValueFor(name, bid, prices, pulse),
+    [prices, pulse]
+  );
 
   const requiredCount = {
     QB: settings.roster.QB + (settings.leagueType !== "Standard" ? settings.roster.SUPERFLEX : 0),
