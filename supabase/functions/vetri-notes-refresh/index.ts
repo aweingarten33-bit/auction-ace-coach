@@ -210,7 +210,7 @@ const SUMMARY_TOOL = {
   },
 };
 
-async function distill(title: string, transcript: string, source: "captions" | "description" = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
+async function distill(title: string, transcript: string, source: "captions" | "description" | "whisper" = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
   // Cap transcript length to keep token usage sane
@@ -218,7 +218,11 @@ async function distill(title: string, transcript: string, source: "captions" | "
 
   const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's YouTube content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
 
-  const sourceNote = source === "description" ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Descriptions often contain timestamped player lists like '2:15 - Bijan Robinson (target)'. Treat each entry as Sal's stated take. If a description entry has no clear lean, use 'neutral'." : "";
+  const sourceNote = source === "description"
+    ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Descriptions often contain timestamped player lists like '2:15 - Bijan Robinson (target)'. Treat each entry as Sal's stated take. If a description entry has no clear lean, use 'neutral'."
+    : source === "whisper"
+    ? "## Source\nThis is a WHISPER audio transcription (no captions were available). Expect occasional misspellings of player names — normalize to the most likely real NFL player."
+    : "";
   const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. Include only players he expresses a clear opinion on. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
