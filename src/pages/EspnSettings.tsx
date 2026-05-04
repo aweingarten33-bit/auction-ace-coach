@@ -99,6 +99,7 @@ export default function EspnSettings() {
     setBusy(false);
     if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Rank sync failed");
     toast.success(`Cached ${data.upserted} player ranks`);
+  };
 
   const copyToken = () => {
     navigator.clipboard.writeText(token);
