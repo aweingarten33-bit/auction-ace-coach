@@ -33,7 +33,7 @@ import {
   recentRuns,
   spendByPosition,
 } from "@/lib/draft-math";
-import { DraftEvent, Position } from "@/lib/draft-types";
+import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
@@ -48,6 +48,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import DraftIntelTicker from "@/components/DraftIntelTicker";
 import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import VetriTierSheet from "@/components/VetriTierSheet";
+import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -188,6 +189,94 @@ export default function LiveDashboard() {
 
   const whatIfFor = (pos: Position, bid: number) =>
     whatIfPick(settings, keepers, events, myCount, requiredCount, pos, bid);
+
+  // ---- Roster Hero: per-slot max bids + single best next target ----
+  const heroRows: SlotRow[] = useMemo(() => {
+    const sevWeight = { critical: 2.6, need: 1.9, depth: 1.05, done: 0.4 } as const;
+    const cap = budget.maxBid;
+    const avg = budget.avgPerSlot;
+    const rows: SlotRow[] = gaps.map((g) => {
+      const recommended = Math.max(1, Math.min(cap, Math.round(avg * sevWeight[g.severity])));
+      return {
+        pos: g.pos as Position,
+        have: g.starterHave,
+        need: g.starterNeed,
+        short: g.starterShort,
+        maxBid: recommended,
+        severity: g.severity,
+      };
+    });
+    if (flexNeed > 0) {
+      const sev: SlotRow["severity"] = flexShort > 0 ? "need" : "done";
+      rows.push({
+        pos: "FLEX",
+        have: flexHave,
+        need: flexNeed,
+        short: flexShort,
+        maxBid: Math.max(1, Math.min(cap, Math.round(avg * sevWeight[sev]))),
+        severity: sev,
+      });
+    }
+    if (requiredCount.BENCH > 0) {
+      const sev: SlotRow["severity"] = benchFilled >= requiredCount.BENCH ? "done" : "depth";
+      rows.push({
+        pos: "BENCH",
+        have: benchFilled,
+        need: requiredCount.BENCH,
+        short: Math.max(0, requiredCount.BENCH - benchFilled),
+        maxBid: Math.max(1, Math.min(cap, Math.round(avg * sevWeight[sev]))),
+        severity: sev,
+      });
+    }
+    return rows;
+  }, [gaps, flexNeed, flexShort, flexHave, requiredCount.BENCH, benchFilled, budget.maxBid, budget.avgPerSlot]);
+
+  const bestTarget: BestTarget | null = useMemo(() => {
+    if (budget.slotsLeft <= 0 || budget.maxBid <= 0) return null;
+    const draftedKeys = new Set<string>([
+      ...events.map((e) => e.player.toLowerCase().replace(/[^a-z0-9]/g, "")),
+      ...keepers.map((k) => k.player.toLowerCase().replace(/[^a-z0-9]/g, "")),
+    ]);
+    // Prefer the most severe open slot first
+    const priority = heroRows
+      .filter((r) => r.pos !== "BENCH" && r.pos !== "FLEX" && r.short > 0)
+      .sort((a, b) => {
+        const order = { critical: 0, need: 1, depth: 2, done: 3 } as const;
+        return order[a.severity] - order[b.severity];
+      });
+    const fallback = heroRows.filter((r) => r.pos !== "BENCH" && r.pos !== "FLEX");
+    const ordered = priority.length ? priority : fallback;
+    for (const row of ordered) {
+      const pos = row.pos as Position;
+      const candidates = prices
+        .filter((p: PriceEstimate) => {
+          const k = p.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+          if (draftedKeys.has(k)) return false;
+          // position match: rely on Vetri-tagged position when available
+          if ((p as any).position && (p as any).position !== pos) return false;
+          return p.price > 0 && p.price <= Math.max(row.maxBid, budget.maxBid);
+        })
+        .sort((a, b) => b.price - a.price);
+      const top = candidates[0];
+      if (top) {
+        const v = valueFor(top.name, Math.min(top.price, row.maxBid));
+        const reasonBits: string[] = [];
+        if (row.severity === "critical") reasonBits.push(`Plugs critical ${pos} hole`);
+        else if (row.severity === "need") reasonBits.push(`Fills open ${pos} starter`);
+        else reasonBits.push(`Best ${pos} value left`);
+        if (v?.verdict && v.verdict !== "unknown") reasonBits.push(v.verdict);
+        reasonBits.push(`market $${top.price}`);
+        return {
+          name: top.name,
+          position: pos,
+          maxBid: Math.min(row.maxBid, budget.maxBid),
+          reason: reasonBits.join(" · "),
+        };
+      }
+    }
+    return null;
+  }, [heroRows, prices, events, keepers, budget.slotsLeft, budget.maxBid, valueFor]);
+
 
   const handlePin = (name: string) => { pinPlayer(name); toast(`Pinned ${name}`); };
   const handleUnpin = (name: string) => { unpinPlayer(name); };
@@ -675,6 +764,20 @@ export default function LiveDashboard() {
 
         {/* RIGHT: State + coach */}
         <section className="space-y-4">
+          <RosterHero
+            remaining={budget.remaining}
+            slotsLeft={budget.slotsLeft}
+            slotsTotal={budget.slotsTotal}
+            maxBid={budget.maxBid}
+            rows={heroRows}
+            bestTarget={bestTarget}
+            onLoadTarget={(name, pos) => {
+              setPlayerName(name);
+              setPosition(pos);
+              setDrafter("me");
+              toast(`${name} loaded — best next target`);
+            }}
+          />
           <NominationForecast
             predictions={nominations}
             roomRead={roomRead}
