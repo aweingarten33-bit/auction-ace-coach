@@ -513,6 +513,14 @@ export default function LiveDashboard() {
 
         {/* RIGHT: State + coach */}
         <section className="space-y-4">
+          <UpNextQueue
+            targets={queue}
+            openMan={openMan}
+            loading={queueLoading}
+            empty={!queue.length}
+            onRefresh={refreshQueue}
+            onPick={handlePickFromQueue}
+          />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
