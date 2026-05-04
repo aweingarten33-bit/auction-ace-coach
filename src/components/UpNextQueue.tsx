@@ -57,7 +57,7 @@ function verdictLabel(v: ValueCall["verdict"]) {
 
 export default function UpNextQueue({
   targets, openMan, loading, empty, pulseMultiplier, pulseConfident,
-  watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor,
+  watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor, knockoutFor,
 }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
