@@ -104,6 +104,99 @@ function expectedTakeCountFromTitle(title: string): number | null {
   return Number.isFinite(n) && n > 0 && n <= 15 ? n : null;
 }
 
+// ---- Blog fallback ------------------------------------------------------
+// Sal mirrors most YouTube videos as written posts on fantasy-football-club.com.
+function slugCandidatesFromTitle(title: string): string[] {
+  const base = title
+    .toLowerCase()
+    .replace(/[''`]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const cands = new Set<string>();
+  const variants = new Set<string>();
+  variants.add(base);
+  // who could → that could
+  variants.add(base.replace(/\bwho could\b/g, "that could"));
+  // strip "this year" / "this season"
+  for (const v of [...variants]) {
+    variants.add(v.replace(/\b(this year|this season|next year)\b/g, "").replace(/\s+/g, " ").trim());
+  }
+  // year suffix variants
+  const years = [new Date().getFullYear(), new Date().getFullYear() - 1, 2025];
+  for (const v of [...variants]) {
+    const slug = v.split(" ").filter(Boolean).join("-");
+    if (slug) cands.add(slug);
+    if (!/\b20\d{2}\b/.test(v)) {
+      for (const y of years) {
+        cands.add(`${slug}-in-${y}`);
+        cands.add(`${slug}-${y}`);
+      }
+    }
+  }
+  return [...cands];
+}
+
+function stripHtmlToText(html: string): string {
+  const cleaned = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+    .replace(/<header[\s\S]*?<\/header>/gi, " ");
+  const article = cleaned.match(/<article[\s\S]*?<\/article>/i)?.[0] ?? cleaned;
+  return article
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n\n")
+    .trim();
+}
+
+async function fetchBlogPost(title: string): Promise<string | null> {
+  for (const slug of slugCandidatesFromTitle(title)) {
+    if (!slug) continue;
+    try {
+      const url = `https://www.fantasy-football-club.com/p/${slug}`;
+      const resp = await fetch(url, { headers: { "User-Agent": UA } });
+      if (resp.ok) {
+        const text = stripHtmlToText(await resp.text());
+        if (text.length > 400) {
+          console.log("blog hit (slug)", slug);
+          return text.slice(0, 16000);
+        }
+      }
+    } catch (e) {
+      console.warn("blog slug fetch error", slug, e);
+    }
+  }
+  try {
+    const q = encodeURIComponent(`site:fantasy-football-club.com ${title}`);
+    const search = await fetch(`https://duckduckgo.com/html/?q=${q}`, { headers: { "User-Agent": UA } });
+    if (!search.ok) return null;
+    const link = (await search.text()).match(/https?:\/\/(?:www\.)?fantasy-football-club\.com\/p\/[a-z0-9-]+/i)?.[0];
+    if (!link) return null;
+    const resp = await fetch(link, { headers: { "User-Agent": UA } });
+    if (!resp.ok) return null;
+    const text = stripHtmlToText(await resp.text());
+    if (text.length > 400) {
+      console.log("blog hit (search)", link);
+      return text.slice(0, 16000);
+    }
+  } catch (e) {
+    console.warn("blog search error", e);
+  }
+  return null;
+}
+
 async function fetchTranscript(videoId: string): Promise<string | null> {
   try {
     const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
@@ -253,24 +346,27 @@ const SUMMARY_TOOL = {
   },
 };
 
-async function distill(title: string, transcript: string, source: "captions" | "description" | "whisper" = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
+type Source = "captions" | "description" | "whisper" | "blog";
+
+async function distill(title: string, transcript: string, source: Source = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
-  // Cap transcript length to keep token usage sane
   const trimmed = transcript.length > 28000 ? transcript.slice(0, 28000) + " [truncated]" : transcript;
 
-  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's YouTube content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
+  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
 
   const sourceNote = source === "description"
-    ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Descriptions often contain timestamped player lists like '2:15 - Bijan Robinson (target)'. Treat each entry as Sal's stated take. If a description entry has no clear lean, use 'neutral'."
+    ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Treat each entry as Sal's stated take."
     : source === "whisper"
-    ? "## Source\nThis is a WHISPER audio transcription (no captions were available). Expect occasional misspellings of player names — normalize to the most likely real NFL player."
+    ? "## Source\nThis is a WHISPER audio transcription. Expect occasional misspellings of player names — normalize to the most likely real NFL player."
+    : source === "blog"
+    ? "## Source\nThis is Sal's WRITTEN BLOG POST mirroring the video. It is well-formatted with numbered player headers — extract every named player."
     : "";
   const expected = expectedTakeCountFromTitle(title);
   const countInstruction = expected
     ? `The title promises ${expected} players. Extract exactly ${expected} player takes if the content contains them. Do not return zero takes unless the content truly contains no player names.`
     : "Extract every clearly named player take. Do not return zero takes if specific player names are present.";
-  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic video recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
+  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -351,26 +447,30 @@ Deno.serve(async (req: Request) => {
       );
 
       let transcript = await fetchTranscript(item.videoId);
-      let source: "captions" | "description" | "whisper" = "captions";
+      let source: Source = "captions";
       if (!transcript) {
-        // Fallback 1: timestamped/player-list descriptions (cheap, often present).
-        // Generic sponsor/link descriptions are not content; use Whisper instead.
         if (item.description && descriptionLooksActionable(item.description)) {
           transcript = item.description;
           source = "description";
         } else {
-          // Fallback 2: Whisper audio transcription (paid)
-          const whisperText = await transcribeWithWhisper(item.videoId);
-          if (whisperText && whisperText.length > 100) {
-            transcript = whisperText;
-            source = "whisper";
+          // Try blog mirror first (cheap, well-structured)
+          const blogText = await fetchBlogPost(item.title);
+          if (blogText) {
+            transcript = blogText;
+            source = "blog";
           } else {
-            await sb
-              .from("vetri_notes")
-              .update({ status: "no_transcript", error: "No captions, description, or Whisper transcript available" })
-              .eq("video_id", item.videoId);
-            results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
-            continue;
+            const whisperText = await transcribeWithWhisper(item.videoId);
+            if (whisperText && whisperText.length > 100) {
+              transcript = whisperText;
+              source = "whisper";
+            } else {
+              await sb
+                .from("vetri_notes")
+                .update({ status: "no_transcript", error: "No captions, blog post, or audio transcript available" })
+                .eq("video_id", item.videoId);
+              results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
+              continue;
+            }
           }
         }
       }
@@ -380,28 +480,36 @@ Deno.serve(async (req: Request) => {
         const expected = expectedTakeCountFromTitle(item.title);
         const takeCount = distilled?.takes?.length ?? 0;
         if (!distilled || takeCount === 0 || (expected != null && takeCount < Math.min(expected, 3))) {
-          if (source !== "whisper") {
-            const whisperText = await transcribeWithWhisper(item.videoId);
-            if (whisperText && whisperText.length > 100) {
-              transcript = whisperText;
-              source = "whisper";
-              const retry = await distill(item.title, transcript, source);
-              if (retry && retry.takes?.length > 0) {
-                await sb
-                  .from("vetri_notes")
-                  .update({
-                    status: "ready",
-                    error: null,
-                    transcript,
-                    summary: retry.summary,
-                    takes: retry.takes,
-                    positions: retry.positions ?? [],
-                  })
-                  .eq("video_id", item.videoId);
-                results.push({ videoId: item.videoId, title: item.title, status: "ready" });
-                continue;
-              }
+          // Try escalating fallbacks: blog → whisper
+          const tryNext = async (nextSource: Source, fetcher: () => Promise<string | null>) => {
+            if (source === nextSource) return null;
+            const text = await fetcher();
+            if (!text || text.length < 100) return null;
+            const retry = await distill(item.title, text, nextSource);
+            if (retry && retry.takes?.length > 0) {
+              transcript = text;
+              source = nextSource;
+              return retry;
             }
+            return null;
+          };
+          const retry =
+            (await tryNext("blog", () => fetchBlogPost(item.title))) ||
+            (await tryNext("whisper", () => transcribeWithWhisper(item.videoId)));
+          if (retry) {
+            await sb
+              .from("vetri_notes")
+              .update({
+                status: "ready",
+                error: null,
+                transcript,
+                summary: retry.summary,
+                takes: retry.takes,
+                positions: retry.positions ?? [],
+              })
+              .eq("video_id", item.videoId);
+            results.push({ videoId: item.videoId, title: item.title, status: "ready" });
+            continue;
           }
           await sb
             .from("vetri_notes")
