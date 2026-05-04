@@ -51,6 +51,7 @@ import VetriTierSheet from "@/components/VetriTierSheet";
 import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import MobileBudgetStrip from "@/components/MobileBudgetStrip";
+import TargetedForecastButton from "@/components/TargetedForecastButton";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -94,6 +95,12 @@ export default function LiveDashboard() {
   const [nominations, setNominations] = useState<NominationPrediction[]>([]);
   const [roomRead, setRoomRead] = useState<string | undefined>(undefined);
   const [nominationsLoading, setNominationsLoading] = useState(false);
+  const [forecastFilters, setForecastFilters] = useState<{
+    positions: Position[];
+    tier: "any" | "elite" | "starter" | "depth";
+    priceMin: string;
+    priceMax: string;
+  }>({ positions: [], tier: "any", priceMin: "", priceMax: "" });
   const [vetriTakes, setVetriTakes] = useState<VetriTake[]>([]);
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
@@ -445,9 +452,16 @@ export default function LiveDashboard() {
     }
   };
 
-  const refreshNominations = async () => {
+  const refreshNominations = async (filtersOverride?: typeof forecastFilters) => {
     setNominationsLoading(true);
     try {
+      const f = filtersOverride ?? forecastFilters;
+      const filters = {
+        positions: f.positions.length ? f.positions : undefined,
+        tier: f.tier !== "any" ? f.tier : undefined,
+        priceMin: f.priceMin ? parseInt(f.priceMin, 10) : undefined,
+        priceMax: f.priceMax ? parseInt(f.priceMax, 10) : undefined,
+      };
       const resp = await fetch(NOMINATIONS_URL, {
         method: "POST",
         headers: {
@@ -473,6 +487,7 @@ export default function LiveDashboard() {
           spendByPosition: spend,
           recentRuns: runs,
           watchlist,
+          filters,
         }),
       });
       if (!resp.ok) {
@@ -776,18 +791,28 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
-          <NominationForecast
-            predictions={nominations}
-            roomRead={roomRead}
-            loading={nominationsLoading}
-            onRefresh={refreshNominations}
-            onPick={(name, position) => {
-              setPlayerName(name);
-              setPosition(position);
-              setDrafter("other");
-              toast(`${name} loaded — ready to log when nominated`);
-            }}
-          />
+          <div className="space-y-2">
+            <div className="flex items-center justify-end">
+              <TargetedForecastButton
+                value={forecastFilters}
+                onChange={setForecastFilters}
+                onRun={(f) => refreshNominations(f)}
+                loading={nominationsLoading}
+              />
+            </div>
+            <NominationForecast
+              predictions={nominations}
+              roomRead={roomRead}
+              loading={nominationsLoading}
+              onRefresh={() => refreshNominations()}
+              onPick={(name, position) => {
+                setPlayerName(name);
+                setPosition(position);
+                setDrafter("other");
+                toast(`${name} loaded — ready to log when nominated`);
+              }}
+            />
+          </div>
           <UpNextQueue
             targets={queue}
             openMan={openMan}

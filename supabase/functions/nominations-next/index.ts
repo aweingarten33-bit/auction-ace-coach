@@ -111,20 +111,43 @@ Deno.serve(async (req: Request) => {
     }
     const marketMult = nMatched >= 3 && sheetSum > 0 ? paidSum / sheetSum : 1;
 
+    // Filter inputs (optional from client)
+    const filters = (p.filters ?? {}) as {
+      positions?: string[];
+      tier?: "elite" | "starter" | "depth" | "any";
+      priceMin?: number;
+      priceMax?: number;
+    };
+    const posFilter = Array.isArray(filters.positions) && filters.positions.length
+      ? new Set(filters.positions.map((s: string) => String(s).toUpperCase()))
+      : null;
+    const priceMin = Number.isFinite(filters.priceMin) ? Number(filters.priceMin) : null;
+    const priceMax = Number.isFinite(filters.priceMax) ? Number(filters.priceMax) : null;
+    const tier = filters.tier && filters.tier !== "any" ? filters.tier : null;
+
     // Fallback board per position — top 12 undrafted by sheet, with going$
     const POS_LIST = ["QB", "RB", "WR", "TE", "K", "DST"] as const;
     const fallbackByPos: Record<string, { name: string; sheet: number; going: number }[]> = {};
     for (const pos of POS_LIST) {
-      const list = ((p.prices ?? []) as any[])
+      let list = ((p.prices ?? []) as any[])
         .filter((r) => r.position === pos && !draftedSet.has(norm(r.name)) && Number(r.price) > 0)
-        .sort((a, b) => Number(b.price) - Number(a.price))
-        .slice(0, 12)
-        .map((r) => ({
-          name: r.name,
-          sheet: Number(r.price),
-          going: Math.max(1, Math.round(Number(r.price) * marketMult)),
-        }));
-      fallbackByPos[pos] = list;
+        .sort((a, b) => Number(b.price) - Number(a.price));
+      // tier slicing on the position list (rough: top 4 elite, next 8 starter, rest depth)
+      if (tier === "elite") list = list.slice(0, 4);
+      else if (tier === "starter") list = list.slice(4, 12);
+      else if (tier === "depth") list = list.slice(12, 30);
+      else list = list.slice(0, 12);
+      const mapped = list.map((r) => ({
+        name: r.name,
+        sheet: Number(r.price),
+        going: Math.max(1, Math.round(Number(r.price) * marketMult)),
+      }));
+      const priced = mapped.filter((r) => {
+        if (priceMin != null && r.going < priceMin) return false;
+        if (priceMax != null && r.going > priceMax) return false;
+        return true;
+      });
+      fallbackByPos[pos] = posFilter && !posFilter.has(pos) ? [] : priced;
     }
 
     // Tier-break detection: gap between #1 and #2 undrafted at each position
@@ -164,6 +187,7 @@ Deno.serve(async (req: Request) => {
       `## Tier Breaks (DETERMINISTIC — large gap between #1 undrafted and #2 at this position)\n${tierBreakText}`,
       `## Fallback Board (DETERMINISTIC — top undrafted per position)\n${fallbackText}`,
       `## Watchlist (user pinned)\n${(p.watchlist ?? []).join(", ") || "(none)"}`,
+      `## User Filters (HARD CONSTRAINTS — every prediction MUST satisfy these)\npositions: ${posFilter ? Array.from(posFilter).join(",") : "any"}\ntier: ${tier ?? "any"}\nprice range (going $): ${priceMin ?? "-∞"} to ${priceMax ?? "+∞"}\nIf the Fallback Board is empty due to filters, return the closest 10 candidates that still satisfy the position/tier filter, ignoring the price band as last resort and noting it in roomRead.`,
       `## Task\nCall emit_nominations with the 10 players MOST LIKELY to be nominated next, ordered by confidence DESCENDING. For each, fill in signals.trend / signals.value / signals.rosterNeed (each 0-100) so the user can see WHY. Cite the dominant signal in reason+trigger. Predictions must be undrafted players from the Fallback Board when possible.`,
     ].join("\n\n");
 
