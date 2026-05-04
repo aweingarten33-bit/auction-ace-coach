@@ -93,6 +93,13 @@ export default function EspnSettings() {
     toast.success(`Pulled ${totalPicks} picks across ${ok.length} season(s)${skipped.length ? ` · ${skipped.length} skipped` : ""}`);
   };
 
+  const syncRanks = async () => {
+    setBusy(true);
+    const { data, error } = await supabase.functions.invoke("espn-player-ranks", {});
+    setBusy(false);
+    if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Rank sync failed");
+    toast.success(`Cached ${data.upserted} player ranks`);
+
   const copyToken = () => {
     navigator.clipboard.writeText(token);
     toast.success("Token copied");
