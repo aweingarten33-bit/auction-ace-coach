@@ -9,7 +9,8 @@ import {
   byeWeekForTeam,
   SleeperPlayer,
 } from "@/lib/sleeper";
-import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle } from "lucide-react";
+import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube } from "lucide-react";
+import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 
 interface Props {
   open: boolean;
@@ -183,6 +184,14 @@ export default function PlayerDetailsOverlay({
               <span className="italic text-muted-foreground">{knockoffNote}</span>
             </Block>
           ) : null}
+        </div>
+
+        {/* Sal Vetri takes */}
+        <div className="rounded-md border border-border/60 bg-secondary/30 p-3">
+          <p className="mb-2 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
+            <Youtube className="h-3 w-3" /> Sal Vetri's takes
+          </p>
+          <VetriTakesForPlayer player={name} compact />
         </div>
       </DialogContent>
     </Dialog>
