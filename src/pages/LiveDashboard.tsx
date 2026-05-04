@@ -343,12 +343,15 @@ export default function LiveDashboard() {
                 </button>
               </div>
               <div className="grid grid-cols-[1fr_90px_80px] gap-2">
-                <Input
-                  placeholder="Player name"
+                <PlayerAutocomplete
                   value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
-                  className="font-medium"
+                  onChange={setPlayerName}
+                  onSelect={(p) => {
+                    if (p.position && POSITIONS.includes(p.position as Pos)) {
+                      setPosition(p.position as Pos);
+                    }
+                  }}
+                  onEnter={submitPick}
                   autoFocus
                 />
                 <Input
