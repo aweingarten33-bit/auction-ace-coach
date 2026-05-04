@@ -226,9 +226,9 @@ const SUMMARY_TOOL = {
           items: { type: "string", enum: ["QB", "RB", "WR", "TE", "K", "DST"] },
           description: "Positions discussed.",
         },
-        takes: {
+          takes: {
           type: "array",
-          minItems: 0,
+          minItems: 1,
           maxItems: 12,
           items: {
             type: "object",
@@ -267,7 +267,11 @@ async function distill(title: string, transcript: string, source: "captions" | "
     : source === "whisper"
     ? "## Source\nThis is a WHISPER audio transcription (no captions were available). Expect occasional misspellings of player names — normalize to the most likely real NFL player."
     : "";
-  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. Include only players he expresses a clear opinion on. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
+  const expected = expectedTakeCountFromTitle(title);
+  const countInstruction = expected
+    ? `The title promises ${expected} players. Extract exactly ${expected} player takes if the content contains them. Do not return zero takes unless the content truly contains no player names.`
+    : "Extract every clearly named player take. Do not return zero takes if specific player names are present.";
+  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic video recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
