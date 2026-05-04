@@ -112,15 +112,9 @@ async function fetchTranscript(videoId: string): Promise<string | null> {
     });
     if (!watch.ok) return null;
     const html = await watch.text();
-    const m = html.match(/"captionTracks":(\[[^\]]+\])/);
-    if (!m) return null;
-    // Parse the JSON-ish array. It's already valid JSON when extracted.
-    let tracks: any[];
-    try {
-      tracks = JSON.parse(m[1].replace(/\\u0026/g, "&"));
-    } catch {
-      return null;
-    }
+    const player = extractJsonObjectAfter(html, "ytInitialPlayerResponse");
+    const tracks: any[] = player?.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
+    if (!tracks.length) return null;
     const track = tracks.find((t) => t?.languageCode === "en") ?? tracks[0];
     if (!track?.baseUrl) return null;
     const ttResp = await fetch(track.baseUrl, {
@@ -159,10 +153,8 @@ async function fetchAudioStreamUrl(videoId: string): Promise<{ url: string; mime
     });
     if (!watch.ok) return null;
     const html = await watch.text();
-    const m = html.match(/ytInitialPlayerResponse\s*=\s*(\{[\s\S]*?\})\s*;\s*(?:var|<\/script>)/);
-    if (!m) return null;
-    let player: any;
-    try { player = JSON.parse(m[1]); } catch { return null; }
+    const player = extractJsonObjectAfter(html, "ytInitialPlayerResponse");
+    if (!player) return null;
     const formats: any[] = player?.streamingData?.adaptiveFormats ?? [];
     // audio-only mp4 (m4a) — smallest bitrate to stay under Whisper 25MB
     const audio = formats
