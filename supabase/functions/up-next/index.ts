@@ -71,7 +71,9 @@ Deno.serve(async (req: Request) => {
       `## Spend by Position\n${JSON.stringify(p.spendByPosition)}`,
       `## Recent Runs (last ${p.recentRuns?.window})\n${JSON.stringify(p.recentRuns?.counts)}`,
       `## User Price Sheet (first 100)\n${(p.prices ?? []).slice(0, 100).map((x: any) => `${x.name} $${x.price}`).join("\n") || "(none)"}`,
-      `## Task\nCall emit_queue with the 3 best targets right now.`,
+      `## Watchlist (user pinned — prefer when fit is real)\n${(p.watchlist ?? []).join(", ") || "(none)"}`,
+      `## Dismissed (user rejected — DO NOT suggest these)\n${(p.dismissed ?? []).join(", ") || "(none)"}`,
+      `## Task\nCall emit_queue with the 3 best targets right now. Never include any name from the Dismissed list.`,
     ].join("\n\n");
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

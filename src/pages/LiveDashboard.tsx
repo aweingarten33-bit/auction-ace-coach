@@ -38,6 +38,8 @@ import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
+import Watchlist from "@/components/Watchlist";
+import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
@@ -50,9 +52,15 @@ export default function LiveDashboard() {
     prices,
     events,
     setupComplete,
+    watchlist,
+    dismissed,
     addEvent,
     undoEvent,
     resetAll,
+    pinPlayer,
+    unpinPlayer,
+    dismissPlayer,
+    clearDismissed,
   } = useDraftStore();
 
   const [playerName, setPlayerName] = useState("");
@@ -89,6 +97,11 @@ export default function LiveDashboard() {
   const myCount = useMemo(() => countByPosition(myItems), [myItems]);
   const spend = useMemo(() => spendByPosition(events), [events]);
   const runs = useMemo(() => recentRuns(events, 6), [events]);
+  const pulse = useMemo(() => computeMarketPulse(events, prices), [events, prices]);
+  const valueFor = useMemo(
+    () => (name: string, bid: number) => computeValueFor(name, bid, prices, pulse),
+    [prices, pulse]
+  );
 
   const requiredCount = {
     QB: settings.roster.QB + (settings.leagueType !== "Standard" ? settings.roster.SUPERFLEX : 0),
@@ -156,6 +169,22 @@ export default function LiveDashboard() {
     if (["RB", "WR", "TE"].includes(previewPos) && flexShort > 0) return "FLEX slot";
     return "bench slot";
   })();
+
+  const whatIfFor = (pos: Position, bid: number) =>
+    whatIfPick(settings, keepers, events, myCount, requiredCount, pos, bid);
+
+  const handlePin = (name: string) => { pinPlayer(name); toast(`Pinned ${name}`); };
+  const handleUnpin = (name: string) => { unpinPlayer(name); };
+  const handleDismiss = (name: string) => {
+    dismissPlayer(name);
+    setQueue((q) => q.filter((t) => t.name !== name));
+    toast(`Dismissed ${name}`);
+  };
+  const handleLoadFromWatchlist = (name: string) => {
+    setPlayerName(name);
+    setDrafter("me");
+    toast(`${name} loaded`);
+  };
 
 
   const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
@@ -267,6 +296,8 @@ export default function LiveDashboard() {
           prices,
           spendByPosition: spend,
           recentRuns: runs,
+          dismissed,
+          watchlist,
         }),
       });
       if (!resp.ok) {
@@ -277,7 +308,8 @@ export default function LiveDashboard() {
       }
       const data = await resp.json();
       if (data?.targets) {
-        setQueue(data.targets);
+        const filtered = (data.targets as QueueTarget[]).filter((t) => !dismissed.includes(t.name));
+        setQueue(filtered);
         setOpenMan(data.openMan);
       }
     } catch (e) {
@@ -518,8 +550,23 @@ export default function LiveDashboard() {
             openMan={openMan}
             loading={queueLoading}
             empty={!queue.length}
+            pulseMultiplier={pulse.multiplier}
+            pulseConfident={pulse.confident}
+            watchlist={watchlist}
             onRefresh={refreshQueue}
             onPick={handlePickFromQueue}
+            onPin={handlePin}
+            onUnpin={handleUnpin}
+            onDismiss={handleDismiss}
+            valueFor={valueFor}
+            whatIfFor={whatIfFor}
+          />
+          <Watchlist
+            watchlist={watchlist}
+            onUnpin={handleUnpin}
+            onLoad={handleLoadFromWatchlist}
+            valueFor={valueFor}
+            maxBid={budget.maxBid}
           />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
