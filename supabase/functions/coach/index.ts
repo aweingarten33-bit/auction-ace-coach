@@ -36,18 +36,38 @@ HARD RULES:
 
 Format the entire response in clean markdown. Aim for 8-15 short lines total.`;
 
+interface KeeperPayload {
+  player: string;
+  position?: string;
+  cost: number;
+}
+
+interface RosterPlayerPayload {
+  player: string;
+  position?: string;
+  price: number;
+  source?: string;
+}
+
+interface DraftEventPayload {
+  player: string;
+  position?: string;
+  price: number;
+  drafter: "me" | "other";
+}
+
 interface CoachPayload {
-  settings: any;
-  budget: any;
-  keepers?: any[];
-  myRoster?: any[];
-  rosterFilled: any;
-  rosterRequired: any;
-  events: any[];
+  settings: Record<string, unknown>;
+  budget: Record<string, unknown>;
+  keepers?: KeeperPayload[];
+  myRoster?: RosterPlayerPayload[];
+  rosterFilled: Record<string, number>;
+  rosterRequired: Record<string, number>;
+  events: DraftEventPayload[];
   prices: { name: string; price: number }[];
   spendByPosition: Record<string, number>;
   recentRuns: { window: number; counts: Record<string, number> };
-  latestEvent?: any;
+  latestEvent?: DraftEventPayload;
   userQuestion?: string;
   history?: { role: "user" | "assistant"; content: string }[];
 }
@@ -59,14 +79,14 @@ function buildUserMessage(p: CoachPayload): string {
   if (p.keepers?.length) {
     parts.push(
       `## User Keepers - already rostered, count toward budget and roster slots\n${p.keepers
-        .map((k: any) => `${k.player}${k.position ? ` (${k.position})` : ""} - $${k.cost}`)
+        .map((k) => `${k.player}${k.position ? ` (${k.position})` : ""} - $${k.cost}`)
         .join("\n")}`
     );
   }
   if (p.myRoster?.length) {
     parts.push(
       `## User Current Roster (keepers + drafted players)\n${p.myRoster
-        .map((x: any) => `[${x.source ?? "roster"}] ${x.player}${x.position ? ` (${x.position})` : ""} - $${x.price}`)
+        .map((x) => `[${x.source ?? "roster"}] ${x.player}${x.position ? ` (${x.position})` : ""} - $${x.price}`)
         .join("\n")}`
     );
   }
@@ -89,7 +109,7 @@ function buildUserMessage(p: CoachPayload): string {
     parts.push(
       `## Draft Log (chronological)\n${p.events
         .map(
-          (e: any) =>
+          (e) =>
             `${e.drafter === "me" ? "[ME]" : "[OTHER]"} ${e.player}${e.position ? ` (${e.position})` : ""} - $${e.price}`
         )
         .join("\n")}`
@@ -117,7 +137,7 @@ Deno.serve(async (req: Request) => {
 
     const payload = (await req.json()) as CoachPayload;
 
-    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
+    const messages: { role: string; content: string }[] = [{ role: "system", content: SYSTEM_PROMPT }];
     if (payload.history?.length) {
       for (const h of payload.history.slice(-6)) {
         messages.push({ role: h.role, content: h.content });
