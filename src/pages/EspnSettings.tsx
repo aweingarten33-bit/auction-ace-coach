@@ -91,6 +91,7 @@ export default function EspnSettings() {
     const skipped = (data.summary ?? []).filter((s: any) => s.status !== "ok");
     const totalPicks = ok.reduce((s: number, x: any) => s + x.picks, 0);
     toast.success(`Pulled ${totalPicks} picks across ${ok.length} season(s)${skipped.length ? ` · ${skipped.length} skipped` : ""}`);
+  };
 
   const copyToken = () => {
     navigator.clipboard.writeText(token);
