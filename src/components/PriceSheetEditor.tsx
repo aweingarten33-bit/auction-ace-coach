@@ -22,6 +22,57 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [quickName, setQuickName] = useState("");
   const [quickPrice, setQuickPrice] = useState("");
   const [filter, setFilter] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (file: File) => {
+    if (file.size > 15 * 1024 * 1024) {
+      return toast.error("File too large (max 15MB)");
+    }
+    setUploading(true);
+    try {
+      const buf = await file.arrayBuffer();
+      // base64 encode in chunks to avoid stack overflow on large files
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      const CHUNK = 0x8000;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + CHUNK)));
+      }
+      const fileBase64 = btoa(binary);
+      const resp = await fetch(PARSE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ fileBase64, mimeType: file.type || "application/pdf" }),
+      });
+      if (!resp.ok) {
+        const t = await resp.json().catch(() => ({}));
+        throw new Error(t.error || `Parse failed (${resp.status})`);
+      }
+      const { players } = await resp.json() as { players: { name: string; price: number }[] };
+      if (!players?.length) {
+        toast.error("No players found in file");
+        return;
+      }
+      // Merge with existing — overwrite duplicates with new prices
+      const map = new Map<string, PriceEstimate>();
+      for (const p of prices) map.set(p.name.toLowerCase(), p);
+      for (const p of players) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
+      const merged = Array.from(map.values());
+      setPrices(merged);
+      setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
+      toast.success(`Imported ${players.length} players from ${file.name}`);
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   // Parse on every keystroke for the live preview
   const parsed = useMemo(() => parsePriceSheet(pricesText), [pricesText]);
