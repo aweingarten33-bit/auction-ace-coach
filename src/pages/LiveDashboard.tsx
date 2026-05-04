@@ -787,7 +787,9 @@ export default function LiveDashboard() {
           {/* Coach */}
           <Card className="bg-gradient-card p-4 shadow-glow">
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
-              <Sparkles className="h-3.5 w-3.5" /> AI Coach {streaming && <span className="text-muted-foreground">· thinking...</span>}
+              <Sparkles className="h-3.5 w-3.5" /> AI Coach
+              <span className="font-mono text-[9px] tracking-[0.2em] text-primary/70">— THE TAKE</span>
+              {streaming && <span className="text-muted-foreground">· thinking...</span>}
             </h2>
             <div ref={coachRef} className="coach-md max-h-96 space-y-3 overflow-auto text-sm leading-relaxed">
               {coachHistory.length === 0 && !streaming && (
