@@ -23,6 +23,7 @@ export interface QueueTarget {
   grade?: number;
   worstCase?: string;
   knockoff?: QueueKnockoff;
+  knockoffNote?: string;
   dossier?: string;
 }
 
