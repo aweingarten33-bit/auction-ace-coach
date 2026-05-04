@@ -29,6 +29,7 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [updatedAt, setUpdatedAt] = useState<number>(0);
+  const [showHelp, setShowHelp] = useState(false);
 
   const load = async () => {
     setLoading(true);
