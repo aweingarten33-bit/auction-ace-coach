@@ -423,6 +423,13 @@ export default function LiveDashboard() {
         <section className="space-y-4">
           <Card className="bg-gradient-card p-4">
             <div className="space-y-3">
+              {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Log a Pick
+                </span>
+                <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+              </div>
               {/* Drafter toggle */}
               <div className="grid grid-cols-2 gap-2 rounded-lg bg-secondary/40 p-1">
                 <button
