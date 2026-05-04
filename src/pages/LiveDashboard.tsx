@@ -48,6 +48,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import DraftIntelTicker from "@/components/DraftIntelTicker";
 import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import VetriTierSheet from "@/components/VetriTierSheet";
+import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
