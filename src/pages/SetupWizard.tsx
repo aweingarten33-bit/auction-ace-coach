@@ -202,23 +202,6 @@ export default function SetupWizard() {
 
           {step === 2 && (
             <div className="space-y-4">
-              <div>
-                <Label>Keeper Cost Increase Rule</Label>
-                <Textarea
-                  rows={4}
-                  placeholder="e.g. +4 in year 1, +8 in year 2, +12 in year 3, then players go back into draft"
-                  value={settings.keeperIncrease}
-                  onChange={(e) => setSettings({ keeperIncrease: e.target.value })}
-                />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Used by the AI when reasoning about value, but you'll enter final keeper costs in the next step.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
               <p className="text-sm">
                 Budget after keepers:{" "}
                 <span className="font-bold text-primary">${settings.totalBudget - keeperSpend}</span>{" "}
@@ -277,7 +260,7 @@ export default function SetupWizard() {
             </div>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <PriceSheetEditor
               prices={prices}
               setPrices={setPrices}
@@ -286,7 +269,7 @@ export default function SetupWizard() {
             />
           )}
 
-          {step === 5 && (
+          {step === 4 && (
             <div className="space-y-3">
               <Label>League Context</Label>
               <p className="text-xs text-muted-foreground">
