@@ -198,6 +198,15 @@ export default function LiveDashboard() {
   const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
     setStreaming(true);
     setCoachText("");
+    // Capture user message immediately so it shows in the thread while streaming
+    if (userQuestion) {
+      setCoachHistory((h) => [...h, { role: "user", content: userQuestion }]);
+    } else if (latestEvent) {
+      setCoachHistory((h) => [
+        ...h,
+        { role: "user", content: `📌 Logged: ${latestEvent.drafter === "me" ? "[ME]" : "[OTHER]"} ${latestEvent.player} — $${latestEvent.price}` },
+      ]);
+    }
     try {
       const resp = await fetch(COACH_URL, {
         method: "POST",
