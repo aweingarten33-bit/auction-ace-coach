@@ -39,9 +39,8 @@ import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 import Watchlist from "@/components/Watchlist";
-import { computeMarketPulse, valueFor as computeValueFor, whatIfPick, knockoutBid } from "@/lib/value";
-import { readIdentity } from "@/lib/identity";
-import IdentityCard from "@/components/IdentityCard";
+import AnimatedNumber from "@/components/AnimatedNumber";
+import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
@@ -103,14 +102,6 @@ export default function LiveDashboard() {
   const valueFor = useMemo(
     () => (name: string, bid: number) => computeValueFor(name, bid, prices, pulse),
     [prices, pulse]
-  );
-  const knockoutFor = useMemo(
-    () => (name: string) => knockoutBid(name, prices, pulse, budget.maxBid),
-    [prices, pulse, budget.maxBid]
-  );
-  const identity = useMemo(
-    () => readIdentity(keepers, events, budget),
-    [keepers, events, budget]
   );
 
   const requiredCount = {
@@ -377,26 +368,29 @@ export default function LiveDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 border-b border-border bg-card/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between p-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-primary">
-              <Trophy className="h-4 w-4 text-primary-foreground" />
+      <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary">
+              <Trophy className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-sm font-bold leading-tight">Auction Draft AI Coach</h1>
-              <p className="text-[10px] text-muted-foreground leading-tight">
-                ${budget.remaining} left · {budget.slotsLeft} slots · max ${budget.maxBid}
-              </p>
-            </div>
+            <h1 className="truncate text-[13px] font-semibold leading-tight tracking-tight">Auction Coach</h1>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+          {/* Compact live budget — Awwwards single-accent emphasis on remaining */}
+          <div className="flex items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
+            <span><AnimatedNumber value={budget.remaining} prefix="$" className="font-bold text-primary" /> <span className="opacity-70">left</span></span>
+            <span className="hidden xs:inline opacity-40">·</span>
+            <span><AnimatedNumber value={budget.maxBid} prefix="$" className="font-bold text-foreground" /> <span className="opacity-70">max</span></span>
+            <span className="hidden xs:inline opacity-40">·</span>
+            <span><AnimatedNumber value={budget.slotsLeft} className="font-bold text-foreground" /><span className="opacity-70"> slots</span></span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="h-8 w-8 p-0">
               <Settings2 className="h-4 w-4" />
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm"><RotateCcw className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><RotateCcw className="h-4 w-4" /></Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -417,7 +411,7 @@ export default function LiveDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-4 p-3 md:p-4 lg:grid-cols-2">
+      <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <Card className="bg-gradient-card p-4">
@@ -523,11 +517,12 @@ export default function LiveDashboard() {
               Draft Log ({events.length})
             </h2>
             <div className="max-h-80 space-y-1.5 overflow-auto">
-              {[...events].reverse().map((e) => (
+              {[...events].reverse().map((e, idx) => (
                 <div
                   key={e.id}
-                  className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm ${
-                    e.drafter === "me" ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/50"
+                  style={{ animationDelay: `${Math.min(idx, 6) * 30}ms` }}
+                  className={`flex animate-fade-in-up items-center justify-between rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                    e.drafter === "me" ? "border-primary/30 bg-primary/5" : "border-border/70 bg-secondary/40"
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -570,9 +565,7 @@ export default function LiveDashboard() {
             onDismiss={handleDismiss}
             valueFor={valueFor}
             whatIfFor={whatIfFor}
-            knockoutFor={knockoutFor}
           />
-          <IdentityCard read={identity} />
           <Watchlist
             watchlist={watchlist}
             onUnpin={handleUnpin}
@@ -585,20 +578,22 @@ export default function LiveDashboard() {
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Remaining</p>
-                <p className="text-2xl font-bold text-primary">${budget.remaining}</p>
+                <AnimatedNumber value={budget.remaining} prefix="$" className="block text-2xl font-bold text-primary" />
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Bid</p>
-                <p className="text-2xl font-bold">${budget.maxBid}</p>
+                <AnimatedNumber value={budget.maxBid} prefix="$" className="block text-2xl font-bold" />
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Slots Left</p>
-                <p className="text-2xl font-bold">{budget.slotsLeft}<span className="text-sm text-muted-foreground">/{budget.slotsTotal}</span></p>
+                <p className="text-2xl font-bold tabular-nums">
+                  <AnimatedNumber value={budget.slotsLeft} /><span className="text-sm text-muted-foreground">/{budget.slotsTotal}</span>
+                </p>
               </div>
             </div>
             <Progress
               value={budget.totalBudget ? (budget.spent / budget.totalBudget) * 100 : 0}
-              className="mt-3 h-1.5"
+              className="mt-3 h-1.5 transition-all duration-500 ease-out-expo"
             />
             <p className="mt-1 text-[10px] text-muted-foreground text-center">
               ${budget.spent} spent · ${budget.avgPerSlot.toFixed(1)}/slot avg
