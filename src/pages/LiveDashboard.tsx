@@ -33,7 +33,7 @@ import {
   recentRuns,
   spendByPosition,
 } from "@/lib/draft-math";
-import { Position } from "@/lib/draft-types";
+import { DraftEvent, Position } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 
@@ -145,14 +145,14 @@ export default function LiveDashboard() {
   const previewPos = position || undefined;
   const previewSlotImpact = (() => {
     if (!previewPos) return "";
-    const need = (requiredCount as any)[previewPos] ?? 0;
+    const need = requiredCount[previewPos];
     if (myCount[previewPos] < need) return `starter slot (${previewPos})`;
     if (["RB", "WR", "TE"].includes(previewPos) && flexShort > 0) return "FLEX slot";
     return "bench slot";
   })();
 
 
-  const askCoach = async (latestEvent?: any, userQuestion?: string) => {
+  const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
     setStreaming(true);
     setCoachText("");
     try {
@@ -168,10 +168,13 @@ export default function LiveDashboard() {
             numTeams: settings.numTeams,
             scoring: settings.scoring,
             leagueType: settings.leagueType,
+            format: settings.format,
             keeperIncrease: settings.keeperIncrease,
             context: settings.context,
           },
           budget,
+          keepers,
+          myRoster: myItems,
           rosterRequired: requiredCount,
           rosterFilled: myCount,
           events,

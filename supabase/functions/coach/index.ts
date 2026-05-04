@@ -7,7 +7,7 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `You are an elite fantasy football auction draft coach giving real-time guidance during a LIVE auction draft.
 
-You will receive a deterministic snapshot of draft state computed by the client (budget, slots remaining, max bid, roster filled, full draft log, position spend, recent runs, the user's own price sheet, and league context).
+You will receive a deterministic snapshot of draft state computed by the client (budget, slots remaining, max bid, keepers, current roster, roster filled, full draft log, position spend, recent runs, the user's own price sheet, and league context).
 
 Your job, after every event or question, is to respond conversationally but SHARP and DIRECT. Your response must:
 
@@ -32,19 +32,42 @@ HARD RULES:
 - Use short Markdown: **bold** the key numbers and recommendations, simple bullet lists.
 - Adapt as the draft unfolds — if the original plan breaks, say so explicitly and pivot.
 - Account for league type (Superflex/2QB inflates QB cost) and scoring (PPR boosts pass-catchers).
+- Treat keepers as already rostered players with locked-in costs. In dynasty/keeper leagues, mention their names/positions when they materially change needs.
 
 Format the entire response in clean markdown. Aim for 8-15 short lines total.`;
 
+interface KeeperPayload {
+  player: string;
+  position?: string;
+  cost: number;
+}
+
+interface RosterPlayerPayload {
+  player: string;
+  position?: string;
+  price: number;
+  source?: string;
+}
+
+interface DraftEventPayload {
+  player: string;
+  position?: string;
+  price: number;
+  drafter: "me" | "other";
+}
+
 interface CoachPayload {
-  settings: any;
-  budget: any;
-  rosterFilled: any;
-  rosterRequired: any;
-  events: any[];
+  settings: Record<string, unknown>;
+  budget: Record<string, unknown>;
+  keepers?: KeeperPayload[];
+  myRoster?: RosterPlayerPayload[];
+  rosterFilled: Record<string, number>;
+  rosterRequired: Record<string, number>;
+  events: DraftEventPayload[];
   prices: { name: string; price: number }[];
   spendByPosition: Record<string, number>;
   recentRuns: { window: number; counts: Record<string, number> };
-  latestEvent?: any;
+  latestEvent?: DraftEventPayload;
   userQuestion?: string;
   history?: { role: "user" | "assistant"; content: string }[];
 }
@@ -53,6 +76,20 @@ function buildUserMessage(p: CoachPayload): string {
   const parts: string[] = [];
   parts.push(`## League Settings\n${JSON.stringify(p.settings, null, 2)}`);
   parts.push(`## Budget State\n${JSON.stringify(p.budget, null, 2)}`);
+  if (p.keepers?.length) {
+    parts.push(
+      `## User Keepers - already rostered, count toward budget and roster slots\n${p.keepers
+        .map((k) => `${k.player}${k.position ? ` (${k.position})` : ""} - $${k.cost}`)
+        .join("\n")}`
+    );
+  }
+  if (p.myRoster?.length) {
+    parts.push(
+      `## User Current Roster (keepers + drafted players)\n${p.myRoster
+        .map((x) => `[${x.source ?? "roster"}] ${x.player}${x.position ? ` (${x.position})` : ""} - $${x.price}`)
+        .join("\n")}`
+    );
+  }
   parts.push(
     `## Roster\nRequired: ${JSON.stringify(p.rosterRequired)}\nFilled by user: ${JSON.stringify(p.rosterFilled)}`
   );
@@ -72,7 +109,7 @@ function buildUserMessage(p: CoachPayload): string {
     parts.push(
       `## Draft Log (chronological)\n${p.events
         .map(
-          (e: any) =>
+          (e) =>
             `${e.drafter === "me" ? "[ME]" : "[OTHER]"} ${e.player}${e.position ? ` (${e.position})` : ""} - $${e.price}`
         )
         .join("\n")}`
@@ -100,7 +137,7 @@ Deno.serve(async (req: Request) => {
 
     const payload = (await req.json()) as CoachPayload;
 
-    const messages: any[] = [{ role: "system", content: SYSTEM_PROMPT }];
+    const messages: { role: string; content: string }[] = [{ role: "system", content: SYSTEM_PROMPT }];
     if (payload.history?.length) {
       for (const h of payload.history.slice(-6)) {
         messages.push({ role: h.role, content: h.content });
