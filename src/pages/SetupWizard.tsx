@@ -128,11 +128,28 @@ export default function SetupWizard() {
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Standard">Standard</SelectItem>
+                    <SelectItem value="Standard">Standard (1 QB)</SelectItem>
                     <SelectItem value="Superflex">Superflex</SelectItem>
                     <SelectItem value="2QB">2QB</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label>League Format</Label>
+                <Select
+                  value={settings.format}
+                  onValueChange={(v) => setSettings({ format: v as any })}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Redraft">Redraft</SelectItem>
+                    <SelectItem value="Keeper">Keeper</SelectItem>
+                    <SelectItem value="Dynasty">Dynasty</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Dynasty/Keeper shifts the coach toward youth, long-term value, and contract awareness.
+                </p>
               </div>
             </div>
           )}

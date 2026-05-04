@@ -1,6 +1,7 @@
 export type Position = "QB" | "RB" | "WR" | "TE" | "K" | "DST";
 export type Scoring = "PPR" | "Half PPR" | "Standard";
 export type LeagueType = "Standard" | "Superflex" | "2QB";
+export type LeagueFormat = "Redraft" | "Keeper" | "Dynasty";
 
 export interface RosterSlots {
   QB: number;
@@ -19,6 +20,7 @@ export interface LeagueSettings {
   numTeams: number;
   scoring: Scoring;
   leagueType: LeagueType;
+  format: LeagueFormat;
   roster: RosterSlots;
   keeperIncrease: string; // free-form e.g. "+4/+8/+12"
   context: string;
@@ -62,6 +64,7 @@ export const DEFAULT_SETTINGS: LeagueSettings = {
   numTeams: 12,
   scoring: "PPR",
   leagueType: "Standard",
+  format: "Redraft",
   roster: DEFAULT_ROSTER,
   keeperIncrease: "+5 per year of being kept",
   context: "",
