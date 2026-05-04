@@ -411,7 +411,7 @@ export default function LiveDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-4 p-3 md:p-4 lg:grid-cols-2">
+      <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <Card className="bg-gradient-card p-4">
@@ -517,11 +517,12 @@ export default function LiveDashboard() {
               Draft Log ({events.length})
             </h2>
             <div className="max-h-80 space-y-1.5 overflow-auto">
-              {[...events].reverse().map((e) => (
+              {[...events].reverse().map((e, idx) => (
                 <div
                   key={e.id}
-                  className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm ${
-                    e.drafter === "me" ? "border-primary/30 bg-primary/5" : "border-border bg-secondary/50"
+                  style={{ animationDelay: `${Math.min(idx, 6) * 30}ms` }}
+                  className={`flex animate-fade-in-up items-center justify-between rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                    e.drafter === "me" ? "border-primary/30 bg-primary/5" : "border-border/70 bg-secondary/40"
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
