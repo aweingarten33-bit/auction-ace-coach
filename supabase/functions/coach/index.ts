@@ -152,6 +152,7 @@ Deno.serve(async (req: Request) => {
         model: "google/gemini-3-flash-preview",
         messages,
         stream: true,
+        max_tokens: 2000,
       }),
     });
 
