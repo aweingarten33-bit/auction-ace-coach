@@ -134,6 +134,36 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
         </Button>
       </div>
 
+      {/* Player search */}
+      <div className="relative mb-2">
+        <Search className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search Sal's takes by player…"
+          className="h-8 pl-7 pr-7 text-xs"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            aria-label="Clear search"
+          >
+            <X className="h-3 w-3" />
+          </button>
+        )}
+      </div>
+
+      {search.trim() && (
+        <div className="mb-3 rounded-md border border-primary/30 bg-primary/5 p-2">
+          <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wide text-primary">
+            Sal on "{search.trim()}"
+          </p>
+          <VetriTakesForPlayer player={search.trim()} emptyText="No takes from Sal on that player yet." />
+        </div>
+      )}
+
       {loading && !notes.length && (
         <p className="py-4 text-center font-mono text-[11px] text-muted-foreground">Loading…</p>
       )}
