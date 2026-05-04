@@ -217,12 +217,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </Badge>
       </div>
 
-      {/* Upload PDF/image */}
+      {/* Upload CSV / XLSX / PDF / image */}
       <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3">
         <input
           ref={fileRef}
           type="file"
-          accept="application/pdf,image/png,image/jpeg,image/webp,image/heic"
+          accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/pdf,image/png,image/jpeg,image/webp,image/heic"
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
@@ -236,13 +236,13 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           disabled={uploading}
         >
           {uploading ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Reading sheet with AI...</>
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> Upload PDF or screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> Upload CSV, Excel, PDF or screenshot</>
           )}
         </Button>
         <p className="mt-1.5 text-[10px] text-muted-foreground">
-          Last year's auction results, FantasyPros export, ESPN screenshot — AI extracts names + prices automatically.
+          CSV/Excel parses instantly (free). PDFs &amp; screenshots use AI. Auto-detects which columns are name and price.
         </p>
       </div>
 
