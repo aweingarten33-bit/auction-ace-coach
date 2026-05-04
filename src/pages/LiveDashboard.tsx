@@ -334,6 +334,7 @@ export default function LiveDashboard() {
           recentRuns: runs,
           latestEvent,
           userQuestion,
+          vetriTakes: vetriTakes.slice(0, 40),
         }),
       });
 
@@ -825,6 +826,15 @@ export default function LiveDashboard() {
           />
           <OpponentHeatmap settings={settings} />
           <VetriTierSheet />
+          <VetriNotesPanel
+            onTakesUpdate={setVetriTakes}
+            onLoadPlayer={(name, pos) => {
+              setPlayerName(name);
+              setPosition(pos);
+              setDrafter("me");
+              toast(`${name} loaded from Vetri Notes`);
+            }}
+          />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
