@@ -119,15 +119,8 @@ export default function RosterHero({
                   {r.have}/{r.need}
                 </span>
               </div>
-              <div className="mt-1 flex items-baseline justify-between">
-                <span className="font-mono text-[9px] uppercase tracking-wider opacity-80">
-                  max
-                </span>
-                <span className="font-mono text-sm font-bold tabular-nums text-foreground">
-                  ${r.maxBid}
-                </span>
-              </div>
             </div>
+
           ))}
         </div>
 
