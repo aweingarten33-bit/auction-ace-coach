@@ -1,0 +1,95 @@
+// Pulls league settings, teams, rosters, budgets from ESPN using stored cookies.
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.95.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    const url = Deno.env.get("SUPABASE_URL")!;
+    const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const auth = req.headers.get("Authorization");
+    if (!auth) return j({ error: "missing auth" }, 401);
+
+    const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
+    const { data: u } = await sb.auth.getUser();
+    if (!u.user) return j({ error: "unauthorized" }, 401);
+
+    const { data: creds } = await sb
+      .from("espn_credentials")
+      .select("swid, espn_s2, league_id, season_id")
+      .eq("user_id", u.user.id)
+      .maybeSingle();
+
+    if (!creds?.league_id || !creds?.season_id) {
+      return j({ error: "No league configured. Connect ESPN first." }, 400);
+    }
+
+    const cookie = `SWID=${creds.swid}; espn_s2=${creds.espn_s2}`;
+    const espnUrl = `https://fantasy.espn.com/apis/v3/games/ffl/seasons/${creds.season_id}/segments/0/leagues/${creds.league_id}?view=mTeam&view=mRoster&view=mSettings&view=mDraftDetail&view=mStandings`;
+
+    const r = await fetch(espnUrl, { headers: { cookie, accept: "application/json" } });
+    if (!r.ok) return j({ error: `ESPN ${r.status}` }, 400);
+    const data = await r.json();
+
+    const settings = data?.settings ?? {};
+    const acq = settings?.acquisitionSettings ?? {};
+    const roster = settings?.rosterSettings ?? {};
+    const draft = settings?.draftSettings ?? {};
+
+    const teams = (data.teams ?? []).map((t: any) => ({
+      id: t.id,
+      name: `${t.location ?? ""} ${t.nickname ?? ""}`.trim() || `Team ${t.id}`,
+      abbrev: t.abbrev,
+      remainingBudget: typeof t.draftDayProjectedRank === "number"
+        ? acq.acquisitionBudget - sumRosterPaid(t)
+        : acq.acquisitionBudget - sumRosterPaid(t),
+      roster: (t.roster?.entries ?? []).map((e: any) => ({
+        playerId: e.playerId,
+        name: e.playerPoolEntry?.player?.fullName,
+        position: posCode(e.playerPoolEntry?.player?.defaultPositionId),
+        bidAmount: e.playerPoolEntry?.appliedStatTotal ?? null,
+        acquisitionType: e.acquisitionType,
+      })),
+    }));
+
+    return j({
+      ok: true,
+      league: {
+        id: creds.league_id,
+        season: creds.season_id,
+        name: settings.name,
+        size: settings.size,
+        budget: acq.acquisitionBudget ?? 200,
+        rosterSlots: roster.lineupSlotCounts ?? {},
+        draftType: draft.type,
+        draftStarted: data.draftDetail?.drafted ?? false,
+      },
+      teams,
+    });
+  } catch (e) {
+    return j({ error: e instanceof Error ? e.message : String(e) }, 500);
+  }
+});
+
+function sumRosterPaid(t: any) {
+  let sum = 0;
+  for (const e of t.roster?.entries ?? []) {
+    sum += e.playerPoolEntry?.appliedStatTotal ?? 0;
+  }
+  return sum;
+}
+
+const POS: Record<number, string> = { 1: "QB", 2: "RB", 3: "WR", 4: "TE", 5: "K", 16: "DST" };
+function posCode(id?: number) { return id ? POS[id] ?? null : null; }
+
+function j(b: unknown, s = 200) {
+  return new Response(JSON.stringify(b), {
+    status: s,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
