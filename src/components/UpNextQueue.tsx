@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, Star, ShieldAlert, Tag, Info } from "lucide-react";
+import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
 import { ValueCall, WhatIf } from "@/lib/value";
@@ -71,6 +72,7 @@ export default function UpNextQueue({
   watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor,
 }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [detailFor, setDetailFor] = useState<QueueTarget | null>(null);
 
   const pulsePct = Math.round((pulseMultiplier - 1) * 100);
   const pulseTone =
@@ -238,6 +240,14 @@ export default function UpNextQueue({
                   </Button>
                   <Button
                     size="sm" variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); setDetailFor(t); }}
+                    className="h-6 w-6 px-0"
+                    title="Player details"
+                  >
+                    <Info className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm" variant="ghost"
                     onClick={(e) => { e.stopPropagation(); onDismiss(t.name); }}
                     className="h-6 w-6 px-0"
                     title="Dismiss"
@@ -278,6 +288,20 @@ export default function UpNextQueue({
           );
         })}
       </div>
+      <PlayerDetailsOverlay
+        open={!!detailFor}
+        onOpenChange={(o) => !o && setDetailFor(null)}
+        name={detailFor?.name ?? ""}
+        position={detailFor?.position}
+        matchPct={detailFor?.matchPct}
+        maxBid={detailFor?.maxBid}
+        reason={detailFor?.reason}
+        dossier={detailFor?.dossier}
+        worstCase={detailFor?.worstCase}
+        knockoff={detailFor?.knockoff ? { name: detailFor.knockoff.name, price: detailFor.knockoff.price } : undefined}
+        knockoffNote={detailFor?.knockoffNote}
+        grade={detailFor?.grade}
+      />
     </Card>
   );
 }
