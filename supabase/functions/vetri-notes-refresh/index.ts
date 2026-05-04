@@ -334,8 +334,10 @@ const SUMMARY_TOOL = {
               },
               tier: { type: "string", description: "Tier label if mentioned (e.g. 'Tier 1 RB'). Optional, may be empty." },
               reasoning: { type: "string", description: "Punchy 1-sentence WHY in Sal's voice. <=140 chars." },
+              salPrice: { type: "string", description: "Exact $ amount or range Sal explicitly states for this player (e.g. '$45', '$30-35', 'late round'). Empty string if he gives no price." },
+              estPrice: { type: "integer", description: "Your auction value estimate in dollars assuming a STANDARD $200 auction budget, 12-team PPR. Base it on Sal's lean (target/breakout=premium, value=mid, fade/avoid=cheap), position, and tier. Use 1 for waiver-tier. Always provide a number." },
             },
-            required: ["player", "position", "lean", "reasoning"],
+            required: ["player", "position", "lean", "reasoning", "estPrice"],
             additionalProperties: false,
           },
         },
@@ -353,7 +355,7 @@ async function distill(title: string, transcript: string, source: Source = "capt
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
   const trimmed = transcript.length > 28000 ? transcript.slice(0, 28000) + " [truncated]" : transcript;
 
-  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
+  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.\n\nFor EVERY take you MUST also provide an estPrice — your best estimate of the player's auction value in dollars on a STANDARD $200, 12-team PPR auction. Use Sal's lean as a strong signal (targets/breakouts cost a premium for their tier; fades/avoids should be discounted; sleepers are cheap dart throws $1-5). Anchor to consensus tiers (elite RB1/WR1 $50-70, mid RB2/WR2 $25-40, flex $10-20, late-round $1-5). If Sal explicitly states a $ amount or range, copy it verbatim into salPrice (e.g. '$45', '$30-35') — leave salPrice empty otherwise. estPrice is REQUIRED and must always be a positive integer.`;
 
   const sourceNote = source === "description"
     ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Treat each entry as Sal's stated take."
