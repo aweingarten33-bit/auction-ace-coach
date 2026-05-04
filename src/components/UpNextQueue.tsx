@@ -184,6 +184,12 @@ export default function UpNextQueue({
                         </span>
                       </p>
                     )}
+                    {!t.knockoff && t.knockoffNote && (
+                      <p className="mt-1 flex items-center gap-1 text-[10px] leading-snug text-muted-foreground">
+                        <Tag className="h-2.5 w-2.5 shrink-0" />
+                        <span className="italic">{t.knockoffNote}</span>
+                      </p>
+                    )}
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
                     <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums ${matchTone(t.matchPct)}`}>
