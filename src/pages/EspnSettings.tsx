@@ -80,6 +80,18 @@ export default function EspnSettings() {
     toast.success(`Synced ${data.teams?.length ?? 0} teams from ${data.league?.name}`);
   };
 
+  const syncHistory = async () => {
+    setBusy(true);
+    const { data, error } = await supabase.functions.invoke("espn-historical-draft", {
+      body: { seasonsBack: 3 },
+    });
+    setBusy(false);
+    if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "History sync failed");
+    const ok = (data.summary ?? []).filter((s: any) => s.status === "ok");
+    const skipped = (data.summary ?? []).filter((s: any) => s.status !== "ok");
+    const totalPicks = ok.reduce((s: number, x: any) => s + x.picks, 0);
+    toast.success(`Pulled ${totalPicks} picks across ${ok.length} season(s)${skipped.length ? ` · ${skipped.length} skipped` : ""}`);
+
   const copyToken = () => {
     navigator.clipboard.writeText(token);
     toast.success("Token copied");
