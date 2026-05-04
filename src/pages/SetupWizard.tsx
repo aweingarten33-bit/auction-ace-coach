@@ -21,6 +21,7 @@ import { Trash2, Plus, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
+import PriceSheetEditor from "@/components/PriceSheetEditor";
 
 const STEPS = [
   "League Basics",
