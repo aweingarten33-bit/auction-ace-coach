@@ -23,8 +23,8 @@ export interface SleeperPlayer {
   search_rank?: number | null;
 }
 
-const CACHE_KEY = "sleeper_players_v1";
-const CACHE_TS_KEY = "sleeper_players_ts_v1";
+const CACHE_KEY = "sleeper_players_v2";
+const CACHE_TS_KEY = "sleeper_players_ts_v2";
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FANTASY_POS = new Set(["QB", "RB", "WR", "TE", "K", "DEF"]);
 
