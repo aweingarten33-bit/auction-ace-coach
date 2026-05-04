@@ -719,6 +719,7 @@ export default function LiveDashboard() {
             maxBid={budget.maxBid}
           />
           <OpponentHeatmap settings={settings} />
+          <VetriTierSheet />
           {/* Budget */}
           <Card className="bg-gradient-card p-4">
             <div className="grid grid-cols-3 gap-3 text-center">
