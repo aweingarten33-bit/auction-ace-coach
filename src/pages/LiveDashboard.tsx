@@ -240,6 +240,54 @@ export default function LiveDashboard() {
     }
   };
 
+  const refreshQueue = async () => {
+    setQueueLoading(true);
+    try {
+      const resp = await fetch(UPNEXT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          settings: {
+            totalBudget: settings.totalBudget,
+            numTeams: settings.numTeams,
+            scoring: settings.scoring,
+            leagueType: settings.leagueType,
+            format: settings.format,
+            context: settings.context,
+          },
+          budget,
+          myRoster: myItems,
+          rosterRequired: requiredCount,
+          rosterFilled: myCount,
+          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
+          events,
+          prices,
+          spendByPosition: spend,
+          recentRuns: runs,
+        }),
+      });
+      if (!resp.ok) {
+        if (resp.status === 429) toast.error("Rate limited.");
+        else if (resp.status === 402) toast.error("AI credits exhausted.");
+        else toast.error("Queue unavailable.");
+        return;
+      }
+      const data = await resp.json();
+      if (data?.targets) {
+        setQueue(data.targets);
+        setOpenMan(data.openMan);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Queue error");
+    } finally {
+      setQueueLoading(false);
+    }
+  };
+
   const submitPick = () => {
     const name = playerName.trim();
     const price = parseInt(priceInput, 10);
