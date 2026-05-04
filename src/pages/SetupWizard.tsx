@@ -279,22 +279,12 @@ export default function SetupWizard() {
           )}
 
           {step === 4 && (
-            <div className="space-y-3">
-              <Label>Player Price Estimates (optional)</Label>
-              <p className="text-xs text-muted-foreground">
-                One per line: <code>Jalen Hurts - 65</code>. The coach uses these to spot value/inflation.
-              </p>
-              <Textarea
-                rows={14}
-                placeholder={"Christian McCaffrey - 70\nJalen Hurts - 45\nCeeDee Lamb - 55"}
-                value={pricesText}
-                onChange={(e) => setPricesText(e.target.value)}
-                className="font-mono text-sm"
-              />
-              <p className="text-xs text-muted-foreground">
-                {parsePriceSheet(pricesText).length} valid lines parsed.
-              </p>
-            </div>
+            <PriceSheetEditor
+              prices={prices}
+              setPrices={setPrices}
+              pricesText={pricesText}
+              setPricesText={setPricesText}
+            />
           )}
 
           {step === 5 && (
