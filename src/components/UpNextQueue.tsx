@@ -23,6 +23,7 @@ export interface QueueTarget {
   grade?: number;
   worstCase?: string;
   knockoff?: QueueKnockoff;
+  knockoffNote?: string;
   dossier?: string;
 }
 
@@ -181,6 +182,12 @@ export default function UpNextQueue({
                           <span className="ml-1 font-mono">${t.knockoff.price}</span>
                           <span className="ml-1 opacity-70">(save ${Math.max(0, t.maxBid - t.knockoff.price)})</span>
                         </span>
+                      </p>
+                    )}
+                    {!t.knockoff && t.knockoffNote && (
+                      <p className="mt-1 flex items-center gap-1 text-[10px] leading-snug text-muted-foreground">
+                        <Tag className="h-2.5 w-2.5 shrink-0" />
+                        <span className="italic">{t.knockoffNote}</span>
                       </p>
                     )}
                   </div>
