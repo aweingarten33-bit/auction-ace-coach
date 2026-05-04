@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { ArrowLeft, Copy, Download, Eye, EyeOff, RefreshCw, Shield } from "lucide-react";
+import ConnectorStatus from "@/components/ConnectorStatus";
 
 interface League { leagueId: number; leagueName: string; teamId: number; teamName: string; seasonId: number; }
 
@@ -102,6 +103,10 @@ export default function EspnSettings() {
       <p className="mb-6 text-sm text-muted-foreground">
         Two paths to live data: paste cookies for league import, install the extension for live draft sync.
       </p>
+
+      <div className="mb-6">
+        <ConnectorStatus />
+      </div>
 
       {/* Path A */}
       <Card className="mb-6 p-5">
