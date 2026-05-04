@@ -122,12 +122,41 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div>
           <p className="text-sm font-medium">Player Price Estimates</p>
           <p className="text-[11px] text-muted-foreground">
-            Paste from anywhere — we'll figure it out.
+            Upload a PDF/screenshot of last year's results, or paste/type below.
           </p>
         </div>
         <Badge variant="outline" className="border-primary/40 text-primary text-[10px]">
           {prices.length} players · ${prices.reduce((s, p) => s + p.price, 0)} total
         </Badge>
+      </div>
+
+      {/* Upload PDF/image */}
+      <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/pdf,image/png,image/jpeg,image/webp,image/heic"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) handleUpload(f);
+          }}
+        />
+        <Button
+          variant="outline"
+          className="w-full border-primary/40 hover:bg-primary/10"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Reading sheet with AI...</>
+          ) : (
+            <><Upload className="mr-2 h-4 w-4" /> Upload PDF or screenshot</>
+          )}
+        </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          Last year's auction results, FantasyPros export, ESPN screenshot — AI extracts names + prices automatically.
+        </p>
       </div>
 
       {/* Quick-add */}
