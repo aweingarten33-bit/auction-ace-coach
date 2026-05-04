@@ -165,6 +165,19 @@ export default function UpNextQueue({
                       NO REF
                     </span>
                   )}
+                  {ko.bid != null && (
+                    <span
+                      className={`flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${
+                        ko.confident
+                          ? "border-accent/50 bg-accent/15 text-accent"
+                          : "border-border bg-secondary/40 text-muted-foreground"
+                      }`}
+                      title={`Knockout bid: ${ko.reason}${ko.confident ? "" : " (early read)"}`}
+                    >
+                      <Zap className="h-2.5 w-2.5" />
+                      KO ${ko.bid}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-0.5">
                   <Button
