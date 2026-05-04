@@ -391,6 +391,9 @@ export default function LiveDashboard() {
             <span><AnimatedNumber value={budget.slotsLeft} className="font-bold text-foreground" /><span className="opacity-70"> slots</span></span>
           </div>
           <div className="flex items-center gap-0.5">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/m")} className="h-8 px-2 text-[10px] font-semibold lg:hidden" title="Mobile draft mode">
+              📱
+            </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/espn")} className="h-8 px-2 text-[10px] font-semibold" title="ESPN connection & live sync">
               ESPN
             </Button>
