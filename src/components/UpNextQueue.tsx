@@ -288,6 +288,20 @@ export default function UpNextQueue({
           );
         })}
       </div>
+      <PlayerDetailsOverlay
+        open={!!detailFor}
+        onOpenChange={(o) => !o && setDetailFor(null)}
+        name={detailFor?.name ?? ""}
+        position={detailFor?.position}
+        matchPct={detailFor?.matchPct}
+        maxBid={detailFor?.maxBid}
+        reason={detailFor?.reason}
+        dossier={detailFor?.dossier}
+        worstCase={detailFor?.worstCase}
+        knockoff={detailFor?.knockoff ? { name: detailFor.knockoff.name, price: detailFor.knockoff.price } : undefined}
+        knockoffNote={detailFor?.knockoffNote}
+        grade={detailFor?.grade}
+      />
     </Card>
   );
 }
