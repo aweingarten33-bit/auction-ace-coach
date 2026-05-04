@@ -1,12 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2 } from "lucide-react";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
+
+const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
 interface Props {
   prices: PriceEstimate[];
