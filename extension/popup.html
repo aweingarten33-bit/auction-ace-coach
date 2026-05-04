@@ -1,0 +1,33 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Auction Coach</title>
+<style>
+  body { font: 13px/1.4 -apple-system, system-ui, sans-serif; width: 320px; padding: 14px; color: #111; }
+  h1 { font-size: 14px; margin: 0 0 8px; }
+  label { display:block; font-size: 11px; color:#555; margin-top: 8px; }
+  input { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: monospace; font-size: 11px; }
+  button { margin-top: 10px; width:100%; padding: 8px; border: 0; border-radius: 6px; background:#1d4ed8; color:#fff; font-weight:600; cursor:pointer; }
+  .status { margin-top: 10px; padding: 8px; border-radius: 6px; font-size: 11px; }
+  .ok { background:#dcfce7; color:#166534; }
+  .err { background:#fee2e2; color:#991b1b; }
+  .muted { color:#666; font-size:11px; }
+  code { background:#f3f4f6; padding:1px 4px; border-radius:3px; font-size:10px; }
+</style>
+</head>
+<body>
+  <h1>Auction Coach — ESPN Live Sync</h1>
+  <p class="muted">Open your ESPN draft room. Picks + live bids stream automatically.</p>
+
+  <label>Webhook URL</label>
+  <input id="url" placeholder="https://....supabase.co/functions/v1/draft-webhook" />
+
+  <label>Extension token</label>
+  <input id="token" placeholder="paste from Auction Coach → ESPN settings" />
+
+  <button id="save">Save</button>
+  <button id="test" style="background:#374151;margin-top:6px">Send test event</button>
+
+  <div id="status" class="status muted">Not connected.</div>
+  <p class="muted" style="margin-top:10px">Status updates live when you're in a draft room.</p>
+
+  <script src="popup.js"></script>
+</body></html>

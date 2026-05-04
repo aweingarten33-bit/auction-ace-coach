@@ -14,7 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      espn_credentials: {
+        Row: {
+          created_at: string
+          espn_s2: string
+          last_verified_at: string | null
+          league_id: number | null
+          season_id: number | null
+          swid: string
+          team_id: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          espn_s2: string
+          last_verified_at?: string | null
+          league_id?: number | null
+          season_id?: number | null
+          swid: string
+          team_id?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          espn_s2?: string
+          last_verified_at?: string | null
+          league_id?: number | null
+          season_id?: number | null
+          swid?: string
+          team_id?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      extension_tokens: {
+        Row: {
+          created_at: string
+          last_used_at: string | null
+          token: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          last_used_at?: string | null
+          token: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          last_used_at?: string | null
+          token?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      live_draft_events: {
+        Row: {
+          created_at: string
+          drafter_team_id: number | null
+          drafter_team_name: string | null
+          espn_player_id: number | null
+          event_type: string
+          id: string
+          occurred_at: string
+          player_name: string | null
+          player_position: string | null
+          player_team: string | null
+          price: number | null
+          raw: Json | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          drafter_team_id?: number | null
+          drafter_team_name?: string | null
+          espn_player_id?: number | null
+          event_type: string
+          id?: string
+          occurred_at?: string
+          player_name?: string | null
+          player_position?: string | null
+          player_team?: string | null
+          price?: number | null
+          raw?: Json | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          drafter_team_id?: number | null
+          drafter_team_name?: string | null
+          espn_player_id?: number | null
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          player_name?: string | null
+          player_position?: string | null
+          player_team?: string | null
+          price?: number | null
+          raw?: Json | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
