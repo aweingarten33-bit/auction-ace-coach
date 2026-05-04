@@ -422,6 +422,7 @@ export default function LiveDashboard() {
       <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
+          <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
           <Card className="bg-gradient-card p-4">
             <div className="space-y-3">
               {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
