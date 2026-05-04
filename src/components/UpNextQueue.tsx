@@ -108,6 +108,7 @@ export default function UpNextQueue({
         )}
         {targets.map((t, i) => {
           const v = valueFor(t.name, t.maxBid);
+          const ko = knockoutFor(t.name);
           const isPinned = watchlist.includes(t.name);
           const isOpen = expanded === t.name;
           const wi = isOpen ? whatIfFor(t.position, t.maxBid) : null;
