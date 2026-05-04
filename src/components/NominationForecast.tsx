@@ -162,7 +162,6 @@ export default function NominationForecast({
                 </div>
               )}
             </div>
-            </div>
           );
         })}
       </div>
