@@ -451,9 +451,16 @@ export default function LiveDashboard() {
     }
   };
 
-  const refreshNominations = async () => {
+  const refreshNominations = async (filtersOverride?: typeof forecastFilters) => {
     setNominationsLoading(true);
     try {
+      const f = filtersOverride ?? forecastFilters;
+      const filters = {
+        positions: f.positions.length ? f.positions : undefined,
+        tier: f.tier !== "any" ? f.tier : undefined,
+        priceMin: f.priceMin ? parseInt(f.priceMin, 10) : undefined,
+        priceMax: f.priceMax ? parseInt(f.priceMax, 10) : undefined,
+      };
       const resp = await fetch(NOMINATIONS_URL, {
         method: "POST",
         headers: {
@@ -479,6 +486,7 @@ export default function LiveDashboard() {
           spendByPosition: spend,
           recentRuns: runs,
           watchlist,
+          filters,
         }),
       });
       if (!resp.ok) {
