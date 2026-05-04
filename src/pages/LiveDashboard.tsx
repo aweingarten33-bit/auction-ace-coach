@@ -76,6 +76,7 @@ export default function LiveDashboard() {
   const [coachText, setCoachText] = useState<string>(
     "Welcome, coach. Enter your first draft pick above to get live recommendations."
   );
+  const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
   const coachRef = useRef<HTMLDivElement>(null);
