@@ -530,6 +530,30 @@ export default function LiveDashboard() {
                   </span>
                 </div>
               )}
+
+              {requiredCount.BENCH > 0 && (
+                <div
+                  className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs ${
+                    benchFilled >= requiredCount.BENCH
+                      ? "border-success/40 bg-success/10"
+                      : "border-border bg-secondary/40"
+                  } ${previewPos && drafter === "me" && previewSlotImpact === "bench slot" ? "ring-2 ring-primary" : ""}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-muted text-foreground border-border text-[10px] px-1.5 py-0">
+                      BENCH
+                    </Badge>
+                    <span className="font-mono text-[11px]">
+                      {benchFilled}/{requiredCount.BENCH} filled
+                    </span>
+                  </div>
+                  <span className={`text-[9px] font-bold tracking-wider ${
+                    benchFilled >= requiredCount.BENCH ? "text-success" : "text-muted-foreground"
+                  }`}>
+                    {benchFilled >= requiredCount.BENCH ? "DONE" : "DEPTH"}
+                  </span>
+                </div>
+              )}
             </div>
 
             {previewPos && drafter === "me" && (
