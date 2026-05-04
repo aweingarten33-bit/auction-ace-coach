@@ -114,7 +114,8 @@ export default function UpNextQueue({
           return (
             <div
               key={`${t.name}-${i}`}
-              className="group relative overflow-hidden rounded-md border border-border bg-secondary/40 transition hover:border-primary/50"
+              style={{ animationDelay: `${i * 60}ms` }}
+              className="group relative animate-fade-in-up overflow-hidden rounded-md border border-border bg-secondary/40 transition-all duration-200 ease-out-expo hover:border-primary/50 hover:bg-secondary/60"
             >
               <button
                 onClick={() => onPick(t)}
