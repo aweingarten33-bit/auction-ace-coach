@@ -2,10 +2,17 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, Star, ShieldAlert, Tag, Info } from "lucide-react";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
 import { ValueCall, WhatIf } from "@/lib/value";
+
+export interface QueueKnockoff {
+  name: string;
+  position: Position;
+  price: number;
+}
 
 export interface QueueTarget {
   name: string;
@@ -13,6 +20,10 @@ export interface QueueTarget {
   matchPct: number;
   maxBid: number;
   reason: string;
+  grade?: number;
+  worstCase?: string;
+  knockoff?: QueueKnockoff;
+  dossier?: string;
 }
 
 interface Props {
