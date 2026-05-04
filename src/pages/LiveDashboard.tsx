@@ -50,6 +50,7 @@ import NominationForecast, { NominationPrediction } from "@/components/Nominatio
 import VetriTierSheet from "@/components/VetriTierSheet";
 import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
+import MobileBudgetStrip from "@/components/MobileBudgetStrip";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -616,6 +617,21 @@ export default function LiveDashboard() {
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
+        <MobileBudgetStrip
+          remaining={budget.remaining}
+          spent={budget.spent}
+          totalBudget={budget.totalBudget}
+          maxBid={budget.maxBid}
+          avgPerSlot={budget.avgPerSlot}
+          slotsLeft={budget.slotsLeft}
+          slotsTotal={budget.slotsTotal}
+          rows={POSITIONS.filter((p) => requiredCount[p] > 0).map((p) => ({
+            pos: p,
+            have: myCount[p] ?? 0,
+            need: requiredCount[p],
+            short: Math.max(0, requiredCount[p] - (myCount[p] ?? 0)),
+          }))}
+        />
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
