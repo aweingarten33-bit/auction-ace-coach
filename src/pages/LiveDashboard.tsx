@@ -41,6 +41,8 @@ import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 import MarketHeat from "@/components/MarketHeat";
 import Watchlist from "@/components/Watchlist";
 import AnimatedNumber from "@/components/AnimatedNumber";
+import EspnSyncStatus from "@/components/EspnSyncStatus";
+import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
@@ -78,6 +80,7 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
+  const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
@@ -420,6 +423,13 @@ export default function LiveDashboard() {
         <section className="space-y-4">
           <Card className="bg-gradient-card p-4">
             <div className="space-y-3">
+              {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  Log a Pick
+                </span>
+                <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+              </div>
               {/* Drafter toggle */}
               <div className="grid grid-cols-2 gap-2 rounded-lg bg-secondary/40 p-1">
                 <button
