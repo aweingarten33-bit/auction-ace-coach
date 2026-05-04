@@ -429,6 +429,7 @@ export default function LiveDashboard() {
     setPosition("");
     askCoach(ev);
     refreshQueue();
+    refreshNominations();
   };
 
   const handlePickFromQueue = (t: QueueTarget) => {
