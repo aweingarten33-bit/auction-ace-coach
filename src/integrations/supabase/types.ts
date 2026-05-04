@@ -71,6 +71,51 @@ export type Database = {
         }
         Relationships: []
       }
+      league_auction_history: {
+        Row: {
+          bid_amount: number
+          created_at: string
+          espn_player_id: number | null
+          id: string
+          league_id: number
+          pick_overall: number | null
+          player_name: string
+          position: string | null
+          raw: Json | null
+          season: number
+          team_id: number | null
+          user_id: string
+        }
+        Insert: {
+          bid_amount: number
+          created_at?: string
+          espn_player_id?: number | null
+          id?: string
+          league_id: number
+          pick_overall?: number | null
+          player_name: string
+          position?: string | null
+          raw?: Json | null
+          season: number
+          team_id?: number | null
+          user_id: string
+        }
+        Update: {
+          bid_amount?: number
+          created_at?: string
+          espn_player_id?: number | null
+          id?: string
+          league_id?: number
+          pick_overall?: number | null
+          player_name?: string
+          position?: string | null
+          raw?: Json | null
+          season?: number
+          team_id?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       live_draft_events: {
         Row: {
           created_at: string
