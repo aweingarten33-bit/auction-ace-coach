@@ -64,6 +64,7 @@ export const DEFAULT_SETTINGS: LeagueSettings = {
   numTeams: 12,
   scoring: "PPR",
   leagueType: "Standard",
+  format: "Redraft",
   roster: DEFAULT_ROSTER,
   keeperIncrease: "+5 per year of being kept",
   context: "",
