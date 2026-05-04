@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ListMusic, RefreshCw, Eye, Pin, X, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Minus, Zap } from "lucide-react";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
-import { ValueCall, WhatIf } from "@/lib/value";
+import { ValueCall, WhatIf, Knockout } from "@/lib/value";
 
 export interface QueueTarget {
   name: string;
@@ -30,6 +30,7 @@ interface Props {
   onDismiss: (name: string) => void;
   valueFor: (name: string, bid: number) => ValueCall;
   whatIfFor: (pos: Position, bid: number) => WhatIf;
+  knockoutFor: (name: string) => Knockout;
 }
 
 function matchTone(pct: number) {
@@ -56,7 +57,7 @@ function verdictLabel(v: ValueCall["verdict"]) {
 
 export default function UpNextQueue({
   targets, openMan, loading, empty, pulseMultiplier, pulseConfident,
-  watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor,
+  watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor, knockoutFor,
 }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -107,6 +108,7 @@ export default function UpNextQueue({
         )}
         {targets.map((t, i) => {
           const v = valueFor(t.name, t.maxBid);
+          const ko = knockoutFor(t.name);
           const isPinned = watchlist.includes(t.name);
           const isOpen = expanded === t.name;
           const wi = isOpen ? whatIfFor(t.position, t.maxBid) : null;
@@ -161,6 +163,19 @@ export default function UpNextQueue({
                   ) : (
                     <span className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-muted-foreground">
                       NO REF
+                    </span>
+                  )}
+                  {ko.bid != null && (
+                    <span
+                      className={`flex items-center gap-0.5 rounded border px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${
+                        ko.confident
+                          ? "border-accent/50 bg-accent/15 text-accent"
+                          : "border-border bg-secondary/40 text-muted-foreground"
+                      }`}
+                      title={`Knockout bid: ${ko.reason}${ko.confident ? "" : " (early read)"}`}
+                    >
+                      <Zap className="h-2.5 w-2.5" />
+                      KO ${ko.bid}
                     </span>
                   )}
                 </div>
