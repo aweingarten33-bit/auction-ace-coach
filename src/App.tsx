@@ -8,6 +8,7 @@ import LiveDashboard from "./pages/LiveDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
+import MobileDraft from "./pages/MobileDraft.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,8 @@ const App = () => (
             <Route path="/draft" element={<LiveDashboard />} />
             <Route path="/dashboard" element={<Protected><LiveDashboard /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+            <Route path="/m" element={<MobileDraft />} />
+            <Route path="/mobile" element={<MobileDraft />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
