@@ -181,6 +181,9 @@ export default function EspnSettings() {
               <Button variant="outline" onClick={syncHistory} disabled={busy}>
                 <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Pull last 3 auctions
               </Button>
+              <Button variant="outline" onClick={syncRanks} disabled={busy}>
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${busy ? "animate-spin" : ""}`} /> Pull ESPN ranks
+              </Button>
             </>
           )}
         </div>
