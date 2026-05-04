@@ -755,96 +755,89 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
-          <div className="space-y-2">
-            <div className="flex items-center justify-end">
-              <TargetedForecastButton
-                value={forecastFilters}
-                onChange={setForecastFilters}
-                onRun={(f) => refreshNominations(f)}
-                loading={nominationsLoading}
+          <Tabs defaultValue="targets" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 h-9">
+              <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
+              <TabsTrigger value="vetri" className="text-[11px]">Vetri</TabsTrigger>
+              <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
+              <TabsTrigger value="forecast" className="text-[11px]">Forecast</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="targets" className="mt-3 space-y-4">
+              <UpNextQueue
+                targets={queue}
+                openMan={openMan}
+                loading={queueLoading}
+                empty={!queue.length}
+                pulseMultiplier={pulse.multiplier}
+                pulseConfident={pulse.confident}
+                watchlist={watchlist}
+                onRefresh={refreshQueue}
+                onPick={handlePickFromQueue}
+                onPin={handlePin}
+                onUnpin={handleUnpin}
+                onDismiss={handleDismiss}
+                valueFor={valueFor}
+                whatIfFor={whatIfFor}
               />
-            </div>
-            <NominationForecast
-              predictions={nominations}
-              roomRead={roomRead}
-              loading={nominationsLoading}
-              onRefresh={() => refreshNominations()}
-              onPick={(name, position) => {
-                setPlayerName(name);
-                setPosition(position);
-                setDrafter("other");
-                toast(`${name} loaded — ready to log when nominated`);
-              }}
-            />
-          </div>
-          <UpNextQueue
-            targets={queue}
-            openMan={openMan}
-            loading={queueLoading}
-            empty={!queue.length}
-            pulseMultiplier={pulse.multiplier}
-            pulseConfident={pulse.confident}
-            watchlist={watchlist}
-            onRefresh={refreshQueue}
-            onPick={handlePickFromQueue}
-            onPin={handlePin}
-            onUnpin={handleUnpin}
-            onDismiss={handleDismiss}
-            valueFor={valueFor}
-            whatIfFor={whatIfFor}
-          />
-          <MarketHeat
-            events={events}
-            prices={prices}
-            gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
-            maxBid={budget.maxBid}
-            remaining={budget.remaining}
-            pulseMultiplier={pulse.multiplier}
-          />
-          <Watchlist
-            watchlist={watchlist}
-            onUnpin={handleUnpin}
-            onLoad={handleLoadFromWatchlist}
-            valueFor={valueFor}
-            maxBid={budget.maxBid}
-          />
-          <OpponentHeatmap settings={settings} />
-          <VetriTierSheet />
-          <VetriNotesPanel
-            onTakesUpdate={setVetriTakes}
-            onLoadPlayer={(name, pos) => {
-              setPlayerName(name);
-              setPosition(pos);
-              setDrafter("me");
-              toast(`${name} loaded from Vetri Notes`);
-            }}
-          />
-          {/* Budget */}
-          <Card className="bg-gradient-card p-4">
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Remaining</p>
-                <AnimatedNumber value={budget.remaining} prefix="$" className="block text-2xl font-bold text-primary" />
+              <Watchlist
+                watchlist={watchlist}
+                onUnpin={handleUnpin}
+                onLoad={handleLoadFromWatchlist}
+                valueFor={valueFor}
+                maxBid={budget.maxBid}
+              />
+            </TabsContent>
+
+            <TabsContent value="vetri" className="mt-3 space-y-4">
+              <VetriNotesPanel
+                onTakesUpdate={setVetriTakes}
+                onLoadPlayer={(name, pos) => {
+                  setPlayerName(name);
+                  setPosition(pos);
+                  setDrafter("me");
+                  toast(`${name} loaded from Vetri Notes`);
+                }}
+              />
+              <VetriTierSheet />
+            </TabsContent>
+
+            <TabsContent value="market" className="mt-3 space-y-4">
+              <MarketHeat
+                events={events}
+                prices={prices}
+                gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
+                maxBid={budget.maxBid}
+                remaining={budget.remaining}
+                pulseMultiplier={pulse.multiplier}
+              />
+              <OpponentHeatmap settings={settings} />
+            </TabsContent>
+
+            <TabsContent value="forecast" className="mt-3 space-y-2">
+              <div className="flex items-center justify-end">
+                <TargetedForecastButton
+                  value={forecastFilters}
+                  onChange={setForecastFilters}
+                  onRun={(f) => refreshNominations(f)}
+                  loading={nominationsLoading}
+                />
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Bid</p>
-                <AnimatedNumber value={budget.maxBid} prefix="$" className="block text-2xl font-bold" />
-              </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Slots Left</p>
-                <p className="text-2xl font-bold tabular-nums">
-                  <AnimatedNumber value={budget.slotsLeft} /><span className="text-sm text-muted-foreground">/{budget.slotsTotal}</span>
-                </p>
-              </div>
-            </div>
-            <Progress
-              value={budget.totalBudget ? (budget.spent / budget.totalBudget) * 100 : 0}
-              className="mt-3 h-1.5 transition-all duration-500 ease-out-expo"
-            />
-            <p className="mt-1 text-[10px] text-muted-foreground text-center">
-              ${budget.spent} spent · ${budget.avgPerSlot.toFixed(1)}/slot avg
-            </p>
-          </Card>
+              <NominationForecast
+                predictions={nominations}
+                roomRead={roomRead}
+                loading={nominationsLoading}
+                onRefresh={() => refreshNominations()}
+                onPick={(name, position) => {
+                  setPlayerName(name);
+                  setPosition(position);
+                  setDrafter("other");
+                  toast(`${name} loaded — ready to log when nominated`);
+                }}
+              />
+            </TabsContent>
+          </Tabs>
+
 
           {/* Roster */}
           <Card className="bg-gradient-card p-4">
