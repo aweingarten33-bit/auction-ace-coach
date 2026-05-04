@@ -37,8 +37,10 @@ import { DraftEvent, Position } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
+import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
+const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
@@ -63,6 +65,9 @@ export default function LiveDashboard() {
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
   const coachRef = useRef<HTMLDivElement>(null);
+  const [queue, setQueue] = useState<QueueTarget[]>([]);
+  const [openMan, setOpenMan] = useState<string | undefined>(undefined);
+  const [queueLoading, setQueueLoading] = useState(false);
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
