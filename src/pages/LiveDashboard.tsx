@@ -612,25 +612,9 @@ export default function LiveDashboard() {
       </header>
 
       <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
-        <MobileBudgetStrip
-          remaining={budget.remaining}
-          spent={budget.spent}
-          totalBudget={budget.totalBudget}
-          maxBid={budget.maxBid}
-          avgPerSlot={budget.avgPerSlot}
-          slotsLeft={budget.slotsLeft}
-          slotsTotal={budget.slotsTotal}
-          rows={POSITIONS.filter((p) => requiredCount[p] > 0).map((p) => ({
-            pos: p,
-            have: myCount[p] ?? 0,
-            need: requiredCount[p],
-            short: Math.max(0, requiredCount[p] - (myCount[p] ?? 0)),
-          }))}
-        />
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
-          <LiveSyncPanel status={espnSync.status} lastEventAt={espnSync.lastEventAt} compact />
           {/* Compact Log-a-Pick — single row, no calculator vibes */}
           <Card className="bg-card/60 backdrop-blur-sm p-2.5 border-border/60">
             <div className="flex items-center gap-1.5 mb-2">
