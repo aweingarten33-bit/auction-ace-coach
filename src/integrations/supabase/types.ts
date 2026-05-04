@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      espn_player_ranks: {
+        Row: {
+          auction_value: number | null
+          espn_player_id: number
+          id: string
+          overall_rank: number | null
+          player_name: string
+          player_name_norm: string
+          pos_rank: number | null
+          position: string | null
+          projected_points: number | null
+          season: number
+          updated_at: string
+        }
+        Insert: {
+          auction_value?: number | null
+          espn_player_id: number
+          id?: string
+          overall_rank?: number | null
+          player_name: string
+          player_name_norm: string
+          pos_rank?: number | null
+          position?: string | null
+          projected_points?: number | null
+          season: number
+          updated_at?: string
+        }
+        Update: {
+          auction_value?: number | null
+          espn_player_id?: number
+          id?: string
+          overall_rank?: number | null
+          player_name?: string
+          player_name_norm?: string
+          pos_rank?: number | null
+          position?: string | null
+          projected_points?: number | null
+          season?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       extension_tokens: {
         Row: {
           created_at: string
