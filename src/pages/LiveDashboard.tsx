@@ -399,6 +399,8 @@ export default function LiveDashboard() {
       setNominationsLoading(false);
     }
   };
+
+  const submitPick = () => {
     const name = playerName.trim();
     const price = parseInt(priceInput, 10);
     if (!name) {
