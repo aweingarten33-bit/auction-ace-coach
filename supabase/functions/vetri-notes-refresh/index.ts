@@ -18,6 +18,7 @@ interface FeedItem {
   title: string;
   url: string;
   publishedAt: string | null;
+  description: string;
 }
 
 function parseFeed(xml: string, max: number): FeedItem[] {
@@ -29,12 +30,14 @@ function parseFeed(xml: string, max: number): FeedItem[] {
     const id = block.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
     const title = block.match(/<title>([^<]+)<\/title>/)?.[1];
     const published = block.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
+    const description = block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? "";
     if (id && title) {
       items.push({
         videoId: id,
         title: decodeXml(title),
         url: `https://www.youtube.com/watch?v=${id}`,
         publishedAt: published,
+        description: decodeXml(description).trim(),
       });
     }
   }
@@ -134,15 +137,16 @@ const SUMMARY_TOOL = {
   },
 };
 
-async function distill(title: string, transcript: string): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
+async function distill(title: string, transcript: string, source: "captions" | "description" = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
   // Cap transcript length to keep token usage sane
   const trimmed = transcript.length > 28000 ? transcript.slice(0, 28000) + " [truncated]" : transcript;
 
-  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's YouTube transcripts. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
+  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's YouTube content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.`;
 
-  const user = `## Video Title\n${title}\n\n## Transcript (auto-captions, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. Include only players he expresses a clear opinion on. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
+  const sourceNote = source === "description" ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Descriptions often contain timestamped player lists like '2:15 - Bijan Robinson (target)'. Treat each entry as Sal's stated take. If a description entry has no clear lean, use 'neutral'." : "";
+  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. Include only players he expresses a clear opinion on. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
 
   const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -219,18 +223,26 @@ Deno.serve(async (req: Request) => {
         { onConflict: "video_id" },
       );
 
-      const transcript = await fetchTranscript(item.videoId);
+      let transcript = await fetchTranscript(item.videoId);
+      let source: "captions" | "description" = "captions";
       if (!transcript) {
-        await sb
-          .from("vetri_notes")
-          .update({ status: "no_transcript", error: "Captions unavailable" })
-          .eq("video_id", item.videoId);
-        results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
-        continue;
+        // Fallback: many of Sal's videos have detailed timestamped descriptions
+        // listing player takes. Use that instead of bailing.
+        if (item.description && item.description.length > 120) {
+          transcript = item.description;
+          source = "description";
+        } else {
+          await sb
+            .from("vetri_notes")
+            .update({ status: "no_transcript", error: "No captions or description available" })
+            .eq("video_id", item.videoId);
+          results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
+          continue;
+        }
       }
 
       try {
-        const distilled = await distill(item.title, transcript);
+        const distilled = await distill(item.title, transcript, source);
         if (!distilled) {
           await sb
             .from("vetri_notes")

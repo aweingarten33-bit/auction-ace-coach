@@ -620,47 +620,32 @@ export default function LiveDashboard() {
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
           <LiveSyncPanel status={espnSync.status} lastEventAt={espnSync.lastEventAt} compact />
-          <Card className="bg-gradient-card p-4">
-            <div className="space-y-3">
-              {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
-              <div className="flex items-center justify-between">
-                <div className="leading-tight">
-                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Log a Pick
-                  </span>
-                  <span className="block font-mono text-[8px] uppercase tracking-[0.2em] text-primary/80">— Drop the Hammer</span>
-                </div>
-                <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
-              </div>
-              {/* Drafter toggle */}
-              <div className="grid grid-cols-2 gap-2 rounded-lg bg-secondary/40 p-1">
-                <button
-                  onClick={() => setDrafter("me")}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
-                    drafter === "me"
-                      ? "bg-primary text-primary-foreground shadow"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <User className="inline h-4 w-4 mr-1.5 -mt-0.5" /> My Pick
-                </button>
+          {/* Compact Log-a-Pick — single row, no calculator vibes */}
+          <Card className="bg-card/60 backdrop-blur-sm p-2.5 border-border/60">
+            <div className="flex items-center gap-1.5 mb-2">
+              <div className="inline-flex rounded-full bg-secondary/50 p-0.5 text-[10px] font-semibold">
                 <button
                   onClick={() => setDrafter("other")}
-                  className={`rounded-md px-3 py-2 text-sm font-semibold transition ${
-                    drafter === "other"
-                      ? "bg-accent text-accent-foreground shadow"
-                      : "text-muted-foreground hover:text-foreground"
+                  className={`rounded-full px-2.5 py-1 transition ${
+                    drafter === "other" ? "bg-accent text-accent-foreground" : "text-muted-foreground"
                   }`}
                 >
-                  <Users className="inline h-4 w-4 mr-1.5 -mt-0.5" /> Other Team
+                  <Users className="inline h-3 w-3 mr-1 -mt-0.5" />OTHER
+                </button>
+                <button
+                  onClick={() => setDrafter("me")}
+                  className={`rounded-full px-2.5 py-1 transition ${
+                    drafter === "me" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  <User className="inline h-3 w-3 mr-1 -mt-0.5" />ME
                 </button>
               </div>
+              <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+            </div>
 
-              {/* Player — full width so autocomplete has room */}
-              <div>
-                <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Player
-                </label>
+            <div className="flex items-stretch gap-1.5">
+              <div className="flex-1 min-w-0">
                 <PlayerAutocomplete
                   value={playerName}
                   onChange={setPlayerName}
@@ -673,92 +658,86 @@ export default function LiveDashboard() {
                   autoFocus
                 />
               </div>
-
-              {/* Price + position side-by-side */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Price
-                  </label>
-                  <div className="relative">
-                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      placeholder="0"
-                      value={priceInput}
-                      onChange={(e) => setPriceInput(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && submitPick()}
-                      className="pl-6 font-medium"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                    Position
-                  </label>
-                  <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-                    <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
-                    <SelectContent>
-                      {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="relative w-16 shrink-0">
+                <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="0"
+                  value={priceInput}
+                  onChange={(e) => setPriceInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
+                  className="pl-5 pr-1 h-9 text-sm font-semibold"
+                />
               </div>
-
-              <div className="flex gap-2 pt-1">
-                <Button
-                  onClick={submitPick}
-                  disabled={streaming}
-                  size="lg"
-                  className="flex-1 bg-gradient-primary text-primary-foreground"
-                >
-                  <Send className="h-4 w-4 mr-2" /> Log Pick
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => { undoEvent(); toast("Last entry undone"); }}
-                  disabled={!events.length}
-                >
-                  <Undo2 className="h-4 w-4" />
-                </Button>
-              </div>
+              <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
+                <SelectTrigger className="w-[68px] shrink-0 h-9 text-xs"><SelectValue placeholder="Pos" /></SelectTrigger>
+                <SelectContent>
+                  {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Button
+                onClick={submitPick}
+                disabled={streaming}
+                size="sm"
+                className="h-9 px-3 bg-gradient-primary text-primary-foreground"
+                title="Log pick"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 px-2"
+                onClick={() => { undoEvent(); toast("Last entry undone"); }}
+                disabled={!events.length}
+                title="Undo"
+              >
+                <Undo2 className="h-4 w-4" />
+              </Button>
             </div>
           </Card>
 
-          {/* Activity feed */}
-          <Card className="bg-gradient-card p-4">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Draft Log <span className="text-foreground/60">({events.length})</span>
-              <span className="ml-2 font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE TAPE</span>
-            </h2>
-            <div className="max-h-80 space-y-1.5 overflow-auto">
-              {[...events].reverse().map((e, idx) => (
-                <div
-                  key={e.id}
-                  style={{ animationDelay: `${Math.min(idx, 6) * 30}ms` }}
-                  className={`flex animate-fade-in-up items-center justify-between rounded-md border px-3 py-1.5 text-sm transition-colors ${
-                    e.drafter === "me" ? "border-primary/30 bg-primary/5" : "border-border/70 bg-secondary/40"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    {e.position && (
-                      <Badge variant="outline" className={`${POS_COLORS[e.position]} text-[10px] px-1.5 py-0`}>
-                        {e.position}
-                      </Badge>
-                    )}
-                    <span className="truncate font-medium">{e.player}</span>
-                    {e.drafter === "me" && (
-                      <Badge variant="outline" className="text-[10px] border-primary/40 text-primary">YOU</Badge>
-                    )}
-                  </div>
-                  <span className="font-bold text-primary">${e.price}</span>
-                </div>
-              ))}
-              {!events.length && (
-                <p className="py-6 text-center text-xs text-muted-foreground">
-                  No picks yet. Log one above.
+          {/* Draft Log — clean timeline, no calculator vibes */}
+          <Card className="bg-gradient-card p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                The Tape <span className="text-foreground/50 font-normal normal-case">· {events.length} pick{events.length === 1 ? "" : "s"}</span>
+              </h2>
+            </div>
+            <div className="max-h-80 overflow-auto">
+              {events.length ? (
+                <ul className="space-y-0">
+                  {[...events].reverse().map((e, idx) => (
+                    <li
+                      key={e.id}
+                      style={{ animationDelay: `${Math.min(idx, 6) * 30}ms` }}
+                      className="flex animate-fade-in-up items-baseline gap-2 py-1.5 border-b border-border/30 last:border-b-0"
+                    >
+                      <span
+                        className={`mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                          e.drafter === "me" ? "bg-primary" : "bg-muted-foreground/40"
+                        }`}
+                      />
+                      <span className="flex-1 min-w-0 truncate text-sm">
+                        <span className={`font-medium ${e.drafter === "me" ? "text-primary" : "text-foreground"}`}>
+                          {e.player}
+                        </span>
+                        {e.position && (
+                          <span className="ml-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                            {e.position}
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        ${e.price}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="py-4 text-center text-xs text-muted-foreground">
+                  Picks will land here as they happen.
                 </p>
               )}
             </div>
