@@ -33,7 +33,7 @@ import {
   recentRuns,
   spendByPosition,
 } from "@/lib/draft-math";
-import { DraftEvent, Position } from "@/lib/draft-types";
+import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
@@ -264,7 +264,7 @@ export default function LiveDashboard() {
         if (row.severity === "critical") reasonBits.push(`Plugs critical ${pos} hole`);
         else if (row.severity === "need") reasonBits.push(`Fills open ${pos} starter`);
         else reasonBits.push(`Best ${pos} value left`);
-        if (v?.label) reasonBits.push(v.label.toLowerCase());
+        if (v?.verdict && v.verdict !== "unknown") reasonBits.push(v.verdict);
         reasonBits.push(`market $${top.price}`);
         return {
           name: top.name,
