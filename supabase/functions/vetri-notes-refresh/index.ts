@@ -114,15 +114,26 @@ function slugCandidatesFromTitle(title: string): string[] {
     .replace(/[^a-z0-9 ]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
-  const words = base.split(" ").filter(Boolean);
   const cands = new Set<string>();
-  cands.add(words.join("-"));
-  cands.add(words.join("-").replace("who-could-break", "that-could-break"));
-  cands.add(words.join("-").replace("could-break", "that-could-break"));
-  if (!/\b20\d{2}\b/.test(base)) {
-    const y = new Date().getFullYear();
-    cands.add(`${words.join("-")}-in-${y}`);
-    cands.add(`${words.join("-")}-in-${y - 1}`);
+  const variants = new Set<string>();
+  variants.add(base);
+  // who could → that could
+  variants.add(base.replace(/\bwho could\b/g, "that could"));
+  // strip "this year" / "this season"
+  for (const v of [...variants]) {
+    variants.add(v.replace(/\b(this year|this season|next year)\b/g, "").replace(/\s+/g, " ").trim());
+  }
+  // year suffix variants
+  const years = [new Date().getFullYear(), new Date().getFullYear() - 1, 2025];
+  for (const v of [...variants]) {
+    const slug = v.split(" ").filter(Boolean).join("-");
+    if (slug) cands.add(slug);
+    if (!/\b20\d{2}\b/.test(v)) {
+      for (const y of years) {
+        cands.add(`${slug}-in-${y}`);
+        cands.add(`${slug}-${y}`);
+      }
+    }
   }
   return [...cands];
 }
