@@ -577,20 +577,22 @@ export default function LiveDashboard() {
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Remaining</p>
-                <p className="text-2xl font-bold text-primary">${budget.remaining}</p>
+                <AnimatedNumber value={budget.remaining} prefix="$" className="block text-2xl font-bold text-primary" />
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Bid</p>
-                <p className="text-2xl font-bold">${budget.maxBid}</p>
+                <AnimatedNumber value={budget.maxBid} prefix="$" className="block text-2xl font-bold" />
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Slots Left</p>
-                <p className="text-2xl font-bold">{budget.slotsLeft}<span className="text-sm text-muted-foreground">/{budget.slotsTotal}</span></p>
+                <p className="text-2xl font-bold tabular-nums">
+                  <AnimatedNumber value={budget.slotsLeft} /><span className="text-sm text-muted-foreground">/{budget.slotsTotal}</span>
+                </p>
               </div>
             </div>
             <Progress
               value={budget.totalBudget ? (budget.spent / budget.totalBudget) * 100 : 0}
-              className="mt-3 h-1.5"
+              className="mt-3 h-1.5 transition-all duration-500 ease-out-expo"
             />
             <p className="mt-1 text-[10px] text-muted-foreground text-center">
               ${budget.spent} spent · ${budget.avgPerSlot.toFixed(1)}/slot avg
