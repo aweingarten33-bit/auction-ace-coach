@@ -90,12 +90,11 @@ function descriptionLooksActionable(description: string): boolean {
   if (text.length < 80) return false;
   const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
   const timestamped = lines.filter((l) => /(?:^|\s)(?:\d{1,2}:)?\d{1,2}:\d{2}\b/.test(l));
-  const playerish = lines.filter((l) =>
+  const footballEntries = lines.filter((l) =>
     /\b(QB|RB|WR|TE)\b/.test(l) ||
-    /[-–—:]\s*[A-Z][a-z'.-]+\s+[A-Z][a-z'.-]+/.test(l) ||
-    /^[•*-]?\s*[A-Z][a-z'.-]+\s+[A-Z][a-z'.-]+\b/.test(l)
+    /\b(target|fade|avoid|sleeper|breakout|value|rookie|draft|adp|ranking)\b/i.test(l)
   );
-  return timestamped.length >= 2 || playerish.length >= 3;
+  return timestamped.length >= 2 || footballEntries.length >= 3;
 }
 
 function expectedTakeCountFromTitle(title: string): number | null {
