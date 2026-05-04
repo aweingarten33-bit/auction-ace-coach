@@ -561,7 +561,8 @@ export default function LiveDashboard() {
           {/* Activity feed */}
           <Card className="bg-gradient-card p-4">
             <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Draft Log ({events.length})
+              Draft Log <span className="text-foreground/60">({events.length})</span>
+              <span className="ml-2 font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE TAPE</span>
             </h2>
             <div className="max-h-80 space-y-1.5 overflow-auto">
               {[...events].reverse().map((e, idx) => (
