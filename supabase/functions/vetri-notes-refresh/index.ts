@@ -1,6 +1,6 @@
 // Pulls Sal Vetri's latest YouTube videos via public RSS, scrapes auto-captions,
-// distills them with Lovable AI into structured "takes", and caches in vetri_notes.
-// No external API keys required.
+// falls back to OpenAI Whisper transcription of the audio stream when captions
+// are missing, then distills with Lovable AI into structured "takes".
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
