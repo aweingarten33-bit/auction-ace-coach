@@ -1,12 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2 } from "lucide-react";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
+
+const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
 interface Props {
   prices: PriceEstimate[];
@@ -20,6 +22,57 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [quickName, setQuickName] = useState("");
   const [quickPrice, setQuickPrice] = useState("");
   const [filter, setFilter] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (file: File) => {
+    if (file.size > 15 * 1024 * 1024) {
+      return toast.error("File too large (max 15MB)");
+    }
+    setUploading(true);
+    try {
+      const buf = await file.arrayBuffer();
+      // base64 encode in chunks to avoid stack overflow on large files
+      let binary = "";
+      const bytes = new Uint8Array(buf);
+      const CHUNK = 0x8000;
+      for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + CHUNK)));
+      }
+      const fileBase64 = btoa(binary);
+      const resp = await fetch(PARSE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ fileBase64, mimeType: file.type || "application/pdf" }),
+      });
+      if (!resp.ok) {
+        const t = await resp.json().catch(() => ({}));
+        throw new Error(t.error || `Parse failed (${resp.status})`);
+      }
+      const { players } = await resp.json() as { players: { name: string; price: number }[] };
+      if (!players?.length) {
+        toast.error("No players found in file");
+        return;
+      }
+      // Merge with existing — overwrite duplicates with new prices
+      const map = new Map<string, PriceEstimate>();
+      for (const p of prices) map.set(p.name.toLowerCase(), p);
+      for (const p of players) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
+      const merged = Array.from(map.values());
+      setPrices(merged);
+      setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
+      toast.success(`Imported ${players.length} players from ${file.name}`);
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
 
   // Parse on every keystroke for the live preview
   const parsed = useMemo(() => parsePriceSheet(pricesText), [pricesText]);
@@ -69,12 +122,41 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div>
           <p className="text-sm font-medium">Player Price Estimates</p>
           <p className="text-[11px] text-muted-foreground">
-            Paste from anywhere — we'll figure it out.
+            Upload a PDF/screenshot of last year's results, or paste/type below.
           </p>
         </div>
         <Badge variant="outline" className="border-primary/40 text-primary text-[10px]">
           {prices.length} players · ${prices.reduce((s, p) => s + p.price, 0)} total
         </Badge>
+      </div>
+
+      {/* Upload PDF/image */}
+      <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/pdf,image/png,image/jpeg,image/webp,image/heic"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) handleUpload(f);
+          }}
+        />
+        <Button
+          variant="outline"
+          className="w-full border-primary/40 hover:bg-primary/10"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+        >
+          {uploading ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Reading sheet with AI...</>
+          ) : (
+            <><Upload className="mr-2 h-4 w-4" /> Upload PDF or screenshot</>
+          )}
+        </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          Last year's auction results, FantasyPros export, ESPN screenshot — AI extracts names + prices automatically.
+        </p>
       </div>
 
       {/* Quick-add */}
