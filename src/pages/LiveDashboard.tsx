@@ -42,6 +42,7 @@ import MarketHeat from "@/components/MarketHeat";
 import Watchlist from "@/components/Watchlist";
 import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
+import LiveBidStrip from "@/components/LiveBidStrip";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
