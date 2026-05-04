@@ -87,6 +87,9 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
+  const [nominations, setNominations] = useState<NominationPrediction[]>([]);
+  const [roomRead, setRoomRead] = useState<string | undefined>(undefined);
+  const [nominationsLoading, setNominationsLoading] = useState(false);
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
