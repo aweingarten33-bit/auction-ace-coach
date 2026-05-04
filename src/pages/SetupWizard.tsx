@@ -33,9 +33,25 @@ const STEPS = [
 
 export default function SetupWizard() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup } =
     useDraftStore();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(() => {
+    const s = searchParams.get("step");
+    if (!s) return 0;
+    const idx = STEPS.findIndex((label) => label.toLowerCase().replace(/\s+/g, "-") === s.toLowerCase());
+    if (idx >= 0) return idx;
+    const n = parseInt(s, 10);
+    return Number.isFinite(n) && n >= 0 && n < STEPS.length ? n : 0;
+  });
+
+  useEffect(() => {
+    const s = searchParams.get("step");
+    if (!s) return;
+    const idx = STEPS.findIndex((label) => label.toLowerCase().replace(/\s+/g, "-") === s.toLowerCase());
+    const n = idx >= 0 ? idx : parseInt(s, 10);
+    if (Number.isFinite(n) && n >= 0 && n < STEPS.length) setStep(n);
+  }, [searchParams]);
   const [keeperName, setKeeperName] = useState("");
   const [keeperCost, setKeeperCost] = useState("");
   const [keeperPos, setKeeperPos] = useState<Position | "">("");
