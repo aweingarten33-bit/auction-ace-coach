@@ -18,7 +18,13 @@ Rules:
 - "matchPct" (0-100) reflects how well the player fits the user's needs RIGHT NOW (positional gap urgency + value vs price sheet + market timing). Higher = better fit.
 - "reason" is ONE short punchy line (max ~70 chars). Concrete: positional fit + value angle. No fluff.
 - Order the 3 by matchPct descending.
-- "openMan" (optional, max ~60 chars): one line on which position the room is sleeping on, if any.`;
+- "openMan" (optional, max ~60 chars): one line on which position the room is sleeping on, if any.
+
+For EACH target also emit (all required):
+- "grade" (1-5 integer): consensus quality score for this player at the suggested bid given current draft state. 5 = elite call, 1 = desperate.
+- "worstCase" (max ~50 chars): one-line MiniMax-style downside if the user PASSES on this player (who/what they'd be stuck with).
+- "knockoff" ({ "name": string, "position": same enum, "price": int >= 1 }): a meaningfully cheaper DHgate-style alternative at the SAME position. Knockoff price MUST be < maxBid * 0.6 and >= 1. Pull from the price sheet when possible. If literally no cheaper alternative exists, repeat the player with price = maxBid (rare).
+- "dossier" (max ~110 chars): IMDb-style one-liner — role, team if known, key trait, why-now. No fluff.`;
 
 const TOOL = {
   type: "function",
@@ -40,8 +46,21 @@ const TOOL = {
               matchPct: { type: "integer", minimum: 0, maximum: 100 },
               maxBid: { type: "integer", minimum: 1 },
               reason: { type: "string" },
+              grade: { type: "integer", minimum: 1, maximum: 5 },
+              worstCase: { type: "string" },
+              knockoff: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  position: { type: "string", enum: ["QB", "RB", "WR", "TE", "K", "DST"] },
+                  price: { type: "integer", minimum: 1 },
+                },
+                required: ["name", "position", "price"],
+                additionalProperties: false,
+              },
+              dossier: { type: "string" },
             },
-            required: ["name", "position", "matchPct", "maxBid", "reason"],
+            required: ["name", "position", "matchPct", "maxBid", "reason", "grade", "worstCase", "knockoff", "dossier"],
             additionalProperties: false,
           },
         },
