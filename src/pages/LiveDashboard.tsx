@@ -393,13 +393,17 @@ export default function LiveDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <QuoteTicker />
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary shadow-glow">
               <Trophy className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <h1 className="truncate text-[13px] font-semibold leading-tight tracking-tight">Auction Coach</h1>
+            <div className="min-w-0 leading-tight">
+              <h1 className="truncate text-[13px] font-semibold tracking-tight neon-text">Auction Coach</h1>
+              <p className="truncate font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground">Fantasy Focus × Vetri</p>
+            </div>
           </div>
           {/* Compact live budget — Awwwards single-accent emphasis on remaining */}
           <div className="flex items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
