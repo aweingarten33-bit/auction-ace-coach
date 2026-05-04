@@ -76,6 +76,7 @@ export default function LiveDashboard() {
   const [coachText, setCoachText] = useState<string>(
     "Welcome, coach. Enter your first draft pick above to get live recommendations."
   );
+  const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
   const coachRef = useRef<HTMLDivElement>(null);
@@ -197,6 +198,15 @@ export default function LiveDashboard() {
   const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
     setStreaming(true);
     setCoachText("");
+    // Capture user message immediately so it shows in the thread while streaming
+    if (userQuestion) {
+      setCoachHistory((h) => [...h, { role: "user", content: userQuestion }]);
+    } else if (latestEvent) {
+      setCoachHistory((h) => [
+        ...h,
+        { role: "user", content: `📌 Logged: ${latestEvent.drafter === "me" ? "[ME]" : "[OTHER]"} ${latestEvent.player} — $${latestEvent.price}` },
+      ]);
+    }
     try {
       const resp = await fetch(COACH_URL, {
         method: "POST",
@@ -273,6 +283,13 @@ export default function LiveDashboard() {
       toast.error("Coach error");
     } finally {
       setStreaming(false);
+      // Persist final assistant message into thread (use the accumulator from above via setCoachText callback)
+      setCoachText((finalText) => {
+        if (finalText && finalText !== "⚠️ Coach unavailable.") {
+          setCoachHistory((h) => [...h, { role: "assistant", content: finalText }]);
+        }
+        return finalText;
+      });
     }
   };
 
@@ -760,8 +777,36 @@ export default function LiveDashboard() {
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
               <Sparkles className="h-3.5 w-3.5" /> AI Coach {streaming && <span className="text-muted-foreground">· thinking...</span>}
             </h2>
-            <div ref={coachRef} className="coach-md max-h-96 overflow-auto text-sm leading-relaxed">
-              <ReactMarkdown>{coachText || "_..._"}</ReactMarkdown>
+            <div ref={coachRef} className="coach-md max-h-96 space-y-3 overflow-auto text-sm leading-relaxed">
+              {coachHistory.length === 0 && !streaming && (
+                <ReactMarkdown>{coachText || "_..._"}</ReactMarkdown>
+              )}
+              {coachHistory.map((m, i) => {
+                const isUser = m.role === "user";
+                const isLastAssistant = !isUser && i === coachHistory.length - 1 && !streaming;
+                return (
+                  <div
+                    key={i}
+                    className={`rounded-md border px-2.5 py-2 ${
+                      isUser
+                        ? "border-primary/30 bg-primary/5"
+                        : "border-border/60 bg-secondary/30"
+                    }`}
+                  >
+                    <p className={`mb-1 text-[9px] font-bold uppercase tracking-wider ${isUser ? "text-primary" : "text-muted-foreground"}`}>
+                      {isUser ? "You" : "Coach"}
+                    </p>
+                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                    {isLastAssistant && null}
+                  </div>
+                );
+              })}
+              {streaming && coachText && (
+                <div className="rounded-md border border-border/60 bg-secondary/30 px-2.5 py-2">
+                  <p className="mb-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Coach · typing</p>
+                  <ReactMarkdown>{coachText}</ReactMarkdown>
+                </div>
+              )}
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {[
