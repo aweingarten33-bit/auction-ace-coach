@@ -18,6 +18,23 @@ const TIER_SIZES: Record<string, number[]> = {
   DST:[5, 7, 10],
 };
 
+// Tier sizes per position — roughly mirror standard FantasyPros tiers.
+const TIER_SIZES: Record<string, number[]> = {
+  QB: [4, 6, 6, 6, 8],
+  RB: [5, 7, 8, 10, 12],
+  WR: [5, 7, 8, 10, 12],
+  TE: [3, 4, 5, 6, 8],
+  K:  [10, 10, 10],
+  DST:[5, 7, 10],
+};
+
+const norm = (s: string) =>
+  s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, " ").trim();
+
+export function tierForPosRank(position: string, posRank: number): number {
+  return tierFor(position, posRank);
+}
+
 export interface TierPrice {
   position: string;
   tier: number;        // 1-based
