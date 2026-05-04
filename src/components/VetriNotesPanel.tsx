@@ -239,6 +239,28 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
                                 )}
                               </div>
                               <p className="mt-0.5 text-[10px] leading-snug text-foreground/75">{t.reasoning}</p>
+                              {(() => {
+                                const est = scaledEstBid(t.estPrice);
+                                const sal = t.salPrice?.trim();
+                                if (!est && !sal) return null;
+                                return (
+                                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                                    {sal && (
+                                      <span className="rounded-sm border border-success/40 bg-success/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-success">
+                                        Sal: {sal}
+                                      </span>
+                                    )}
+                                    {est && (
+                                      <span className="rounded-sm border border-primary/40 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-primary">
+                                        Bid ~${est}
+                                      </span>
+                                    )}
+                                    <span className="font-mono text-[8px] uppercase tracking-wider text-muted-foreground/70">
+                                      ${LEAGUE_BUDGET} league
+                                    </span>
+                                  </div>
+                                );
+                              })()}
                             </div>
                             {onLoadPlayer && (
                               <Button
