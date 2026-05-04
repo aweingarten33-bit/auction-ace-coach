@@ -1,4 +1,4 @@
-// Predict next 3 likely NOMINATED players (by anyone in the room) with confidence + reasoning.
+// Predict next 10 likely NOMINATED players (by anyone in the room) with confidence + signal breakdown.
 // Uses deterministic signals: position runs, tier breaks, who's hoarding what, recent paid-vs-sheet,
 // then asks the model to pick exact names from the user's price sheet via a tool call.
 const corsHeaders = {
@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const SYSTEM_PROMPT = `You are an elite fantasy football auction draft strategist.
 
-Your ONLY job is to predict the NEXT 3 PLAYERS LIKELY TO BE NOMINATED in the room (by ANY team, including the user). This is about NOMINATION ORDER — who is about to get thrown out for bidding — not who the user should target.
+Your ONLY job is to predict the NEXT 10 PLAYERS LIKELY TO BE NOMINATED in the room (by ANY team, including the user). This is about NOMINATION ORDER — who is about to get thrown out for bidding — not who the user should target.
 
 You receive deterministic draft state: budget snapshot, every team's apparent roster gaps, recent picks, position runs, market multiplier, and a per-position "fallback board" of the top undrafted players by sheet $.
 
@@ -20,33 +20,37 @@ Heuristics for nomination prediction (apply in order):
 4. Roster needs across the room: positions where MULTIPLE teams still need a starter get nominated sooner.
 5. The user's own likely next nomination counts too — include it if it scores high.
 
-For EACH of the 3 predictions, call emit_nominations with:
+For EACH of the 10 predictions, call emit_nominations with:
 - "name": exact name from the price sheet when possible. Otherwise a widely-known undrafted player who fits.
 - "position": one of QB/RB/WR/TE/K/DST.
-- "confidence" (0-100 integer): how sure you are this is one of the next 3 nominated. Higher = stronger signal.
+- "confidence" (0-100 integer): how sure you are this is one of the next 10 nominated. Higher = stronger signal.
 - "expectedBid" (integer >= 1): what you think they'll go for given the market multiplier (NOT a recommendation — a forecast).
-- "reason" (max ~90 chars): one punchy line citing the SPECIFIC signal (tier break, run, budget, room need). Concrete.
+- "reason" (max ~90 chars): one punchy line citing the SPECIFIC signal. Concrete.
 - "trigger" (max ~50 chars): a short label for the dominant signal. e.g. "Last RB1 standing", "QB run continues", "Bid drainer".
+- "signals" object with three integer scores 0-100:
+   * "trend": how strongly recent runs / room momentum push this nomination. High when a position run is active or the player is in a hot tier.
+   * "value": market value strength — high when sheet $ is high relative to going rate (bargain risk forces nomination), or when a tier-break creates a forced bid.
+   * "rosterNeed": how many teams in the room still need this position as a starter. High = multiple open slots league-wide.
 
-Order by confidence DESCENDING.
+Order by confidence DESCENDING. Earlier picks should have higher confidence than later picks.
 
 Hard rules:
 - NEVER predict a player who is already in the draft log or on the user's roster/keepers.
 - expectedBid must respect market reality (sheet $ * market multiplier ~).
-- 3 distinct players. Spread positions if signals are mixed; cluster positions if a real run is on.`;
+- 10 distinct players. Spread positions if signals are mixed; cluster positions if a real run is on.`;
 
 const TOOL = {
   type: "function",
   function: {
     name: "emit_nominations",
-    description: "Emit the 3 most likely next nominations.",
+    description: "Emit the 10 most likely next nominations.",
     parameters: {
       type: "object",
       properties: {
         nominations: {
           type: "array",
-          minItems: 3,
-          maxItems: 3,
+          minItems: 10,
+          maxItems: 10,
           items: {
             type: "object",
             properties: {
@@ -56,8 +60,18 @@ const TOOL = {
               expectedBid: { type: "integer", minimum: 1 },
               reason: { type: "string" },
               trigger: { type: "string" },
+              signals: {
+                type: "object",
+                properties: {
+                  trend: { type: "integer", minimum: 0, maximum: 100 },
+                  value: { type: "integer", minimum: 0, maximum: 100 },
+                  rosterNeed: { type: "integer", minimum: 0, maximum: 100 },
+                },
+                required: ["trend", "value", "rosterNeed"],
+                additionalProperties: false,
+              },
             },
-            required: ["name", "position", "confidence", "expectedBid", "reason", "trigger"],
+            required: ["name", "position", "confidence", "expectedBid", "reason", "trigger", "signals"],
             additionalProperties: false,
           },
         },
@@ -68,6 +82,7 @@ const TOOL = {
     },
   },
 };
+
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -149,7 +164,7 @@ Deno.serve(async (req: Request) => {
       `## Tier Breaks (DETERMINISTIC — large gap between #1 undrafted and #2 at this position)\n${tierBreakText}`,
       `## Fallback Board (DETERMINISTIC — top undrafted per position)\n${fallbackText}`,
       `## Watchlist (user pinned)\n${(p.watchlist ?? []).join(", ") || "(none)"}`,
-      `## Task\nCall emit_nominations with the 3 players MOST LIKELY to be nominated next, in any order of confidence DESCENDING. Cite which signal drives each pick (tier break / run / budget drain / room need). Predictions must be undrafted players from the Fallback Board when possible.`,
+      `## Task\nCall emit_nominations with the 10 players MOST LIKELY to be nominated next, ordered by confidence DESCENDING. For each, fill in signals.trend / signals.value / signals.rosterNeed (each 0-100) so the user can see WHY. Cite the dominant signal in reason+trigger. Predictions must be undrafted players from the Fallback Board when possible.`,
     ].join("\n\n");
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

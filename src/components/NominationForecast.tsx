@@ -13,6 +13,11 @@ export interface NominationPrediction {
   expectedBid: number;
   reason: string;
   trigger: string;
+  signals?: {
+    trend: number;
+    value: number;
+    rosterNeed: number;
+  };
 }
 
 interface Props {
@@ -128,6 +133,35 @@ export default function NominationForecast({
                   </Button>
                 )}
               </div>
+
+              {/* Signal breakdown */}
+              {n.signals && (
+                <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+                  {([
+                    { key: "trend", label: "TREND", val: n.signals.trend, color: "bg-accent" },
+                    { key: "value", label: "VALUE", val: n.signals.value, color: "bg-primary" },
+                    { key: "rosterNeed", label: "NEED", val: n.signals.rosterNeed, color: "bg-warning" },
+                  ] as const).map((s) => (
+                    <div key={s.key} className="rounded-sm border border-border/60 bg-secondary/30 px-1.5 py-1">
+                      <div className="flex items-baseline justify-between">
+                        <span className="font-mono text-[8px] font-bold tracking-wider text-muted-foreground">
+                          {s.label}
+                        </span>
+                        <span className="font-mono text-[9px] font-bold tabular-nums text-foreground">
+                          {s.val}
+                        </span>
+                      </div>
+                      <div className="mt-0.5 h-0.5 w-full overflow-hidden rounded-full bg-secondary">
+                        <div
+                          className={`h-full ${s.color} transition-all duration-500`}
+                          style={{ width: `${Math.max(2, Math.min(100, s.val))}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             </div>
           );
         })}
