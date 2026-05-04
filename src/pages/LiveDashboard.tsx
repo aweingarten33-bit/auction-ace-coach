@@ -52,7 +52,8 @@ export default function LiveDashboard() {
     resetAll,
   } = useDraftStore();
 
-  const [input, setInput] = useState("");
+  const [playerName, setPlayerName] = useState("");
+  const [priceInput, setPriceInput] = useState("");
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
   const [coachText, setCoachText] = useState<string>(
@@ -231,25 +232,31 @@ export default function LiveDashboard() {
   };
 
   const submitPick = () => {
-    const parsed = parsePlayerLine(input);
-    if (!parsed) {
-      toast.error("Format: Player Name - Price");
+    const name = playerName.trim();
+    const price = parseInt(priceInput, 10);
+    if (!name) {
+      toast.error("Enter a player name");
       return;
     }
-    if (drafter === "me" && parsed.price > budget.maxBid) {
+    if (!Number.isFinite(price) || price <= 0) {
+      toast.error("Enter a valid price");
+      return;
+    }
+    if (drafter === "me" && price > budget.maxBid) {
       toast.error(`Over max bid. You can only spend $${budget.maxBid} on this slot.`);
       return;
     }
     const ev = {
       id: crypto.randomUUID(),
-      player: parsed.name,
-      price: parsed.price,
+      player: name,
+      price,
       position: position || undefined,
       drafter,
       ts: Date.now(),
     };
     addEvent(ev);
-    setInput("");
+    setPlayerName("");
+    setPriceInput("");
     setPosition("");
     askCoach(ev);
   };
@@ -330,17 +337,26 @@ export default function LiveDashboard() {
                   <Users className="inline h-3 w-3 mr-1" /> Other team
                 </button>
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-[1fr_90px_80px] gap-2">
                 <Input
-                  placeholder="Player Name - Price"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Player name"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submitPick()}
                   className="font-medium"
                   autoFocus
                 />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Price $"
+                  value={priceInput}
+                  onChange={(e) => setPriceInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
+                  className="font-medium"
+                />
                 <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-                  <SelectTrigger className="w-20"><SelectValue placeholder="Pos" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
                   <SelectContent>
                     {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                   </SelectContent>
