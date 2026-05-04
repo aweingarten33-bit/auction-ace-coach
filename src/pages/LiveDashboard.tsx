@@ -414,7 +414,7 @@ export default function LiveDashboard() {
             <Button variant="ghost" size="sm" onClick={() => navigate("/espn")} className="h-8 px-2 text-[10px] font-semibold" title="ESPN connection & live sync">
               ESPN
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="h-8 w-8 p-0">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/?step=league-basics")} className="h-8 w-8 p-0" title="Setup wizard — Budget">
               <Settings2 className="h-4 w-4" />
             </Button>
             <AlertDialog>
