@@ -455,9 +455,12 @@ export default function LiveDashboard() {
             <div className="space-y-3">
               {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Log a Pick
-                </span>
+                <div className="leading-tight">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Log a Pick
+                  </span>
+                  <span className="block font-mono text-[8px] uppercase tracking-[0.2em] text-primary/80">— Drop the Hammer</span>
+                </div>
                 <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
               </div>
               {/* Drafter toggle */}
