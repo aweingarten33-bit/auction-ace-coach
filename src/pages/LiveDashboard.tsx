@@ -337,17 +337,26 @@ export default function LiveDashboard() {
                   <Users className="inline h-3 w-3 mr-1" /> Other team
                 </button>
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-[1fr_90px_80px] gap-2">
                 <Input
-                  placeholder="Player Name - Price"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Player name"
+                  value={playerName}
+                  onChange={(e) => setPlayerName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && submitPick()}
                   className="font-medium"
                   autoFocus
                 />
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  placeholder="Price $"
+                  value={priceInput}
+                  onChange={(e) => setPriceInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
+                  className="font-medium"
+                />
                 <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-                  <SelectTrigger className="w-20"><SelectValue placeholder="Pos" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Pos" /></SelectTrigger>
                   <SelectContent>
                     {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                   </SelectContent>
