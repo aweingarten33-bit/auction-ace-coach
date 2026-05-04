@@ -72,6 +72,7 @@ export default function UpNextQueue({
   watchlist, onRefresh, onPick, onPin, onUnpin, onDismiss, valueFor, whatIfFor,
 }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [detailFor, setDetailFor] = useState<QueueTarget | null>(null);
 
   const pulsePct = Math.round((pulseMultiplier - 1) * 100);
   const pulseTone =
