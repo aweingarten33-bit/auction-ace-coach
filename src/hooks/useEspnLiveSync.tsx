@@ -5,45 +5,53 @@ import { Position } from "@/lib/draft-types";
 import { toast } from "sonner";
 
 export type EspnSyncStatus =
-  | "disabled"   // no auth / not connected
+  | "disabled"
   | "connecting"
-  | "live"       // recent activity within window
-  | "idle"       // connected, no recent events (normal between picks)
-  | "stale"      // expected events but channel quiet too long
-  | "offline";   // realtime channel error / disconnected
+  | "live"
+  | "idle"
+  | "stale"
+  | "offline";
 
-const STALE_AFTER_MS = 90_000; // 90s without any event after first sync = stale
+export interface LiveBid {
+  player: string;
+  position?: Position;
+  team?: string;
+  price: number;          // current top bid
+  bidder?: string;        // drafter team name
+  nominatedAt: number;
+  updatedAt: number;
+}
+
+const STALE_AFTER_MS = 90_000;
 
 interface Options {
-  /** Set true once user clicks "I'm drafting" or similar; controls stale detection. */
   expectingEvents?: boolean;
 }
 
 /**
- * Subscribes to live_draft_events from the connected ESPN session and
- * automatically inserts won-pick events into the local draft store.
- *
- * If realtime drops or no events arrive within STALE_AFTER_MS while the
- * user is actively drafting, status flips to "stale"/"offline" so the UI
- * can prompt the user to fall back to manual entry (which always works).
+ * Subscribes to live_draft_events and:
+ *  - Backfills recent "won" picks into the local draft log on mount
+ *  - Auto-inserts new "won" picks as they arrive (deduped vs manual entries)
+ *  - Tracks the *current* nomination + climbing bid so the UI can render
+ *    a live bidding-war strip without polluting the draft log
  */
 export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
   const [status, setStatus] = useState<EspnSyncStatus>("connecting");
   const [lastEventAt, setLastEventAt] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [liveBid, setLiveBid] = useState<LiveBid | null>(null);
+
   const seenIds = useRef<Set<string>>(new Set());
   const addEvent = useDraftStore((s) => s.addEvent);
   const events = useDraftStore((s) => s.events);
 
-  // Track existing events to dedupe against incoming webhook picks
+  // Dedupe signature: player|price already in local store
   const eventSig = useRef<Set<string>>(new Set());
   useEffect(() => {
-    eventSig.current = new Set(
-      events.map((e) => `${e.player.toLowerCase()}|${e.price}`)
-    );
+    eventSig.current = new Set(events.map((e) => `${e.player.toLowerCase()}|${e.price}`));
   }, [events]);
 
-  // Resolve user — if no auth session, sync is disabled (manual mode only)
+  // Resolve auth user
   useEffect(() => {
     let mounted = true;
     supabase.auth.getSession().then(({ data }) => {
@@ -63,10 +71,102 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
     };
   }, []);
 
-  // Subscribe to realtime won-pick events for this user
+  // Apply a single event row to local state (used for both backfill and realtime)
+  const applyEvent = (row: any, fromBackfill = false) => {
+    if (!row || seenIds.current.has(row.id)) return;
+    seenIds.current.add(row.id);
+    if (!fromBackfill) {
+      setLastEventAt(Date.now());
+      setStatus("live");
+    }
+
+    if (row.event_type === "won" && row.player_name && row.price != null) {
+      const sig = `${String(row.player_name).toLowerCase()}|${row.price}`;
+      if (!eventSig.current.has(sig)) {
+        addEvent({
+          id: row.id,
+          player: row.player_name,
+          position: (row.player_position as Position) || undefined,
+          price: Number(row.price) || 0,
+          drafter: "other",
+          ts: new Date(row.occurred_at || row.created_at || Date.now()).getTime(),
+        });
+        if (!fromBackfill) {
+          toast.success(`ESPN: ${row.player_name} → $${row.price}`, { duration: 2500 });
+        }
+      }
+      // Won → bidding war is over for that player
+      setLiveBid((cur) => (cur && cur.player === row.player_name ? null : cur));
+      return;
+    }
+
+    if (row.event_type === "nomination" && row.player_name) {
+      setLiveBid({
+        player: row.player_name,
+        position: (row.player_position as Position) || undefined,
+        team: row.player_team || undefined,
+        price: Number(row.price) || 1,
+        bidder: row.drafter_team_name || undefined,
+        nominatedAt: new Date(row.occurred_at || row.created_at || Date.now()).getTime(),
+        updatedAt: Date.now(),
+      });
+      return;
+    }
+
+    if (row.event_type === "bid" && row.player_name && row.price != null) {
+      setLiveBid((cur) => {
+        // If this bid is for a different player than the current nomination, replace it
+        if (!cur || cur.player !== row.player_name) {
+          return {
+            player: row.player_name,
+            position: (row.player_position as Position) || undefined,
+            team: row.player_team || undefined,
+            price: Number(row.price),
+            bidder: row.drafter_team_name || undefined,
+            nominatedAt: Date.now(),
+            updatedAt: Date.now(),
+          };
+        }
+        // Only climb (ignore stale out-of-order bids)
+        if (Number(row.price) <= cur.price) return cur;
+        return {
+          ...cur,
+          price: Number(row.price),
+          bidder: row.drafter_team_name || cur.bidder,
+          updatedAt: Date.now(),
+        };
+      });
+      return;
+    }
+
+    if (row.event_type === "undo") {
+      // Conservative: just clear the bid card; user undoes log manually if needed
+      setLiveBid(null);
+    }
+  };
+
+  // Backfill + realtime subscription
   useEffect(() => {
     if (!userId) return;
     setStatus("idle");
+
+    let cancelled = false;
+    // Backfill last hour of events so picks/bids that arrived before mount appear
+    (async () => {
+      const since = new Date(Date.now() - 60 * 60_000).toISOString();
+      const { data } = await supabase
+        .from("live_draft_events")
+        .select("id, event_type, player_name, player_position, player_team, price, drafter_team_name, occurred_at, created_at")
+        .eq("user_id", userId)
+        .gte("created_at", since)
+        .order("created_at", { ascending: true })
+        .limit(500);
+      if (cancelled || !data) return;
+      for (const row of data) applyEvent(row, true);
+      // After backfill, the most recent event time still drives staleness
+      const last = data[data.length - 1];
+      if (last) setLastEventAt(new Date(last.created_at as string).getTime());
+    })();
 
     const channel = supabase
       .channel(`live_draft:${userId}`)
@@ -78,30 +178,7 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
           table: "live_draft_events",
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
-          const row: any = payload.new;
-          if (!row || seenIds.current.has(row.id)) return;
-          seenIds.current.add(row.id);
-          setLastEventAt(Date.now());
-          setStatus("live");
-
-          // Only auto-insert "won" picks into the local draft log.
-          if (row.event_type !== "won" || !row.player_name || !row.price) return;
-          const sig = `${String(row.player_name).toLowerCase()}|${row.price}`;
-          if (eventSig.current.has(sig)) return; // already logged manually
-
-          addEvent({
-            id: row.id,
-            player: row.player_name,
-            position: (row.player_position as Position) || undefined,
-            price: Number(row.price) || 0,
-            // Webhook doesn't reliably know "me" vs "other"; default other.
-            // User can correct via undo if needed.
-            drafter: "other",
-            ts: new Date(row.occurred_at || row.created_at || Date.now()).getTime(),
-          });
-          toast.success(`ESPN: ${row.player_name} → $${row.price}`, { duration: 2500 });
-        }
+        (payload) => applyEvent(payload.new),
       )
       .subscribe((s) => {
         if (s === "SUBSCRIBED") setStatus((cur) => (cur === "live" ? cur : "idle"));
@@ -109,11 +186,13 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
       });
 
     return () => {
+      cancelled = true;
       supabase.removeChannel(channel);
     };
-  }, [userId, addEvent]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
-  // Stale detection: if drafting actively and no events for STALE window, flag stale
+  // Stale watchdog
   useEffect(() => {
     if (status === "disabled" || status === "offline") return;
     if (!expectingEvents) return;
@@ -125,5 +204,19 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
     return () => clearInterval(id);
   }, [status, lastEventAt, expectingEvents]);
 
-  return { status, lastEventAt, isManualOnly: status !== "live" && status !== "idle" };
+  // Auto-clear an idle bid card after 60s of no updates
+  useEffect(() => {
+    if (!liveBid) return;
+    const id = setTimeout(() => {
+      setLiveBid((cur) => (cur && Date.now() - cur.updatedAt > 60_000 ? null : cur));
+    }, 65_000);
+    return () => clearTimeout(id);
+  }, [liveBid]);
+
+  return {
+    status,
+    lastEventAt,
+    liveBid,
+    isManualOnly: status !== "live" && status !== "idle",
+  };
 }
