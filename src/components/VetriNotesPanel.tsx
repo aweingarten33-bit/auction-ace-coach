@@ -9,6 +9,7 @@ import { Youtube, RefreshCw, ExternalLink, ChevronDown, ChevronUp, TrendingUp, T
 import { Input } from "@/components/ui/input";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import { toast } from "sonner";
+import { useLeagueTierPrices, parseTierLabel, priceForPositionTier } from "@/lib/league-tier-prices";
 
 export interface VetriTake {
   player: string;
