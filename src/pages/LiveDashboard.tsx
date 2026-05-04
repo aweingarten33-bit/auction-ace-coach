@@ -94,6 +94,63 @@ export default function LiveDashboard() {
     BENCH: settings.roster.BENCH,
   };
 
+  // Roster gap analysis
+  const flexNeed = requiredCount.FLEX;
+  const flexHave = Math.max(
+    0,
+    (myCount.RB - requiredCount.RB) +
+      (myCount.WR - requiredCount.WR) +
+      (myCount.TE - requiredCount.TE)
+  );
+  const flexShort = Math.max(0, flexNeed - flexHave);
+
+  const gaps = (["QB", "RB", "WR", "TE", "DST", "K"] as const)
+    .filter((p) => requiredCount[p] > 0)
+    .map((pos) => {
+      const starterHave = Math.min(myCount[pos], requiredCount[pos]);
+      const starterNeed = requiredCount[pos];
+      const starterShort = Math.max(0, starterNeed - starterHave);
+      const severity: "critical" | "need" | "depth" | "done" =
+        starterShort >= 2
+          ? "critical"
+          : starterShort === 1
+          ? "need"
+          : myCount[pos] < starterNeed + 1 && (pos === "RB" || pos === "WR")
+          ? "depth"
+          : "done";
+      return { pos, starterHave, starterNeed, starterShort, severity };
+    })
+    .sort((a, b) => {
+      const order = { critical: 0, need: 1, depth: 2, done: 3 };
+      return order[a.severity] - order[b.severity];
+    });
+
+  const startersTotal =
+    requiredCount.QB + requiredCount.RB + requiredCount.WR + requiredCount.TE +
+    requiredCount.K + requiredCount.DST + requiredCount.FLEX;
+  const startersFilled = Math.min(
+    startersTotal,
+    Math.min(myCount.QB, requiredCount.QB) +
+      Math.min(myCount.RB, requiredCount.RB) +
+      Math.min(myCount.WR, requiredCount.WR) +
+      Math.min(myCount.TE, requiredCount.TE) +
+      Math.min(myCount.K, requiredCount.K) +
+      Math.min(myCount.DST, requiredCount.DST) +
+      Math.min(flexHave, flexNeed)
+  );
+  const benchFilled = Math.max(0, myItems.length - startersFilled);
+
+  // Preview the impact of currently-typed pick
+  const previewPos = position || undefined;
+  const previewSlotImpact = (() => {
+    if (!previewPos) return "";
+    const need = (requiredCount as any)[previewPos] ?? 0;
+    if (myCount[previewPos] < need) return `starter slot (${previewPos})`;
+    if (["RB", "WR", "TE"].includes(previewPos) && flexShort > 0) return "FLEX slot";
+    return "bench slot";
+  })();
+
+
   const askCoach = async (latestEvent?: any, userQuestion?: string) => {
     setStreaming(true);
     setCoachText("");
@@ -373,27 +430,100 @@ export default function LiveDashboard() {
 
           {/* Roster */}
           <Card className="bg-gradient-card p-4">
-            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Your Roster
-            </h2>
-            <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-              {(["QB", "RB", "WR", "TE", "K", "DST"] as const).map((p) => {
-                const have = myCount[p];
-                const need = (requiredCount as any)[p] ?? 0;
-                const short = have < need;
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Roster Needs
+              </h2>
+              <p className="text-[10px] text-muted-foreground">
+                Starters {startersFilled}/{startersTotal} · Bench {benchFilled}/{requiredCount.BENCH}
+              </p>
+            </div>
+
+            <div className="space-y-1.5">
+              {gaps.map((g) => {
+                const willFill = previewPos === g.pos && drafter === "me" && g.starterShort > 0;
+                const tone =
+                  g.severity === "critical"
+                    ? "border-destructive/60 bg-destructive/10"
+                    : g.severity === "need"
+                    ? "border-warning/50 bg-warning/10"
+                    : g.severity === "depth"
+                    ? "border-border bg-secondary/40"
+                    : "border-success/40 bg-success/10";
+                const label =
+                  g.severity === "critical"
+                    ? "CRITICAL"
+                    : g.severity === "need"
+                    ? "NEED"
+                    : g.severity === "depth"
+                    ? "DEPTH"
+                    : "DONE";
                 return (
-                  <div key={p} className={`rounded-md border px-2 py-1.5 text-center ${POS_COLORS[p]}`}>
-                    <p className="text-[10px] font-bold">{p}</p>
-                    <p className="text-sm font-bold">
-                      {have}<span className="opacity-60">/{need}</span>
-                      {short && <span className="ml-0.5 text-[10px]">!</span>}
-                    </p>
+                  <div
+                    key={g.pos}
+                    className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs transition ${tone} ${
+                      willFill ? "ring-2 ring-primary shadow-glow" : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className={`${POS_COLORS[g.pos]} text-[10px] px-1.5 py-0`}>
+                        {g.pos}
+                      </Badge>
+                      <span className="font-mono text-[11px]">
+                        {g.starterHave}/{g.starterNeed} starters
+                      </span>
+                      {willFill && (
+                        <span className="font-mono text-[11px] text-primary">
+                          → {g.starterHave + 1}/{g.starterNeed} ✓
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      className={`text-[9px] font-bold tracking-wider ${
+                        g.severity === "critical"
+                          ? "text-destructive"
+                          : g.severity === "need"
+                          ? "text-warning"
+                          : g.severity === "done"
+                          ? "text-success"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {label}
+                    </span>
                   </div>
                 );
               })}
+
+              {flexNeed > 0 && (
+                <div
+                  className={`flex items-center justify-between rounded-md border px-2.5 py-1.5 text-xs ${
+                    flexShort > 0 ? "border-warning/50 bg-warning/10" : "border-success/40 bg-success/10"
+                  } ${previewPos && ["RB", "WR", "TE"].includes(previewPos) && drafter === "me" && flexShort > 0 ? "ring-2 ring-primary" : ""}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-muted text-foreground border-border text-[10px] px-1.5 py-0">
+                      FLEX
+                    </Badge>
+                    <span className="font-mono text-[11px]">
+                      {flexHave}/{flexNeed} (RB/WR/TE overflow)
+                    </span>
+                  </div>
+                  <span className={`text-[9px] font-bold tracking-wider ${flexShort > 0 ? "text-warning" : "text-success"}`}>
+                    {flexShort > 0 ? "OPEN" : "DONE"}
+                  </span>
+                </div>
+              )}
             </div>
+
+            {previewPos && drafter === "me" && (
+              <p className="mt-3 text-[11px] text-primary">
+                Logging this {previewPos} pick will fill a {previewSlotImpact}.
+              </p>
+            )}
+
             {runs.window > 1 && (
-              <p className="mt-3 text-[11px] text-muted-foreground">
+              <p className="mt-3 border-t border-border pt-2 text-[10px] text-muted-foreground">
                 Last {runs.window} picks:{" "}
                 {Object.entries(runs.counts).map(([k, v]) => `${k}×${v}`).join(" · ")}
               </p>
