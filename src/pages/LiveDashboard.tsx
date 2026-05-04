@@ -615,83 +615,90 @@ export default function LiveDashboard() {
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
-          {/* Compact Log-a-Pick — single row, no calculator vibes */}
-          <Card className="bg-card/60 backdrop-blur-sm p-2.5 border-border/60">
-            <div className="flex items-center gap-1.5 mb-2">
-              <div className="inline-flex rounded-full bg-secondary/50 p-0.5 text-[10px] font-semibold">
-                <button
-                  onClick={() => setDrafter("other")}
-                  className={`rounded-full px-2.5 py-1 transition ${
-                    drafter === "other" ? "bg-accent text-accent-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  <Users className="inline h-3 w-3 mr-1 -mt-0.5" />OTHER
-                </button>
-                <button
-                  onClick={() => setDrafter("me")}
-                  className={`rounded-full px-2.5 py-1 transition ${
-                    drafter === "me" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  <User className="inline h-3 w-3 mr-1 -mt-0.5" />ME
-                </button>
+          {/* Manual entry — collapsed by default; ESPN sync feeds picks automatically */}
+          <details className="group rounded-md border border-border/40 bg-card/40 backdrop-blur-sm">
+            <summary className="flex cursor-pointer list-none items-center justify-between px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground">
+              <span className="flex items-center gap-2">
+                <span>Manual entry</span>
+                <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+              </span>
+              <span className="text-[9px] opacity-60 group-open:hidden">tap to open</span>
+            </summary>
+            <div className="border-t border-border/40 p-2.5">
+              <div className="flex items-center gap-1.5 mb-2">
+                <div className="inline-flex rounded-full bg-secondary/50 p-0.5 text-[10px] font-semibold">
+                  <button
+                    onClick={() => setDrafter("other")}
+                    className={`rounded-full px-2.5 py-1 transition ${
+                      drafter === "other" ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    <Users className="inline h-3 w-3 mr-1 -mt-0.5" />OTHER
+                  </button>
+                  <button
+                    onClick={() => setDrafter("me")}
+                    className={`rounded-full px-2.5 py-1 transition ${
+                      drafter === "me" ? "bg-primary text-primary-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    <User className="inline h-3 w-3 mr-1 -mt-0.5" />ME
+                  </button>
+                </div>
               </div>
-              <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
-            </div>
 
-            <div className="flex items-stretch gap-1.5">
-              <div className="flex-1 min-w-0">
-                <PlayerAutocomplete
-                  value={playerName}
-                  onChange={setPlayerName}
-                  onSelect={(p) => {
-                    if (p.position && POSITIONS.includes(p.position as Position)) {
-                      setPosition(p.position as Position);
-                    }
-                  }}
-                  onEnter={submitPick}
-                  autoFocus
-                />
+              <div className="flex items-stretch gap-1.5">
+                <div className="flex-1 min-w-0">
+                  <PlayerAutocomplete
+                    value={playerName}
+                    onChange={setPlayerName}
+                    onSelect={(p) => {
+                      if (p.position && POSITIONS.includes(p.position as Position)) {
+                        setPosition(p.position as Position);
+                      }
+                    }}
+                    onEnter={submitPick}
+                  />
+                </div>
+                <div className="relative w-16 shrink-0">
+                  <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submitPick()}
+                    className="pl-5 pr-1 h-9 text-sm font-semibold"
+                  />
+                </div>
+                <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
+                  <SelectTrigger className="w-[68px] shrink-0 h-9 text-xs"><SelectValue placeholder="Pos" /></SelectTrigger>
+                  <SelectContent>
+                    {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={submitPick}
+                  disabled={streaming}
+                  size="sm"
+                  className="h-9 px-3 bg-gradient-primary text-primary-foreground"
+                  title="Log pick"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 px-2"
+                  onClick={() => { undoEvent(); toast("Last entry undone"); }}
+                  disabled={!events.length}
+                  title="Undo"
+                >
+                  <Undo2 className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="relative w-16 shrink-0">
-                <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                <Input
-                  type="number"
-                  inputMode="numeric"
-                  placeholder="0"
-                  value={priceInput}
-                  onChange={(e) => setPriceInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
-                  className="pl-5 pr-1 h-9 text-sm font-semibold"
-                />
-              </div>
-              <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
-                <SelectTrigger className="w-[68px] shrink-0 h-9 text-xs"><SelectValue placeholder="Pos" /></SelectTrigger>
-                <SelectContent>
-                  {POSITIONS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={submitPick}
-                disabled={streaming}
-                size="sm"
-                className="h-9 px-3 bg-gradient-primary text-primary-foreground"
-                title="Log pick"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 px-2"
-                onClick={() => { undoEvent(); toast("Last entry undone"); }}
-                disabled={!events.length}
-                title="Undo"
-              >
-                <Undo2 className="h-4 w-4" />
-              </Button>
             </div>
-          </Card>
+          </details>
 
           {/* Draft Log — clean timeline, no calculator vibes */}
           <Card className="bg-gradient-card p-3">
