@@ -85,14 +85,52 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const mergeImported = (incoming: { name: string; price: number }[], filename: string) => {
+    if (!incoming.length) {
+      toast.error("No players found in file");
+      return;
+    }
+    const map = new Map<string, PriceEstimate>();
+    for (const p of prices) map.set(p.name.toLowerCase(), p);
+    for (const p of incoming) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
+    const merged = Array.from(map.values());
+    setPrices(merged);
+    setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    toast.success(`Imported ${incoming.length} players from ${filename}`);
+  };
+
   const handleUpload = async (file: File) => {
     if (file.size > 15 * 1024 * 1024) {
       return toast.error("File too large (max 15MB)");
     }
+    const name = file.name.toLowerCase();
+    const isCsv = name.endsWith(".csv") || file.type === "text/csv";
+    const isXlsx = name.endsWith(".xlsx") || name.endsWith(".xls") || file.type.includes("spreadsheet") || file.type.includes("excel");
+
     setUploading(true);
     try {
+      // Fast path: CSV / XLSX parsed locally — no AI cost, instant
+      if (isCsv || isXlsx) {
+        const buf = await file.arrayBuffer();
+        const wb = XLSX.read(buf, { type: "array" });
+        // Concatenate ALL sheets so multi-tab workbooks (e.g. one tab per position) work
+        const allRows: any[][] = [];
+        for (const sheetName of wb.SheetNames) {
+          const sheet = wb.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json<any[]>(sheet, { header: 1, defval: "", blankrows: false });
+          allRows.push(...rows);
+        }
+        const players = parseTabular(allRows);
+        if (!players.length) {
+          toast.error("Couldn't auto-detect name + price columns. Try the AI parser by uploading as PDF, or paste the data instead.");
+          return;
+        }
+        mergeImported(players, file.name);
+        return;
+      }
+
+      // PDF / image → AI parse
       const buf = await file.arrayBuffer();
-      // base64 encode in chunks to avoid stack overflow on large files
       let binary = "";
       const bytes = new Uint8Array(buf);
       const CHUNK = 0x8000;
@@ -113,18 +151,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         throw new Error(t.error || `Parse failed (${resp.status})`);
       }
       const { players } = await resp.json() as { players: { name: string; price: number }[] };
-      if (!players?.length) {
-        toast.error("No players found in file");
-        return;
-      }
-      // Merge with existing — overwrite duplicates with new prices
-      const map = new Map<string, PriceEstimate>();
-      for (const p of prices) map.set(p.name.toLowerCase(), p);
-      for (const p of players) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
-      const merged = Array.from(map.values());
-      setPrices(merged);
-      setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
-      toast.success(`Imported ${players.length} players from ${file.name}`);
+      mergeImported(players || [], file.name);
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || "Upload failed");
