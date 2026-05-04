@@ -170,6 +170,22 @@ export default function LiveDashboard() {
     return "bench slot";
   })();
 
+  const whatIfFor = (pos: Position, bid: number) =>
+    whatIfPick(settings, keepers, events, myCount, requiredCount, pos, bid);
+
+  const handlePin = (name: string) => { pinPlayer(name); toast(`Pinned ${name}`); };
+  const handleUnpin = (name: string) => { unpinPlayer(name); };
+  const handleDismiss = (name: string) => {
+    dismissPlayer(name);
+    setQueue((q) => q.filter((t) => t.name !== name));
+    toast(`Dismissed ${name}`);
+  };
+  const handleLoadFromWatchlist = (name: string) => {
+    setPlayerName(name);
+    setDrafter("me");
+    toast(`${name} loaded`);
+  };
+
 
   const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
     setStreaming(true);
