@@ -19,6 +19,7 @@ import { Position } from "@/lib/draft-types";
 import { POSITIONS } from "@/lib/positions";
 import { Trash2, Plus, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
 import { toast } from "sonner";
+import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 
 const STEPS = [
   "League Basics",
@@ -206,11 +207,15 @@ export default function SetupWizard() {
                 <span className="text-muted-foreground">(${keeperSpend} spent on {keepers.length} keepers)</span>
               </p>
               <div className="grid grid-cols-[1fr_90px_80px_auto] gap-2">
-                <Input
-                  placeholder="Player name"
+                <PlayerAutocomplete
                   value={keeperName}
-                  onChange={(e) => setKeeperName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addKeeper()}
+                  onChange={setKeeperName}
+                  onSelect={(p) => {
+                    if (p.position && POSITIONS.includes(p.position as Position)) {
+                      setKeeperPos(p.position as Position);
+                    }
+                  }}
+                  onEnter={addKeeper}
                 />
                 <Input
                   type="number"

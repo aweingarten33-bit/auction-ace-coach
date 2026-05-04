@@ -36,6 +36,7 @@ import {
 import { DraftEvent, Position } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
+import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
@@ -341,12 +342,15 @@ export default function LiveDashboard() {
                 </button>
               </div>
               <div className="grid grid-cols-[1fr_90px_80px] gap-2">
-                <Input
-                  placeholder="Player name"
+                <PlayerAutocomplete
                   value={playerName}
-                  onChange={(e) => setPlayerName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
-                  className="font-medium"
+                  onChange={setPlayerName}
+                  onSelect={(p) => {
+                    if (p.position && POSITIONS.includes(p.position as Position)) {
+                      setPosition(p.position as Position);
+                    }
+                  }}
+                  onEnter={submitPick}
                   autoFocus
                 />
                 <Input
