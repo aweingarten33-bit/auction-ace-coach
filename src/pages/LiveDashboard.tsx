@@ -408,7 +408,27 @@ export default function LiveDashboard() {
             <div ref={coachRef} className="coach-md max-h-96 overflow-auto text-sm leading-relaxed">
               <ReactMarkdown>{coachText || "_..._"}</ReactMarkdown>
             </div>
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {[
+                { label: "Max bid?", q: "What's my realistic max bid for the next pick I should target, and on whom?" },
+                { label: "Next position", q: "Which position should I target next and why?" },
+                { label: "Should I pivot?", q: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
+                { label: "Sleepers", q: "Give me 3 sleeper/value picks I should target right now with reasoning." },
+                { label: "Nominate who?", q: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
+              ].map((b) => (
+                <Button
+                  key={b.label}
+                  size="sm"
+                  variant="secondary"
+                  disabled={streaming}
+                  onClick={() => askCoach(undefined, b.q)}
+                  className="h-7 text-xs"
+                >
+                  {b.label}
+                </Button>
+              ))}
+            </div>
+            <div className="mt-2 flex gap-2">
               <Input
                 placeholder="Ask the coach a question..."
                 value={followUp}
