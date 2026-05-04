@@ -674,6 +674,18 @@ export default function LiveDashboard() {
 
         {/* RIGHT: State + coach */}
         <section className="space-y-4">
+          <NominationForecast
+            predictions={nominations}
+            roomRead={roomRead}
+            loading={nominationsLoading}
+            onRefresh={refreshNominations}
+            onPick={(name, position) => {
+              setPlayerName(name);
+              setPosition(position);
+              setDrafter("other");
+              toast(`${name} loaded — ready to log when nominated`);
+            }}
+          />
           <UpNextQueue
             targets={queue}
             openMan={openMan}
