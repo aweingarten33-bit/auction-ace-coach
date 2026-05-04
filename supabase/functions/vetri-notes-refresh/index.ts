@@ -104,6 +104,88 @@ function expectedTakeCountFromTitle(title: string): number | null {
   return Number.isFinite(n) && n > 0 && n <= 15 ? n : null;
 }
 
+// ---- Blog fallback ------------------------------------------------------
+// Sal mirrors most YouTube videos as written posts on fantasy-football-club.com.
+function slugCandidatesFromTitle(title: string): string[] {
+  const base = title
+    .toLowerCase()
+    .replace(/[''`]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const words = base.split(" ").filter(Boolean);
+  const cands = new Set<string>();
+  cands.add(words.join("-"));
+  cands.add(words.join("-").replace("who-could-break", "that-could-break"));
+  cands.add(words.join("-").replace("could-break", "that-could-break"));
+  if (!/\b20\d{2}\b/.test(base)) {
+    const y = new Date().getFullYear();
+    cands.add(`${words.join("-")}-in-${y}`);
+    cands.add(`${words.join("-")}-in-${y - 1}`);
+  }
+  return [...cands];
+}
+
+function stripHtmlToText(html: string): string {
+  const cleaned = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+    .replace(/<header[\s\S]*?<\/header>/gi, " ");
+  const article = cleaned.match(/<article[\s\S]*?<\/article>/i)?.[0] ?? cleaned;
+  return article
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n\n")
+    .trim();
+}
+
+async function fetchBlogPost(title: string): Promise<string | null> {
+  for (const slug of slugCandidatesFromTitle(title)) {
+    if (!slug) continue;
+    try {
+      const url = `https://www.fantasy-football-club.com/p/${slug}`;
+      const resp = await fetch(url, { headers: { "User-Agent": UA } });
+      if (resp.ok) {
+        const text = stripHtmlToText(await resp.text());
+        if (text.length > 400) {
+          console.log("blog hit (slug)", slug);
+          return text.slice(0, 16000);
+        }
+      }
+    } catch (e) {
+      console.warn("blog slug fetch error", slug, e);
+    }
+  }
+  try {
+    const q = encodeURIComponent(`site:fantasy-football-club.com ${title}`);
+    const search = await fetch(`https://duckduckgo.com/html/?q=${q}`, { headers: { "User-Agent": UA } });
+    if (!search.ok) return null;
+    const link = (await search.text()).match(/https?:\/\/(?:www\.)?fantasy-football-club\.com\/p\/[a-z0-9-]+/i)?.[0];
+    if (!link) return null;
+    const resp = await fetch(link, { headers: { "User-Agent": UA } });
+    if (!resp.ok) return null;
+    const text = stripHtmlToText(await resp.text());
+    if (text.length > 400) {
+      console.log("blog hit (search)", link);
+      return text.slice(0, 16000);
+    }
+  } catch (e) {
+    console.warn("blog search error", e);
+  }
+  return null;
+}
+
 async function fetchTranscript(videoId: string): Promise<string | null> {
   try {
     const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
