@@ -5,7 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
 import { Position } from "@/lib/draft-types";
 import { supabase } from "@/integrations/supabase/client";
-import { Youtube, RefreshCw, ExternalLink, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Sparkles } from "lucide-react";
+import { Youtube, RefreshCw, ExternalLink, ChevronDown, ChevronUp, TrendingUp, TrendingDown, Sparkles, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import { toast } from "sonner";
 
 export interface VetriTake {
