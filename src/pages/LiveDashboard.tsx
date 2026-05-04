@@ -48,6 +48,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import DraftIntelTicker from "@/components/DraftIntelTicker";
 import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import VetriTierSheet from "@/components/VetriTierSheet";
+import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
@@ -92,6 +93,7 @@ export default function LiveDashboard() {
   const [nominations, setNominations] = useState<NominationPrediction[]>([]);
   const [roomRead, setRoomRead] = useState<string | undefined>(undefined);
   const [nominationsLoading, setNominationsLoading] = useState(false);
+  const [vetriTakes, setVetriTakes] = useState<VetriTake[]>([]);
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
