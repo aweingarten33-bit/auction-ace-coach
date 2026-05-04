@@ -436,26 +436,30 @@ Deno.serve(async (req: Request) => {
       );
 
       let transcript = await fetchTranscript(item.videoId);
-      let source: "captions" | "description" | "whisper" = "captions";
+      let source: Source = "captions";
       if (!transcript) {
-        // Fallback 1: timestamped/player-list descriptions (cheap, often present).
-        // Generic sponsor/link descriptions are not content; use Whisper instead.
         if (item.description && descriptionLooksActionable(item.description)) {
           transcript = item.description;
           source = "description";
         } else {
-          // Fallback 2: Whisper audio transcription (paid)
-          const whisperText = await transcribeWithWhisper(item.videoId);
-          if (whisperText && whisperText.length > 100) {
-            transcript = whisperText;
-            source = "whisper";
+          // Try blog mirror first (cheap, well-structured)
+          const blogText = await fetchBlogPost(item.title);
+          if (blogText) {
+            transcript = blogText;
+            source = "blog";
           } else {
-            await sb
-              .from("vetri_notes")
-              .update({ status: "no_transcript", error: "No captions, description, or Whisper transcript available" })
-              .eq("video_id", item.videoId);
-            results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
-            continue;
+            const whisperText = await transcribeWithWhisper(item.videoId);
+            if (whisperText && whisperText.length > 100) {
+              transcript = whisperText;
+              source = "whisper";
+            } else {
+              await sb
+                .from("vetri_notes")
+                .update({ status: "no_transcript", error: "No captions, blog post, or audio transcript available" })
+                .eq("video_id", item.videoId);
+              results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
+              continue;
+            }
           }
         }
       }
@@ -465,28 +469,36 @@ Deno.serve(async (req: Request) => {
         const expected = expectedTakeCountFromTitle(item.title);
         const takeCount = distilled?.takes?.length ?? 0;
         if (!distilled || takeCount === 0 || (expected != null && takeCount < Math.min(expected, 3))) {
-          if (source !== "whisper") {
-            const whisperText = await transcribeWithWhisper(item.videoId);
-            if (whisperText && whisperText.length > 100) {
-              transcript = whisperText;
-              source = "whisper";
-              const retry = await distill(item.title, transcript, source);
-              if (retry && retry.takes?.length > 0) {
-                await sb
-                  .from("vetri_notes")
-                  .update({
-                    status: "ready",
-                    error: null,
-                    transcript,
-                    summary: retry.summary,
-                    takes: retry.takes,
-                    positions: retry.positions ?? [],
-                  })
-                  .eq("video_id", item.videoId);
-                results.push({ videoId: item.videoId, title: item.title, status: "ready" });
-                continue;
-              }
+          // Try escalating fallbacks: blog → whisper
+          const tryNext = async (nextSource: Source, fetcher: () => Promise<string | null>) => {
+            if (source === nextSource) return null;
+            const text = await fetcher();
+            if (!text || text.length < 100) return null;
+            const retry = await distill(item.title, text, nextSource);
+            if (retry && retry.takes?.length > 0) {
+              transcript = text;
+              source = nextSource;
+              return retry;
             }
+            return null;
+          };
+          const retry =
+            (await tryNext("blog", () => fetchBlogPost(item.title))) ||
+            (await tryNext("whisper", () => transcribeWithWhisper(item.videoId)));
+          if (retry) {
+            await sb
+              .from("vetri_notes")
+              .update({
+                status: "ready",
+                error: null,
+                transcript,
+                summary: retry.summary,
+                takes: retry.takes,
+                positions: retry.positions ?? [],
+              })
+              .eq("video_id", item.videoId);
+            results.push({ videoId: item.videoId, title: item.title, status: "ready" });
+            continue;
           }
           await sb
             .from("vetri_notes")
