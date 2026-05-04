@@ -45,6 +45,7 @@ import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import LiveSyncPanel from "@/components/LiveSyncPanel";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
+import QuoteTicker from "@/components/QuoteTicker";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 
@@ -392,13 +393,17 @@ export default function LiveDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
+      <QuoteTicker />
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-primary shadow-glow">
               <Trophy className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <h1 className="truncate text-[13px] font-semibold leading-tight tracking-tight">Auction Coach</h1>
+            <div className="min-w-0 leading-tight">
+              <h1 className="truncate text-[13px] font-semibold tracking-tight neon-text">Auction Coach</h1>
+              <p className="truncate font-mono text-[8px] uppercase tracking-[0.2em] text-muted-foreground">Fantasy Focus × Vetri</p>
+            </div>
           </div>
           {/* Compact live budget — Awwwards single-accent emphasis on remaining */}
           <div className="flex items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
@@ -450,9 +455,12 @@ export default function LiveDashboard() {
             <div className="space-y-3">
               {/* Sync status — tells user if ESPN auto-log is on, or manual fallback is active */}
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  Log a Pick
-                </span>
+                <div className="leading-tight">
+                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Log a Pick
+                  </span>
+                  <span className="block font-mono text-[8px] uppercase tracking-[0.2em] text-primary/80">— Drop the Hammer</span>
+                </div>
                 <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
               </div>
               {/* Drafter toggle */}
@@ -553,7 +561,8 @@ export default function LiveDashboard() {
           {/* Activity feed */}
           <Card className="bg-gradient-card p-4">
             <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Draft Log ({events.length})
+              Draft Log <span className="text-foreground/60">({events.length})</span>
+              <span className="ml-2 font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE TAPE</span>
             </h2>
             <div className="max-h-80 space-y-1.5 overflow-auto">
               {[...events].reverse().map((e, idx) => (
@@ -653,8 +662,9 @@ export default function LiveDashboard() {
             <div className="mb-3 flex items-baseline justify-between">
               <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 Roster Needs
+                <span className="ml-2 font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE BUILD</span>
               </h2>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="font-mono text-[10px] text-muted-foreground">
                 Starters {startersFilled}/{startersTotal} · Bench {benchFilled}/{requiredCount.BENCH}
               </p>
             </div>
@@ -777,7 +787,9 @@ export default function LiveDashboard() {
           {/* Coach */}
           <Card className="bg-gradient-card p-4 shadow-glow">
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
-              <Sparkles className="h-3.5 w-3.5" /> AI Coach {streaming && <span className="text-muted-foreground">· thinking...</span>}
+              <Sparkles className="h-3.5 w-3.5" /> AI Coach
+              <span className="font-mono text-[9px] tracking-[0.2em] text-primary/70">— THE TAKE</span>
+              {streaming && <span className="text-muted-foreground">· thinking...</span>}
             </h2>
             <div ref={coachRef} className="coach-md max-h-96 space-y-3 overflow-auto text-sm leading-relaxed">
               {coachHistory.length === 0 && !streaming && (
