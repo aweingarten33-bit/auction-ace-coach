@@ -30,6 +30,7 @@ interface Props {
   onDismiss: (name: string) => void;
   valueFor: (name: string, bid: number) => ValueCall;
   whatIfFor: (pos: Position, bid: number) => WhatIf;
+  knockoutFor: (name: string) => Knockout;
 }
 
 function matchTone(pct: number) {
