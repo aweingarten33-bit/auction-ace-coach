@@ -156,7 +156,7 @@ export default function UpNextQueue({
                             </span>
                           </HoverCardTrigger>
                           <HoverCardContent side="top" className="w-64 text-[11px] leading-snug">
-                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Dossier</p>
+                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">About this player</p>
                             <p>{t.dossier}</p>
                           </HoverCardContent>
                         </HoverCard>
