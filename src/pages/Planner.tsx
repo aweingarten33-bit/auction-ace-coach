@@ -222,12 +222,12 @@ export default function Planner() {
         {/* ---------- Step 1: Setup ---------- */}
         <SetupChecklist />
 
+        {/* ---------- Step 2: Slot allocation ---------- */}
 
-      <main className="mx-auto max-w-3xl space-y-4 p-3">
-        {/* ---------- Slot allocation ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
+              <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">2</span>
               <Calculator className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-semibold">$ per roster slot</h2>
             </div>
@@ -266,6 +266,7 @@ export default function Planner() {
         {/* ---------- Affordability checker ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center gap-2">
+            <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">3</span>
             <Check className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Can I afford…?</h2>
           </div>
@@ -310,6 +311,7 @@ export default function Planner() {
         {/* ---------- $ → players lookup ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center gap-2">
+            <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">4</span>
             <Search className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">What can I get for $X?</h2>
           </div>
@@ -421,3 +423,99 @@ function SyncHistoryButton() {
   );
 }
 
+
+// ============================================================
+// Step 1: Setup checklist — 1a Connect ESPN, 1b Sync history, 1c Upload cheat sheet
+// ============================================================
+function SetupChecklist() {
+  const navigate = useNavigate();
+  const { prices } = useDraftStore();
+  const [espnConnected, setEspnConnected] = useState<boolean | null>(null);
+  const [historySeasons, setHistorySeasons] = useState<number[]>([]);
+  const [rankSeasons, setRankSeasons] = useState<number[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const refresh = async () => {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u.user) return;
+    const [{ data: creds }, { data: hist }, { data: ranks }] = await Promise.all([
+      supabase.from("espn_credentials").select("league_id, season_id").eq("user_id", u.user.id).maybeSingle(),
+      supabase.from("league_auction_history").select("season").eq("user_id", u.user.id),
+      supabase.from("espn_preseason_ranks").select("season"),
+    ]);
+    setEspnConnected(!!creds?.league_id);
+    setHistorySeasons([...new Set((hist ?? []).map((r: any) => r.season))].sort((a, b) => b - a));
+    setRankSeasons([...new Set((ranks ?? []).map((r: any) => r.season))].sort((a, b) => b - a));
+  };
+
+  useEffect(() => { refresh(); }, []);
+
+  const runSync = async () => {
+    setBusy(true);
+    try {
+      const [d, r] = await Promise.all([
+        supabase.functions.invoke("espn-historical-draft", { body: { seasonsBack: 3 } }),
+        supabase.functions.invoke("espn-historical-ranks", { body: { seasonsBack: 3 } }),
+      ]);
+      const err = (d.data as any)?.error || (r.data as any)?.error;
+      if (err?.toLowerCase?.().includes("connect espn")) {
+        toast.error("Connect ESPN first.");
+      } else if (err) {
+        toast.error(`Sync issue: ${err}`);
+      } else {
+        toast.success("History synced.");
+        await refresh();
+      }
+    } finally { setBusy(false); }
+  };
+
+  const Step = ({ n, label, done, children }: { n: string; label: string; done: boolean; children: React.ReactNode }) => (
+    <div className="flex items-start gap-2 rounded-md border bg-card/40 p-2">
+      <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${done ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"}`}>
+        {done ? "✓" : n}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="text-xs font-semibold">{label}</div>
+        <div className="mt-1 text-[11px] text-muted-foreground">{children}</div>
+      </div>
+    </div>
+  );
+
+  const hasPrices = prices.length > 0;
+
+  return (
+    <Card className="p-3">
+      <div className="mb-2 flex items-center gap-2">
+        <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">1</span>
+        <h2 className="text-sm font-semibold">Setup — load your data</h2>
+      </div>
+      <div className="space-y-2">
+        <Step n="1a" label="Connect ESPN league" done={!!espnConnected}>
+          {espnConnected ? (
+            <span className="text-emerald-500">Connected.</span>
+          ) : (
+            <button onClick={() => navigate("/espn")} className="text-primary underline">
+              Paste SWID + espn_s2 + league ID →
+            </button>
+          )}
+        </Step>
+        <Step n="1b" label="Sync last 3 yrs of auction history" done={historySeasons.length > 0 && rankSeasons.length > 0}>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={runSync} disabled={busy || !espnConnected} className="h-6 text-[11px]">
+              <Download className="mr-1 h-3 w-3" />
+              {busy ? "Syncing…" : historySeasons.length ? "Re-sync" : "Sync now"}
+            </Button>
+            <span className="text-[10px]">
+              Drafts: {historySeasons.join(", ") || "—"} · Ranks: {rankSeasons.join(", ") || "—"}
+            </span>
+          </div>
+        </Step>
+        <Step n="1c" label="Upload this year's cheat sheet (tiers)" done={hasPrices}>
+          {hasPrices
+            ? <span className="text-emerald-500">{prices.length} players priced. Re-import in setup wizard.</span>
+            : <button onClick={() => navigate("/setup")} className="text-primary underline">Open setup wizard →</button>}
+        </Step>
+      </div>
+    </Card>
+  );
+}
