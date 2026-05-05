@@ -90,7 +90,7 @@ export default function Draft() {
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
   const [coachText, setCoachText] = useState<string>(
-    "**Hey — I'm your fantasy football guy.** Think of me as your Matthew Berry / Fantasy Focus voice in your ear during the draft.\n\nAsk me anything: *should I bid on Bijan?* — *who's a sleeper RB?* — *is Kupp worth $40?* — *how do I handle a QB run?* I'll give you a straight take, fast.\n\nI also see your live draft state (budget, roster, who's been picked) so my advice fits *your* draft, not generic rankings.\n\nWhat's on your mind?"
+    "Ask me anything about this draft. I can see your budget, roster, prices, and what's happening in the room."
   );
   const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
