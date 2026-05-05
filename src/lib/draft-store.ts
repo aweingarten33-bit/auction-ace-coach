@@ -89,7 +89,7 @@ export const useDraftStore = create<DraftState>()(
       quickPrompts: DEFAULT_QUICK_PROMPTS,
       setQuickPrompts: (p) => set({ quickPrompts: p }),
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
-      showMath: false,
+      showMath: true,
       setShowMath: (b) => set({ showMath: b }),
       setSettings: (s) =>
         set((state) => {
