@@ -74,6 +74,7 @@ export default function Draft() {
   const {
     settings, keepers, prices, events, setupComplete, watchlist, dismissed,
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
+    quickPrompts, setQuickPrompts, resetQuickPrompts,
   } = useDraftStore();
 
   const [playerName, setPlayerName] = useState("");
