@@ -210,8 +210,12 @@ export default function DraftV2() {
     if (acc) setCoachHistory((h) => [...h, { role: "assistant", content: acc }]);
   };
 
-  // ---------- mobile tab ----------
+  // ---------- mobile tab + theme ----------
   const [tab, setTab] = useState<MobileTab>("decision");
+  const [theme, setTheme] = useState<"dark" | "light">(() =>
+    (typeof localStorage !== "undefined" && (localStorage.getItem("draft-v2-theme") as "dark" | "light")) || "dark"
+  );
+  useEffect(() => { localStorage.setItem("draft-v2-theme", theme); }, [theme]);
 
   // ---------- top-rail card data (existing signals) ----------
   const railCards = useMemo(() => {
