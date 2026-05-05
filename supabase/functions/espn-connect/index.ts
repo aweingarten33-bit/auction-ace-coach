@@ -32,16 +32,22 @@ Deno.serve(async (req) => {
     if (!body.swid || !body.espn_s2 || !body.season) {
       return j({ error: "swid, espn_s2, season required" }, 400);
     }
-    // Strip any non-ASCII / control chars that may have been copied from the browser inspector
-    const clean = (v: string) => v.replace(/[^\x20-\x7E]/g, "").trim();
-    let swid = clean(body.swid);
-    const s2 = clean(body.espn_s2);
-    // Ensure SWID is wrapped in braces
+    // Accept either raw values or copied Cookie rows like "SWID={...}" / "espn_s2=...".
+    const clean = (v: string) => v.replace(/[^\x20-\x7E]/g, "").trim().replace(/^['"]|['"]$/g, "");
+    const cookieValue = (raw: string, name: string) => {
+      const value = clean(raw);
+      const match = value.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`, "i"));
+      return clean(match?.[1] ?? value);
+    };
+    let swid = cookieValue(body.swid, "SWID").replace(/\s+/g, "").replace(/^%7B/i, "{").replace(/%7D$/i, "}");
+    const s2 = cookieValue(body.espn_s2, "espn_s2").replace(/\s+/g, "");
+    // ESPN wants braces in the Cookie header, but not in the fan id URL path.
     if (!swid.startsWith("{")) swid = `{${swid}`;
     if (!swid.endsWith("}")) swid = `${swid}}`;
+    const fanId = swid.replace(/[{}]/g, "");
 
     // Fan API → list leagues for the user
-    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
+    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(fanId)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
     const cookie = `SWID=${swid}; espn_s2=${s2}`;
 
     const fanRes = await fetch(fanUrl, {
@@ -53,7 +59,7 @@ Deno.serve(async (req) => {
     });
     if (!fanRes.ok) {
       const text = await fanRes.text();
-      return j({ error: `ESPN auth failed (${fanRes.status})`, detail: text.slice(0, 300), hint: "Re-copy cookies, make sure SWID includes the braces { }" }, 400);
+      return j({ error: `ESPN auth failed (${fanRes.status})`, detail: text.slice(0, 300), hint: "Paste only the cookie values: SWID can include braces, espn_s2 should not include spaces or line breaks." }, 400);
     }
     const fanData = await fanRes.json();
 
