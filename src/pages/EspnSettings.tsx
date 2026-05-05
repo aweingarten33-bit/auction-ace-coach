@@ -26,6 +26,8 @@ export default function EspnSettings() {
   const [selected, setSelected] = useState<League | null>(null);
   const [token, setToken] = useState<string>("");
   const [verified, setVerified] = useState<string | null>(null);
+  const [joinLeagueId, setJoinLeagueId] = useState<string>("");
+  const [savedLeagueId, setSavedLeagueId] = useState<number | null>(null);
 
   // Load existing
   useEffect(() => {
