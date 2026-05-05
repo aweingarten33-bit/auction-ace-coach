@@ -81,7 +81,7 @@ export default function TierBreakAlerts({ prices, events, keepers, positions, cl
               {b.pos}
             </span>
             <span className="font-semibold">
-              {b.remainingTier === 1 ? "Last" : `Only ${b.remainingTier}`} {b.pos} tier-1 left
+              {b.remainingTier === 1 ? "Last" : `Only ${b.remainingTier}`} top {b.pos} left
             </span>
             <span className="ml-1 text-muted-foreground">
               — <span className="font-medium text-foreground">{b.topName}</span>{" "}
