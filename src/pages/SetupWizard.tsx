@@ -28,7 +28,7 @@ const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 export default function SetupWizard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup } =
+  const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup, setupComplete } =
     useDraftStore();
   const [step, setStep] = useState(() => {
     const s = searchParams.get("step");
