@@ -85,9 +85,29 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [quickName, setQuickName] = useState("");
   const [quickPrice, setQuickPrice] = useState("");
   const [filter, setFilter] = useState("");
+  const [posFilter, setPosFilter] = useState<"ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DST">("ALL");
+  const [sortBy, setSortBy] = useState<"default" | "price-desc" | "price-asc" | "name">("default");
+  const [posByName, setPosByName] = useState<Map<string, string>>(new Map());
   const [uploading, setUploading] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Pull positions from cached ESPN ranks so we can filter the list by position
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("espn_player_ranks")
+        .select("player_name, position");
+      if (cancelled || !data) return;
+      const m = new Map<string, string>();
+      for (const r of data) {
+        if (r.player_name && r.position) m.set(r.player_name.toLowerCase(), r.position);
+      }
+      setPosByName(m);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const autoFillFromEspn = async () => {
     setAutoBusy(true);
