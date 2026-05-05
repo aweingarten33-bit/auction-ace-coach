@@ -45,8 +45,6 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import VetriTierSheet from "@/components/VetriTierSheet";
-import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
@@ -95,7 +93,7 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
-  const [vetriTakes, setVetriTakes] = useState<VetriTake[]>([]);
+  
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
@@ -336,7 +334,7 @@ export default function LiveDashboard() {
           recentRuns: runs,
           latestEvent,
           userQuestion,
-          vetriTakes: vetriTakes.slice(0, 40),
+          vetriTakes: [],
           history: coachHistory.slice(-6),
           draftedPlayers: events.map((e) => e.player),
         }),
