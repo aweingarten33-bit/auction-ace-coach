@@ -329,28 +329,6 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </Button>
       </div>
 
-      {/* Quick-add */}
-      <div className="grid grid-cols-[1fr_90px_auto] gap-2">
-        <PlayerAutocomplete
-          value={quickName}
-          onChange={setQuickName}
-          onSelect={(p) => setQuickName(p.full_name)}
-          onEnter={addQuick}
-          placeholder="Player name"
-        />
-        <Input
-          type="number"
-          inputMode="numeric"
-          placeholder="$"
-          value={quickPrice}
-          onChange={(e) => setQuickPrice(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addQuick()}
-        />
-        <Button onClick={addQuick} size="icon" variant="outline">
-          <Plus className="h-4 w-4" />
-        </Button>
-      </div>
-
       {/* Filter / list */}
       {prices.length > 0 && (
         <>
@@ -386,9 +364,6 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </>
       )}
 
-      <p className="text-[11px] text-muted-foreground">
-        Optional — but with prices the assistant can flag steals, reaches, and market inflation in real time.
-      </p>
     </div>
   );
 }
