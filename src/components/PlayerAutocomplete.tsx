@@ -89,7 +89,7 @@ export default function PlayerAutocomplete({
         className="font-medium"
       />
       {open && suggestions.length > 0 && (
-        <div className="absolute z-50 mt-1 left-0 right-auto min-w-full w-max max-w-[92vw] max-h-80 overflow-auto rounded-md border border-border bg-popover shadow-lg">
+        <div className="absolute z-50 mt-1 left-0 right-0 max-h-80 overflow-auto rounded-md border border-border bg-popover shadow-lg">
           {suggestions.map((p, i) => (
             <button
               key={p.player_id}
