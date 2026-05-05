@@ -64,9 +64,6 @@ import NominationCard from "@/components/NominationCard";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
 
-const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
-const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
-const NOMINATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nominate-suggest`;
 
 export default function Draft() {
   const navigate = useNavigate();
