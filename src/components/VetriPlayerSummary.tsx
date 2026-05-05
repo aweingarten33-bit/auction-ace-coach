@@ -62,7 +62,7 @@ function priceFor(prices: PriceEstimate[], player: string): number | null {
 export default function VetriPlayerSummary() {
   const prices = useDraftStore((s) => s.prices);
   const [notes, setNotes] = useState<RawNote[] | null>(null);
-  const [filter, setFilter] = useState<"all" | "target" | "fade">("all");
+  const [filter, setFilter] = useState<"all" | "target" | "fade">("target");
 
   useEffect(() => {
     let cancelled = false;
@@ -123,13 +123,15 @@ export default function VetriPlayerSummary() {
   }, [notes]);
 
   const filtered = useMemo(() => {
-    if (filter === "all") return players;
+    // Always hide players who only have neutral mentions
+    const meaningful = players.filter((p) => p.leans.some((l) => l !== "neutral"));
+    if (filter === "all") return meaningful;
     if (filter === "target") {
-      return players.filter((p) =>
+      return meaningful.filter((p) =>
         p.leans.some((l) => l === "target" || l === "breakout" || l === "sleeper" || l === "value")
       );
     }
-    return players.filter((p) => p.leans.some((l) => l === "fade" || l === "avoid"));
+    return meaningful.filter((p) => p.leans.some((l) => l === "fade" || l === "avoid"));
   }, [players, filter]);
 
   if (notes === null) {
