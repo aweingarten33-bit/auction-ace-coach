@@ -41,12 +41,19 @@ Deno.serve(async (req) => {
     if (!swid.endsWith("}")) swid = `${swid}}`;
 
     // Fan API → list leagues for the user
-    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?context=fantasy&useCookieAuth=true`;
+    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
     const cookie = `SWID=${swid}; espn_s2=${s2}`;
 
-    const fanRes = await fetch(fanUrl, { headers: { cookie, accept: "application/json" } });
+    const fanRes = await fetch(fanUrl, {
+      headers: {
+        cookie,
+        accept: "application/json",
+        "user-agent": "Mozilla/5.0",
+      },
+    });
     if (!fanRes.ok) {
-      return j({ error: `ESPN auth failed (${fanRes.status})`, hint: "Re-copy cookies, make sure SWID includes the braces { }" }, 400);
+      const text = await fanRes.text();
+      return j({ error: `ESPN auth failed (${fanRes.status})`, detail: text.slice(0, 300), hint: "Re-copy cookies, make sure SWID includes the braces { }" }, 400);
     }
     const fanData = await fanRes.json();
 
