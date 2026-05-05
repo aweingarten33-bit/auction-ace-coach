@@ -205,7 +205,7 @@ export default function EspnSettings() {
           <h2 className="font-semibold">In a league with someone who already connected?</h2>
         </div>
         <p className="mb-3 text-xs text-muted-foreground">
-          Just enter your ESPN <strong>League ID</strong> — you'll instantly see the same draft history &amp; tier prices they pulled. No cookies, no DevTools. (Find it in the URL when you visit your league on espn.com: <code className="rounded bg-secondary px-1">leagueId=XXXXXX</code>.)
+          Just enter your ESPN <strong>League ID</strong> — you'll instantly see the same draft history &amp; tier prices they pulled. <strong>View-only</strong>: you can't change their data, and your own keepers, notes, and price tweaks stay private to you. No cookies, no DevTools. (Find your League ID in the URL when you visit your league on espn.com: <code className="rounded bg-secondary px-1">leagueId=XXXXXX</code>.)
         </p>
         <div className="flex gap-2">
           <Input
