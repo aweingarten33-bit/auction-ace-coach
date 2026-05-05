@@ -178,10 +178,45 @@ Deno.serve(async (req: Request) => {
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
     const payload = (await req.json()) as CoachPayload;
 
-    const sysPrompt = payload.showMath ? SYSTEM_PROMPT + MATH_ADDENDUM : SYSTEM_PROMPT;
+    // ---------- Optional live web search via Firecrawl ----------
+    let webContext = "";
+    const q = (payload.userQuestion || "").trim();
+    const shouldSearch = !!FIRECRAWL_API_KEY && q.length > 0 && q.split(/\s+/).length >= 3;
+    if (shouldSearch) {
+      try {
+        const searchQuery = `${q} fantasy football 2026 ESPN OR FantasyPros OR "Matthew Berry"`;
+        const fcRes = await fetch("https://api.firecrawl.dev/v2/search", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ query: searchQuery, limit: 3, tbs: "qdr:m" }),
+        });
+        if (fcRes.ok) {
+          const fc = await fcRes.json();
+          const results = (fc?.data ?? fc?.web ?? []).slice(0, 3);
+          if (results.length) {
+            webContext = results
+              .map((r: { url?: string; title?: string; description?: string }, i: number) =>
+                `[${i + 1}] ${r.title || ""}\n${r.description || ""}\nSource: ${r.url || ""}`,
+              )
+              .join("\n\n");
+          }
+        } else {
+          console.warn("Firecrawl search failed", fcRes.status, await fcRes.text());
+        }
+      } catch (err) {
+        console.warn("Firecrawl error", err);
+      }
+    }
+
+    const sysBase = SYSTEM_PROMPT + (payload.showMath ? MATH_ADDENDUM : "");
+    const sysPrompt = webContext
+      ? sysBase +
+        `\n\nWEB SEARCH RESULTS — use these to inform your answer when relevant. If you quote or rely on one, cite it inline like "(per ESPN — <url>)" so the user can click through.\n\n${webContext}`
+      : sysBase;
     const messages: { role: string; content: string }[] = [{ role: "system", content: sysPrompt }];
     if (payload.history?.length) {
       for (const h of payload.history.slice(-6)) {
