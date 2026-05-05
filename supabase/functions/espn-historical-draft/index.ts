@@ -34,12 +34,11 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (!creds?.league_id || !creds?.season_id) {
-      return j({ error: "No ESPN league configured. Connect ESPN first." }, 400);
+      return j({ error: "No ESPN league selected yet. Go to the ESPN connection step and pick your league + team, then come back." }, 400);
     }
 
     const cookie = `SWID=${creds.swid}; espn_s2=${creds.espn_s2}`;
     const currentSeason: number = creds.season_id;
-    // Pull seasons BEFORE the current one (this year's draft is what we're prepping for).
     const seasons = Array.from({ length: seasonsBack }, (_, i) => currentSeason - 1 - i);
 
     const summary: { season: number; picks: number; status: string; error?: string }[] = [];
@@ -47,16 +46,35 @@ Deno.serve(async (req) => {
     for (const season of seasons) {
       try {
         const espnUrl =
-          `https://fantasy.espn.com/apis/v3/games/ffl/seasons/${season}` +
+          `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}` +
           `/segments/0/leagues/${creds.league_id}` +
           `?view=mDraftDetail&view=mSettings&view=mTeam`;
 
-        const r = await fetch(espnUrl, { headers: { cookie, accept: "application/json" } });
+        const r = await fetch(espnUrl, {
+          headers: {
+            cookie,
+            accept: "application/json",
+            "accept-language": "en-US,en;q=0.9",
+            referer: "https://fantasy.espn.com/",
+            origin: "https://fantasy.espn.com",
+            "user-agent":
+              "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          },
+        });
+        const text = await r.text();
         if (!r.ok) {
-          summary.push({ season, picks: 0, status: "skipped", error: `ESPN ${r.status}` });
+          summary.push({ season, picks: 0, status: "skipped", error: `ESPN ${r.status}: ${text.slice(0, 120)}` });
           continue;
         }
-        const data = await r.json();
+        if (text.trimStart().startsWith("<")) {
+          summary.push({ season, picks: 0, status: "skipped", error: "ESPN returned HTML (auth/WAF block)" });
+          continue;
+        }
+        let data: any;
+        try { data = JSON.parse(text); } catch (e) {
+          summary.push({ season, picks: 0, status: "skipped", error: `Bad JSON: ${e instanceof Error ? e.message : String(e)}` });
+          continue;
+        }
 
         const draftType = data?.settings?.draftSettings?.type;
         const picks = data?.draftDetail?.picks ?? [];
