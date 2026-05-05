@@ -92,10 +92,16 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const autoFillFromEspn = async () => {
     setAutoBusy(true);
     try {
+      // Must be signed in — edge functions need a real user JWT (anon key won't pass)
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session?.access_token) {
+        toast.error("Please sign in to auto-fill from ESPN");
+        return;
+      }
       // 1) Make sure last 3 drafts + this year's ranks are cached
       const [hist, ranks] = await Promise.all([
         supabase.functions.invoke("espn-historical-draft", { body: { seasonsBack: 3 } }),
-        supabase.functions.invoke("espn-player-ranks", {}),
+        supabase.functions.invoke("espn-player-ranks", { body: {} }),
       ]);
       if (hist.error || (hist.data as { error?: string })?.error) {
         throw new Error((hist.data as { error?: string })?.error || hist.error?.message || "Couldn't pull ESPN draft history");
