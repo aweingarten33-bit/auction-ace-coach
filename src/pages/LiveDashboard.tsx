@@ -609,8 +609,16 @@ export default function LiveDashboard() {
                   placeholder="0"
                   value={priceInput}
                   onChange={(e) => setPriceInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submitPick()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") { e.preventDefault(); submitPick(); return; }
+                    const cur = parseInt(priceInput, 10);
+                    const base = Number.isFinite(cur) ? cur : 0;
+                    const step = e.shiftKey ? 5 : 1;
+                    if (e.key === "ArrowUp") { e.preventDefault(); setPriceInput(String(Math.max(0, base + step))); }
+                    else if (e.key === "ArrowDown") { e.preventDefault(); setPriceInput(String(Math.max(0, base - step))); }
+                  }}
                   className="pl-5 pr-1 h-9 text-sm font-semibold"
+                  title="↑/↓ to adjust ($1) · Shift+↑/↓ ($5) · Enter to log"
                 />
               </div>
               <Select value={position} onValueChange={(v) => setPosition(v as Position)}>
