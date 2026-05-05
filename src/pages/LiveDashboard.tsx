@@ -45,20 +45,18 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import VetriTierSheet from "@/components/VetriTierSheet";
 import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
-import TargetedForecastButton from "@/components/TargetedForecastButton";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 import { projectRemainingBuild } from "@/lib/simulator";
 import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
+import TierBreakAlerts from "@/components/TierBreakAlerts";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
-const NOMINATIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nominations-next`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
@@ -93,15 +91,6 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
-  const [nominations, setNominations] = useState<NominationPrediction[]>([]);
-  const [roomRead, setRoomRead] = useState<string | undefined>(undefined);
-  const [nominationsLoading, setNominationsLoading] = useState(false);
-  const [forecastFilters, setForecastFilters] = useState<{
-    positions: Position[];
-    tier: "any" | "elite" | "starter" | "depth";
-    priceMin: string;
-    priceMax: string;
-  }>({ positions: [], tier: "any", priceMin: "", priceMax: "" });
   const [vetriTakes, setVetriTakes] = useState<VetriTake[]>([]);
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
@@ -455,62 +444,7 @@ export default function LiveDashboard() {
     }
   };
 
-  const refreshNominations = async (filtersOverride?: typeof forecastFilters) => {
-    setNominationsLoading(true);
-    try {
-      const f = filtersOverride ?? forecastFilters;
-      const filters = {
-        positions: f.positions.length ? f.positions : undefined,
-        tier: f.tier !== "any" ? f.tier : undefined,
-        priceMin: f.priceMin ? parseInt(f.priceMin, 10) : undefined,
-        priceMax: f.priceMax ? parseInt(f.priceMax, 10) : undefined,
-      };
-      const resp = await fetch(NOMINATIONS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          settings: {
-            totalBudget: settings.totalBudget,
-            numTeams: settings.numTeams,
-            scoring: settings.scoring,
-            leagueType: settings.leagueType,
-            format: settings.format,
-            context: settings.context,
-          },
-          budget,
-          myRoster: myItems,
-          rosterRequired: requiredCount,
-          rosterFilled: myCount,
-          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
-          events,
-          prices,
-          spendByPosition: spend,
-          recentRuns: runs,
-          watchlist,
-          filters,
-        }),
-      });
-      if (!resp.ok) {
-        if (resp.status === 429) toast.error("Rate limited.");
-        else if (resp.status === 402) toast.error("AI credits exhausted.");
-        else toast.error("Forecast unavailable.");
-        return;
-      }
-      const data = await resp.json();
-      if (Array.isArray(data?.nominations)) {
-        setNominations(data.nominations);
-        setRoomRead(data.roomRead);
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Forecast error");
-    } finally {
-      setNominationsLoading(false);
-    }
-  };
+  // (Nomination forecast removed — TierBreakAlerts replaces it deterministically.)
 
   const submitPick = () => {
     const name = playerName.trim();
@@ -541,7 +475,6 @@ export default function LiveDashboard() {
     setPosition("");
     // Coach no longer auto-fires — opt-in only via Ask buttons.
     refreshQueue();
-    refreshNominations();
   };
 
   const handlePickFromQueue = (t: QueueTarget) => {
@@ -616,7 +549,7 @@ export default function LiveDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
+      <main className="mx-auto grid max-w-[1600px] gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)_minmax(0,1fr)]">
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
@@ -791,12 +724,12 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
+          <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-9">
+            <TabsList className="grid w-full grid-cols-3 h-9">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
               <TabsTrigger value="vetri" className="text-[11px]">Notes</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
-              <TabsTrigger value="forecast" className="text-[11px]">Forecast</TabsTrigger>
             </TabsList>
 
             <TabsContent value="targets" className="mt-3 space-y-4">
@@ -849,31 +782,11 @@ export default function LiveDashboard() {
               />
               <OpponentHeatmap settings={settings} />
             </TabsContent>
-
-            <TabsContent value="forecast" className="mt-3 space-y-2">
-              <div className="flex items-center justify-end">
-                <TargetedForecastButton
-                  value={forecastFilters}
-                  onChange={setForecastFilters}
-                  onRun={(f) => refreshNominations(f)}
-                  loading={nominationsLoading}
-                />
-              </div>
-              <NominationForecast
-                predictions={nominations}
-                roomRead={roomRead}
-                loading={nominationsLoading}
-                onRefresh={() => refreshNominations()}
-                onPick={(name, position) => {
-                  setPlayerName(name);
-                  setPosition(position);
-                  setDrafter("other");
-                  toast(`${name} loaded — ready to log when nominated`);
-                }}
-              />
-            </TabsContent>
           </Tabs>
+        </section>
 
+        {/* COACH COLUMN — its own column at xl, stacks below at lg */}
+        <section className="space-y-4 lg:col-span-2 xl:col-span-1">
           {/* Coach */}
           <Card className="bg-gradient-card p-4 shadow-glow">
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">

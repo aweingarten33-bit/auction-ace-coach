@@ -36,6 +36,7 @@ import { computeMarketPulse, valueFor as computeValueFor } from "@/lib/value";
 import { projectRemainingBuild } from "@/lib/simulator";
 import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
+import TierBreakAlerts from "@/components/TierBreakAlerts";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
@@ -127,6 +128,7 @@ export default function MobileDraft() {
           rosterRequired: requiredCount, rosterFilled: myCount,
           events, prices, spendByPosition: spend, recentRuns: runs,
           latestEvent, userQuestion,
+          draftedPlayers: events.map((e) => e.player),
         }),
       });
       if (!resp.ok || !resp.body) {
@@ -330,6 +332,8 @@ function LogTab(props: {
           </div>
         ))}
       </div>
+
+      <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
 
       <Card className="bg-gradient-card p-3">
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
