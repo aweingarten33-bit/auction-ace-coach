@@ -645,7 +645,7 @@ export default function Draft() {
             <TabsList className="grid h-9 w-full grid-cols-3">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
-              <TabsTrigger value="vetri" className="text-[11px]">Sal Vetri</TabsTrigger>
+              <TabsTrigger value="vetri" className="text-[11px]">Analyst</TabsTrigger>
             </TabsList>
             <TabsContent value="targets" className="mt-3 space-y-4">
               <UpNextQueue
@@ -685,7 +685,7 @@ export default function Draft() {
               <Card className="p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Vetri players · projected $
+                    Analyst players · projected $
                   </span>
                 </div>
                 <VetriPlayerSummary />
@@ -704,18 +704,18 @@ export default function Draft() {
                 {(playerName || bestTarget?.name) ? (
                   <VetriTakesForPlayer
                     player={playerName || bestTarget!.name}
-                    emptyText="No Sal Vetri takes on this player yet."
+                    emptyText="No analyst takes on this player yet."
                   />
                 ) : (
                   <p className="text-[11px] italic text-muted-foreground">
-                    Type a player name above to see Sal Vetri's takes.
+                    Type a player name above to see analyst takes.
                   </p>
                 )}
               </Card>
               <Card className="p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Sal Vetri videos tracked
+                    Analyst videos tracked
                   </span>
                 </div>
                 <VetriVideoList />
