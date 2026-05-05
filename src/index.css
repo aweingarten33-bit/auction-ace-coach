@@ -35,12 +35,12 @@
     --muted: 218 25% 26%;
     --muted-foreground: 40 8% 70%;
 
-    /* Blood red — cape & shield */
-    --accent: 0 60% 42%;
-    --accent-foreground: 40 20% 96%;
+    /* Brighter red — readable on dark navy */
+    --accent: 0 78% 62%;
+    --accent-foreground: 40 20% 98%;
 
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 40 20% 96%;
+    --destructive: 0 78% 60%;
+    --destructive-foreground: 40 20% 98%;
 
     --warning: 42 60% 50%;
     --warning-foreground: 218 42% 12%;
