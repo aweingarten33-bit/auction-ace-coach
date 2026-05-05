@@ -107,7 +107,7 @@ export default function UpNextQueue({
       {openMan && (
         <div className="mb-3 flex items-start gap-2 rounded-md border border-accent/40 bg-accent/10 px-2.5 py-1.5 text-[11px]">
           <Eye className="mt-0.5 h-3 w-3 shrink-0 text-accent" />
-          <span className="text-foreground/90"><span className="font-semibold text-accent">Open man:</span> {openMan}</span>
+          <span className="text-foreground/90"><span className="font-semibold text-accent">Nobody's bidding on:</span> {openMan}</span>
         </div>
       )}
 
