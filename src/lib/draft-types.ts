@@ -52,7 +52,7 @@ export const DEFAULT_ROSTER: RosterSlots = {
   RB: 2,
   WR: 2,
   TE: 1,
-  FLEX: 1,
+  FLEX: 0,
   SUPERFLEX: 1,
   K: 0,
   DST: 0,
