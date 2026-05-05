@@ -73,6 +73,10 @@ export type Database = {
           auction_value: number | null
           espn_player_id: number
           id: string
+          injury_note: string | null
+          injury_source: string | null
+          injury_status: string | null
+          injury_updated_at: string | null
           overall_rank: number | null
           player_name: string
           player_name_norm: string
@@ -88,6 +92,10 @@ export type Database = {
           auction_value?: number | null
           espn_player_id: number
           id?: string
+          injury_note?: string | null
+          injury_source?: string | null
+          injury_status?: string | null
+          injury_updated_at?: string | null
           overall_rank?: number | null
           player_name: string
           player_name_norm: string
@@ -103,6 +111,10 @@ export type Database = {
           auction_value?: number | null
           espn_player_id?: number
           id?: string
+          injury_note?: string | null
+          injury_source?: string | null
+          injury_status?: string | null
+          injury_updated_at?: string | null
           overall_rank?: number | null
           player_name?: string
           player_name_norm?: string
