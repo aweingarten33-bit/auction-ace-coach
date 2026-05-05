@@ -300,7 +300,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       </div>
 
       {/* OR divider */}
-      <div className="flex items-center gap-2 text-[10px] font-semibold text-muted-foreground">
+      <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
         <div className="h-px flex-1 bg-border" />
         OR
         <div className="h-px flex-1 bg-border" />
