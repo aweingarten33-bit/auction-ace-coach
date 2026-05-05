@@ -147,7 +147,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       // 3) Pull this year's ranks (incl. last season's actual PPG)
       const { data: rRows, error: rErr } = await supabase
         .from("espn_player_ranks")
-        .select("player_name, position, pos_rank, auction_value, prior_ppg");
+        .select("player_name, position, pos_rank, auction_value, prior_ppg, injury_status");
       if (rErr) throw rErr;
       if (!rRows?.length) {
         throw new Error("No player ranks cached. Try again in a moment.");
@@ -180,7 +180,10 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           : r.pos_rank;
         const tier = tierForPosRank(r.position, blendedRank);
         const tp = tierPrices.find((t) => t.position === r.position && t.tier === tier);
-        const price = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
+        const basePrice = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
+        // Auto-fade injured players (season-ending → ~$1, soft injuries scaled).
+        const mult = injuryMultiplier((r as { injury_status?: string | null }).injury_status);
+        const price = mult < 1 ? Math.max(1, Math.round(basePrice * mult)) : basePrice;
         if (price > 0) built.push({ name: r.player_name, price });
       }
       if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
