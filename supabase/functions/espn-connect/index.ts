@@ -13,6 +13,8 @@ interface Body {
   season: number;
   league_id?: number;
   team_id?: number;
+  save?: boolean;
+  clear_selection?: boolean;
 }
 
 Deno.serve(async (req) => {
@@ -82,18 +84,24 @@ Deno.serve(async (req) => {
         seasonId: e.seasonId,
       }));
 
-    // Persist creds + (optional) selected league
-    const upsertRow: any = {
-      user_id: u.user.id,
-      swid, espn_s2: s2,
-      season_id: body.season,
-      last_verified_at: new Date().toISOString(),
-    };
-    if (body.league_id) upsertRow.league_id = body.league_id;
-    if (body.team_id) upsertRow.team_id = body.team_id;
+    // Persist creds when explicitly verifying/selecting. Initial page load can list only.
+    if (body.save !== false) {
+      const upsertRow: any = {
+        user_id: u.user.id,
+        swid, espn_s2: s2,
+        season_id: body.season,
+        last_verified_at: new Date().toISOString(),
+      };
+      if (body.league_id) upsertRow.league_id = body.league_id;
+      if (body.team_id) upsertRow.team_id = body.team_id;
+      if (body.clear_selection) {
+        upsertRow.league_id = null;
+        upsertRow.team_id = null;
+      }
 
-    const { error } = await sb.from("espn_credentials").upsert(upsertRow, { onConflict: "user_id" });
-    if (error) return j({ error: error.message }, 500);
+      const { error } = await sb.from("espn_credentials").upsert(upsertRow, { onConflict: "user_id" });
+      if (error) return j({ error: error.message }, 500);
+    }
 
     return j({ ok: true, leagues, season: body.season });
   } catch (e) {
