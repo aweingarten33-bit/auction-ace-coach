@@ -118,15 +118,15 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image:
-      linear-gradient(180deg, hsl(218 42% 20%) 0%, hsl(218 45% 15%) 100%),
-      repeating-linear-gradient(0deg, hsl(0 0% 100% / 0.02) 0 1px, transparent 1px 2px);
+      linear-gradient(180deg, hsl(210 80% 96%) 0%, hsl(210 65% 88%) 100%),
+      repeating-linear-gradient(0deg, hsl(220 70% 14% / 0.012) 0 1px, transparent 1px 2px);
   }
 
   h1, h2, h3, h4 {
     font-family: "Lucida Grande", "Helvetica Neue", Helvetica, "Inter", sans-serif;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: hsl(40 14% 92%);
+    color: hsl(220 70% 14%);
   }
 
   .font-chyron, .font-lower-third {
