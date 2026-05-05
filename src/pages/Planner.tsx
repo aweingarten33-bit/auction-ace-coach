@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
 import PricedPlayerAutocomplete from "@/components/PricedPlayerAutocomplete";
+import { STRATEGIES, getStrategy } from "@/lib/strategies";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
