@@ -22,17 +22,13 @@ export interface QuickPrompt {
 }
 
 export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
-  { id: "qp-bid-x",     label: "Should I bid on…?",   prompt: "Should I bid on the player who was just nominated? Give me a max bid and a one-line take." },
-  { id: "qp-best-val",  label: "Best value at…?",     prompt: "What's the best remaining value on the board right now, by position? Pick the single best value at RB, WR, and TE and tell me why." },
-  { id: "qp-next-tgt",  label: "What's my next target?", prompt: "Based on my roster, budget, and what's still available, what's my next target and how much should I be willing to pay?" },
-  { id: "qp-nominate",  label: "Nominate?",           prompt: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
-  { id: "qp-sleepers",  label: "Sleepers",            prompt: "Give me 3 sleeper or value picks still on the board I should target in the later rounds. Be specific and tell me why." },
-  { id: "qp-busts",     label: "Busts to avoid",      prompt: "Which still-available players are you fading this year? Give me 3 names and why you'd let someone else overpay." },
-  { id: "qp-startsit",  label: "Start/sit",           prompt: "From the players I've already drafted, who are my locked-in starters and who's a question mark? Walk me through any tough start/sit calls." },
-  { id: "qp-trade",     label: "Trade ideas",         prompt: "Looking at my roster, what kind of trade should I be working toward post-draft? Suggest 1-2 realistic trade angles (positions to consolidate or upgrade)." },
-  { id: "qp-strategy",  label: "Draft strategy",      prompt: "Given how this draft is unfolding (budget left, roster gaps, market prices), what's the best strategy from here?" },
-  { id: "qp-hole",      label: "Biggest hole",        prompt: "What's the biggest weakness on my roster right now and what's the cheapest way to fix it?" },
+  { id: "qp-bid",       label: "Should I bid?",            prompt: "Should I bid on the player who was just nominated? Give me a max bid and a one-line take." },
+  { id: "qp-nominate",  label: "Who should I nominate?",   prompt: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
+  { id: "qp-next",      label: "What's my next move?",     prompt: "Based on my roster, budget, and what's still available, what's my next move and how much should I be willing to pay?" },
+  { id: "qp-thin",      label: "Am I too thin?",           prompt: "Looking at my roster and what's left on the board, am I getting too thin anywhere? Where's my biggest hole?" },
+  { id: "qp-value",     label: "Best value left?",         prompt: "What's the single best value still on the board right now and why?" },
 ];
+
 
 interface DraftState {
   settings: LeagueSettings;
