@@ -45,8 +45,6 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import VetriTierSheet from "@/components/VetriTierSheet";
-import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
@@ -95,7 +93,7 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
-  const [vetriTakes, setVetriTakes] = useState<VetriTake[]>([]);
+  
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
@@ -336,7 +334,7 @@ export default function LiveDashboard() {
           recentRuns: runs,
           latestEvent,
           userQuestion,
-          vetriTakes: vetriTakes.slice(0, 40),
+          vetriTakes: [],
           history: coachHistory.slice(-6),
           draftedPlayers: events.map((e) => e.player),
         }),
@@ -763,9 +761,8 @@ export default function LiveDashboard() {
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-9">
+            <TabsList className="grid w-full grid-cols-2 h-9">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
-              <TabsTrigger value="vetri" className="text-[11px]">Notes</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
             </TabsList>
 
@@ -793,19 +790,6 @@ export default function LiveDashboard() {
                 valueFor={valueFor}
                 maxBid={budget.maxBid}
               />
-            </TabsContent>
-
-            <TabsContent value="vetri" className="mt-3 space-y-4">
-              <VetriNotesPanel
-                onTakesUpdate={setVetriTakes}
-                onLoadPlayer={(name, pos) => {
-                  setPlayerName(name);
-                  setPosition(pos);
-                  setDrafter("me");
-                  toast(`${name} loaded from analyst notes`);
-                }}
-              />
-              <VetriTierSheet />
             </TabsContent>
 
             <TabsContent value="market" className="mt-3 space-y-4">
