@@ -227,10 +227,3 @@ export default function VetriPlayerSummary() {
     </div>
   );
 }
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
-}
