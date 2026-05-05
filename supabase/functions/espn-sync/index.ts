@@ -58,13 +58,20 @@ Deno.serve(async (req) => {
     const roster = settings?.rosterSettings ?? {};
     const draft = settings?.draftSettings ?? {};
 
+    // Auction draft budget. ESPN exposes it under draftSettings.auctionBudget;
+    // acquisitionSettings.acquisitionBudget is the in-season FAAB waiver budget
+    // and we must NOT use that (it's e.g. $75/$100 in most leagues).
+    const auctionBudget =
+      draft.auctionBudget ??
+      settings?.draftSettings?.auctionBudget ??
+      data?.draftDetail?.auctionBudget ??
+      200;
+
     const teams = (data.teams ?? []).map((t: any) => ({
       id: t.id,
       name: `${t.location ?? ""} ${t.nickname ?? ""}`.trim() || `Team ${t.id}`,
       abbrev: t.abbrev,
-      remainingBudget: typeof t.draftDayProjectedRank === "number"
-        ? acq.acquisitionBudget - sumRosterPaid(t)
-        : acq.acquisitionBudget - sumRosterPaid(t),
+      remainingBudget: auctionBudget - sumRosterPaid(t),
       roster: (t.roster?.entries ?? []).map((e: any) => ({
         playerId: e.playerId,
         name: e.playerPoolEntry?.player?.fullName,
@@ -89,7 +96,8 @@ Deno.serve(async (req) => {
         season: creds.season_id,
         name: settings.name,
         size: settings.size,
-        budget: acq.acquisitionBudget ?? 200,
+        budget: auctionBudget,
+        faabBudget: acq.acquisitionBudget ?? null,
         rosterSlots: roster.lineupSlotCounts ?? {},
         scoring: scoringLabel,
         receptionPoints: recPts,
