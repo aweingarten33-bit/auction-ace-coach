@@ -266,6 +266,7 @@ export type Database = {
           display_name: string | null
           email: string | null
           id: string
+          league_id: number | null
           updated_at: string
           user_id: string
         }
@@ -274,6 +275,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          league_id?: number | null
           updated_at?: string
           user_id: string
         }
@@ -282,6 +284,7 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+          league_id?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -340,7 +343,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      current_user_league_id: { Args: never; Returns: number }
     }
     Enums: {
       [_ in never]: never

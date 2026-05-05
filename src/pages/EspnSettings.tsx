@@ -26,6 +26,8 @@ export default function EspnSettings() {
   const [selected, setSelected] = useState<League | null>(null);
   const [token, setToken] = useState<string>("");
   const [verified, setVerified] = useState<string | null>(null);
+  const [joinLeagueId, setJoinLeagueId] = useState<string>("");
+  const [savedLeagueId, setSavedLeagueId] = useState<number | null>(null);
 
   // Load existing
   useEffect(() => {
@@ -54,6 +56,12 @@ export default function EspnSettings() {
       const { data: t } = await supabase
         .from("extension_tokens").select("token").maybeSingle();
       if (t) setToken(t.token);
+      const { data: prof } = await supabase
+        .from("profiles").select("league_id").maybeSingle();
+      if (prof?.league_id) {
+        setSavedLeagueId(Number(prof.league_id));
+        setJoinLeagueId(String(prof.league_id));
+      }
     })();
   }, []);
 
@@ -104,6 +112,11 @@ export default function EspnSettings() {
     const { data, error } = await supabase.functions.invoke("espn-connect", {
       body: { swid, espn_s2: s2, season, league_id: lg.leagueId, team_id: lg.teamId },
     });
+    // Also stamp the user's profile with this league_id so league mates who
+    // share the same league_id can read this league's auction history.
+    if (user) {
+      await supabase.from("profiles").update({ league_id: lg.leagueId }).eq("user_id", user.id);
+    }
     setBusy(false);
     if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Failed");
     toast.success(`Selected: ${lg.leagueName}`);
@@ -153,6 +166,17 @@ export default function EspnSettings() {
 
   const webhookUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/draft-webhook`;
 
+  const joinLeague = async () => {
+    if (!user) return toast.error("Please sign in first");
+    const id = Number(joinLeagueId);
+    if (!Number.isFinite(id) || id <= 0) return toast.error("Enter a valid ESPN League ID");
+    const { error } = await supabase
+      .from("profiles").update({ league_id: id }).eq("user_id", user.id);
+    if (error) return toast.error(error.message);
+    setSavedLeagueId(id);
+    toast.success("Joined! You'll see your league mate's draft history.");
+  };
+
   return (
     <div className="mx-auto max-w-3xl p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -173,6 +197,34 @@ export default function EspnSettings() {
       <div className="mb-6">
         <ConnectorStatus />
       </div>
+
+      {/* League mate shortcut — no cookies needed */}
+      <Card className="mb-6 p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <Badge variant="outline" className="border-success/40 bg-success/10 text-success">Easy</Badge>
+          <h2 className="font-semibold">In a league with someone who already connected?</h2>
+        </div>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Just enter your ESPN <strong>League ID</strong> — you'll instantly see the same draft history &amp; tier prices they pulled. No cookies, no DevTools. (Find it in the URL when you visit your league on espn.com: <code className="rounded bg-secondary px-1">leagueId=XXXXXX</code>.)
+        </p>
+        <div className="flex gap-2">
+          <Input
+            type="number"
+            value={joinLeagueId}
+            onChange={(e) => setJoinLeagueId(e.target.value)}
+            placeholder="e.g. 123456"
+            className="font-mono"
+          />
+          <Button onClick={joinLeague} disabled={!joinLeagueId || Number(joinLeagueId) === savedLeagueId}>
+            {savedLeagueId === Number(joinLeagueId) && savedLeagueId ? "Joined ✓" : "Join league"}
+          </Button>
+        </div>
+        {savedLeagueId && (
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Currently joined to league <span className="font-mono">{savedLeagueId}</span>. Auto-fill on the draft setup page will use this league's shared history.
+          </p>
+        )}
+      </Card>
 
       {/* Path A */}
       <Card className="mb-6 p-5">
