@@ -354,7 +354,19 @@ function LogTab(props: {
 
       <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
 
-      <Card className="bg-gradient-card p-3">
+      {/* ESPN sync is primary. Manual entry is a fallback — collapsed by default. */}
+      <button
+        type="button"
+        onClick={() => setManualOpen(!manualOpen)}
+        className="flex w-full items-center justify-between rounded-md border border-dashed border-border/60 bg-secondary/30 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:bg-secondary/50"
+      >
+        <span>{manualOpen ? "Hide manual fallback" : "Manual fallback (if ESPN drops)"}</span>
+        <ChevronDown className={`h-4 w-4 transition ${manualOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {manualOpen && (
+      <Card className="bg-gradient-card p-3"></Card>
+      )}
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
           <button
             onClick={() => setDrafter("me")}
