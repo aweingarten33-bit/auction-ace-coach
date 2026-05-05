@@ -12,90 +12,88 @@
 
 @layer base {
   :root {
-    /* Workshop canvas — near-black with a hint of blue */
-    --background: 220 15% 8%;
-    --foreground: 210 15% 92%;
+    /* Very pale navy-tinted canvas — Superman navy, way lighter */
+    --background: 215 60% 96%;
+    --foreground: 220 60% 14%;
 
-    --card: 220 14% 11%;
-    --card-foreground: 210 15% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 60% 14%;
 
-    --popover: 220 14% 12%;
-    --popover-foreground: 210 15% 94%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 60% 14%;
 
-    /* Signal: amber-on-black instrument readout. Calm, precise, legible. */
-    --primary: 38 95% 58%;
-    --primary-foreground: 220 20% 8%;
-    --primary-glow: 42 100% 65%;
+    /* Royal Reeve navy — the suit */
+    --primary: 220 80% 38%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 90% 58%;
 
-    --secondary: 220 12% 15%;
-    --secondary-foreground: 210 15% 92%;
+    --secondary: 215 45% 92%;
+    --secondary-foreground: 220 60% 18%;
 
-    --muted: 220 12% 14%;
-    --muted-foreground: 215 10% 58%;
+    --muted: 215 40% 93%;
+    --muted-foreground: 220 25% 40%;
 
-    /* Data accent: cool cyan — for selection / interactive */
-    --accent: 190 80% 55%;
-    --accent-foreground: 220 20% 8%;
+    --accent: 195 85% 50%;
+    --accent-foreground: 220 60% 14%;
 
-    --destructive: 358 75% 55%;
+    --destructive: 358 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 38 95% 58%;
-    --warning-foreground: 220 20% 8%;
+    --warning: 38 95% 55%;
+    --warning-foreground: 220 60% 14%;
 
-    --success: 145 60% 48%;
+    --success: 145 60% 40%;
     --success-foreground: 0 0% 100%;
 
-    --border: 220 12% 18%;
-    --input: 220 12% 14%;
-    --ring: 38 95% 58%;
+    --border: 215 40% 84%;
+    --input: 215 40% 88%;
+    --ring: 220 80% 45%;
 
-    --radius: 0.375rem;
+    --radius: 0.5rem;
 
-    --gradient-primary: linear-gradient(180deg, hsl(38 95% 58%), hsl(34 90% 50%));
-    --gradient-card: linear-gradient(180deg, hsl(220 14% 12%), hsl(220 14% 10%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(220 12% 16%), hsl(220 14% 11%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(220 14% 13%), hsl(220 15% 9%));
-    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.04) 0%, hsl(0 0% 100% / 0) 50%);
+    --gradient-primary: linear-gradient(180deg, hsl(215 90% 50%), hsl(220 80% 38%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(215 50% 97%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(215 50% 95%), hsl(215 45% 88%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 100%), hsl(215 45% 95%));
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.7) 0%, hsl(0 0% 100% / 0) 60%);
 
-    --shadow-glow: 0 0 0 1px hsl(38 95% 58% / 0.35), 0 0 16px -2px hsl(38 95% 58% / 0.25);
-    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 2px hsl(0 0% 0% / 0.5);
-    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -12px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 1px 2px hsl(220 60% 20% / 0.05), 0 8px 24px -10px hsl(220 80% 38% / 0.25);
+    --shadow-aqua: 0 1px 2px hsl(220 60% 20% / 0.08);
+    --shadow-card: 0 1px 2px hsl(220 60% 20% / 0.06), 0 4px 16px -8px hsl(220 60% 20% / 0.1);
 
-    /* Blueprint grid — subtle technical backdrop */
-    --grid-line: hsl(220 12% 14%);
-    --grid-line-strong: hsl(220 12% 17%);
+    --grid-line: hsl(215 50% 92%);
+    --grid-line-strong: hsl(215 45% 88%);
 
-    --sidebar-background: 220 15% 7%;
-    --sidebar-foreground: 210 15% 88%;
-    --sidebar-primary: 38 95% 58%;
-    --sidebar-primary-foreground: 220 20% 8%;
-    --sidebar-accent: 220 12% 14%;
-    --sidebar-accent-foreground: 210 15% 92%;
-    --sidebar-border: 220 12% 16%;
-    --sidebar-ring: 38 95% 58%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 220 60% 18%;
+    --sidebar-primary: 220 80% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 45% 92%;
+    --sidebar-accent-foreground: 220 60% 18%;
+    --sidebar-border: 215 40% 84%;
+    --sidebar-ring: 220 80% 45%;
   }
 
   .dark {
-    --background: 220 15% 8%;
-    --foreground: 210 15% 92%;
-    --card: 220 14% 11%;
-    --card-foreground: 210 15% 92%;
-    --popover: 220 14% 12%;
-    --popover-foreground: 210 15% 94%;
-    --primary: 38 95% 58%;
-    --primary-foreground: 220 20% 8%;
-    --secondary: 220 12% 15%;
-    --secondary-foreground: 210 15% 92%;
-    --muted: 220 12% 14%;
-    --muted-foreground: 215 10% 58%;
-    --accent: 190 80% 55%;
-    --accent-foreground: 220 20% 8%;
-    --destructive: 358 75% 55%;
+    --background: 215 60% 96%;
+    --foreground: 220 60% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 60% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 60% 14%;
+    --primary: 220 80% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 45% 92%;
+    --secondary-foreground: 220 60% 18%;
+    --muted: 215 40% 93%;
+    --muted-foreground: 220 25% 40%;
+    --accent: 195 85% 50%;
+    --accent-foreground: 220 60% 14%;
+    --destructive: 358 75% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 12% 18%;
-    --input: 220 12% 14%;
-    --ring: 38 95% 58%;
+    --border: 215 40% 84%;
+    --input: 215 40% 88%;
+    --ring: 220 80% 45%;
   }
 }
 
