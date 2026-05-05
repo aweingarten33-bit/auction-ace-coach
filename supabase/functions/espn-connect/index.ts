@@ -32,8 +32,13 @@ Deno.serve(async (req) => {
     if (!body.swid || !body.espn_s2 || !body.season) {
       return j({ error: "swid, espn_s2, season required" }, 400);
     }
-    const swid = body.swid.trim();
-    const s2 = body.espn_s2.trim();
+    // Strip any non-ASCII / control chars that may have been copied from the browser inspector
+    const clean = (v: string) => v.replace(/[^\x20-\x7E]/g, "").trim();
+    let swid = clean(body.swid);
+    const s2 = clean(body.espn_s2);
+    // Ensure SWID is wrapped in braces
+    if (!swid.startsWith("{")) swid = `{${swid}`;
+    if (!swid.endsWith("}")) swid = `${swid}}`;
 
     // Fan API → list leagues for the user
     const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?context=fantasy&useCookieAuth=true`;
