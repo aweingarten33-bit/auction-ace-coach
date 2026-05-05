@@ -59,14 +59,16 @@ function defaultAlloc(slot: Slot, idx: number, total: number, budget: number): R
 }
 
 function suggestedAllocations(slots: Slot[], budget: number, strategyWeights?: Partial<Record<Slot["pos"], number[]>>): Record<string, number> {
-  // Baseline weights (no-strategy default)
+  // Baseline weights (no-strategy default) — SUPERFLEX league:
+  // QBs are heavily upweighted because nearly every team starts 2 of them,
+  // and the SUPERFLEX slot itself is treated as a 2nd-QB-quality spot.
   const base: Record<Slot["pos"], number[]> = {
-    QB: [9, 3, 1],
-    RB: [8, 5, 2.5, 1.5, 1],
-    WR: [7, 5, 3, 1.5, 1],
-    TE: [3, 1],
+    QB: [10, 7, 1],          // QB1 elite, QB2 still very valuable
+    RB: [7, 4.5, 2.5, 1.5, 1],
+    WR: [6.5, 4.5, 3, 1.5, 1],
+    TE: [2.5, 1],
     FLEX: [2.5],
-    SUPERFLEX: [4, 1],
+    SUPERFLEX: [7, 1],       // superflex slot ≈ a 2nd starting QB
     K: [0.05],
     DST: [0.05],
     BENCH: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
