@@ -67,6 +67,7 @@ import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
 import QuickPromptsEditor from "@/components/QuickPromptsEditor";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
+import DraftPlanCard from "@/components/DraftPlanCard";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
 
@@ -77,8 +78,9 @@ export default function Draft() {
     settings, keepers, prices, events, setupComplete, watchlist, dismissed,
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
     quickPrompts, setQuickPrompts, resetQuickPrompts,
-    showMath, setShowMath,
+    showMath, setShowMath, setDraftPlan,
   } = useDraftStore();
+  const [planGenerating, setPlanGenerating] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
   const [priceInput, setPriceInput] = useState("");
