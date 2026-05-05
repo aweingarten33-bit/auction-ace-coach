@@ -519,9 +519,9 @@ Keep it tight. No fluff, no closing line.`;
     : null;
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen overflow-x-hidden bg-background pb-24">
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
+        <div className="mx-auto flex w-full max-w-7xl min-w-0 items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 ring-1 ring-primary/30">
               <img src={coachBotImg} alt="Matthew Berry" className="h-full w-full object-cover" />
@@ -580,9 +580,9 @@ Keep it tight. No fluff, no closing line.`;
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
+      <main className="mx-auto grid w-full max-w-7xl min-w-0 gap-3 overflow-x-hidden p-3 md:gap-4 md:p-4 lg:grid-cols-2">
         {/* LEFT: Input → Decision → Log */}
-        <section className="space-y-4">
+        <section className="min-w-0 space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
 
           <Card className="bg-card/60 p-2.5">
@@ -740,7 +740,7 @@ Keep it tight. No fluff, no closing line.`;
         </section>
 
         {/* RIGHT: State + targets */}
-        <section className="space-y-4">
+        <section className="min-w-0 space-y-4">
           <RosterHero
             remaining={budget.remaining}
             slotsLeft={budget.slotsLeft}
@@ -766,8 +766,8 @@ Keep it tight. No fluff, no closing line.`;
             }}
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
-          <Tabs defaultValue="targets" className="w-full">
-            <TabsList className="grid h-9 w-full grid-cols-3">
+          <Tabs defaultValue="targets" className="w-full min-w-0 overflow-hidden">
+            <TabsList className="grid h-9 w-full min-w-0 grid-cols-3">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
               <TabsTrigger value="vetri" className="text-[11px]">Analyst</TabsTrigger>
