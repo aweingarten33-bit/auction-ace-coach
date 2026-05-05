@@ -611,7 +611,7 @@ function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk, onC
     "Which position should I target next and why?",
     "Should I pivot? If yes, to what?",
     "Give me 3 sleeper/value picks right now.",
-    "Who should I nominate to drain budgets?",
+    "Who should I throw out to make others spend?",
   ];
   return (
     <div className="space-y-3">
