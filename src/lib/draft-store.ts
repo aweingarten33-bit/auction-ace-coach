@@ -49,6 +49,8 @@ interface DraftState {
   priceOverrides: string[]; // normalized player names where user manually set price (Vetri won't overwrite)
   quickPrompts: QuickPrompt[]; // editable assistant quick-question buttons
   showMath: boolean;           // when true, assistant always shows the full math behind each rec
+  // Saved draft plan — sticky strategy + targets the user can refer to between picks
+  draftPlan: { content: string; updatedAt: number; pickCountAtSave: number } | null;
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
