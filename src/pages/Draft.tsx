@@ -83,6 +83,7 @@ export default function Draft() {
   const [planGenerating, setPlanGenerating] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
+  const [takesQuery, setTakesQuery] = useState("");
   const [priceInput, setPriceInput] = useState("");
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
