@@ -47,6 +47,7 @@ const App = () => (
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
               <Route path="/draft" element={<Protected><Draft /></Protected>} />
+              <Route path="/draft-v2" element={<Protected><DraftV2 /></Protected>} />
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               {/* Admin always reachable so you can unlock */}
