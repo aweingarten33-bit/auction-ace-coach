@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import CoachMessage from "@/components/CoachMessage";
 import coachBotImg from "@/assets/coach-bot.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
