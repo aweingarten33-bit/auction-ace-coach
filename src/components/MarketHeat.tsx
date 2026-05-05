@@ -164,7 +164,7 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
         </p>
       )}
 
-      <div className="space-y-1.5">
+      <div className="max-h-[280px] space-y-1 overflow-y-auto pr-1">
         {top.map((t, i) => {
           const p = t.player!;
           const pos = (p.position as Position) || "RB";
@@ -185,85 +185,68 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
           if (!ref || goingRate == null) {
             tier = "UNKNOWN";
             tierTone = "border-border bg-secondary/40 text-muted-foreground";
-            callout = needsPos
-              ? `${pos} need but no sheet price — set one to gauge fit`
-              : `No sheet price — informational only`;
+            callout = needsPos ? `${pos} need · no sheet $` : `No sheet $`;
           } else if (sev === "done") {
             tier = "FADE";
             tierTone = "border-muted-foreground/30 bg-muted/20 text-muted-foreground";
-            callout = `${pos} done — let the room overpay at $${goingRate}`;
+            callout = `${pos} done · ~$${goingRate}`;
           } else if (affordable && needsPos) {
             tier = "TARGET";
             tierTone = "border-success/50 bg-success/15 text-success";
-            const head = sev === "critical" ? `Critical ${pos} need`
-              : sev === "need" ? `Fills ${pos} starter`
-              : `${pos} depth play`;
-            callout = `${head} — going ~$${goingRate}, fits your $${maxBid} max`;
+            const head = sev === "critical" ? `Critical ${pos}` : sev === "need" ? `Starter ${pos}` : `${pos} depth`;
+            callout = `${head} · ~$${goingRate} (max $${maxBid})`;
           } else if (stretchable && needsPos) {
             tier = "STRETCH";
             tierTone = "border-warning/50 bg-warning/15 text-warning";
-            callout = `${pos} need but $${goingRate - maxBid} over max — only with knockoff plan`;
+            callout = `${pos} need · $${goingRate - maxBid} over max`;
           } else if (goingRate > remaining) {
             tier = "SKIP";
             tierTone = "border-destructive/50 bg-destructive/10 text-destructive";
-            callout = `Out of budget — $${goingRate} vs $${remaining} left`;
+            callout = `$${goingRate} vs $${remaining} left`;
           } else {
             tier = "FADE";
             tierTone = "border-muted-foreground/30 bg-muted/20 text-muted-foreground";
-            callout = `${pos} not a need — pass unless steal`;
+            callout = `${pos} not a need`;
           }
 
           return (
             <div
               key={t.player_id}
-              style={{ animationDelay: `${i * 50}ms` }}
-              className="animate-fade-in-up rounded-md border border-border bg-secondary/40 px-2.5 py-1.5"
+              className="rounded-md border border-border bg-secondary/40 px-2 py-1"
             >
-              <div className="flex items-center gap-2">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-background text-[10px] font-bold text-warning">
-                  {i + 1}
-                </span>
-                <Badge variant="outline" className={`${POS_COLORS[pos]} px-1.5 py-0 text-[10px]`}>
+              <div className="flex items-center gap-1.5">
+                <Badge variant="outline" className={`${POS_COLORS[pos]} px-1 py-0 text-[9px]`}>
                   {pos}
                 </Badge>
-                <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+                <span className="min-w-0 flex-1 truncate text-[12px] font-semibold">
                   {p.full_name}
                 </span>
-                <span className="text-[10px] text-muted-foreground">
-                  {p.team || "FA"}{bye ? ` · BYE ${bye}` : ""}
-                </span>
                 {inj && (
-                  <Badge variant="outline" className="border-destructive/40 bg-destructive/10 px-1 py-0 text-[9px] text-destructive">
+                  <Badge variant="outline" className="border-destructive/40 bg-destructive/10 px-1 py-0 text-[8px] text-destructive">
                     {inj}
                   </Badge>
                 )}
-                <span className="ml-1 flex shrink-0 items-center gap-0.5 font-mono text-[11px] font-bold tabular-nums text-warning" title="Sleeper add count (24h)">
+                <span className={`shrink-0 rounded border px-1 py-0 text-[8px] font-bold tracking-wider ${tierTone}`}>
+                  {tier}
+                </span>
+                <span className="flex shrink-0 items-center gap-0.5 font-mono text-[10px] font-bold tabular-nums text-warning">
                   <Flame className="h-2.5 w-2.5" />
                   {t.count >= 1000 ? `${(t.count / 1000).toFixed(1)}k` : t.count}
                 </span>
               </div>
-              <div className="mt-1 flex items-center gap-1.5 pl-7">
-                <span className={`shrink-0 rounded border px-1.5 py-0.5 text-[9px] font-bold tracking-wider ${tierTone}`}>
-                  {tier}
-                </span>
-                <p className="min-w-0 flex-1 truncate text-[10px] leading-snug text-muted-foreground">
-                  {callout}
-                  {ref && (
-                    <span className="ml-1 font-mono text-foreground/80">
-                      · sheet ${ref}
-                      {goingRate !== ref && <span className="opacity-70"> → ${goingRate}</span>}
-                    </span>
-                  )}
-                </p>
-              </div>
+              <p className="mt-0.5 truncate text-[10px] leading-snug text-muted-foreground">
+                {callout}
+                {ref && (
+                  <span className="ml-1 font-mono text-foreground/80">
+                    · ${ref}{goingRate !== ref && <span className="opacity-70"> → ${goingRate}</span>}
+                  </span>
+                )}
+                <span className="ml-1 opacity-70">{p.team || "FA"}{bye ? ` · BYE ${bye}` : ""}</span>
+              </p>
             </div>
           );
         })}
       </div>
-
-      <p className="mt-2 text-[10px] leading-snug text-muted-foreground">
-        💡 Tap <HelpCircle className="inline h-2.5 w-2.5" /> above if any label is confusing.
-      </p>
     </Card>
   );
 }
