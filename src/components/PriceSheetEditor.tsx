@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2 } from "lucide-react";
+import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
@@ -248,11 +249,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
 
       {/* Quick-add */}
       <div className="grid grid-cols-[1fr_90px_auto] gap-2">
-        <Input
-          placeholder="Player name"
+        <PlayerAutocomplete
           value={quickName}
-          onChange={(e) => setQuickName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && addQuick()}
+          onChange={setQuickName}
+          onSelect={(p) => setQuickName(p.full_name)}
+          onEnter={addQuick}
+          placeholder="Player name"
         />
         <Input
           type="number"
