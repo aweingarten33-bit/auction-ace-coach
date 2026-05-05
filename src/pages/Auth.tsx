@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Trophy } from "lucide-react";
+import { Trophy, Gavel, LineChart, Zap } from "lucide-react";
 
 export default function AuthPage() {
   const { user, loading } = useAuth();
