@@ -712,14 +712,6 @@ export default function Draft() {
                   </p>
                 )}
               </Card>
-              <Card className="p-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Analyst videos tracked
-                  </span>
-                </div>
-                <VetriVideoList />
-              </Card>
             </TabsContent>
           </Tabs>
         </section>
