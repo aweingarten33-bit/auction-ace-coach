@@ -284,6 +284,7 @@ export default function Draft() {
           vetriTakes: [],
           history: coachHistory.slice(-6),
           draftedPlayers: events.map((e) => e.player),
+          showMath,
         },
         (chunk) => {
           acc += chunk;
