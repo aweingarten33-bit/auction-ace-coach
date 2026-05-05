@@ -64,7 +64,7 @@ function verdictTone(v: ValueCall["verdict"]) {
 }
 
 function verdictLabel(v: ValueCall["verdict"]) {
-  return { steal: "STEAL", value: "VALUE", fair: "FAIR", reach: "REACH", overpay: "OVER", unknown: "—" }[v];
+  return { steal: "GREAT DEAL", value: "GOOD DEAL", fair: "FAIR PRICE", reach: "A BIT HIGH", overpay: "TOO MUCH", unknown: "—" }[v];
 }
 
 export default function UpNextQueue({
@@ -86,13 +86,16 @@ export default function UpNextQueue({
     <Card className="bg-gradient-card p-4 shadow-glow">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
-          <ListMusic className="h-3.5 w-3.5" /> Up Next
-          {loading && <span className="text-muted-foreground normal-case">· tuning...</span>}
+          <ListMusic className="h-3.5 w-3.5" /> Who to go after next
+          {loading && <span className="text-muted-foreground normal-case">· thinking...</span>}
         </h2>
         <div className="flex items-center gap-1.5">
-          <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums transition-colors duration-300 ${pulseTone} ${Math.abs(pulsePct) > 8 && pulseConfident ? "animate-pulse-soft" : ""}`}>
+          <span
+            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums transition-colors duration-300 ${pulseTone} ${Math.abs(pulsePct) > 8 && pulseConfident ? "animate-pulse-soft" : ""}`}
+            title="How much higher or lower the room is paying compared to normal prices"
+          >
             <PulseIcon className="h-3 w-3" />
-            Market {pulsePct >= 0 ? "+" : ""}{pulsePct}%
+            Prices {pulsePct >= 0 ? "+" : ""}{pulsePct}% vs normal
             {!pulseConfident && <span className="opacity-60">·early</span>}
           </span>
           <Button size="sm" variant="ghost" onClick={onRefresh} disabled={loading} className="h-7 px-2">
@@ -104,7 +107,7 @@ export default function UpNextQueue({
       {openMan && (
         <div className="mb-3 flex items-start gap-2 rounded-md border border-accent/40 bg-accent/10 px-2.5 py-1.5 text-[11px]">
           <Eye className="mt-0.5 h-3 w-3 shrink-0 text-accent" />
-          <span className="text-foreground/90"><span className="font-semibold text-accent">Open man:</span> {openMan}</span>
+          <span className="text-foreground/90"><span className="font-semibold text-accent">Nobody's bidding on:</span> {openMan}</span>
         </div>
       )}
 
@@ -153,7 +156,7 @@ export default function UpNextQueue({
                             </span>
                           </HoverCardTrigger>
                           <HoverCardContent side="top" className="w-64 text-[11px] leading-snug">
-                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Dossier</p>
+                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">About this player</p>
                             <p>{t.dossier}</p>
                           </HoverCardContent>
                         </HoverCard>
@@ -180,9 +183,9 @@ export default function UpNextQueue({
                       <p className="mt-1 flex items-center gap-1 text-[10px] leading-snug text-success/90">
                         <Tag className="h-2.5 w-2.5 shrink-0" />
                         <span>
-                          <span className="font-semibold">Knockoff:</span> {t.knockoff.name}
+                          <span className="font-semibold">Cheaper option:</span> {t.knockoff.name}
                           <span className="ml-1 font-mono">${t.knockoff.price}</span>
-                          <span className="ml-1 opacity-70">(save ${Math.max(0, t.maxBid - t.knockoff.price)})</span>
+                          <span className="ml-1 opacity-70">(saves ${Math.max(0, t.maxBid - t.knockoff.price)})</span>
                         </span>
                       </p>
                     )}
@@ -222,8 +225,11 @@ export default function UpNextQueue({
                       {v.goingRate != null && <span className="ml-1 font-mono opacity-80">${v.goingRate}</span>}
                     </span>
                   ) : (
-                    <span className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-muted-foreground">
-                      NO REF
+                    <span
+                      className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-muted-foreground"
+                      title="No price info for this player on your sheet"
+                    >
+                      NO PRICE INFO
                     </span>
                   )}
                 </div>
