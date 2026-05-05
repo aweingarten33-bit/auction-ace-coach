@@ -35,7 +35,8 @@ import {
 } from "@/lib/draft-math";
 import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
-import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users, Download } from "lucide-react";
+import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users, Download, MoreVertical } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
