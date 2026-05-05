@@ -89,7 +89,7 @@ export default function PlayerAutocomplete({
         className="font-medium"
       />
       {open && suggestions.length > 0 && (
-        <div className="absolute z-50 mt-1 left-0 right-0 max-h-80 overflow-auto rounded-md border border-border bg-popover shadow-lg">
+        <div className="absolute z-50 mt-1 left-0 w-[min(22rem,90vw)] max-h-80 overflow-auto rounded-md border border-border bg-popover shadow-lg">
           {suggestions.map((p, i) => (
             <button
               key={p.player_id}
@@ -103,7 +103,7 @@ export default function PlayerAutocomplete({
                 i === highlight ? "bg-accent/30" : ""
               }`}
             >
-              <span className="truncate font-medium text-sm">{p.full_name}</span>
+              <span className="font-medium text-sm">{p.full_name}</span>
               <span className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                 {p.team && <span>{p.team}</span>}
                 {p.position && (
