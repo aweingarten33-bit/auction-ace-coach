@@ -889,7 +889,7 @@ Keep it tight. No fluff, no closing line.`;
                   <Sparkles className="h-4 w-4" />
                 </div>
                 <div className="prose prose-sm max-w-none text-foreground">
-                  <ReactMarkdown>{coachText || "How can I help you with your draft?"}</ReactMarkdown>
+                  <CoachMessage content={coachText || "How can I help you with your draft?"} />
                 </div>
               </div>
             )}
