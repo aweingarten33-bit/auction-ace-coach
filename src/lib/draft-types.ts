@@ -62,7 +62,7 @@ export const DEFAULT_ROSTER: RosterSlots = {
 export const DEFAULT_SETTINGS: LeagueSettings = {
   totalBudget: 225,
   numTeams: 12,
-  scoring: "PPR",
+  scoring: "Half PPR",
   leagueType: "Superflex",
   format: "Keeper",
   roster: DEFAULT_ROSTER,

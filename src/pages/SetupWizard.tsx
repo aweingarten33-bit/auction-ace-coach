@@ -103,7 +103,7 @@ export default function SetupWizard() {
               <EspnImportButton />
 
               <div className="rounded-md border border-border/60 bg-secondary/30 p-3 text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">Defaults pre-filled:</span> $225 budget · Superflex · Keeper. Change anything below if your league differs.
+                <span className="font-semibold text-foreground">Defaults pre-filled:</span> $225 budget · Half PPR · Superflex · Keeper. Change anything below if your league differs.
               </div>
 
               <section className="space-y-3">
