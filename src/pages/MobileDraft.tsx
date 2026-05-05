@@ -66,6 +66,7 @@ export default function MobileDraft() {
   const [playerName, setPlayerName] = useState("");
   const [priceInput, setPriceInput] = useState("");
   const [position, setPosition] = useState<Position | "">("");
+  const [manualOpen, setManualOpen] = useState(false);
 
   const [coachText, setCoachText] = useState("Tap **Ask assistant** below for a recommendation.");
   const [streaming, setStreaming] = useState(false);
