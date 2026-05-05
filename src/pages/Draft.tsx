@@ -865,6 +865,10 @@ Keep it tight. No fluff, no closing line.`;
             )}
           </div>
 
+          <div className="border-b border-border/60 bg-secondary/10 px-3 py-3">
+            <DraftPlanCard onGenerate={generateDraftPlan} generating={planGenerating} />
+          </div>
+
           <div ref={coachRef} className="coach-md flex flex-1 flex-col gap-4 overflow-auto px-4 py-4 text-sm leading-relaxed">
             {coachHistory.length === 0 && !streaming && (
               <div className="flex gap-3">
