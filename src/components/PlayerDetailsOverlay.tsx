@@ -186,7 +186,7 @@ export default function PlayerDetailsOverlay({
           ) : null}
         </div>
 
-        {/* Sal Vetri takes — only shown when there's actually something to say */}
+        {/* Analyst takes — only shown when there's actually something to say */}
         <VetriTakesForPlayer
           player={name}
           compact
