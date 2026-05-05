@@ -32,7 +32,10 @@ import { DraftEvent, Position } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import AnimatedNumber from "@/components/AnimatedNumber";
-import { computeMarketPulse } from "@/lib/value";
+import { computeMarketPulse, valueFor as computeValueFor } from "@/lib/value";
+import { projectRemainingBuild } from "@/lib/simulator";
+import RemainingBuildPanel from "@/components/RemainingBuildPanel";
+import ValueVerdict from "@/components/ValueVerdict";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
@@ -105,8 +108,7 @@ export default function MobileDraft() {
     addEvent(ev);
     setPlayerName(""); setPriceInput(""); setPosition("");
     toast.success(`${name} → $${price}`);
-    // Auto-ask coach after my picks; otherwise just log
-    if (drafter === "me") askCoach(ev);
+    // Coach is opt-in (Sparkles button) — don't auto-burn credits on every pick.
   };
 
   const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
@@ -217,6 +219,8 @@ export default function MobileDraft() {
             priceInput={priceInput} setPriceInput={setPriceInput}
             position={position} setPosition={setPosition}
             onUndo={() => { undoEvent(); toast("Undone"); }}
+            settings={settings} keepers={keepers} prices={prices}
+            pulse={pulse} myCount={myCount} requiredCount={requiredCount}
           />
         )}
         {tab === "roster" && (
@@ -281,10 +285,52 @@ function LogTab(props: {
   priceInput: string; setPriceInput: (s: string) => void;
   position: Position | ""; setPosition: (p: Position | "") => void;
   onUndo: () => void;
+  settings: any; keepers: any[]; prices: any[];
+  pulse: any; myCount: any; requiredCount: any;
 }) {
-  const { events, drafter, setDrafter, playerName, setPlayerName, priceInput, setPriceInput, position, setPosition, onUndo } = props;
+  const {
+    events, drafter, setDrafter, playerName, setPlayerName,
+    priceInput, setPriceInput, position, setPosition, onUndo,
+    settings, keepers, prices, pulse, myCount, requiredCount,
+  } = props;
+
+  const priceNum = parseInt(priceInput, 10);
+  const validPrice = Number.isFinite(priceNum) && priceNum > 0;
+  const verdict = validPrice && playerName
+    ? computeValueFor(playerName, priceNum, prices, pulse)
+    : null;
+  const projection = validPrice
+    ? projectRemainingBuild({
+        settings, keepers, events, prices,
+        hypothetical: { name: playerName, pos: (position as Position) || undefined, price: priceNum },
+      })
+    : null;
+
+  // Open positions strip
+  const posRows = (["QB", "RB", "WR", "TE", "K", "DST"] as Position[])
+    .filter((p) => requiredCount[p] > 0)
+    .map((p) => {
+      const have = myCount[p];
+      const need = requiredCount[p];
+      const short = Math.max(0, need - have);
+      const tone = short >= 2 ? "border-destructive/60 bg-destructive/10 text-destructive"
+        : short === 1 ? "border-warning/50 bg-warning/10 text-warning"
+        : "border-success/40 bg-success/10 text-success";
+      return { p, have, need, tone };
+    });
+
   return (
     <div className="space-y-3">
+      {/* Open positions chip strip */}
+      <div className="grid grid-cols-6 gap-1">
+        {posRows.map(({ p, have, need, tone }) => (
+          <div key={p} className={`rounded-md border px-1 py-1 text-center ${tone}`}>
+            <div className="text-[9px] font-bold leading-none">{p}</div>
+            <div className="font-mono text-[10px] tabular-nums leading-tight">{have}/{need}</div>
+          </div>
+        ))}
+      </div>
+
       <Card className="bg-gradient-card p-3">
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
           <button
@@ -312,13 +358,26 @@ function LogTab(props: {
             onSelect={(p) => p.position && POSITIONS.includes(p.position as Position) && setPosition(p.position as Position)}
           />
 
-          {/* Big price display + increment chips */}
+          {/* Big price display + live verdict */}
           <div className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/40 px-3 py-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Price</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Price</span>
+              {verdict && verdict.hasRef && <ValueVerdict value={verdict} />}
+            </div>
             <span className="font-mono text-2xl font-bold tabular-nums text-primary">
               ${priceInput || "0"}
             </span>
           </div>
+
+          {projection && (
+            <RemainingBuildPanel
+              projection={projection}
+              hypoPrice={priceNum}
+              hypoName={playerName || undefined}
+              hypoPos={(position as Position) || undefined}
+              compact
+            />
+          )}
 
           {/* Quick increments */}
           <div className="grid grid-cols-5 gap-1.5">
