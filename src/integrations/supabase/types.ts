@@ -227,6 +227,27 @@ export type Database = {
         }
         Relationships: []
       }
+      league_invites: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          league_id: number
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          league_id: number
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          league_id?: number
+        }
+        Relationships: []
+      }
       live_draft_events: {
         Row: {
           created_at: string
