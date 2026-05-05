@@ -56,8 +56,9 @@ Deno.serve(async (req) => {
       return j({ error: "Invalid espn_s2", hint: "The espn_s2 cookie contains non-cookie characters. Copy the raw value directly from browser DevTools, not from a screenshot/OCR scan." }, 400);
     }
 
-    // Fan API → list leagues for the user
-    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
+    // Fan API → list leagues for the user. The URL path needs the bare fan id;
+    // the Cookie header needs the braced SWID value.
+    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(fanId)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
     const cookie = `SWID=${swid}; espn_s2=${s2}`;
 
     const fanRes = await fetch(fanUrl, {
@@ -103,7 +104,14 @@ Deno.serve(async (req) => {
       if (error) return j({ error: error.message }, 500);
     }
 
-    return j({ ok: true, leagues, season: body.season });
+    return j({
+      ok: true,
+      leagues,
+      season: body.season,
+      hint: leagues.length === 0
+        ? "ESPN accepted the request but returned no fantasy football leagues for this season. Re-copy the full espn_s2 value from espn.com cookies, then verify again."
+        : undefined,
+    });
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
