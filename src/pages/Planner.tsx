@@ -274,9 +274,9 @@ export default function Planner() {
             Type 1–3 players you want. Prices come from your sheet.
           </p>
           <div className="space-y-2">
-            <PlayerAutocomplete value={checkA} onChange={setCheckA} placeholder="Player 1 (e.g. Jalen Hurts)" />
-            <PlayerAutocomplete value={checkB} onChange={setCheckB} placeholder="Player 2 (optional)" />
-            <PlayerAutocomplete value={checkC} onChange={setCheckC} placeholder="Player 3 (optional)" />
+            <PricedPlayerAutocomplete value={checkA} onChange={setCheckA} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 1 (e.g. Jalen Hurts)" />
+            <PricedPlayerAutocomplete value={checkB} onChange={setCheckB} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 2 (optional)" />
+            <PricedPlayerAutocomplete value={checkC} onChange={setCheckC} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 3 (optional)" />
           </div>
           {checkRows.length > 0 && (
             <div className="mt-3 space-y-1.5 rounded-md border bg-muted/30 p-2 text-sm">
