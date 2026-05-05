@@ -537,14 +537,7 @@ export default function LiveDashboard() {
               </p>
             </div>
           </div>
-          {/* Compact live budget — Awwwards single-accent emphasis on remaining */}
-          <div className="flex items-center gap-3 font-mono text-[11px] tabular-nums text-muted-foreground">
-            <span><AnimatedNumber value={budget.remaining} prefix="$" className="font-bold text-primary" /> <span className="opacity-70">left</span></span>
-            <span className="hidden xs:inline opacity-40">·</span>
-            <span><AnimatedNumber value={budget.maxBid} prefix="$" className="font-bold text-foreground" /> <span className="opacity-70">max</span></span>
-            <span className="hidden xs:inline opacity-40">·</span>
-            <span><AnimatedNumber value={budget.slotsLeft} className="font-bold text-foreground" /><span className="opacity-70"> slots</span></span>
-          </div>
+          {/* Budget strip moved into the Decision Card — header stays clean */}
           <div className="flex items-center gap-0.5">
             <Button variant="ghost" size="sm" onClick={() => navigate("/m")} className="h-8 px-2 text-[10px] font-semibold lg:hidden" title="Mobile draft mode">
               📱
