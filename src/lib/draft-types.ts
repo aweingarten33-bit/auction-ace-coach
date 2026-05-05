@@ -29,6 +29,7 @@ export interface LeagueSettings {
 export interface PriceEstimate {
   name: string;
   price: number;
+  position?: Position;
 }
 
 export interface DraftEvent {
