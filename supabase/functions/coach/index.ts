@@ -119,6 +119,7 @@ interface CoachPayload {
   history?: { role: "user" | "assistant"; content: string }[];
   draftedPlayers?: string[];
   showMath?: boolean;
+  strategy?: { id: string; label: string; guidance: string };
 }
 
 const MATH_ADDENDUM = ``;
