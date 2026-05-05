@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import CoachMessage from "@/components/CoachMessage";
+import { parseBidQuery } from "@/lib/bid-query";
 import coachBotImg from "@/assets/coach-bot.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,6 +95,8 @@ export default function Draft() {
   const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
+  const [pendingBid, setPendingBid] = useState<{ player: string } | null>(null);
+  const [pendingBidPrice, setPendingBidPrice] = useState("");
   const [coachOpen, setCoachOpen] = useState(false);
   const coachRef = useRef<HTMLDivElement>(null);
   const [queue, setQueue] = useState<QueueTarget[]>([]);
@@ -421,9 +424,62 @@ Keep it tight. No fluff, no closing line.`;
     toast(`${t.name} loaded · max bid $${t.maxBid}`);
   };
 
+  const sendBidQuestion = (player: string, price: number) => {
+    askCoach(undefined, `Should I bid on ${player} at $${price}? Give me a max bid and a one-line take.`);
+  };
+
+  const confirmPendingBid = () => {
+    if (!pendingBid) return;
+    const n = Number(pendingBidPrice);
+    if (!Number.isFinite(n) || n < 1) {
+      toast.error("Enter a current bid (e.g. 12)");
+      return;
+    }
+    const player = pendingBid.player;
+    setPendingBid(null);
+    setPendingBidPrice("");
+    sendBidQuestion(player, Math.round(n));
+  };
+
   const handleFollowUp = () => {
     if (!followUp.trim()) return;
-    const q = followUp.trim(); setFollowUp("");
+    const q = followUp.trim();
+    const parsed = parseBidQuery(q);
+
+    // Bid-style question — try to enrich with a price.
+    if (parsed.isBidIntent && parsed.player) {
+      // 1. Price already in the question.
+      if (parsed.price != null) {
+        setFollowUp("");
+        sendBidQuestion(parsed.player, parsed.price);
+        return;
+      }
+      // 2. Live ESPN bid for this player.
+      const live = espnSync.liveBid;
+      if (live?.player && live.player.toLowerCase().includes(parsed.player.toLowerCase().split(" ")[0])) {
+        setFollowUp("");
+        sendBidQuestion(parsed.player, live.price);
+        return;
+      }
+      // 3. Pick input matches and has a numeric price.
+      const inputPrice = Number(priceInput);
+      if (
+        playerName.trim() &&
+        playerName.toLowerCase().includes(parsed.player.toLowerCase().split(" ")[0]) &&
+        Number.isFinite(inputPrice) && inputPrice > 0
+      ) {
+        setFollowUp("");
+        sendBidQuestion(parsed.player, Math.round(inputPrice));
+        return;
+      }
+      // 4. Need to ask the user for the current price.
+      setFollowUp("");
+      setPendingBid({ player: parsed.player });
+      setPendingBidPrice("");
+      return;
+    }
+
+    setFollowUp("");
     askCoach(undefined, q);
   };
 
@@ -950,6 +1006,45 @@ Keep it tight. No fluff, no closing line.`;
                 </Button>
               )}
             </div>
+            {pendingBid && (
+              <div className="mb-2 flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-[12px]">
+                <span className="min-w-0 flex-1 truncate">
+                  Current bid on <span className="font-semibold text-foreground">{pendingBid.player}</span>?
+                </span>
+                <div className="relative w-20 shrink-0">
+                  <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    autoFocus
+                    placeholder="0"
+                    value={pendingBidPrice}
+                    onChange={(e) => setPendingBidPrice(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") { e.preventDefault(); confirmPendingBid(); }
+                      if (e.key === "Escape") { setPendingBid(null); setPendingBidPrice(""); }
+                    }}
+                    disabled={streaming}
+                    className="h-7 pl-5 text-right font-mono tabular-nums"
+                  />
+                </div>
+                <Button
+                  onClick={confirmPendingBid}
+                  disabled={streaming || !pendingBidPrice.trim()}
+                  size="sm"
+                  className="h-7 px-2 text-[11px]"
+                >
+                  Ask
+                </Button>
+                <Button
+                  onClick={() => { setPendingBid(null); setPendingBidPrice(""); }}
+                  size="sm" variant="ghost"
+                  className="h-7 px-1.5 text-[11px] text-muted-foreground"
+                >
+                  ✕
+                </Button>
+              </div>
+            )}
             <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
               <Input
                 placeholder='Ask Matthew Berry… e.g. "Should I bid on Bijan?"'
