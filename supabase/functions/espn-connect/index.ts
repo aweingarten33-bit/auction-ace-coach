@@ -55,6 +55,9 @@ Deno.serve(async (req) => {
     if (!/^[\x21-\x7E]+$/.test(s2)) {
       return j({ error: "Invalid espn_s2", hint: "The espn_s2 cookie contains non-cookie characters. Copy the raw value directly from browser DevTools, not from a screenshot/OCR scan." }, 400);
     }
+    if (s2.length < 200) {
+      return j({ error: "espn_s2 looks truncated", hint: `Got ${s2.length} characters; a real espn_s2 cookie is usually 300+ characters. In Chrome DevTools → Application → Cookies → https://www.espn.com, click the espn_s2 row, then copy the full value from the "Cookie Value" panel at the bottom (the table column truncates it).` }, 400);
+    }
 
     // Fan API → list leagues for the user. The URL path needs the bare fan id;
     // the Cookie header needs the braced SWID value.
