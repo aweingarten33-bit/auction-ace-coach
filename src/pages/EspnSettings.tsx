@@ -104,6 +104,11 @@ export default function EspnSettings() {
     const { data, error } = await supabase.functions.invoke("espn-connect", {
       body: { swid, espn_s2: s2, season, league_id: lg.leagueId, team_id: lg.teamId },
     });
+    // Also stamp the user's profile with this league_id so league mates who
+    // share the same league_id can read this league's auction history.
+    if (user) {
+      await supabase.from("profiles").update({ league_id: lg.leagueId }).eq("user_id", user.id);
+    }
     setBusy(false);
     if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Failed");
     toast.success(`Selected: ${lg.leagueName}`);
