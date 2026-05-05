@@ -224,6 +224,7 @@ export default function MobileDraft() {
             onUndo={() => { undoEvent(); toast("Undone"); }}
             settings={settings} keepers={keepers} prices={prices}
             pulse={pulse} myCount={myCount} requiredCount={requiredCount}
+            manualOpen={manualOpen} setManualOpen={setManualOpen}
           />
         )}
         {tab === "roster" && (
@@ -240,8 +241,8 @@ export default function MobileDraft() {
         )}
       </main>
 
-      {/* Sticky bottom action bar — thumb zone */}
-      {tab === "log" && (
+      {/* Sticky bottom action bar — thumb zone. Manual log only when fallback toggled on. */}
+      {tab === "log" && manualOpen && (
         <div
           className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-card/95 px-3 py-2 backdrop-blur"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}
@@ -263,6 +264,21 @@ export default function MobileDraft() {
               <Sparkles className="h-5 w-5 text-primary" />
             </Button>
           </div>
+        </div>
+      )}
+      {tab === "log" && !manualOpen && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-card/95 px-3 py-2 backdrop-blur"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}
+        >
+          <Button
+            size="lg" variant="outline"
+            className="h-12 w-full text-sm font-semibold"
+            onClick={() => askCoach()}
+            disabled={streaming}
+          >
+            <Sparkles className="mr-2 h-5 w-5 text-primary" /> Ask assistant
+          </Button>
         </div>
       )}
     </div>
