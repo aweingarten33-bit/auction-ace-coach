@@ -229,9 +229,6 @@ export default function Planner() {
       </div>
 
       <main className="mx-auto max-w-3xl space-y-4 p-3">
-        {/* ---------- Step 1: Setup ---------- */}
-        <SetupChecklist />
-
         {/* ---------- Strategy picker ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center gap-2">
