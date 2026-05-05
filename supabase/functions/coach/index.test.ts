@@ -263,3 +263,45 @@ Deno.test({
     assertEquals(a!.slotsLeft, budget.slotsLeft);
   },
 });
+
+const VALUE_PICK_PROMPTS = [
+  "What's the best remaining value on the board right now? Pick the single best value at RB, WR, and TE and tell me why.",
+  "What's my next target and how much should I be willing to pay?",
+  "Give me a sleeper at WR I can grab cheap.",
+];
+
+for (const q of VALUE_PICK_PROMPTS) {
+  Deno.test({
+    name: `live: value pick ends with math anchor — ${q.slice(0, 60)}…`,
+    ignore: !LIVE,
+    sanitizeOps: false,
+    sanitizeResources: false,
+    fn: async () => {
+      const budget: CoachBudget = {
+        remaining: 84,
+        maxBid: 28,
+        slotsLeft: 11,
+        slotsTotal: 16,
+      };
+      const text = await callCoach(makePayload(budget, q));
+      assert(text.length > 0, "expected non-empty coach reply");
+      assert(
+        endsWithAnchor(text),
+        `value pick must end with the math anchor. tail: ${JSON.stringify(text.slice(-200))}`,
+      );
+      const a = extractAnchor(text)!;
+      assertEquals(a.bank, budget.remaining);
+      assertEquals(a.maxBid, budget.maxBid);
+      assertEquals(a.slotsLeft, budget.slotsLeft);
+
+      // Anchor must appear exactly once.
+      const occurrences =
+        text.match(new RegExp(MATH_ANCHOR_RE.source, "g"))?.length ?? 0;
+      assertEquals(
+        occurrences,
+        1,
+        `anchor should appear exactly once, got ${occurrences}`,
+      );
+    },
+  });
+}
