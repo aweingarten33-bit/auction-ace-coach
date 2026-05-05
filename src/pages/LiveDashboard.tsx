@@ -807,6 +807,15 @@ export default function LiveDashboard() {
               <Sparkles className="h-3.5 w-3.5" /> AI Assistant
               <span className="font-mono text-[9px] tracking-[0.2em] text-primary/70">— THE TAKE</span>
               {streaming && <span className="text-muted-foreground">· thinking...</span>}
+              {(coachHistory.length > 0 || coachText) && !streaming && (
+                <button
+                  onClick={() => { setCoachHistory([]); setCoachText(""); }}
+                  className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-destructive"
+                  title="Clear conversation"
+                >
+                  Clear
+                </button>
+              )}
             </h2>
             <div ref={coachRef} className="coach-md max-h-96 space-y-3 overflow-auto text-sm leading-relaxed">
               {coachHistory.length === 0 && !streaming && (
