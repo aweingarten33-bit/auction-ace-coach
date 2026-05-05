@@ -64,7 +64,7 @@ function verdictTone(v: ValueCall["verdict"]) {
 }
 
 function verdictLabel(v: ValueCall["verdict"]) {
-  return { steal: "STEAL", value: "VALUE", fair: "FAIR", reach: "REACH", overpay: "OVER", unknown: "—" }[v];
+  return { steal: "GREAT DEAL", value: "GOOD DEAL", fair: "FAIR PRICE", reach: "A BIT HIGH", overpay: "TOO MUCH", unknown: "—" }[v];
 }
 
 export default function UpNextQueue({
