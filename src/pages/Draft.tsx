@@ -769,7 +769,7 @@ export default function Draft() {
               <span><span className="text-muted-foreground">Bank</span> <span className="font-semibold text-foreground">${budget.remaining}</span></span>
               <span><span className="text-muted-foreground">Max bid</span> <span className="font-semibold text-foreground">${budget.maxBid}</span></span>
               <span><span className="text-muted-foreground">Slots</span> <span className="font-semibold text-foreground">{budget.slotsLeft}</span></span>
-              <span><span className="text-muted-foreground">$/slot</span> <span className="font-semibold text-foreground">${budget.perSlot}</span></span>
+              <span><span className="text-muted-foreground">$/slot</span> <span className="font-semibold text-foreground">${budget.avgPerSlot}</span></span>
             </div>
 
             <div className="flex flex-wrap gap-1">
