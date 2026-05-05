@@ -685,6 +685,14 @@ export default function Draft() {
               <Card className="p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Vetri players · projected $
+                  </span>
+                </div>
+                <VetriPlayerSummary />
+              </Card>
+              <Card className="p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Takes on this player
                   </span>
                   {(playerName || bestTarget?.name) && (
