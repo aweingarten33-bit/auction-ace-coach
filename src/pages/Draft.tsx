@@ -749,7 +749,7 @@ export default function Draft() {
                 Back to draft
               </Button>
               <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
-              Auction Assistant
+              Ask Matthew Berry
               <span className="ml-auto mr-6 text-[10px] font-normal text-muted-foreground">
                 {streaming ? "typing…" : "online"}
               </span>
