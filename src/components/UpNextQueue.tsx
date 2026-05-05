@@ -183,9 +183,9 @@ export default function UpNextQueue({
                       <p className="mt-1 flex items-center gap-1 text-[10px] leading-snug text-success/90">
                         <Tag className="h-2.5 w-2.5 shrink-0" />
                         <span>
-                          <span className="font-semibold">Knockoff:</span> {t.knockoff.name}
+                          <span className="font-semibold">Cheaper option:</span> {t.knockoff.name}
                           <span className="ml-1 font-mono">${t.knockoff.price}</span>
-                          <span className="ml-1 opacity-70">(save ${Math.max(0, t.maxBid - t.knockoff.price)})</span>
+                          <span className="ml-1 opacity-70">(saves ${Math.max(0, t.maxBid - t.knockoff.price)})</span>
                         </span>
                       </p>
                     )}
