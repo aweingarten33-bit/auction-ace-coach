@@ -71,7 +71,12 @@ export default function EspnSettings() {
     setLeagues(data.leagues ?? []);
     setSelected(null);
     setVerified(new Date().toISOString());
-    toast.success(`Found ${data.leagues?.length ?? 0} league(s)`);
+    const count = data.leagues?.length ?? 0;
+    if (count === 0) {
+      toast.warning(data?.hint ?? "No leagues found. Re-copy the full espn_s2 cookie from espn.com, then verify again.");
+    } else {
+      toast.success(`Found ${count} league(s)`);
+    }
   };
 
   const pickLeague = async (lg: League) => {
