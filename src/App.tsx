@@ -41,19 +41,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/draft" element={<Protected><Draft /></Protected>} />
-            <Route path="/planner" element={<Protected><Planner /></Protected>} />
-            <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
-            <Route path="/admin" element={<Protected><Admin /></Protected>} />
-            {/* Legacy redirects */}
-            <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
-            <Route path="/m" element={<Navigate to="/draft" replace />} />
-            <Route path="/mobile" element={<Navigate to="/draft" replace />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <LockProvider>
+            <Routes>
+              <Route path="/" element={<PublicGate><Index /></PublicGate>} />
+              <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
+              <Route path="/draft" element={<Protected><Draft /></Protected>} />
+              <Route path="/planner" element={<Protected><Planner /></Protected>} />
+              <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+              {/* Admin always reachable so you can unlock */}
+              <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
+              {/* Legacy redirects */}
+              <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
+              <Route path="/m" element={<Navigate to="/draft" replace />} />
+              <Route path="/mobile" element={<Navigate to="/draft" replace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </LockProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
