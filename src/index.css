@@ -96,38 +96,38 @@
     --ring: 40 35% 70%;
   }
 
-  /* Light theme — inverted dark: same hues, lightness flipped. */
+  /* Light theme — bright, saturated, sky-blue base. Vivid signal colors. */
   .theme-light {
-    --background: 220 45% 92%;
-    --foreground: 210 20% 10%;
+    --background: 205 95% 75%;
+    --foreground: 220 60% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 210 20% 10%;
+    --card-foreground: 220 60% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 210 20% 10%;
-    --primary: 40 55% 38%;
+    --popover-foreground: 220 60% 12%;
+    --primary: 25 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 40 55% 45%;
-    --secondary: 220 14% 88%;
-    --secondary-foreground: 210 20% 10%;
-    --muted: 220 14% 90%;
-    --muted-foreground: 215 12% 38%;
-    --accent: 210 20% 10%;
+    --primary-glow: 25 100% 58%;
+    --secondary: 205 80% 88%;
+    --secondary-foreground: 220 60% 12%;
+    --muted: 205 70% 92%;
+    --muted-foreground: 220 30% 30%;
+    --accent: 320 90% 55%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 75% 42%;
+    --destructive: 0 90% 50%;
     --destructive-foreground: 0 0% 100%;
-    --warning: 40 55% 38%;
-    --warning-foreground: 0 0% 100%;
-    --success: 150 45% 30%;
+    --warning: 45 100% 50%;
+    --warning-foreground: 220 60% 12%;
+    --success: 145 75% 40%;
     --success-foreground: 0 0% 100%;
-    --border: 220 14% 78%;
-    --input: 220 14% 86%;
-    --ring: 40 55% 38%;
-    --gradient-primary: linear-gradient(180deg, hsl(40 55% 42%), hsl(40 55% 35%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 14% 96%));
-    --shadow-glow: 0 0 0 1px hsl(40 55% 38% / 0.30);
-    --shadow-card: 0 1px 2px hsl(210 20% 10% / 0.08), 0 4px 12px -6px hsl(210 20% 10% / 0.12);
-    --grid-line: hsl(220 14% 86%);
-    --grid-line-strong: hsl(220 14% 80%);
+    --border: 205 60% 65%;
+    --input: 205 60% 80%;
+    --ring: 25 100% 50%;
+    --gradient-primary: linear-gradient(180deg, hsl(25 100% 55%), hsl(25 100% 45%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(205 80% 96%));
+    --shadow-glow: 0 0 0 2px hsl(25 100% 50% / 0.40);
+    --shadow-card: 0 2px 4px hsl(220 60% 12% / 0.10), 0 6px 16px -6px hsl(220 60% 12% / 0.18);
+    --grid-line: hsl(205 80% 82%);
+    --grid-line-strong: hsl(205 70% 72%);
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
