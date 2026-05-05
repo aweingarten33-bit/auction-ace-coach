@@ -22,12 +22,14 @@ export interface QuickPrompt {
 }
 
 export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
-  { id: "qp-bid",      label: "Who should I bid on next?",  prompt: "Based on my roster, budget, and what's left on the board, who should I go after next and how much should I pay?" },
-  { id: "qp-nominate", label: "Who should I nominate?",     prompt: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
-  { id: "qp-pivot",    label: "Should I change my plan?",   prompt: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
-  { id: "qp-spend",    label: "Am I spending too much?",    prompt: "Am I overspending so far? Compare what I've spent to what's normal for this point in the draft and tell me what to do." },
-  { id: "qp-hole",     label: "What's my biggest hole?",    prompt: "What's the biggest weakness on my roster right now and what's the cheapest way to fix it?" },
-  { id: "qp-sleepers", label: "Any sleepers I'm missing?",  prompt: "Give me 2-3 sleeper or value picks I should be watching for later in the draft based on what's still available." },
+  { id: "qp-bid",       label: "Bid next?",       prompt: "Based on my roster, budget, and what's left on the board, who should I bid on next and how much should I pay?" },
+  { id: "qp-nominate",  label: "Nominate?",       prompt: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
+  { id: "qp-sleepers",  label: "Sleepers",        prompt: "Give me 3 sleeper or value picks still on the board I should target in the later rounds. Be specific and tell me why." },
+  { id: "qp-busts",     label: "Busts to avoid",  prompt: "Which still-available players are you fading this year? Give me 3 names and why you'd let someone else overpay." },
+  { id: "qp-startsit",  label: "Start/sit",       prompt: "From the players I've already drafted, who are my locked-in starters and who's a question mark? Walk me through any tough start/sit calls." },
+  { id: "qp-trade",     label: "Trade ideas",     prompt: "Looking at my roster, what kind of trade should I be working toward post-draft? Suggest 1-2 realistic trade angles (positions to consolidate or upgrade)." },
+  { id: "qp-strategy",  label: "Draft strategy",  prompt: "Given how this draft is unfolding (budget left, roster gaps, market prices), what's the best strategy from here? Hammer-and-anvil, stars-and-scrubs, balanced — what fits and why?" },
+  { id: "qp-hole",      label: "Biggest hole",    prompt: "What's the biggest weakness on my roster right now and what's the cheapest way to fix it?" },
 ];
 
 interface DraftState {
