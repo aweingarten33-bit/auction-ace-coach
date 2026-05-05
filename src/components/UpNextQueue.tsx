@@ -86,8 +86,8 @@ export default function UpNextQueue({
     <Card className="bg-gradient-card p-4 shadow-glow">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
-          <ListMusic className="h-3.5 w-3.5" /> Up Next
-          {loading && <span className="text-muted-foreground normal-case">· tuning...</span>}
+          <ListMusic className="h-3.5 w-3.5" /> Who to go after next
+          {loading && <span className="text-muted-foreground normal-case">· thinking...</span>}
         </h2>
         <div className="flex items-center gap-1.5">
           <span
