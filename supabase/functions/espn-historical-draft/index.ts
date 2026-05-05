@@ -45,10 +45,15 @@ Deno.serve(async (req) => {
 
     for (const season of seasons) {
       try {
-        const espnUrl =
-          `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}` +
-          `/segments/0/leagues/${creds.league_id}` +
-          `?view=mDraftDetail&view=mSettings&view=mTeam`;
+        // For prior seasons, /leagueHistory/ is more reliable than /seasons/
+        // (returns a single-element array). For current season, use /seasons/.
+        const isHistorical = season < currentSeason;
+        const espnUrl = isHistorical
+          ? `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/leagueHistory/${creds.league_id}` +
+            `?seasonId=${season}&view=mDraftDetail&view=mSettings&view=mTeam`
+          : `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}` +
+            `/segments/0/leagues/${creds.league_id}` +
+            `?view=mDraftDetail&view=mSettings&view=mTeam`;
 
         const r = await fetch(espnUrl, {
           headers: {
