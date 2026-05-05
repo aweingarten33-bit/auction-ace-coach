@@ -295,6 +295,7 @@ export default function Draft() {
           history: coachHistory.slice(-6),
           draftedPlayers: events.map((e) => e.player),
           showMath: true,
+          strategy: { id: strategy.id, label: strategy.label, guidance: strategy.coachGuidance },
         },
         (chunk) => {
           acc += chunk;
