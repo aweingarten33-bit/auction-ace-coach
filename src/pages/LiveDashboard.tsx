@@ -763,9 +763,8 @@ export default function LiveDashboard() {
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-9">
+            <TabsList className="grid w-full grid-cols-2 h-9">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
-              <TabsTrigger value="vetri" className="text-[11px]">Notes</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
             </TabsList>
 
@@ -793,19 +792,6 @@ export default function LiveDashboard() {
                 valueFor={valueFor}
                 maxBid={budget.maxBid}
               />
-            </TabsContent>
-
-            <TabsContent value="vetri" className="mt-3 space-y-4">
-              <VetriNotesPanel
-                onTakesUpdate={setVetriTakes}
-                onLoadPlayer={(name, pos) => {
-                  setPlayerName(name);
-                  setPosition(pos);
-                  setDrafter("me");
-                  toast(`${name} loaded from analyst notes`);
-                }}
-              />
-              <VetriTierSheet />
             </TabsContent>
 
             <TabsContent value="market" className="mt-3 space-y-4">
