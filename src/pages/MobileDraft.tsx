@@ -181,11 +181,11 @@ export default function MobileDraft() {
         style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="flex items-center gap-2 px-3 pt-2">
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => navigate("/dashboard")}>
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="ghost" size="sm" className="h-10 w-10 p-0" onClick={() => navigate("/dashboard")}>
+            <ArrowLeft className="h-6 w-6" />
           </Button>
-          <span className="text-sm font-semibold">Mobile Draft</span>
-          <span className="ml-auto text-[10px] text-muted-foreground">manual mode</span>
+          <span className="text-xl font-bold tracking-tight">Auction Assistant</span>
+          <span className="ml-auto text-xs text-muted-foreground">manual</span>
         </div>
 
         {/* Big budget readout */}
@@ -193,10 +193,10 @@ export default function MobileDraft() {
           <BudgetCell label="Left" value={budget.remaining} accent />
           <BudgetCell label="Max bid" value={budget.maxBid} />
           <div>
-            <p className="text-[9px] uppercase tracking-wide text-muted-foreground">Slots</p>
-            <p className="text-lg font-bold tabular-nums">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Slots</p>
+            <p className="text-2xl font-bold tabular-nums">
               <AnimatedNumber value={budget.slotsLeft} />
-              <span className="text-xs text-muted-foreground">/{budget.slotsTotal}</span>
+              <span className="text-base text-muted-foreground">/{budget.slotsTotal}</span>
             </p>
           </div>
         </div>
@@ -208,7 +208,7 @@ export default function MobileDraft() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`py-2.5 text-xs font-semibold uppercase tracking-wide transition ${
+              className={`py-3 text-sm font-semibold uppercase tracking-wide transition ${
                 tab === t ? "bg-background text-primary border-b-2 border-primary" : "text-muted-foreground"
               }`}
             >
