@@ -352,7 +352,7 @@ export function mergeVetriIntoPrices(
     result.set(key, {
       name: existingRow?.name ?? c.name,
       price: c.value,
-      // @ts-expect-error PriceEstimate may grow position later — keep flexible
+      
       position: c.position,
     });
   }
