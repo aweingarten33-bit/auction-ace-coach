@@ -52,19 +52,31 @@ export default function AuthPage() {
           <Trophy className="h-6 w-6 text-primary" />
           <h1 className="text-xl font-bold">Auction Assistant</h1>
         </div>
-        <div className="space-y-3">
-          <div>
-            <Label>Email</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div>
-            <Label>Password</Label>
-            <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
-          </div>
-          <Button className="w-full" disabled={busy || !email || !pw} onClick={signIn}>
-            Sign in
-          </Button>
-        </div>
+        <Tabs defaultValue="signin">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="signin">Sign in</TabsTrigger>
+            <TabsTrigger value="signup">Sign up</TabsTrigger>
+          </TabsList>
+          {(["signin", "signup"] as const).map((mode) => (
+            <TabsContent key={mode} value={mode} className="space-y-3">
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
+                <Label>Password</Label>
+                <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
+              </div>
+              <Button
+                className="w-full"
+                disabled={busy || !email || !pw}
+                onClick={mode === "signin" ? signIn : signUp}
+              >
+                {mode === "signin" ? "Sign in" : "Create account"}
+              </Button>
+            </TabsContent>
+          ))}
+        </Tabs>
         <div className="my-4 flex items-center gap-2 text-[11px] text-muted-foreground">
           <div className="h-px flex-1 bg-border" /> or <div className="h-px flex-1 bg-border" />
         </div>
