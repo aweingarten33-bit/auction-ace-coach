@@ -24,34 +24,33 @@
     --popover: 220 16% 12%;
     --popover-foreground: 40 12% 88%;
 
-    /* Dark muted navy — the evil suit */
-    --primary: 218 55% 28%;
-    --primary-foreground: 40 20% 92%;
-    --primary-glow: 218 60% 38%;
+    /* Lighter muted navy — the evil suit */
+    --primary: 218 60% 42%;
+    --primary-foreground: 40 20% 96%;
+    --primary-glow: 218 65% 52%;
 
-    --secondary: 220 12% 18%;
-    --secondary-foreground: 40 12% 86%;
+    --secondary: 218 30% 28%;
+    --secondary-foreground: 40 12% 92%;
 
-    --muted: 220 10% 16%;
-    --muted-foreground: 40 6% 60%;
+    --muted: 218 25% 26%;
+    --muted-foreground: 40 8% 70%;
 
     /* Blood red — cape & shield */
-    --accent: 0 55% 32%;
-    --accent-foreground: 40 20% 92%;
+    --accent: 0 60% 42%;
+    --accent-foreground: 40 20% 96%;
 
-    --destructive: 0 70% 38%;
-    --destructive-foreground: 40 20% 92%;
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 40 20% 96%;
 
-    /* Tarnished gold — belt */
-    --warning: 42 55% 42%;
-    --warning-foreground: 220 18% 8%;
+    --warning: 42 60% 50%;
+    --warning-foreground: 218 42% 12%;
 
-    --success: 142 30% 32%;
-    --success-foreground: 40 20% 92%;
+    --success: 142 35% 40%;
+    --success-foreground: 40 20% 96%;
 
-    --border: 220 14% 22%;
-    --input: 220 14% 18%;
-    --ring: 218 55% 38%;
+    --border: 218 30% 32%;
+    --input: 218 28% 26%;
+    --ring: 218 60% 50%;
 
     --radius: 0.5rem;
 
@@ -108,8 +107,8 @@
     -moz-osx-font-smoothing: grayscale;
     /* Subtle pinstripe like Leopard windows */
     background-image:
-      linear-gradient(180deg, hsl(220 18% 9%) 0%, hsl(220 20% 6%) 100%),
-      repeating-linear-gradient(0deg, hsl(0 0% 100% / 0.015) 0 1px, transparent 1px 2px);
+      linear-gradient(180deg, hsl(218 42% 20%) 0%, hsl(218 45% 15%) 100%),
+      repeating-linear-gradient(0deg, hsl(0 0% 100% / 0.02) 0 1px, transparent 1px 2px);
   }
 
   h1, h2, h3, h4 {
