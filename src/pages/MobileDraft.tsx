@@ -32,7 +32,10 @@ import { DraftEvent, Position } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import AnimatedNumber from "@/components/AnimatedNumber";
-import { computeMarketPulse } from "@/lib/value";
+import { computeMarketPulse, valueFor as computeValueFor } from "@/lib/value";
+import { projectRemainingBuild } from "@/lib/simulator";
+import RemainingBuildPanel from "@/components/RemainingBuildPanel";
+import ValueVerdict from "@/components/ValueVerdict";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
