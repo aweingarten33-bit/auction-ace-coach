@@ -96,7 +96,22 @@ Deno.serve(async (req) => {
           projected_points: null,
         };
       })
-      .filter(Boolean);
+      .filter(Boolean) as Array<{ season: number; espn_player_id: number; player_name: string; player_name_norm: string; position: string | null; overall_rank: number | null; pos_rank: number | null; auction_value: number | null; projected_points: number | null }>;
+
+    // Compute pos_rank ourselves when ESPN omits positionalRank: rank players
+    // within each position by overall_rank ascending. This is what the auto-fill
+    // tier mapping needs.
+    const byPos = new Map<string, typeof rows>();
+    for (const r of rows) {
+      if (!r.position || r.overall_rank == null) continue;
+      const arr = byPos.get(r.position) ?? [];
+      arr.push(r);
+      byPos.set(r.position, arr);
+    }
+    for (const arr of byPos.values()) {
+      arr.sort((a, b) => (a.overall_rank ?? 9999) - (b.overall_rank ?? 9999));
+      arr.forEach((r, i) => { if (r.pos_rank == null) r.pos_rank = i + 1; });
+    }
 
     // Use service role for upsert (bypasses RLS write block on this read-only-public table).
     const sbAdmin = createClient(url, serviceKey);
