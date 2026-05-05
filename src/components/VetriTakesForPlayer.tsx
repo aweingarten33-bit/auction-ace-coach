@@ -122,4 +122,14 @@ export default function VetriTakesForPlayer({
       })}
     </div>
   );
+
+  if (hideWhenEmpty) {
+    return (
+      <div className={wrapperClassName}>
+        {header}
+        {list}
+      </div>
+    );
+  }
+  return list;
 }
