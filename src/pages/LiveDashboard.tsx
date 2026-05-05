@@ -93,6 +93,7 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
+  const [manualOpen, setManualOpen] = useState(false);
   
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
@@ -578,14 +579,30 @@ export default function LiveDashboard() {
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
-          {/* Manual entry — always visible. ESPN sync feeds picks too, but this is the trust layer. */}
+          {/* Manual entry — collapsed when ESPN is auto-syncing. Expand only as a fallback. */}
+          {(() => {
+            const espnLive = espnSync.status === "live" || espnSync.status === "idle";
+            const showForm = !espnLive || manualOpen;
+            return (
           <Card className="bg-card/60 p-2.5">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Log a pick
+                {espnLive ? "ESPN auto-logging picks" : "Log a pick"}
               </span>
-              <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+              <div className="flex items-center gap-2">
+                <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+                {espnLive && (
+                  <button
+                    onClick={() => setManualOpen(!manualOpen)}
+                    className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary"
+                  >
+                    {manualOpen ? "Hide" : "Manual"}
+                  </button>
+                )}
+              </div>
             </div>
+            {showForm && (<>
+
             <div className="flex items-center gap-1.5 mb-2">
               <div className="inline-flex rounded-full bg-secondary/50 p-0.5 text-[10px] font-semibold">
                 <button
@@ -684,7 +701,10 @@ export default function LiveDashboard() {
               });
               return <div className="mt-2"><DecisionCard d={d} /></div>;
             })()}
+            </>)}
           </Card>
+            );
+          })()}
 
           {/* Draft Log — clean timeline, no calculator vibes */}
           <Card className="bg-gradient-card p-3">
