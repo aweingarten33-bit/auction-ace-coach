@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2, Zap } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { buildTierPrices, tierForPosRank, type AuctionRow } from "@/lib/league-tier-prices";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
@@ -84,7 +86,62 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [quickPrice, setQuickPrice] = useState("");
   const [filter, setFilter] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [autoBusy, setAutoBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const autoFillFromEspn = async () => {
+    setAutoBusy(true);
+    try {
+      // 1) Make sure last 3 drafts + this year's ranks are cached
+      const [hist, ranks] = await Promise.all([
+        supabase.functions.invoke("espn-historical-draft", { body: { seasonsBack: 3 } }),
+        supabase.functions.invoke("espn-player-ranks", {}),
+      ]);
+      if (hist.error || (hist.data as { error?: string })?.error) {
+        throw new Error((hist.data as { error?: string })?.error || hist.error?.message || "Couldn't pull ESPN draft history");
+      }
+      if (ranks.error || (ranks.data as { error?: string })?.error) {
+        throw new Error((ranks.data as { error?: string })?.error || ranks.error?.message || "Couldn't pull ESPN player ranks");
+      }
+
+      // 2) Build league tier prices from history
+      const { data: hRows, error: hErr } = await supabase
+        .from("league_auction_history")
+        .select("season, player_name, position, bid_amount");
+      if (hErr) throw hErr;
+      const tierPrices = buildTierPrices((hRows ?? []) as AuctionRow[]);
+      if (!tierPrices.length) {
+        throw new Error("No auction history found in your last 3 ESPN drafts. Connect ESPN first.");
+      }
+
+      // 3) Pull this year's ranks
+      const { data: rRows, error: rErr } = await supabase
+        .from("espn_player_ranks")
+        .select("player_name, position, pos_rank, auction_value");
+      if (rErr) throw rErr;
+      if (!rRows?.length) {
+        throw new Error("No player ranks cached. Try again in a moment.");
+      }
+
+      // 4) For each ranked player → tier → league avg $
+      const built: { name: string; price: number }[] = [];
+      for (const r of rRows) {
+        if (!r.position || !r.pos_rank) continue;
+        const tier = tierForPosRank(r.position, r.pos_rank);
+        const tp = tierPrices.find((t) => t.position === r.position && t.tier === tier);
+        const price = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
+        if (price > 0) built.push({ name: r.player_name, price });
+      }
+      if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
+      mergeImported(built, "ESPN auto-fill");
+      toast.success(`Auto-filled ${built.length} players from your last 3 ESPN drafts`);
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Auto-fill failed");
+    } finally {
+      setAutoBusy(false);
+    }
+  };
 
   const mergeImported = (incoming: { name: string; price: number }[], filename: string) => {
     if (!incoming.length) {
