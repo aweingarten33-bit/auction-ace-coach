@@ -198,6 +198,34 @@ export default function EspnSettings() {
         <ConnectorStatus />
       </div>
 
+      {/* League mate shortcut — no cookies needed */}
+      <Card className="mb-6 p-5">
+        <div className="mb-2 flex items-center gap-2">
+          <Badge variant="outline" className="border-success/40 bg-success/10 text-success">Easy</Badge>
+          <h2 className="font-semibold">In a league with someone who already connected?</h2>
+        </div>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Just enter your ESPN <strong>League ID</strong> — you'll instantly see the same draft history &amp; tier prices they pulled. No cookies, no DevTools. (Find it in the URL when you visit your league on espn.com: <code className="rounded bg-secondary px-1">leagueId=XXXXXX</code>.)
+        </p>
+        <div className="flex gap-2">
+          <Input
+            type="number"
+            value={joinLeagueId}
+            onChange={(e) => setJoinLeagueId(e.target.value)}
+            placeholder="e.g. 123456"
+            className="font-mono"
+          />
+          <Button onClick={joinLeague} disabled={!joinLeagueId || Number(joinLeagueId) === savedLeagueId}>
+            {savedLeagueId === Number(joinLeagueId) && savedLeagueId ? "Joined ✓" : "Join league"}
+          </Button>
+        </div>
+        {savedLeagueId && (
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Currently joined to league <span className="font-mono">{savedLeagueId}</span>. Auto-fill on the draft setup page will use this league's shared history.
+          </p>
+        )}
+      </Card>
+
       {/* Path A */}
       <Card className="mb-6 p-5">
         <div className="mb-3 flex items-center gap-2">
