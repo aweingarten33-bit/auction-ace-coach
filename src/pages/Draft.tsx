@@ -534,6 +534,15 @@ Keep it tight. No fluff, no closing line.`;
           <div className="flex items-center gap-1">
             <Button
               size="sm"
+              variant="outline"
+              onClick={() => navigate("/draft-v2")}
+              className="h-8 px-2.5 text-[11px] font-semibold"
+              title="Try new layout"
+            >
+              v2
+            </Button>
+            <Button
+              size="sm"
               onClick={() => navigate("/planner")}
               className="h-8 gap-1.5 px-2.5 text-[11px] font-semibold"
               title="Budget Planner"
