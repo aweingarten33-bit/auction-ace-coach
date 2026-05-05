@@ -723,7 +723,7 @@ export default function Draft() {
         <SheetTrigger asChild>
           <Button
             size="lg"
-            className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-red-600 p-0 shadow-glow ring-2 ring-primary/40 hover:bg-red-600"
+            className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full p-0 shadow-glow ring-2 ring-primary/40"
             style={{ marginBottom: "env(safe-area-inset-bottom)" }}
             title="Ask the coach"
           >
