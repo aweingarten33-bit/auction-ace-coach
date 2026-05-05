@@ -549,7 +549,7 @@ export default function LiveDashboard() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-7xl gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2">
+      <main className="mx-auto grid max-w-[1600px] gap-3 p-3 md:gap-4 md:p-4 lg:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)_minmax(0,1fr)]">
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
@@ -783,7 +783,10 @@ export default function LiveDashboard() {
               <OpponentHeatmap settings={settings} />
             </TabsContent>
           </Tabs>
+        </section>
 
+        {/* COACH COLUMN — its own column at xl, stacks below at lg */}
+        <section className="space-y-4 lg:col-span-2 xl:col-span-1">
           {/* Coach */}
           <Card className="bg-gradient-card p-4 shadow-glow">
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
