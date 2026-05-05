@@ -232,6 +232,6 @@
 .coach-md p { @apply mb-2 leading-relaxed; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply text-primary font-semibold; }
+.coach-md strong { @apply text-foreground font-semibold; }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply font-semibold mt-3 mb-1 text-foreground; }
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
