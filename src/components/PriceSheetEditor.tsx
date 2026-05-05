@@ -271,7 +271,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-sm font-medium">Player Price Estimates</p>
+          <p className="text-sm font-medium">Player Values</p>
           <p className="text-[11px] text-muted-foreground">
             Auto-fill from your ESPN league (last 3 drafts × this year's ranks). Upload/paste only if you want to override.
           </p>
