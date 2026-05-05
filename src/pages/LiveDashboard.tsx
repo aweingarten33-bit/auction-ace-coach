@@ -582,8 +582,7 @@ export default function LiveDashboard() {
           {/* Manual entry — collapsed when ESPN is auto-syncing. Expand only as a fallback. */}
           {(() => {
             const espnLive = espnSync.status === "live" || espnSync.status === "idle";
-            const [forceOpen, setForceOpen] = [manualOpen, setManualOpen] as [boolean, (v: boolean) => void];
-            const showForm = !espnLive || forceOpen;
+            const showForm = !espnLive || manualOpen;
             return (
           <Card className="bg-card/60 p-2.5">
             <div className="mb-2 flex items-center justify-between">
@@ -594,10 +593,10 @@ export default function LiveDashboard() {
                 <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
                 {espnLive && (
                   <button
-                    onClick={() => setForceOpen(!forceOpen)}
+                    onClick={() => setManualOpen(!manualOpen)}
                     className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary"
                   >
-                    {forceOpen ? "Hide" : "Manual"}
+                    {manualOpen ? "Hide" : "Manual"}
                   </button>
                 )}
               </div>
@@ -702,7 +701,10 @@ export default function LiveDashboard() {
               });
               return <div className="mt-2"><DecisionCard d={d} /></div>;
             })()}
+            </>)}
           </Card>
+            );
+          })()}
 
           {/* Draft Log — clean timeline, no calculator vibes */}
           <Card className="bg-gradient-card p-3">
