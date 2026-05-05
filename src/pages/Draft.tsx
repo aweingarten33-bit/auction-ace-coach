@@ -85,7 +85,7 @@ export default function Draft() {
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
   const [coachText, setCoachText] = useState<string>(
-    "Welcome. Enter your first draft pick above to get live recommendations."
+    "**Welcome to your Auction Draft Assistant.**\n\nThis is a live draft calculator — not a general chatbot. As picks happen, log each one above (player, price, who drafted them). After each pick I'll give you:\n\n- **Verdict** — bid up to $X, pass, or pivot positions\n- **Why** — the math behind it: your remaining budget, roster needs, market inflation vs. sheet price\n- **Targets** — up to 3 specific players to chase next, with max bids\n\nEverything is grounded in your league settings, your roster, and the live price sheet. I won't recommend players already drafted, and I won't suggest a bid that breaks your budget.\n\n**Log your first pick above to get started.**"
   );
   const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
