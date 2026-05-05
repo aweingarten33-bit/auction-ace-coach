@@ -125,6 +125,61 @@ export default function NominationCard({ drain, get, aiSuggestions, aiLoading, o
           <p className="mt-1 text-[11px] text-muted-foreground">{get.reason}</p>
         )}
       </div>
+
+      {/* AI SUGGESTIONS */}
+      {(onAskAi || aiSuggestions?.length) && (
+        <div className="mt-2 rounded-md border border-border bg-secondary/30 p-2.5">
+          <div className="flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-foreground" />
+            <p className="text-[9px] font-bold uppercase tracking-widest text-foreground">
+              AI suggestions
+            </p>
+            {onAskAi && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="ml-auto h-6 px-2 text-[10px]"
+                onClick={onAskAi}
+                disabled={aiLoading}
+              >
+                {aiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Suggest"}
+              </Button>
+            )}
+          </div>
+          {aiSuggestions && aiSuggestions.length > 0 ? (
+            <div className="mt-1.5 space-y-1.5">
+              {aiSuggestions.map((s) => {
+                const style = STRATEGY_STYLE[s.strategy];
+                return (
+                  <button
+                    key={s.name}
+                    onClick={() => onPickAi?.(s)}
+                    className="block w-full rounded border border-border bg-background/40 px-2 py-1.5 text-left transition hover:border-primary/60 hover:bg-background"
+                  >
+                    <div className="flex items-baseline gap-2">
+                      <span className={`rounded px-1 py-0 text-[9px] font-bold tracking-wider ${style.cls}`}>
+                        {style.label}
+                      </span>
+                      <span className="text-sm font-bold text-foreground">{s.name}</span>
+                      <Badge variant="outline" className="px-1 py-0 text-[10px]">{s.position}</Badge>
+                      <span className="ml-auto font-mono text-xs tabular-nums text-muted-foreground">
+                        ~${s.price}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">{s.reason}</p>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            !aiLoading && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Tap Suggest for AI picks using draft + history + takes.
+              </p>
+            )
+          )}
+        </div>
+      )}
     </Card>
   );
 }
