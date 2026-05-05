@@ -222,9 +222,8 @@ export default function Planner() {
         {/* ---------- Step 1: Setup ---------- */}
         <SetupChecklist />
 
+        {/* ---------- Step 2: Slot allocation ---------- */}
 
-      <main className="mx-auto max-w-3xl space-y-4 p-3">
-        {/* ---------- Slot allocation ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
