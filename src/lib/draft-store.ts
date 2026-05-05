@@ -69,6 +69,7 @@ interface DraftState {
   // Quick prompts
   setQuickPrompts: (p: QuickPrompt[]) => void;
   resetQuickPrompts: () => void;
+  setShowMath: (b: boolean) => void;
 }
 
 export const useDraftStore = create<DraftState>()(
