@@ -266,14 +266,10 @@ export default function Draft() {
         { role: "user", content: `📌 Logged: ${latestEvent.drafter === "me" ? "[ME]" : "[OTHER]"} ${latestEvent.player} — $${latestEvent.price}` },
       ]);
     }
+    let acc = "";
     try {
-      const resp = await fetch(COACH_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
+      await streamCoach(
+        {
           settings: {
             totalBudget: settings.totalBudget, numTeams: settings.numTeams,
             scoring: settings.scoring, leagueType: settings.leagueType,
@@ -287,126 +283,57 @@ export default function Draft() {
           vetriTakes: [],
           history: coachHistory.slice(-6),
           draftedPlayers: events.map((e) => e.player),
-        }),
-      });
-      if (!resp.ok || !resp.body) {
-        if (resp.status === 429) toast.error("Rate limited. Try again shortly.");
-        else if (resp.status === 402) toast.error("AI credits exhausted.");
-        else toast.error("Assistant unavailable.");
-        setCoachText("⚠️ Assistant unavailable.");
-        setStreaming(false);
-        return;
-      }
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buf = "", acc = "", done = false;
-      while (!done) {
-        const { value, done: d } = await reader.read();
-        if (d) break;
-        buf += decoder.decode(value, { stream: true });
-        let idx: number;
-        while ((idx = buf.indexOf("\n")) !== -1) {
-          let line = buf.slice(0, idx); buf = buf.slice(idx + 1);
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (!line.startsWith("data: ")) continue;
-          const json = line.slice(6).trim();
-          if (json === "[DONE]") { done = true; break; }
-          try {
-            const c = JSON.parse(json).choices?.[0]?.delta?.content;
-            if (c) {
-              acc += c;
-              setCoachText(acc);
-              coachRef.current?.scrollTo({ top: 1e9 });
-            }
-          } catch { buf = line + "\n" + buf; break; }
+        },
+        (chunk) => {
+          acc += chunk;
+          setCoachText(acc);
+          coachRef.current?.scrollTo({ top: 1e9 });
         }
-      }
+      );
     } catch (e) {
-      console.error(e);
-      toast.error("Assistant error");
+      const msg = e instanceof ApiError ? e.message : "Assistant error";
+      toast.error(msg);
+      setCoachText("⚠️ Assistant unavailable.");
+      setStreaming(false);
+      return;
     } finally {
       setStreaming(false);
-      setCoachText((finalText) => {
-        if (finalText && finalText !== "⚠️ Assistant unavailable.") {
-          setCoachHistory((h) => [...h, { role: "assistant", content: finalText }]);
-        }
-        return finalText;
-      });
     }
+    if (acc) setCoachHistory((h) => [...h, { role: "assistant", content: acc }]);
   };
 
-  const refreshQueue = async () => {
-    setQueueLoading(true);
-    try {
-      const resp = await fetch(UPNEXT_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          settings: {
-            totalBudget: settings.totalBudget, numTeams: settings.numTeams,
-            scoring: settings.scoring, leagueType: settings.leagueType,
-            format: settings.format, context: settings.context,
-          },
-          budget, myRoster: myItems,
-          rosterRequired: requiredCount, rosterFilled: myCount,
-          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
-          events, prices, spendByPosition: spend, recentRuns: runs,
-          dismissed, watchlist,
-        }),
-      });
-      if (!resp.ok) {
-        if (resp.status === 429) toast.error("Rate limited.");
-        else if (resp.status === 402) toast.error("AI credits exhausted.");
-        else toast.error("Queue unavailable.");
-        return;
-      }
-      const data = await resp.json();
-      if (data?.targets) {
-        const filtered = (data.targets as QueueTarget[]).filter((t) => !dismissed.includes(t.name));
-        setQueue(filtered);
-        setOpenMan(data.openMan);
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Queue error");
-    } finally {
-      setQueueLoading(false);
-    }
-  };
+  const targetsMutation = useMutation({
+    mutationFn: () => fetchTargets({
+      settings: {
+        totalBudget: settings.totalBudget, numTeams: settings.numTeams,
+        scoring: settings.scoring, leagueType: settings.leagueType,
+        format: settings.format, context: settings.context,
+      },
+      budget, myRoster: myItems,
+      rosterRequired: requiredCount, rosterFilled: myCount,
+      gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
+      events, prices, spendByPosition: spend, recentRuns: runs,
+      dismissed, watchlist,
+    }),
+    onSuccess: ({ targets, openMan }) => {
+      setQueue(targets.filter((t) => !dismissed.includes(t.name)));
+      setOpenMan(openMan);
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Queue unavailable."),
+  });
+  const refreshQueue = () => targetsMutation.mutate();
 
-  const fetchAiNominations = async () => {
-    setAiNomsLoading(true);
-    try {
-      const resp = await fetch(NOMINATE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          budget,
-          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
-          myRoster: myItems, events, prices,
-        }),
-      });
-      if (!resp.ok) {
-        if (resp.status === 429) toast.error("Rate limited.");
-        else if (resp.status === 402) toast.error("AI credits exhausted.");
-        else toast.error("Suggestions unavailable.");
-        return;
-      }
-      const data = await resp.json();
-      if (Array.isArray(data?.suggestions)) setAiNoms(data.suggestions);
-    } catch (e) {
-      console.error(e);
-      toast.error("Suggestion error");
-    } finally {
-      setAiNomsLoading(false);
-    }
-  };
+  const nominationsMutation = useMutation({
+    mutationFn: () => fetchNominations({
+      budget,
+      gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
+      myRoster: myItems, events, prices,
+    }),
+    onSuccess: (suggestions) => setAiNoms(suggestions),
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Suggestions unavailable."),
+  });
+  const fetchAiNominations = () => nominationsMutation.mutate();
+
 
   const submitPick = () => {
     const name = playerName.trim();
