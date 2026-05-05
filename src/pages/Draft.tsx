@@ -996,20 +996,20 @@ Keep it tight. No fluff, no closing line.`;
                 </Button>
               </div>
             )}
-            <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
+            <div className="flex items-end gap-2 rounded-2xl border-2 border-primary/50 bg-background px-3 py-2 shadow-md focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
               <Input
-                placeholder='Ask Matthew Berry… e.g. "Should I bid on Bijan?"'
+                placeholder='Ask Coach AI… e.g. "Should I bid on Bijan?"'
                 value={followUp}
                 onChange={(e) => setFollowUp(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}
                 disabled={streaming}
-                className="h-8 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+                className="h-10 flex-1 border-0 bg-transparent p-0 text-base font-medium text-foreground placeholder:text-muted-foreground/80 shadow-none focus-visible:ring-0"
               />
               <Button
                 onClick={handleFollowUp}
                 disabled={streaming || !followUp.trim()}
                 size="sm"
-                className="h-8 w-8 shrink-0 rounded-full p-0"
+                className="h-10 w-10 shrink-0 rounded-full p-0 text-base"
               >
                 ↑
               </Button>
