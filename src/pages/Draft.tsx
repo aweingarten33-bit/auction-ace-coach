@@ -532,14 +532,6 @@ Keep it tight. No fluff, no closing line.`;
             <h1 className="truncate text-[16px] font-semibold tracking-tight text-foreground">Draft</h1>
           </div>
           <div className="flex items-center gap-0.5">
-            <Button
-              variant="ghost" size="sm"
-              onClick={() => navigate("/espn")}
-              className="h-8 px-2 text-[10px] font-semibold"
-              title="ESPN connection & live sync"
-            >
-              ESPN
-            </Button>
             <AlertDialog>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
