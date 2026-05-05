@@ -37,9 +37,23 @@ const fmt = (iso: string | null) => {
 
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
+  const { locked, refresh: refreshLock } = useLock();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const [togglingLock, setTogglingLock] = useState(false);
+
+  const toggleLock = async (next: boolean) => {
+    setTogglingLock(true);
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ locked: next, updated_at: new Date().toISOString() })
+      .eq("id", true);
+    setTogglingLock(false);
+    if (error) return toast.error(error.message);
+    await refreshLock();
+    toast.success(next ? "Site locked — non-admins now see 404" : "Site unlocked");
+  };
 
   const load = async () => {
     setLoading(true);
