@@ -3,135 +3,124 @@
 @tailwind utilities;
 
 /*
-  APPLE CIRCA '08 — Leopard / early iPhone era
-  --------------------------------------------
-  Brushed aluminum + glossy aqua. Light theme.
-  Type: Lucida Grande → Helvetica Neue → Inter (system stack).
-  Accent: aqua blue. Surfaces: silver gradients with subtle pinstripe.
+  FENG SHUI / WATER FLOW
+  ----------------------
+  White space first. Calm neutrals. A single quiet accent that flows like water.
+  Type breathes. Surfaces float. Nothing shouts.
 */
 
 @layer base {
   :root {
-    /* SUPERMAN 1978 (Christopher Reeve) — bright, optimistic, comic-book pop.
-       Suit = vibrant royal blue. Cape = vivid red. Shield/belt = bold yellow.
-       Background = sky blue (Metropolis daylight). Light theme. */
-
-    --background: 210 70% 94%;          /* daylight sky blue */
-    --foreground: 220 70% 14%;          /* deep navy ink */
+    --background: 210 20% 99%;
+    --foreground: 215 25% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 70% 14%;
+    --card-foreground: 215 25% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 70% 14%;
+    --popover-foreground: 215 25% 18%;
 
-    /* Royal Reeve blue — the suit */
-    --primary: 220 90% 42%;
+    /* Water — calm teal-blue. Single accent. */
+    --primary: 200 55% 42%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 215 95% 58%;
+    --primary-glow: 195 60% 62%;
 
-    --secondary: 210 50% 88%;
-    --secondary-foreground: 220 70% 16%;
+    --secondary: 210 25% 96%;
+    --secondary-foreground: 215 25% 22%;
 
-    --muted: 210 40% 90%;
-    --muted-foreground: 220 30% 38%;
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 12% 48%;
 
-    /* Bold comic yellow — shield/belt accent */
-    --accent: 48 100% 55%;
-    --accent-foreground: 220 70% 14%;
+    --accent: 38 45% 88%;
+    --accent-foreground: 215 25% 22%;
 
-    /* Vivid cape red */
-    --destructive: 358 78% 50%;
+    --destructive: 0 60% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 42 100% 52%;
-    --warning-foreground: 220 70% 14%;
+    --warning: 35 80% 55%;
+    --warning-foreground: 215 25% 18%;
 
-    --success: 145 65% 38%;
+    --success: 155 40% 42%;
     --success-foreground: 0 0% 100%;
 
-    --border: 215 40% 78%;
-    --input: 215 40% 84%;
-    --ring: 220 90% 50%;
+    --border: 215 20% 92%;
+    --input: 215 20% 94%;
+    --ring: 200 55% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.875rem;
 
-    --gradient-primary: linear-gradient(180deg, hsl(215 95% 56%) 0%, hsl(220 90% 42%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 50% 96%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(210 50% 92%) 0%, hsl(215 40% 80%) 100%);
-    --gradient-titlebar: linear-gradient(180deg, hsl(220 90% 46%) 0%, hsl(220 90% 36%) 100%);
-    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.85) 0%, hsl(0 0% 100% / 0.15) 50%, hsl(0 0% 100% / 0) 50%, hsl(0 0% 100% / 0.1) 100%);
+    --gradient-primary: linear-gradient(180deg, hsl(200 55% 48%) 0%, hsl(200 55% 38%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 25% 99%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(210 20% 98%) 0%, hsl(210 18% 94%) 100%);
+    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 97%) 100%);
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.6) 0%, hsl(0 0% 100% / 0) 60%);
 
-    --shadow-glow: 0 0 0 3px hsl(48 100% 55% / 0.45);
-    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.5) inset, 0 2px 4px hsl(220 70% 20% / 0.3), 0 1px 0 hsl(220 70% 14% / 0.15);
-    --shadow-card: 0 1px 0 hsl(0 0% 100%) inset, 0 1px 3px hsl(220 50% 20% / 0.12), 0 8px 24px -10px hsl(220 70% 20% / 0.25);
+    --shadow-glow: 0 1px 2px hsl(215 30% 20% / 0.04), 0 8px 24px -12px hsl(200 55% 42% / 0.18);
+    --shadow-aqua: 0 1px 2px hsl(215 30% 20% / 0.06);
+    --shadow-card: 0 1px 2px hsl(215 30% 20% / 0.04), 0 4px 16px -8px hsl(215 30% 20% / 0.08);
 
-    --sidebar-background: 220 90% 42%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 48 100% 55%;
-    --sidebar-primary-foreground: 220 70% 14%;
-    --sidebar-accent: 215 95% 56%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 220 90% 32%;
-    --sidebar-ring: 48 100% 55%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 25% 22%;
+    --sidebar-primary: 200 55% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 25% 96%;
+    --sidebar-accent-foreground: 215 25% 22%;
+    --sidebar-border: 215 20% 92%;
+    --sidebar-ring: 200 55% 50%;
   }
 
   .dark {
-    /* "Daily Planet at night" — same hero palette, deeper canvas */
-    --background: 220 70% 10%;
-    --foreground: 210 40% 96%;
-    --card: 220 60% 14%;
-    --card-foreground: 210 40% 96%;
-    --popover: 220 60% 14%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 215 95% 58%;
-    --primary-foreground: 220 70% 10%;
-    --secondary: 220 50% 20%;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 220 40% 18%;
-    --muted-foreground: 210 25% 70%;
-    --accent: 48 100% 58%;
-    --accent-foreground: 220 70% 10%;
-    --destructive: 358 78% 55%;
+    --background: 215 28% 10%;
+    --foreground: 210 20% 94%;
+    --card: 215 25% 13%;
+    --card-foreground: 210 20% 94%;
+    --popover: 215 25% 13%;
+    --popover-foreground: 210 20% 94%;
+    --primary: 195 60% 58%;
+    --primary-foreground: 215 28% 10%;
+    --secondary: 215 22% 18%;
+    --secondary-foreground: 210 20% 94%;
+    --muted: 215 22% 16%;
+    --muted-foreground: 215 12% 65%;
+    --accent: 38 25% 22%;
+    --accent-foreground: 210 20% 94%;
+    --destructive: 0 60% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 40% 24%;
-    --input: 220 40% 22%;
-    --ring: 48 100% 58%;
+    --border: 215 22% 20%;
+    --input: 215 22% 18%;
+    --ring: 195 60% 58%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
-  html {
-    font-size: 18px;
-  }
-  @media (max-width: 640px) {
-    html { font-size: 19px; }
-  }
+  html { font-size: 17px; }
+  @media (max-width: 640px) { html { font-size: 17px; } }
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Lucida Grande", "Helvetica Neue", Helvetica, "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-image:
-      linear-gradient(180deg, hsl(210 80% 96%) 0%, hsl(210 65% 88%) 100%),
-      repeating-linear-gradient(0deg, hsl(220 70% 14% / 0.012) 0 1px, transparent 1px 2px);
+    background-image: none;
+    background-color: hsl(var(--background));
   }
 
   h1, h2, h3, h4 {
-    font-family: "Lucida Grande", "Helvetica Neue", Helvetica, "Inter", sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: hsl(220 70% 14%);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: hsl(var(--foreground));
   }
 
+  h1 { line-height: 1.15; }
+  h2 { line-height: 1.2; }
+  p  { line-height: 1.6; }
+
   .font-chyron, .font-lower-third {
-    font-family: "Lucida Grande", "Helvetica Neue", Helvetica, sans-serif;
-    font-weight: 700;
+    font-family: "Inter", "Helvetica Neue", sans-serif;
+    font-weight: 600;
     letter-spacing: 0;
     text-transform: none;
   }
