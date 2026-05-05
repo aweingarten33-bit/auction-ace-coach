@@ -52,6 +52,9 @@ import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import TargetedForecastButton from "@/components/TargetedForecastButton";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
+import { projectRemainingBuild } from "@/lib/simulator";
+import RemainingBuildPanel from "@/components/RemainingBuildPanel";
+import ValueVerdict from "@/components/ValueVerdict";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
