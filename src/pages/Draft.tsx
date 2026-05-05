@@ -63,6 +63,7 @@ import DecisionCard from "@/components/DecisionCard";
 import NominationCard from "@/components/NominationCard";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
+import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
 
