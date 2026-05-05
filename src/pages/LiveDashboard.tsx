@@ -578,14 +578,31 @@ export default function LiveDashboard() {
         {/* LEFT: Input + activity */}
         <section className="space-y-4">
           <LiveBidStrip bid={espnSync.liveBid} recommendedMax={budget.maxBid} />
-          {/* Manual entry — always visible. ESPN sync feeds picks too, but this is the trust layer. */}
+          {/* Manual entry — collapsed when ESPN is auto-syncing. Expand only as a fallback. */}
+          {(() => {
+            const espnLive = espnSync.status === "live" || espnSync.status === "idle";
+            const [forceOpen, setForceOpen] = [manualOpen, setManualOpen] as [boolean, (v: boolean) => void];
+            const showForm = !espnLive || forceOpen;
+            return (
           <Card className="bg-card/60 p-2.5">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Log a pick
+                {espnLive ? "ESPN auto-logging picks" : "Log a pick"}
               </span>
-              <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+              <div className="flex items-center gap-2">
+                <EspnSyncStatus status={espnSync.status} lastEventAt={espnSync.lastEventAt} />
+                {espnLive && (
+                  <button
+                    onClick={() => setForceOpen(!forceOpen)}
+                    className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-primary"
+                  >
+                    {forceOpen ? "Hide" : "Manual"}
+                  </button>
+                )}
+              </div>
             </div>
+            {showForm && (<>
+
             <div className="flex items-center gap-1.5 mb-2">
               <div className="inline-flex rounded-full bg-secondary/50 p-0.5 text-[10px] font-semibold">
                 <button
