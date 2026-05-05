@@ -57,7 +57,6 @@ import TierBreakAlerts from "@/components/TierBreakAlerts";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
-const NOMINATIONS_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nominations-next`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
@@ -92,15 +91,6 @@ export default function LiveDashboard() {
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
-  const [nominations, setNominations] = useState<NominationPrediction[]>([]);
-  const [roomRead, setRoomRead] = useState<string | undefined>(undefined);
-  const [nominationsLoading, setNominationsLoading] = useState(false);
-  const [forecastFilters, setForecastFilters] = useState<{
-    positions: Position[];
-    tier: "any" | "elite" | "starter" | "depth";
-    priceMin: string;
-    priceMax: string;
-  }>({ positions: [], tier: "any", priceMin: "", priceMax: "" });
   const [vetriTakes, setVetriTakes] = useState<VetriTake[]>([]);
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
