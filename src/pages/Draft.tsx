@@ -548,10 +548,6 @@ Keep it tight. No fluff, no closing line.`;
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => navigate("/planner")}>
-                    <Calculator className="mr-2 h-4 w-4" /> Budget Planner
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
                     <Download className="mr-2 h-4 w-4" /> Export CSV
                   </DropdownMenuItem>
