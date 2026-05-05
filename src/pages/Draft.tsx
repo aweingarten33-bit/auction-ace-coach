@@ -730,9 +730,9 @@ export default function Draft() {
             size="lg"
             className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full p-0 shadow-glow ring-2 ring-primary/40"
             style={{ marginBottom: "env(safe-area-inset-bottom)" }}
-            title="Ask the coach"
+            title="Ask Matthew Berry"
           >
-            <img src={coachBotImg} alt="Auction Assistant" className="h-full w-full object-cover" />
+            <img src={coachBotImg} alt="Ask Matthew Berry" className="h-full w-full object-cover" />
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
@@ -749,7 +749,7 @@ export default function Draft() {
                 Back to draft
               </Button>
               <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
-              Auction Assistant
+              Ask Matthew Berry
               <span className="ml-auto mr-6 text-[10px] font-normal text-muted-foreground">
                 {streaming ? "typing…" : "online"}
               </span>
@@ -878,7 +878,7 @@ export default function Draft() {
             </div>
             <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
               <Input
-                placeholder="Message Auction Assistant…"
+                placeholder='Ask Matthew Berry… e.g. "Should I bid on Bijan?"'
                 value={followUp}
                 onChange={(e) => setFollowUp(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}
