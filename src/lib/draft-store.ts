@@ -84,6 +84,9 @@ export const useDraftStore = create<DraftState>()(
       vetriDecay: 0.55,
       vetriAutoSync: true,
       priceOverrides: [],
+      quickPrompts: DEFAULT_QUICK_PROMPTS,
+      setQuickPrompts: (p) => set({ quickPrompts: p }),
+      resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
