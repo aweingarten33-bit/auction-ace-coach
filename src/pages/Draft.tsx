@@ -62,6 +62,7 @@ import TierBreakAlerts from "@/components/TierBreakAlerts";
 import DecisionCard from "@/components/DecisionCard";
 import NominationCard from "@/components/NominationCard";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import VetriVideoList from "@/components/VetriVideoList";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
 
@@ -679,11 +680,11 @@ export default function Draft() {
               />
               <OpponentHeatmap settings={settings} />
             </TabsContent>
-            <TabsContent value="vetri" className="mt-3">
+            <TabsContent value="vetri" className="mt-3 space-y-3">
               <Card className="p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Sal Vetri research
+                    Takes on this player
                   </span>
                   {(playerName || bestTarget?.name) && (
                     <span className="text-[10px] text-foreground/80 truncate max-w-[60%]">
@@ -701,6 +702,14 @@ export default function Draft() {
                     Type a player name above to see Sal Vetri's takes.
                   </p>
                 )}
+              </Card>
+              <Card className="p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Sal Vetri videos tracked
+                  </span>
+                </div>
+                <VetriVideoList />
               </Card>
             </TabsContent>
           </Tabs>
