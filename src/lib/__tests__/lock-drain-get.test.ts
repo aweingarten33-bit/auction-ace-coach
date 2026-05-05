@@ -22,7 +22,7 @@ const keepers: Keeper[] = [];
 const events: DraftEvent[] = [];
 
 // Priced sheet (with positions for nomination logic)
-const prices: PriceEstimate[] = [
+const prices: PriceEstimate[] = ([
   { name: "Christian McCaffrey", price: 70, position: "RB" },
   { name: "Bijan Robinson", price: 60, position: "RB" },
   { name: "Saquon Barkley", price: 55, position: "RB" },
@@ -34,7 +34,7 @@ const prices: PriceEstimate[] = [
   { name: "Josh Allen", price: 20, position: "QB" },
   { name: "Jalen Hurts", price: 18, position: "QB" },
   { name: "Patrick Mahomes", price: 16, position: "QB" },
-] as PriceEstimate[];
+] as unknown) as PriceEstimate[];
 
 describe("LOCK — decide() deterministic budget math", () => {
   it("budget baseline matches manual math", () => {
