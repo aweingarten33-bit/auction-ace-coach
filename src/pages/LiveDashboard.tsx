@@ -50,7 +50,7 @@ import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 import { projectRemainingBuild } from "@/lib/simulator";
-import RemainingBuildPanel from "@/components/RemainingBuildPanel";
+
 import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import DecisionCard from "@/components/DecisionCard";

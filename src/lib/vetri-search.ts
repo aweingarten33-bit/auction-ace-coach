@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { VetriTake } from "@/components/VetriNotesPanel";
+import type { VetriTake } from "@/lib/vetri-types";
 
 export interface VetriTakeMatch {
   take: VetriTake;
