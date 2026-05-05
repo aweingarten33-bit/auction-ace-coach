@@ -723,11 +723,11 @@ export default function Draft() {
         <SheetTrigger asChild>
           <Button
             size="lg"
-            className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-yellow-400 p-0 shadow-glow ring-2 ring-primary/40 hover:bg-yellow-400"
+            className="fixed bottom-4 right-4 z-30 flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-red-600 p-0 shadow-glow ring-2 ring-primary/40 hover:bg-red-600"
             style={{ marginBottom: "env(safe-area-inset-bottom)" }}
             title="Ask the coach"
           >
-            <img src={coachBotImg} alt="Auction Assistant" className="h-[85%] w-[85%] object-contain" />
+            <img src={coachBotImg} alt="Auction Assistant" className="h-full w-full object-cover" />
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
