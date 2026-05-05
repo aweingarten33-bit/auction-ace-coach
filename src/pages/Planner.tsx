@@ -189,11 +189,11 @@ export default function Planner() {
           <div>
             <h1 className="text-base font-semibold leading-tight">Budget Planner</h1>
             <p className="text-[11px] text-muted-foreground leading-tight">
-              Allocate · Check affordability · Find players at a price
+              Setup · Allocate · Check · Find
             </p>
           </div>
         </div>
-        <SyncHistoryButton />
+        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
       </header>
 
       {/* Summary bar */}
@@ -217,6 +217,11 @@ export default function Planner() {
           </div>
         </Card>
       </div>
+
+      <main className="mx-auto max-w-3xl space-y-4 p-3">
+        {/* ---------- Step 1: Setup ---------- */}
+        <SetupChecklist />
+
 
       <main className="mx-auto max-w-3xl space-y-4 p-3">
         {/* ---------- Slot allocation ---------- */}
