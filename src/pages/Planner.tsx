@@ -57,10 +57,9 @@ function defaultAlloc(slot: Slot, idx: number, total: number, budget: number): R
   return {}; // unused — calculator below produces values directly
 }
 
-function suggestedAllocations(slots: Slot[], budget: number): Record<string, number> {
-  // Simple weighted suggestion. K/DST/Bench = $1, Bench last = $1.
-  // Remaining split by position weights.
-  const weights: Record<Slot["pos"], number[]> = {
+function suggestedAllocations(slots: Slot[], budget: number, strategyWeights?: Partial<Record<Slot["pos"], number[]>>): Record<string, number> {
+  // Baseline weights (no-strategy default)
+  const base: Record<Slot["pos"], number[]> = {
     QB: [9, 3, 1],
     RB: [8, 5, 2.5, 1.5, 1],
     WR: [7, 5, 3, 1.5, 1],
@@ -71,6 +70,14 @@ function suggestedAllocations(slots: Slot[], budget: number): Record<string, num
     DST: [0.05],
     BENCH: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
   };
+  // Apply per-position multipliers from the chosen strategy (if any)
+  const weights: Record<Slot["pos"], number[]> = { ...base };
+  if (strategyWeights) {
+    for (const k of Object.keys(strategyWeights) as (keyof typeof base)[]) {
+      const mult = strategyWeights[k] ?? [];
+      weights[k] = base[k].map((w, i) => w * (mult[i] ?? mult[mult.length - 1] ?? 1));
+    }
+  }
   const counters: Record<string, number> = {};
   const raw: number[] = slots.map((s) => {
     const idx = counters[s.pos] ?? 0;
@@ -78,7 +85,6 @@ function suggestedAllocations(slots: Slot[], budget: number): Record<string, num
     const w = weights[s.pos]?.[idx] ?? weights[s.pos]?.[weights[s.pos].length - 1] ?? 0.1;
     return w;
   });
-  // Reserve $1 floor per slot
   const floor = slots.length;
   if (budget <= floor) return Object.fromEntries(slots.map((s) => [s.id, 1]));
   const pool = budget - floor;
@@ -90,7 +96,6 @@ function suggestedAllocations(slots: Slot[], budget: number): Record<string, num
     out[s.id] = v;
     allocated += v;
   });
-  // Reconcile rounding to exact budget by adjusting the largest slot
   const diff = budget - allocated;
   if (diff !== 0) {
     const biggestId = [...slots].sort((a, b) => out[b.id] - out[a.id])[0].id;
