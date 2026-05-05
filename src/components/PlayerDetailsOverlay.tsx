@@ -186,13 +186,18 @@ export default function PlayerDetailsOverlay({
           ) : null}
         </div>
 
-        {/* Sal Vetri takes */}
-        <div className="rounded-md border border-border/60 bg-secondary/30 p-3">
-          <p className="mb-2 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
-            <Youtube className="h-3 w-3" /> Analyst takes
-          </p>
-          <VetriTakesForPlayer player={name} compact />
-        </div>
+        {/* Sal Vetri takes — only shown when there's actually something to say */}
+        <VetriTakesForPlayer
+          player={name}
+          compact
+          hideWhenEmpty
+          wrapperClassName="rounded-md border border-border/60 bg-secondary/30 p-3"
+          header={
+            <p className="mb-2 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <Youtube className="h-3 w-3" /> What the analysts say
+            </p>
+          }
+        />
       </DialogContent>
     </Dialog>
   );

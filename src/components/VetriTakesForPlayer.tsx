@@ -27,9 +27,22 @@ interface Props {
   player: string;
   emptyText?: string;
   compact?: boolean;
+  /** When true, render nothing if there are no takes (and skip the loading line). */
+  hideWhenEmpty?: boolean;
+  /** Optional header rendered above the takes (only shown when there ARE takes, if hideWhenEmpty). */
+  header?: React.ReactNode;
+  /** Optional wrapper rendered around the takes (only shown when there ARE takes, if hideWhenEmpty). */
+  wrapperClassName?: string;
 }
 
-export default function VetriTakesForPlayer({ player, emptyText = "No analyst takes on this player yet.", compact }: Props) {
+export default function VetriTakesForPlayer({
+  player,
+  emptyText = "No analyst takes on this player yet.",
+  compact,
+  hideWhenEmpty,
+  header,
+  wrapperClassName,
+}: Props) {
   const [matches, setMatches] = useState<VetriTakeMatch[] | null>(null);
 
   useEffect(() => {
@@ -44,13 +57,15 @@ export default function VetriTakesForPlayer({ player, emptyText = "No analyst ta
   }, [player]);
 
   if (matches === null) {
+    if (hideWhenEmpty) return null;
     return <p className="text-[10px] italic text-muted-foreground">Loading analyst takes…</p>;
   }
   if (matches.length === 0) {
+    if (hideWhenEmpty) return null;
     return <p className="text-[10px] italic text-muted-foreground">{emptyText}</p>;
   }
 
-  return (
+  const list = (
     <div className="space-y-1.5">
       {matches.map((m, i) => {
         const tone = LEAN_TONE[m.take.lean] ?? LEAN_TONE.neutral;
@@ -107,4 +122,14 @@ export default function VetriTakesForPlayer({ player, emptyText = "No analyst ta
       })}
     </div>
   );
+
+  if (hideWhenEmpty) {
+    return (
+      <div className={wrapperClassName}>
+        {header}
+        {list}
+      </div>
+    );
+  }
+  return list;
 }
