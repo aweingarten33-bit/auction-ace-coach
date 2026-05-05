@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
+import DraftV2 from "./pages/DraftV2.tsx";
 import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
               <Route path="/draft" element={<Protected><Draft /></Protected>} />
+              <Route path="/draft-v2" element={<Protected><DraftV2 /></Protected>} />
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               {/* Admin always reachable so you can unlock */}
