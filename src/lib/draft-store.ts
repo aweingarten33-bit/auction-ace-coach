@@ -44,6 +44,7 @@ interface DraftState {
   vetriAutoSync: boolean;   // re-merge into prices when settings/tiers change
   priceOverrides: string[]; // normalized player names where user manually set price (Vetri won't overwrite)
   quickPrompts: QuickPrompt[]; // editable assistant quick-question buttons
+  showMath: boolean;           // when true, assistant always shows the full math behind each rec
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
