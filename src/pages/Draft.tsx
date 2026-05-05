@@ -83,6 +83,7 @@ export default function Draft() {
   const [planGenerating, setPlanGenerating] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
+  const [takesQuery, setTakesQuery] = useState("");
   const [priceInput, setPriceInput] = useState("");
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
@@ -758,20 +759,27 @@ Keep it tight. No fluff, no closing line.`;
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Takes on this player
                   </span>
-                  {(playerName || bestTarget?.name) && (
+                  {(takesQuery || playerName || bestTarget?.name) && (
                     <span className="text-[10px] text-foreground/80 truncate max-w-[60%]">
-                      {playerName || bestTarget?.name}
+                      {takesQuery || playerName || bestTarget?.name}
                     </span>
                   )}
                 </div>
-                {(playerName || bestTarget?.name) ? (
+                <div className="mb-2">
+                  <PlayerAutocomplete
+                    value={takesQuery}
+                    onChange={setTakesQuery}
+                    placeholder="Search a player for analyst takes…"
+                  />
+                </div>
+                {(takesQuery || playerName || bestTarget?.name) ? (
                   <VetriTakesForPlayer
-                    player={playerName || bestTarget!.name}
+                    player={takesQuery || playerName || bestTarget!.name}
                     emptyText="No analyst takes on this player yet."
                   />
                 ) : (
                   <p className="text-[11px] italic text-muted-foreground">
-                    Type a player name above to see analyst takes.
+                    Start typing a player name above to see analyst takes.
                   </p>
                 )}
               </Card>
