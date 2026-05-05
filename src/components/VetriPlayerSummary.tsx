@@ -220,21 +220,13 @@ export default function VetriPlayerSummary() {
                 </p>
               )}
 
-              <div className="mt-1 flex flex-wrap gap-1">
-                {p.videos.slice(0, 3).map((v) => (
-                  <a
-                    key={v.videoId}
-                    href={v.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={v.title}
-                    className="inline-flex items-center gap-1 rounded border border-border bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground hover:text-primary hover:border-primary/40"
-                  >
-                    <Youtube className="h-2.5 w-2.5 text-destructive" />
-                    <span className="max-w-[160px] truncate">{v.title}</span>
-                  </a>
-                ))}
-              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
             </li>
           );
         })}
