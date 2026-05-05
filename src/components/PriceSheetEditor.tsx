@@ -10,7 +10,7 @@ import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { buildTierPrices, tierForPosRank, type AuctionRow } from "@/lib/league-tier-prices";
+import { buildTierPrices, tierForPosRank, injuryMultiplier, type AuctionRow } from "@/lib/league-tier-prices";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
