@@ -279,30 +279,45 @@ export default function Planner() {
             <PricedPlayerAutocomplete value={checkC} onChange={setCheckC} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 3 (optional)" />
           </div>
           {checkRows.length > 0 && (
-            <div className="mt-3 space-y-1.5 rounded-md border bg-muted/30 p-2 text-sm">
-              {checkResults.map((r) => (
-                <div key={r.name} className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{r.name}</span>
-                    {r.info?.pos && posBadge(r.info.pos)}
+            <div className="mt-3 space-y-2 rounded-md border bg-muted/30 p-3 text-sm">
+              {/* Per-player breakdown */}
+              <div className="space-y-1">
+                {checkResults.map((r) => (
+                  <div key={r.name} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{r.name}</span>
+                      {r.info?.pos && posBadge(r.info.pos)}
+                    </div>
+                    <span className={`font-mono tabular-nums ${r.info ? "" : "text-muted-foreground"}`}>
+                      {r.info ? `$${r.info.price}` : "no price on sheet"}
+                    </span>
                   </div>
-                  <span className={`font-mono tabular-nums ${r.info ? "" : "text-muted-foreground"}`}>
-                    {r.info ? `$${r.info.price}` : "no price"}
-                  </span>
-                </div>
-              ))}
-              <div className="mt-2 border-t pt-2 text-xs">
-                <div className="flex justify-between"><span className="text-muted-foreground">Cost</span><span className="font-mono">${checkSum}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Bank after</span><span className="font-mono">${remainingAfter}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Slots left after</span><span className="font-mono">{slotsAfter}</span></div>
-                <div className={`mt-2 flex items-center gap-1.5 font-semibold ${canAfford ? "text-emerald-500" : "text-red-500"}`}>
-                  {canAfford ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                  {canAfford
-                    ? `Yes — ${remainingAfter - minNeededForRest >= 0 ? `$${remainingAfter - minNeededForRest} cushion` : "tight"} for the remaining ${slotsAfter} slots`
-                    : remainingAfter < minNeededForRest
-                      ? `No — leaves only $${remainingAfter} for ${slotsAfter} slots ($1/slot minimum)`
-                      : "No — too many slots"}
-                </div>
+                ))}
+              </div>
+
+              {/* Verdict pill */}
+              <div className={`flex items-center gap-2 rounded-md border px-2.5 py-2 font-semibold ${canAfford ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" : "border-red-500/40 bg-red-500/10 text-red-400"}`}>
+                {canAfford ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+                {canAfford
+                  ? `Yes — you can afford this`
+                  : slotsAfter < 0
+                    ? `No — you only have ${budget.slotsLeft} roster spot${budget.slotsLeft === 1 ? "" : "s"} left`
+                    : `No — leaves only $${remainingAfter} for ${slotsAfter} more slot${slotsAfter === 1 ? "" : "s"} ($1/slot minimum)`}
+              </div>
+
+              {/* Exact math */}
+              <div className="rounded-md border border-border/60 bg-background/60 p-2 font-mono text-[11px] tabular-nums leading-relaxed">
+                <div className="mb-1 font-sans text-[10px] uppercase tracking-wide text-muted-foreground">The math</div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Bank now</span><span>${budget.remaining}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">− Cost of these {checkResults.filter(r=>r.info).length} player{checkResults.filter(r=>r.info).length===1?"":"s"}</span><span>−${checkSum}</span></div>
+                <div className="my-1 border-t border-border/60" />
+                <div className="flex justify-between"><span className="text-muted-foreground">= Bank after</span><span className="font-semibold text-foreground">${remainingAfter}</span></div>
+                <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Slots open now</span><span>{budget.slotsLeft}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">− Slots used</span><span>−{checkResults.filter(r=>r.info).length}</span></div>
+                <div className="my-1 border-t border-border/60" />
+                <div className="flex justify-between"><span className="text-muted-foreground">= Slots left after</span><span className="font-semibold text-foreground">{slotsAfter}</span></div>
+                <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Min $ needed (1/slot)</span><span>${minNeededForRest}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Cushion (Bank after − min)</span><span className={remainingAfter - minNeededForRest >= 0 ? "text-emerald-400" : "text-red-400"}>${remainingAfter - minNeededForRest}</span></div>
               </div>
             </div>
           )}
