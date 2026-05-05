@@ -36,6 +36,7 @@ import { computeMarketPulse, valueFor as computeValueFor } from "@/lib/value";
 import { projectRemainingBuild } from "@/lib/simulator";
 import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
+import TierBreakAlerts from "@/components/TierBreakAlerts";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
