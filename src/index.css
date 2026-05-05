@@ -21,18 +21,20 @@
     --popover: 220 14% 12%;
     --popover-foreground: 210 15% 94%;
 
-    --primary: 38 95% 58%;
-    --primary-foreground: 220 20% 8%;
-    --primary-glow: 42 100% 65%;
+    /* Restrained, professional palette: a single muted gold accent. */
+    --primary: 40 35% 70%;
+    --primary-foreground: 220 20% 10%;
+    --primary-glow: 40 35% 75%;
 
     --secondary: 220 12% 15%;
     --secondary-foreground: 210 15% 92%;
 
     --muted: 220 12% 14%;
-    --muted-foreground: 215 10% 58%;
+    --muted-foreground: 215 10% 65%;
 
-    --accent: 190 80% 55%;
-    --accent-foreground: 220 20% 8%;
+    /* Accent intentionally matches foreground so stray accent uses stay neutral. */
+    --accent: 210 15% 92%;
+    --accent-foreground: 220 20% 10%;
 
     --destructive: 0 95% 72%;
     --destructive-foreground: 0 0% 100%;
