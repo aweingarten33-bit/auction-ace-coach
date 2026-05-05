@@ -169,7 +169,9 @@ export default function SetupWizard() {
                 <div className="grid grid-cols-3 gap-2">
                   {(["QB", "RB", "WR", "TE", "FLEX", "SUPERFLEX", "K", "DST", "BENCH"] as const).map((k) => (
                     <div key={k} className="flex items-center justify-between gap-2 rounded-md border border-border px-2 py-1">
-                      <Label className="text-xs">{k}</Label>
+                      <Label className="text-xs" title={k === "SUPERFLEX" ? "Any position including QB" : undefined}>
+                        {k === "SUPERFLEX" ? "SFLEX" : k}
+                      </Label>
                       <Input
                         type="number"
                         min={0}
@@ -180,6 +182,9 @@ export default function SetupWizard() {
                     </div>
                   ))}
                 </div>
+                <p className="text-[11px] text-muted-foreground">
+                  <span className="font-semibold text-foreground">SFLEX</span> = Superflex (any position, <em>including QB</em>). <span className="font-semibold text-foreground">FLEX</span> = RB/WR/TE.
+                </p>
               </section>
             </div>
           )}
