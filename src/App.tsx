@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
+import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/draft" element={<Protected><Draft /></Protected>} />
+            <Route path="/planner" element={<Protected><Planner /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
             {/* Legacy redirects */}
             <Route path="/dashboard" element={<Navigate to="/draft" replace />} />

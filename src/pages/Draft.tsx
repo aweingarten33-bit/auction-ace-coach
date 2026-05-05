@@ -44,7 +44,7 @@ import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS } from "@/lib/positions";
 import {
   Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2,
-  User, Users, Download, MoreVertical, ChevronLeft,
+  User, Users, Download, MoreVertical, ChevronLeft, Calculator,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -545,6 +545,10 @@ Keep it tight. No fluff, no closing line.`;
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => navigate("/planner")}>
+                    <Calculator className="mr-2 h-4 w-4" /> Budget Planner
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
                     <Download className="mr-2 h-4 w-4" /> Export CSV
                   </DropdownMenuItem>
