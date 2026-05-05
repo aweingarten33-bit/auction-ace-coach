@@ -141,6 +141,32 @@ export interface PlayerRank {
   pos_rank: number | null;
   overall_rank: number | null;
   auction_value: number | null;
+  injury_status: string | null;
+  injury_note: string | null;
+}
+
+/**
+ * Maps a canonical injury status to a price multiplier (1.0 = no change).
+ * OUT_SEASON = season-ending / IR / PUP / NFI / suspended → ~stash value.
+ */
+export function injuryMultiplier(status: string | null | undefined): number {
+  switch (status) {
+    case "OUT_SEASON": return 0.10;
+    case "OUT": return 0.55;
+    case "DOUBTFUL": return 0.70;
+    case "QUESTIONABLE": return 0.92;
+    default: return 1.0;
+  }
+}
+
+export function injuryLabel(status: string | null | undefined): string | null {
+  switch (status) {
+    case "OUT_SEASON": return "Out for season";
+    case "OUT": return "Out";
+    case "DOUBTFUL": return "Doubtful";
+    case "QUESTIONABLE": return "Questionable";
+    default: return null;
+  }
 }
 
 export function usePlayerRanks() {
@@ -152,8 +178,9 @@ export function usePlayerRanks() {
     (async () => {
       const { data, error } = await supabase
         .from("espn_player_ranks")
-        .select("espn_player_id, player_name, player_name_norm, position, pos_rank, overall_rank, auction_value")
+        .select("espn_player_id, player_name, player_name_norm, position, pos_rank, overall_rank, auction_value, injury_status, injury_note")
         .order("overall_rank", { ascending: true });
+
       if (cancelled) return;
       if (error || !data) {
         setLoading(false);
