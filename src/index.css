@@ -95,6 +95,41 @@
     --input: 220 12% 14%;
     --ring: 40 35% 70%;
   }
+
+  /* Light theme — opt-in via .theme-light on a wrapper element. Does not affect rest of app. */
+  .theme-light {
+    --background: 220 25% 97%;
+    --foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 220 90% 65%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 220 25% 12%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 220 25% 12%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --warning: 35 90% 50%;
+    --warning-foreground: 0 0% 100%;
+    --success: 145 60% 40%;
+    --success-foreground: 0 0% 100%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 220 90% 56%;
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(220 20% 98%));
+    --shadow-glow: 0 0 0 1px hsl(220 90% 56% / 0.20);
+    --shadow-card: 0 1px 2px hsl(220 25% 12% / 0.06), 0 4px 16px -8px hsl(220 25% 12% / 0.10);
+    --grid-line: hsl(220 13% 92%);
+    --grid-line-strong: hsl(220 13% 88%);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
 }
 
 @layer base {
