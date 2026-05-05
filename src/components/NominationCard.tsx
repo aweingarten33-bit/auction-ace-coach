@@ -23,9 +23,9 @@ interface Props {
 }
 
 const STRATEGY_STYLE: Record<AiNomination["strategy"], { label: string; cls: string }> = {
-  drain:    { label: "DRAIN",    cls: "bg-accent/15 text-accent" },
-  plug:     { label: "PLUG",     cls: "bg-primary/15 text-primary" },
-  enforcer: { label: "ENFORCER", cls: "bg-warning/15 text-warning" },
+  drain:    { label: "MAKE THEM SPEND", cls: "bg-accent/15 text-accent" },
+  plug:     { label: "CHEAP FILL",      cls: "bg-primary/15 text-primary" },
+  enforcer: { label: "PUSH PRICE UP",   cls: "bg-warning/15 text-warning" },
 };
 
 export default function NominationCard({ drain, get, aiSuggestions, aiLoading, onAskAi, onPickAi }: Props) {
@@ -40,7 +40,7 @@ export default function NominationCard({ drain, get, aiSuggestions, aiLoading, o
         <div className="flex items-center gap-1.5">
           <Megaphone className="h-3.5 w-3.5 text-accent" />
           <p className="text-[9px] font-bold uppercase tracking-widest text-accent">
-            Next nomination · drain
+            Throw out — make others spend
           </p>
         </div>
         {drain.primary ? (
@@ -72,7 +72,7 @@ export default function NominationCard({ drain, get, aiSuggestions, aiLoading, o
             )}
           </>
         ) : (
-          <p className="mt-1 text-[11px] text-muted-foreground">No drain target available.</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">No good name to throw out yet.</p>
         )}
       </div>
 
