@@ -756,8 +756,57 @@ export default function Draft() {
             </SheetTitle>
           </SheetHeader>
 
-          {/* Math is always shown — no toggle */}
+          {/* Compact "Current draft state" panel */}
+          <div className="border-b border-border/60 bg-secondary/20 px-3 py-2 text-[11px] leading-tight">
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="font-semibold uppercase tracking-wide text-muted-foreground">Draft state</span>
+              <span className="tabular-nums text-muted-foreground">
+                pick {events.length + 1} · {events.length} drafted
+              </span>
+            </div>
 
+            <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 tabular-nums">
+              <span><span className="text-muted-foreground">Bank</span> <span className="font-semibold text-foreground">${budget.remaining}</span></span>
+              <span><span className="text-muted-foreground">Max bid</span> <span className="font-semibold text-foreground">${budget.maxBid}</span></span>
+              <span><span className="text-muted-foreground">Slots</span> <span className="font-semibold text-foreground">{budget.slotsLeft}</span></span>
+              <span><span className="text-muted-foreground">$/slot</span> <span className="font-semibold text-foreground">${budget.avgPerSlot}</span></span>
+            </div>
+
+            <div className="flex flex-wrap gap-1">
+              {gaps.map((g) => {
+                const cls =
+                  g.severity === "critical" ? "bg-destructive/20 text-destructive border-destructive/40"
+                  : g.severity === "need" ? "bg-primary/15 text-foreground border-primary/40"
+                  : g.severity === "depth" ? "bg-secondary text-muted-foreground border-border"
+                  : "bg-transparent text-muted-foreground/70 border-border/50";
+                return (
+                  <span key={g.pos} className={`rounded border px-1.5 py-0.5 tabular-nums ${cls}`}>
+                    {g.pos} {g.starterHave}/{g.starterNeed}
+                  </span>
+                );
+              })}
+              {flexShort > 0 && (
+                <span className="rounded border border-primary/40 bg-primary/15 px-1.5 py-0.5 tabular-nums text-foreground">
+                  FLEX need {flexShort}
+                </span>
+              )}
+            </div>
+
+            {events.length > 0 && (
+              <div className="mt-1.5 truncate text-muted-foreground">
+                <span className="uppercase tracking-wide">Last:</span>{" "}
+                {events.slice(-3).reverse().map((e, i) => (
+                  <span key={i} className="tabular-nums">
+                    {i > 0 && " · "}
+                    <span className={e.drafter === "me" ? "text-foreground font-medium" : ""}>
+                      {e.player}
+                    </span>{" "}
+                    ${e.price}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div ref={coachRef} className="coach-md flex flex-1 flex-col gap-4 overflow-auto px-4 py-4 text-sm leading-relaxed">
             {coachHistory.length === 0 && !streaming && (
