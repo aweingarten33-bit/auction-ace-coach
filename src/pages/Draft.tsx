@@ -865,91 +865,44 @@ Keep it tight. No fluff, no closing line.`;
             <img src={coachBotImg} alt="Ask Matthew Berry" className="h-full w-full object-cover" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
-          <SheetHeader className="border-b border-border/60 px-4 py-3">
-            <SheetTitle className="flex items-center gap-2 text-sm">
+        <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-[460px]">
+          {/* Header */}
+          <SheetHeader className="border-b border-border/60 px-3 py-2.5">
+            <SheetTitle className="flex items-center gap-2 text-sm font-medium">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCoachOpen(false)}
-                className="-ml-2 h-8 gap-1 px-2 text-xs"
+                className="-ml-2 h-8 w-8 p-0"
                 title="Back to draft"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Back to draft
               </Button>
               <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
-              Ask Matthew Berry
-              <span className="ml-auto mr-6 text-[10px] font-normal text-muted-foreground">
-                {streaming ? "typing…" : "online"}
+              <span>Ask Coach</span>
+              <span className="ml-auto mr-6 flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
+                <span className={`h-1.5 w-1.5 rounded-full ${streaming ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
+                {streaming ? "thinking…" : "Live draft context on"}
               </span>
             </SheetTitle>
           </SheetHeader>
 
-          {/* Compact "Current draft state" panel */}
-          <div className="border-b border-border/60 bg-secondary/20 px-3 py-2 text-[11px] leading-tight">
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="font-semibold uppercase tracking-wide text-muted-foreground">Draft state</span>
-              <span className="tabular-nums text-muted-foreground">
-                pick {events.length + 1} · {events.length} drafted
-              </span>
-            </div>
-
-            <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 tabular-nums">
-              <span><span className="text-muted-foreground">Bank</span> <span className="font-semibold text-foreground">${budget.remaining}</span></span>
-              <span><span className="text-muted-foreground">Max bid</span> <span className="font-semibold text-foreground">${budget.maxBid}</span></span>
-              <span><span className="text-muted-foreground">Slots</span> <span className="font-semibold text-foreground">{budget.slotsLeft}</span></span>
-              <span><span className="text-muted-foreground">$/slot</span> <span className="font-semibold text-foreground">${budget.avgPerSlot}</span></span>
-            </div>
-
-            <div className="flex flex-wrap gap-1">
-              {gaps.map((g) => {
-                const cls =
-                  g.severity === "critical" ? "bg-destructive/20 text-destructive border-destructive/40"
-                  : g.severity === "need" ? "bg-primary/15 text-foreground border-primary/40"
-                  : g.severity === "depth" ? "bg-secondary text-muted-foreground border-border"
-                  : "bg-transparent text-muted-foreground/70 border-border/50";
-                return (
-                  <span key={g.pos} className={`rounded border px-1.5 py-0.5 tabular-nums ${cls}`}>
-                    {g.pos} {g.starterHave}/{g.starterNeed}
-                  </span>
-                );
-              })}
-              {flexShort > 0 && (
-                <span className="rounded border border-primary/40 bg-primary/15 px-1.5 py-0.5 tabular-nums text-foreground">
-                  FLEX need {flexShort}
-                </span>
-              )}
-            </div>
-
-            {events.length > 0 && (
-              <div className="mt-1.5 truncate text-muted-foreground">
-                <span className="uppercase tracking-wide">Last:</span>{" "}
-                {events.slice(-3).reverse().map((e, i) => (
-                  <span key={i} className="tabular-nums">
-                    {i > 0 && " · "}
-                    <span className={e.drafter === "me" ? "text-foreground font-medium" : ""}>
-                      {e.player}
-                    </span>{" "}
-                    ${e.price}
-                  </span>
-                ))}
-              </div>
-            )}
+          {/* One-line context bar */}
+          <div className="border-b border-border/60 px-3 py-1.5 text-[11px] tabular-nums text-muted-foreground">
+            Budget <span className="font-semibold text-foreground">${budget.remaining}</span>
+            {" · "}Max <span className="font-semibold text-foreground">${budget.maxBid}</span>
+            {" · "}<span className="font-semibold text-foreground">{budget.slotsLeft}</span> spots left
           </div>
 
-          <div className="border-b border-border/60 bg-secondary/10 px-3 py-3">
-            <DraftPlanCard onGenerate={generateDraftPlan} generating={planGenerating} />
-          </div>
-
-          <div ref={coachRef} className="coach-md flex flex-1 flex-col gap-4 overflow-auto px-4 py-4 text-sm leading-relaxed">
+          {/* Conversation */}
+          <div ref={coachRef} className="flex flex-1 flex-col gap-3 overflow-auto px-4 py-4 text-sm leading-relaxed">
             {coachHistory.length === 0 && !streaming && (
-              <div className="flex gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <Sparkles className="h-4 w-4" />
+              <div className="flex gap-2.5">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Sparkles className="h-3.5 w-3.5" />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <CoachMessage content={coachText || "How can I help you with your draft?"} />
+                <div className="min-w-0 flex-1 text-foreground/90">
+                  <CoachMessage content={coachText} />
                 </div>
               </div>
             )}
@@ -957,14 +910,14 @@ Keep it tight. No fluff, no closing line.`;
               const isUser = m.role === "user";
               return isUser ? (
                 <div key={i} className="flex justify-end">
-                  <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2 text-primary-foreground">
+                  <div className="max-w-[85%] rounded-2xl rounded-br-md bg-secondary px-3 py-1.5 text-[13px] text-foreground">
                     <ReactMarkdown>{m.content}</ReactMarkdown>
                   </div>
                 </div>
               ) : (
-                <div key={i} className="flex gap-3">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                    <Sparkles className="h-4 w-4" />
+                <div key={i} className="flex gap-2.5">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                    <Sparkles className="h-3.5 w-3.5" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <CoachMessage content={m.content} />
@@ -973,9 +926,9 @@ Keep it tight. No fluff, no closing line.`;
               );
             })}
             {streaming && coachText && (
-              <div className="flex gap-3">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  <Sparkles className="h-4 w-4 animate-pulse" />
+              <div className="flex gap-2.5">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <CoachMessage content={coachText} />
@@ -983,6 +936,29 @@ Keep it tight. No fluff, no closing line.`;
               </div>
             )}
           </div>
+
+          {/* Quick prompts + input */}
+          <div className="border-t border-border/60 px-3 pb-3 pt-2">
+            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+              {quickPrompts.slice(0, 5).map((b) => (
+                <Button
+                  key={b.id} size="sm" variant="outline" disabled={streaming}
+                  onClick={() => askCoach(undefined, b.prompt)}
+                  className="h-7 rounded-full border-border/60 px-2.5 text-[11px] font-normal text-muted-foreground hover:text-foreground"
+                >
+                  {b.label}
+                </Button>
+              ))}
+              {(coachHistory.length > 0 || streaming) && !streaming && (
+                <Button
+                  size="sm" variant="ghost"
+                  onClick={() => { setCoachHistory([]); setCoachText(""); }}
+                  className="ml-auto h-7 text-[10px] text-muted-foreground hover:text-destructive"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
 
           <div className="border-t border-border/60 bg-secondary/20 px-3 py-3">
             <div className="mb-2 flex flex-wrap items-center gap-1.5">
