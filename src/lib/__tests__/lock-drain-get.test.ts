@@ -128,8 +128,13 @@ describe("DRAIN — computeDrain() picks safe, high-cost targets", () => {
     for (const b of drain.backups) expect(b.name).not.toBe("Christian McCaffrey");
   });
 
-  it("returns a primary when priced players exist", () => {
-    const drain = computeDrain({ settings, keepers, events, prices });
+  it("returns a primary when user has filled some positions", () => {
+    // User has filled RB starters → big-money RBs become safe drain targets
+    const filledRBs: DraftEvent[] = [
+      { id: "1", player: "MyRB1", price: 30, drafter: "me", position: "RB", ts: 0 },
+      { id: "2", player: "MyRB2", price: 25, drafter: "me", position: "RB", ts: 1 },
+    ];
+    const drain = computeDrain({ settings, keepers, events: filledRBs, prices });
     expect(drain.primary).not.toBeNull();
     expect(drain.primary!.price).toBeGreaterThan(0);
   });
