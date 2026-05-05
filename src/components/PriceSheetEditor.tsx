@@ -299,6 +299,13 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </p>
       </div>
 
+      {/* OR divider */}
+      <div className="flex items-center gap-2 text-[10px] font-semibold text-muted-foreground">
+        <div className="h-px flex-1 bg-border" />
+        OR
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
       {/* FALLBACK: Upload CSV / XLSX / PDF / image */}
       <div className="rounded-md border border-dashed border-border/60 bg-secondary/20 p-3">
         <input
@@ -320,11 +327,11 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           {uploading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> AND/OR upload CSV / Excel / PDF / screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> Upload CSV / Excel / PDF / screenshot</>
           )}
         </Button>
-        <p className="mt-1.5 text-[10px] text-muted-foreground">
-          Only needed if ESPN isn't connected or you want to override with a custom sheet.
+        <p className="mt-1.5 text-[10px] italic text-muted-foreground">
+          *Only needed if ESPN isn't connected or you want to override with a custom sheet.
         </p>
       </div>
 
