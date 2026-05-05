@@ -90,9 +90,12 @@ export default function UpNextQueue({
           {loading && <span className="text-muted-foreground normal-case">· tuning...</span>}
         </h2>
         <div className="flex items-center gap-1.5">
-          <span className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums transition-colors duration-300 ${pulseTone} ${Math.abs(pulsePct) > 8 && pulseConfident ? "animate-pulse-soft" : ""}`}>
+          <span
+            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold tabular-nums transition-colors duration-300 ${pulseTone} ${Math.abs(pulsePct) > 8 && pulseConfident ? "animate-pulse-soft" : ""}`}
+            title="How much higher or lower the room is paying compared to normal prices"
+          >
             <PulseIcon className="h-3 w-3" />
-            Market {pulsePct >= 0 ? "+" : ""}{pulsePct}%
+            Prices {pulsePct >= 0 ? "+" : ""}{pulsePct}% vs normal
             {!pulseConfident && <span className="opacity-60">·early</span>}
           </span>
           <Button size="sm" variant="ghost" onClick={onRefresh} disabled={loading} className="h-7 px-2">
