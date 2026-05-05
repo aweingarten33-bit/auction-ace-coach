@@ -35,19 +35,18 @@ Deno.serve(async (req) => {
     const season = creds.season_id;
     const cookie = creds.swid && creds.espn_s2 ? `SWID=${creds.swid}; espn_s2=${creds.espn_s2}` : "";
 
-    // ESPN's players_wl endpoint returns up to ~600 ranked players in one shot.
-    // X-Fantasy-Filter limits to fantasy-relevant positions and sorts by overall rank.
+    // kona_player_info returns full draftRanksByRankType + auctionValue.
+    // players_wl does NOT — prior runs saved 14k rows with every rank null.
     const filter = {
       players: {
         limit: 600,
         sortDraftRanks: { sortPriority: 100, sortAsc: true, value: "STANDARD" },
-        filterStatsForTopScoringPeriodIds: { value: 2 },
+        filterSlotIds: { value: [0, 2, 4, 6, 17, 16] },
+        filterRanksForSlotIds: { value: [0, 2, 4, 6, 17, 16] },
       },
     };
 
-    // lm-api-reads is the read-only mirror that doesn't return HTML login pages
-    // when called from datacenter IPs.
-    const espnUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}/players?scoringPeriodId=0&view=players_wl`;
+    const espnUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}/segments/0/leaguedefaults/3?view=kona_player_info`;
     const r = await fetch(espnUrl, {
       headers: {
         accept: "application/json",
@@ -65,15 +64,18 @@ Deno.serve(async (req) => {
     });
     const text = await r.text();
     if (!r.ok) return j({ error: `ESPN ${r.status}`, body: text.slice(0, 200) }, 502);
-    // ESPN sometimes serves an HTML error/login page with status 200 from edge IPs.
     if (text.trimStart().startsWith("<")) {
       return j({ error: "ESPN returned HTML instead of JSON (likely auth/WAF block)", body: text.slice(0, 200) }, 502);
     }
-    let players: any;
-    try { players = JSON.parse(text); } catch (e) {
+    let parsed: any;
+    try { parsed = JSON.parse(text); } catch (e) {
       return j({ error: `Bad JSON from ESPN: ${e instanceof Error ? e.message : String(e)}`, body: text.slice(0, 200) }, 502);
     }
-    if (!Array.isArray(players)) return j({ error: "Unexpected ESPN response shape", body: JSON.stringify(players).slice(0, 200) }, 502);
+    // kona_player_info returns { players: [{ player: {...}, ... }] }
+    const players: any[] = Array.isArray(parsed?.players)
+      ? parsed.players.map((entry: any) => entry.player ?? entry)
+      : Array.isArray(parsed) ? parsed : [];
+    if (!players.length) return j({ error: "No players in ESPN response", body: JSON.stringify(parsed).slice(0, 200) }, 502);
 
     const rows = players
       .map((p: any) => {
