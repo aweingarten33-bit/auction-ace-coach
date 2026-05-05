@@ -39,8 +39,8 @@ Deno.serve(async (req) => {
       const match = value.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`, "i"));
       return clean(match?.[1] ?? value);
     };
-    let swid = cookieValue(body.swid, "SWID").replace(/^%7B/i, "{").replace(/%7D$/i, "}");
-    const s2 = cookieValue(body.espn_s2, "espn_s2");
+    let swid = cookieValue(body.swid, "SWID").replace(/\s+/g, "").replace(/^%7B/i, "{").replace(/%7D$/i, "}");
+    const s2 = cookieValue(body.espn_s2, "espn_s2").replace(/\s+/g, "");
     // ESPN wants braces in the Cookie header, but not in the fan id URL path.
     if (!swid.startsWith("{")) swid = `{${swid}`;
     if (!swid.endsWith("}")) swid = `${swid}}`;
