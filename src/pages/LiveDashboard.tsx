@@ -35,7 +35,7 @@ import {
 } from "@/lib/draft-math";
 import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS, POS_COLORS } from "@/lib/positions";
-import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users } from "lucide-react";
+import { Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2, User, Users, Download } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
@@ -491,6 +491,33 @@ export default function LiveDashboard() {
     askCoach(undefined, q);
   };
 
+  const exportCsv = () => {
+    if (!events.length) { toast("No picks to export yet"); return; }
+    const esc = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = [
+      ["timestamp", "drafter", "player", "position", "price"],
+      ...events.map((e) => [
+        new Date(e.ts).toISOString(),
+        e.drafter,
+        e.player,
+        e.position ?? "",
+        e.price,
+      ]),
+    ];
+    const csv = rows.map((r) => r.map(esc).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `draft-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    toast.success(`Exported ${events.length} picks`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
@@ -522,6 +549,9 @@ export default function LiveDashboard() {
             </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/espn")} className="h-8 px-2 text-[10px] font-semibold" title="ESPN connection & live sync">
               ESPN
+            </Button>
+            <Button variant="ghost" size="sm" onClick={exportCsv} className="h-8 w-8 p-0" title="Export draft as CSV" disabled={!events.length}>
+              <Download className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/?step=league-basics")} className="h-8 w-8 p-0" title="Setup wizard — Budget">
               <Settings2 className="h-4 w-4" />
