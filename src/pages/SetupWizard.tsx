@@ -187,7 +187,7 @@ export default function SetupWizard() {
                   ))}
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  <span className="font-semibold text-foreground">SFLEX</span> = Superflex (any position, <em>including QB</em>). <span className="font-semibold text-foreground">FLEX</span> = RB/WR/TE.
+                  <span className="font-semibold text-foreground">SFLEX</span> = QB/RB/WR/TE. <span className="font-semibold text-foreground">FLEX</span> = RB/WR/TE.
                 </p>
               </section>
             </div>
