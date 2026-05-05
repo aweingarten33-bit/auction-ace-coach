@@ -5,7 +5,7 @@
 //   3) "What can I get for $X at POS?" lookup against the price sheet
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calculator, Check, Download, Plus, RotateCcw, Search, Trash2, X } from "lucide-react";
+import { ArrowLeft, Calculator, Check, ChevronDown, Download, Plus, RotateCcw, Search, Trash2, X } from "lucide-react";
 import { useDraftStore } from "@/lib/draft-store";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
