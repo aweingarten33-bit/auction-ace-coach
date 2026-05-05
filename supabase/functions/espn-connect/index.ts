@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
       leagues,
       season: body.season,
       hint: leagues.length === 0
-        ? "ESPN accepted the request but returned no fantasy football leagues for this season. Re-copy the full espn_s2 value from espn.com cookies, then verify again."
+        ? "ESPN accepted the request but returned no fantasy football leagues for this season. Your espn_s2 may be incomplete or stale; re-copy the full value from DevTools > Application > Cookies > espn.com, then verify again."
         : undefined,
     });
   } catch (e) {
