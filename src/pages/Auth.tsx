@@ -108,37 +108,6 @@ export default function AuthPage() {
             Continue with Google
           </Button>
 
-          <div className="my-4 flex items-center gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
-            <div className="h-px flex-1 bg-border" /> or email <div className="h-px flex-1 bg-border" />
-          </div>
-
-          <Tabs defaultValue="signin">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign in</TabsTrigger>
-              <TabsTrigger value="signup">Sign up</TabsTrigger>
-            </TabsList>
-            {(["signin", "signup"] as const).map((mode) => (
-              <TabsContent key={mode} value={mode} className="space-y-3 pt-3">
-                <div>
-                  <Label>Email</Label>
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                </div>
-                <div>
-                  <Label>Password</Label>
-                  <Input type="password" value={pw} onChange={(e) => setPw(e.target.value)} />
-                </div>
-                <Button
-                  className="w-full"
-                  variant="secondary"
-                  disabled={busy || !email || !pw}
-                  onClick={mode === "signin" ? signIn : signUp}
-                >
-                  {mode === "signin" ? "Sign in" : "Create account"}
-                </Button>
-              </TabsContent>
-            ))}
-          </Tabs>
-
           <p className="mt-5 text-center text-[11px] text-muted-foreground">
             By continuing you agree to play smart and bid sharp.
           </p>
