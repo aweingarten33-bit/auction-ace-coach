@@ -37,6 +37,8 @@ import { projectRemainingBuild } from "@/lib/simulator";
 import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
+import DecisionCard from "@/components/DecisionCard";
+import { decide } from "@/lib/decision-engine";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
@@ -320,10 +322,12 @@ function LogTab(props: {
   const verdict = validPrice && playerName
     ? computeValueFor(playerName, priceNum, prices, pulse)
     : null;
-  const projection = validPrice
-    ? projectRemainingBuild({
+  const decision = playerName
+    ? decide({
         settings, keepers, events, prices,
-        hypothetical: { name: playerName, pos: (position as Position) || undefined, price: priceNum },
+        player: playerName,
+        position: (position as Position) || undefined,
+        currentPrice: validPrice ? priceNum : 0,
       })
     : null;
 
