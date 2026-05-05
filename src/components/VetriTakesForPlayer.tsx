@@ -103,7 +103,7 @@ export default function VetriTakesForPlayer({
                 <div className="mt-1 flex flex-wrap items-center gap-1.5">
                   {sal && (
                     <span className="rounded-sm border border-success/40 bg-success/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-success">
-                      Sal: {sal}
+                      Analyst: {sal}
                     </span>
                   )}
                   {est && (
