@@ -74,16 +74,31 @@ Deno.serve(async (req) => {
     }
     const fanData = await fanRes.json();
 
-    const leagues = (fanData?.preferences ?? [])
+    const allEntries = (fanData?.preferences ?? [])
       .map((p: any) => p?.metaData?.entry)
-      .filter((e: any) => e && e.groups?.[0]?.groupId && e.seasonId === body.season && e.abbrev === "FFL")
-      .map((e: any) => ({
-        leagueId: Number(e.groups[0].groupId),
-        leagueName: e.groups[0].groupName,
-        teamId: Number(e.entryId),
-        teamName: e.entryMetadata?.teamName ?? `Team ${e.entryId}`,
-        seasonId: e.seasonId,
-      }));
+      .filter((e: any) => e && e.groups?.[0]?.groupId);
+
+    // Loose filter: match season as number-or-string; allow any sport but prefer FFL
+    const seasonMatch = (e: any) => Number(e.seasonId) === Number(body.season);
+    const ffl = allEntries.filter((e: any) => seasonMatch(e) && e.abbrev === "FFL");
+    const chosen = ffl.length > 0 ? ffl : allEntries.filter(seasonMatch);
+
+    const leagues = chosen.map((e: any) => ({
+      leagueId: Number(e.groups[0].groupId),
+      leagueName: e.groups[0].groupName,
+      teamId: Number(e.entryId),
+      teamName: e.entryMetadata?.teamName ?? `Team ${e.entryId}`,
+      seasonId: Number(e.seasonId),
+      sport: e.abbrev,
+    }));
+
+    // Debug summary so we can see what ESPN actually returned
+    const debug = {
+      totalPreferences: (fanData?.preferences ?? []).length,
+      totalEntries: allEntries.length,
+      seasons: [...new Set(allEntries.map((e: any) => e.seasonId))],
+      sports: [...new Set(allEntries.map((e: any) => e.abbrev))],
+    };
 
     // Persist creds when explicitly verifying/selecting. Initial page load can list only.
     if (body.save !== false) {
@@ -108,8 +123,9 @@ Deno.serve(async (req) => {
       ok: true,
       leagues,
       season: body.season,
+      debug,
       hint: leagues.length === 0
-        ? "ESPN accepted the request but returned no fantasy football leagues for this season. Your espn_s2 may be incomplete or stale; re-copy the full value from DevTools > Application > Cookies > espn.com, then verify again."
+        ? `ESPN returned ${debug.totalEntries} fantasy entries (seasons: ${JSON.stringify(debug.seasons)}, sports: ${JSON.stringify(debug.sports)}). None matched season ${body.season}. Try a different season, or re-copy a fresh espn_s2 cookie.`
         : undefined,
     });
   } catch (e) {
