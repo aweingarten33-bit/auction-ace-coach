@@ -33,21 +33,29 @@ Deno.serve(async (req) => {
       return j({ error: "swid, espn_s2, season required" }, 400);
     }
     // Accept either raw values or copied Cookie rows like "SWID={...}" / "espn_s2=...".
-    const clean = (v: string) => v.replace(/[^\x20-\x7E]/g, "").trim().replace(/^['"]|['"]$/g, "");
+    // Also fix common screenshot/OCR homoglyphs, but never silently drop bad characters.
+    const normalizeHomoglyphs = (v: string) => v.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u0410]/g, "A").replace(/[\u0412]/g, "B").replace(/[\u0421]/g, "C").replace(/[\u0415]/g, "E").replace(/[\u041D]/g, "H").replace(/[\u041A]/g, "K").replace(/[\u041C]/g, "M").replace(/[\u041E]/g, "O").replace(/[\u0420]/g, "P").replace(/[\u0422]/g, "T").replace(/[\u0425]/g, "X").replace(/[\u0430]/g, "a").replace(/[\u0441]/g, "c").replace(/[\u0435]/g, "e").replace(/[\u043E]/g, "o").replace(/[\u0440]/g, "p").replace(/[\u0445]/g, "x").replace(/[\u0443]/g, "y");
+    const clean = (v: string) => normalizeHomoglyphs(v).trim().replace(/^['"]|['"]$/g, "");
     const cookieValue = (raw: string, name: string) => {
       const value = clean(raw);
       const match = value.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`, "i"));
       return clean(match?.[1] ?? value);
     };
-    let swid = cookieValue(body.swid, "SWID").replace(/\s+/g, "").replace(/^%7B/i, "{").replace(/%7D$/i, "}");
+    let swid = cookieValue(body.swid, "SWID").replace(/\s+/g, "").replace(/^%7B/i, "{").replace(/%7D$/i, "}").replace(/[Oo]/g, "0");
     const s2 = cookieValue(body.espn_s2, "espn_s2").replace(/\s+/g, "");
     // ESPN wants braces in the Cookie header, but not in the fan id URL path.
     if (!swid.startsWith("{")) swid = `{${swid}`;
     if (!swid.endsWith("}")) swid = `${swid}}`;
     const fanId = swid.replace(/[{}]/g, "");
+    if (!/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(fanId)) {
+      return j({ error: "Invalid SWID", hint: "The SWID is not a valid ESPN cookie value. Copy it directly from browser DevTools > Application > Cookies, not from a screenshot/OCR scan." }, 400);
+    }
+    if (!/^[\x21-\x7E]+$/.test(s2)) {
+      return j({ error: "Invalid espn_s2", hint: "The espn_s2 cookie contains non-cookie characters. Copy the raw value directly from browser DevTools, not from a screenshot/OCR scan." }, 400);
+    }
 
     // Fan API → list leagues for the user
-    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(fanId)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
+    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
     const cookie = `SWID=${swid}; espn_s2=${s2}`;
 
     const fanRes = await fetch(fanUrl, {
