@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import CoachMessage from "@/components/CoachMessage";
 import coachBotImg from "@/assets/coach-bot.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -887,8 +888,8 @@ Keep it tight. No fluff, no closing line.`;
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                   <Sparkles className="h-4 w-4" />
                 </div>
-                <div className="prose prose-sm max-w-none text-foreground">
-                  <ReactMarkdown>{coachText || "How can I help you with your draft?"}</ReactMarkdown>
+                <div className="min-w-0 flex-1">
+                  <CoachMessage content={coachText || "How can I help you with your draft?"} />
                 </div>
               </div>
             )}
@@ -905,8 +906,8 @@ Keep it tight. No fluff, no closing line.`;
                   <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <Sparkles className="h-4 w-4" />
                   </div>
-                  <div className="prose prose-sm max-w-none text-foreground">
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
+                  <div className="min-w-0 flex-1">
+                    <CoachMessage content={m.content} />
                   </div>
                 </div>
               );
@@ -916,8 +917,8 @@ Keep it tight. No fluff, no closing line.`;
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                   <Sparkles className="h-4 w-4 animate-pulse" />
                 </div>
-                <div className="prose prose-sm max-w-none text-foreground">
-                  <ReactMarkdown>{coachText}</ReactMarkdown>
+                <div className="min-w-0 flex-1">
+                  <CoachMessage content={coachText} />
                 </div>
               </div>
             )}
