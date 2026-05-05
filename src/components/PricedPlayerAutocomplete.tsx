@@ -97,7 +97,7 @@ export default function PricedPlayerAutocomplete({
         const priced = priceMap.get(k);
         out.push({
           name: sp.full_name,
-          position: sp.position || priced?.position,
+          position: sp.position || (priced as (PriceEstimate & { position?: string }) | undefined)?.position,
           team: sp.team,
           price: priced?.price,
           key: k + ":" + sp.player_id,
