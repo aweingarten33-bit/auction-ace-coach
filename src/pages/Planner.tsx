@@ -355,21 +355,30 @@ export default function Planner() {
 }
 
 function SyncHistoryButton() {
+  const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
+  const [needsEspn, setNeedsEspn] = useState(false);
 
   const run = async () => {
     setBusy(true);
     setSummary(null);
+    setNeedsEspn(false);
     try {
       const [draftRes, ranksRes] = await Promise.all([
         supabase.functions.invoke("espn-historical-draft", { body: { seasonsBack: 3 } }),
         supabase.functions.invoke("espn-historical-ranks", { body: { seasonsBack: 3 } }),
       ]);
-      const dErr = draftRes.error || (draftRes.data as any)?.error;
-      const rErr = ranksRes.error || (ranksRes.data as any)?.error;
-      if (dErr || rErr) {
-        toast.error(`Sync issue: ${dErr?.message || dErr || rErr?.message || rErr}`);
+      const dErr = (draftRes.data as any)?.error || draftRes.error?.message;
+      const rErr = (ranksRes.data as any)?.error || ranksRes.error?.message;
+      const combined = `${dErr ?? ""} ${rErr ?? ""}`.toLowerCase();
+      if (combined.includes("connect espn")) {
+        setNeedsEspn(true);
+        toast.error("Connect ESPN first to sync history.", {
+          action: { label: "Open ESPN settings", onClick: () => navigate("/espn") },
+        });
+      } else if (dErr || rErr) {
+        toast.error(`Sync issue: ${dErr || rErr}`);
       } else {
         const ds = (draftRes.data as any)?.summary ?? [];
         const rs = (ranksRes.data as any)?.summary ?? [];
@@ -384,6 +393,17 @@ function SyncHistoryButton() {
       setBusy(false);
     }
   };
+
+  if (needsEspn) {
+    return (
+      <button
+        onClick={() => navigate("/espn")}
+        className="rounded border border-amber-500/50 bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-600 hover:bg-amber-500/20"
+      >
+        Connect ESPN to sync history →
+      </button>
+    );
+  }
 
   return (
     <div className="flex flex-col items-end gap-0.5">
