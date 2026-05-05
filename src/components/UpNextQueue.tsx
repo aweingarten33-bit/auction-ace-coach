@@ -293,7 +293,15 @@ export default function UpNextQueue({
                     </div>
                   </div>
                   <p className="mt-1.5 text-[10px] text-muted-foreground">
-                    {t.position} need after: <span className="font-semibold text-foreground">{wi.newGapSeverityForPos.toUpperCase()}</span>
+                    After this pick, your {t.position} situation:{" "}
+                    <span className="font-semibold text-foreground">
+                      {{
+                        critical: "still missing a starter",
+                        need: "still need one more",
+                        depth: "starters set, could use depth",
+                        done: "all set",
+                      }[wi.newGapSeverityForPos] ?? wi.newGapSeverityForPos}
+                    </span>
                   </p>
                 </div>
               )}
