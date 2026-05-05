@@ -306,11 +306,13 @@ function LogTab(props: {
   onUndo: () => void;
   settings: any; keepers: any[]; prices: any[];
   pulse: any; myCount: any; requiredCount: any;
+  manualOpen: boolean; setManualOpen: (v: boolean) => void;
 }) {
   const {
     events, drafter, setDrafter, playerName, setPlayerName,
     priceInput, setPriceInput, position, setPosition, onUndo,
     settings, keepers, prices, pulse, myCount, requiredCount,
+    manualOpen, setManualOpen,
   } = props;
 
   const priceNum = parseInt(priceInput, 10);
