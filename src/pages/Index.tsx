@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDraftStore } from "@/lib/draft-store";
+import { Button } from "@/components/ui/button";
 import SetupWizard from "./SetupWizard";
 
 const Index = () => {
@@ -11,7 +12,19 @@ const Index = () => {
   useEffect(() => {
     if (setupComplete && !editing) navigate("/draft");
   }, [setupComplete, navigate, editing]);
-  return <SetupWizard />;
+  return (
+    <>
+      <div className="flex justify-end gap-2 p-3 border-b bg-background">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/espn">Connect ESPN League</Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/draft">Open Draft</Link>
+        </Button>
+      </div>
+      <SetupWizard />
+    </>
+  );
 };
 
 export default Index;
