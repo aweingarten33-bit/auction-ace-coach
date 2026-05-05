@@ -55,7 +55,9 @@ import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import DecisionCard from "@/components/DecisionCard";
+import NominationCard from "@/components/NominationCard";
 import { decide } from "@/lib/decision-engine";
+import { computeDrain, computeGet } from "@/lib/nomination";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;

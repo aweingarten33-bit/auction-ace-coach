@@ -38,7 +38,9 @@ import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import DecisionCard from "@/components/DecisionCard";
+import NominationCard from "@/components/NominationCard";
 import { decide } from "@/lib/decision-engine";
+import { computeDrain, computeGet } from "@/lib/nomination";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 
@@ -330,6 +332,8 @@ function LogTab(props: {
         currentPrice: validPrice ? priceNum : 0,
       })
     : null;
+  const drain = computeDrain({ settings, keepers, events, prices });
+  const getPlan = computeGet({ settings, keepers, events, prices });
 
   // Open positions strip
   const posRows = (["QB", "RB", "WR", "TE", "K", "DST"] as Position[])
@@ -348,6 +352,9 @@ function LogTab(props: {
     <div className="space-y-3">
       {/* THE DECISION — one card, five seconds */}
       {decision && <DecisionCard d={decision} />}
+
+      {/* NOMINATION — drain + get */}
+      <NominationCard drain={drain} get={getPlan} />
 
       {/* Open positions chip strip */}
       <div className="grid grid-cols-6 gap-1">
