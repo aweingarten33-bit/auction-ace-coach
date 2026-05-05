@@ -127,7 +127,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
         <div>
           <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             <Youtube className="h-3.5 w-3.5 text-destructive" /> Analyst Notes
-            <span className="font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE TAKE TAPE</span>
+            
           </h2>
           <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
             {totalTakes} takes from {notes.filter((n) => n.status === "ready").length} videos · feeds the assistant

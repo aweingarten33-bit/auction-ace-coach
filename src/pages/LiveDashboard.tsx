@@ -530,11 +530,11 @@ export default function LiveDashboard() {
               <Trophy className="h-4 w-4 text-primary-foreground" />
             </div>
             <div className="min-w-0 leading-none">
-              <h1 className="font-chyron truncate text-[18px] font-extrabold italic uppercase tracking-tight text-foreground neon-text">
-                The Auction Room
+              <h1 className="truncate text-[18px] font-bold tracking-tight text-foreground">
+                Auction Assistant
               </h1>
-              <p className="font-lower-third mt-0.5 truncate text-[8px] text-accent">
-                ESPN-Style · Auction Assistant
+              <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
+                Live draft helper
               </p>
             </div>
           </div>
@@ -710,7 +710,7 @@ export default function LiveDashboard() {
           <Card className="bg-gradient-card p-3">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                The Tape <span className="text-foreground/50 font-normal normal-case">· {events.length} pick{events.length === 1 ? "" : "s"}</span>
+                Draft Log <span className="text-foreground/50 font-normal normal-case">· {events.length} pick{events.length === 1 ? "" : "s"}</span>
               </h2>
             </div>
             <div className="max-h-80 overflow-auto">
@@ -825,7 +825,7 @@ export default function LiveDashboard() {
           <Card className="bg-gradient-card p-4 shadow-glow">
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
               <Sparkles className="h-3.5 w-3.5" /> AI Assistant
-              <span className="font-mono text-[9px] tracking-[0.2em] text-primary/70">— THE TAKE</span>
+              
               {streaming && <span className="text-muted-foreground">· thinking...</span>}
               {(coachHistory.length > 0 || coachText) && !streaming && (
                 <button
