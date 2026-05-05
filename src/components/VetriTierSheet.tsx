@@ -5,7 +5,7 @@
 //   - "RB Tier 1: Bijan, Saquon, McCaffrey"
 //   - "RB1:" newline list
 // Computes auction $ values calibrated to the user's league settings,
-// then merges into the price sheet the coach reads from. Manual price
+// then merges into the price sheet the assistant reads from. Manual price
 // overrides (set in the price editor) are preserved.
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";

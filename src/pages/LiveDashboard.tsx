@@ -347,8 +347,8 @@ export default function LiveDashboard() {
       if (!resp.ok || !resp.body) {
         if (resp.status === 429) toast.error("Rate limited. Try again shortly.");
         else if (resp.status === 402) toast.error("AI credits exhausted. Add credits in workspace usage.");
-        else toast.error("Coach unavailable. Try again.");
-        setCoachText("⚠️ Coach unavailable.");
+        else toast.error("Assistant unavailable. Try again.");
+        setCoachText("⚠️ Assistant unavailable.");
         setStreaming(false);
         return;
       }
@@ -386,12 +386,12 @@ export default function LiveDashboard() {
       }
     } catch (e) {
       console.error(e);
-      toast.error("Coach error");
+      toast.error("Assistant error");
     } finally {
       setStreaming(false);
       // Persist final assistant message into thread (use the accumulator from above via setCoachText callback)
       setCoachText((finalText) => {
-        if (finalText && finalText !== "⚠️ Coach unavailable.") {
+        if (finalText && finalText !== "⚠️ Assistant unavailable.") {
           setCoachHistory((h) => [...h, { role: "assistant", content: finalText }]);
         }
         return finalText;
@@ -566,7 +566,7 @@ export default function LiveDashboard() {
                 The Auction Room
               </h1>
               <p className="font-lower-third mt-0.5 truncate text-[8px] text-accent">
-                ESPN-Style · Auction Coach
+                ESPN-Style · Auction Assistant
               </p>
             </div>
           </div>
@@ -848,7 +848,7 @@ export default function LiveDashboard() {
           {/* Coach */}
           <Card className="bg-gradient-card p-4 shadow-glow">
             <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
-              <Sparkles className="h-3.5 w-3.5" /> AI Coach
+              <Sparkles className="h-3.5 w-3.5" /> AI Assistant
               <span className="font-mono text-[9px] tracking-[0.2em] text-primary/70">— THE TAKE</span>
               {streaming && <span className="text-muted-foreground">· thinking...</span>}
             </h2>
@@ -878,7 +878,7 @@ export default function LiveDashboard() {
               })}
               {streaming && coachText && (
                 <div className="rounded-md border border-border/60 bg-secondary/30 px-2.5 py-2">
-                  <p className="mb-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Coach · typing</p>
+                  <p className="mb-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Assistant · typing</p>
                   <ReactMarkdown>{coachText}</ReactMarkdown>
                 </div>
               )}
@@ -905,7 +905,7 @@ export default function LiveDashboard() {
             </div>
             <div className="mt-2 flex gap-2">
               <Input
-                placeholder="Ask the coach a question..."
+                placeholder="Ask the assistant a question..."
                 value={followUp}
                 onChange={(e) => setFollowUp(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}

@@ -50,7 +50,7 @@ export default function AuthPage() {
       <Card className="w-full max-w-md p-6 shadow-glow">
         <div className="mb-6 flex items-center gap-2">
           <Trophy className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold">Auction Coach</h1>
+          <h1 className="text-xl font-bold">Auction Assistant</h1>
         </div>
         <Tabs defaultValue="signin">
           <TabsList className="grid w-full grid-cols-2">
