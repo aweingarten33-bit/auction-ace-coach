@@ -54,6 +54,8 @@ import { projectRemainingBuild } from "@/lib/simulator";
 import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
+import DecisionCard from "@/components/DecisionCard";
+import { decide } from "@/lib/decision-engine";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
@@ -678,25 +680,16 @@ export default function LiveDashboard() {
               </Button>
             </div>
 
-            {/* Remaining-Build Simulator — recomputes per keystroke, no AI */}
-            {(() => {
+            {/* THE DECISION — replaces scattered panels with one answer */}
+            {playerName && (() => {
               const priceNum = parseInt(priceInput, 10);
-              if (!Number.isFinite(priceNum) || priceNum <= 0) return null;
-              const projection = projectRemainingBuild({
+              const d = decide({
                 settings, keepers, events, prices,
-                hypothetical: { name: playerName || undefined, pos: (position as Position) || undefined, price: priceNum },
+                player: playerName,
+                position: (position as Position) || undefined,
+                currentPrice: Number.isFinite(priceNum) && priceNum > 0 ? priceNum : 0,
               });
-              return (
-                <div className="mt-2">
-                  <RemainingBuildPanel
-                    projection={projection}
-                    hypoPrice={priceNum}
-                    hypoName={playerName || undefined}
-                    hypoPos={(position as Position) || undefined}
-                    compact
-                  />
-                </div>
-              );
+              return <div className="mt-2"><DecisionCard d={d} /></div>;
             })()}
           </Card>
 
