@@ -774,7 +774,7 @@ Keep it tight. No fluff, no closing line.`;
                     placeholder="Search a player for analyst takes…"
                   />
                 </div>
-                <div className="max-h-[300px] overflow-y-auto pr-1">
+                <div className="h-[280px] overflow-y-auto pr-1">
                   {(takesQuery || playerName || bestTarget?.name) ? (
                     <VetriTakesForPlayer
                       player={takesQuery || playerName || bestTarget!.name}
