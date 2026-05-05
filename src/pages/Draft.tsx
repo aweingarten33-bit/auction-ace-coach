@@ -86,10 +86,8 @@ export default function Draft() {
   const coachRef = useRef<HTMLDivElement>(null);
   const [queue, setQueue] = useState<QueueTarget[]>([]);
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
-  const [queueLoading, setQueueLoading] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
   const [aiNoms, setAiNoms] = useState<import("@/components/NominationCard").AiNomination[]>([]);
-  const [aiNomsLoading, setAiNomsLoading] = useState(false);
 
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
