@@ -288,8 +288,8 @@ export default function Planner() {
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost" size="sm"
-                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget))}
-                title="Auto-suggest"
+                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights))}
+                title="Auto-suggest from chosen strategy"
               >
                 <RotateCcw className="mr-1 h-3.5 w-3.5" /> Suggest
               </Button>
@@ -299,7 +299,8 @@ export default function Planner() {
             </div>
           </div>
           <p className="mb-3 text-[11px] text-muted-foreground">
-            Edit any slot. Auto-suggest splits your <span className="font-mono">${settings.totalBudget}</span> by position weight.
+            Edit any slot. Auto-suggest splits your <span className="font-mono">${settings.totalBudget}</span> using your{" "}
+            <span className="font-semibold text-foreground">{strategy.label}</span> shape.
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {slots.map((s) => (
