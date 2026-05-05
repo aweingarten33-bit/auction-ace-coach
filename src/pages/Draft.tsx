@@ -63,6 +63,7 @@ import DecisionCard from "@/components/DecisionCard";
 import NominationCard from "@/components/NominationCard";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
+import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
 
@@ -681,6 +682,14 @@ export default function Draft() {
               <OpponentHeatmap settings={settings} />
             </TabsContent>
             <TabsContent value="vetri" className="mt-3 space-y-3">
+              <Card className="p-3">
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Vetri players · projected $
+                  </span>
+                </div>
+                <VetriPlayerSummary />
+              </Card>
               <Card className="p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
