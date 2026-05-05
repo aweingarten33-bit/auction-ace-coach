@@ -12,86 +12,91 @@
 
 @layer base {
   :root {
-    /* EVIL SUPERMAN (Superman III) — grimy, desaturated, dark.
-       Suit = muted dark navy. Cape/shield = blood red. Belt = tarnished gold. */
+    /* SUPERMAN 1978 (Christopher Reeve) — bright, optimistic, comic-book pop.
+       Suit = vibrant royal blue. Cape = vivid red. Shield/belt = bold yellow.
+       Background = sky blue (Metropolis daylight). Light theme. */
 
-    --background: 218 42% 18%;         /* lifted dark navy — clearly blue */
-    --foreground: 40 12% 90%;          /* dingy off-white */
+    --background: 210 70% 94%;          /* daylight sky blue */
+    --foreground: 220 70% 14%;          /* deep navy ink */
 
-    --card: 218 38% 22%;
-    --card-foreground: 40 12% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 70% 14%;
 
-    --popover: 218 38% 22%;
-    --popover-foreground: 40 12% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 70% 14%;
 
-    /* Lighter muted navy — the evil suit */
-    --primary: 218 60% 42%;
-    --primary-foreground: 40 20% 96%;
-    --primary-glow: 218 65% 52%;
+    /* Royal Reeve blue — the suit */
+    --primary: 220 90% 42%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 95% 58%;
 
-    --secondary: 218 30% 28%;
-    --secondary-foreground: 40 12% 92%;
+    --secondary: 210 50% 88%;
+    --secondary-foreground: 220 70% 16%;
 
-    --muted: 218 25% 26%;
-    --muted-foreground: 40 8% 70%;
+    --muted: 210 40% 90%;
+    --muted-foreground: 220 30% 38%;
 
-    /* Crisp yellow — high-contrast accent on dark navy */
-    --accent: 50 100% 62%;
-    --accent-foreground: 218 50% 10%;
+    /* Bold comic yellow — shield/belt accent */
+    --accent: 48 100% 55%;
+    --accent-foreground: 220 70% 14%;
 
-    --destructive: 0 78% 60%;
-    --destructive-foreground: 40 20% 98%;
+    /* Vivid cape red */
+    --destructive: 358 78% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 42 60% 50%;
-    --warning-foreground: 218 42% 12%;
+    --warning: 42 100% 52%;
+    --warning-foreground: 220 70% 14%;
 
-    --success: 142 35% 40%;
-    --success-foreground: 40 20% 96%;
+    --success: 145 65% 38%;
+    --success-foreground: 0 0% 100%;
 
-    --border: 218 30% 32%;
-    --input: 218 28% 26%;
-    --ring: 218 60% 50%;
+    --border: 215 40% 78%;
+    --input: 215 40% 84%;
+    --ring: 220 90% 50%;
 
     --radius: 0.5rem;
 
-    --gradient-primary: linear-gradient(180deg, hsl(218 55% 34%) 0%, hsl(218 60% 24%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(220 16% 14%), hsl(220 16% 10%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(220 12% 20%) 0%, hsl(220 14% 12%) 100%);
-    --gradient-titlebar: linear-gradient(180deg, hsl(220 14% 16%) 0%, hsl(220 16% 10%) 100%);
-    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.05) 0%, hsl(0 0% 100% / 0.01) 50%, hsl(0 0% 0% / 0) 50%, hsl(0 0% 0% / 0.2) 100%);
+    --gradient-primary: linear-gradient(180deg, hsl(215 95% 56%) 0%, hsl(220 90% 42%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 50% 96%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(210 50% 92%) 0%, hsl(215 40% 80%) 100%);
+    --gradient-titlebar: linear-gradient(180deg, hsl(220 90% 46%) 0%, hsl(220 90% 36%) 100%);
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.85) 0%, hsl(0 0% 100% / 0.15) 50%, hsl(0 0% 100% / 0) 50%, hsl(0 0% 100% / 0.1) 100%);
 
-    --shadow-glow: 0 0 0 3px hsl(0 60% 30% / 0.35);
-    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.06) inset, 0 1px 3px hsl(0 0% 0% / 0.6), 0 1px 0 hsl(0 0% 0% / 0.3);
-    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 2px 6px hsl(0 0% 0% / 0.5), 0 12px 28px -12px hsl(0 0% 0% / 0.7);
+    --shadow-glow: 0 0 0 3px hsl(48 100% 55% / 0.45);
+    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.5) inset, 0 2px 4px hsl(220 70% 20% / 0.3), 0 1px 0 hsl(220 70% 14% / 0.15);
+    --shadow-card: 0 1px 0 hsl(0 0% 100%) inset, 0 1px 3px hsl(220 50% 20% / 0.12), 0 8px 24px -10px hsl(220 70% 20% / 0.25);
 
-    --sidebar-background: 220 16% 10%;
-    --sidebar-foreground: 40 12% 86%;
-    --sidebar-primary: 218 55% 32%;
-    --sidebar-primary-foreground: 40 20% 92%;
-    --sidebar-accent: 0 55% 30%;
-    --sidebar-accent-foreground: 40 20% 92%;
-    --sidebar-border: 220 14% 20%;
-    --sidebar-ring: 218 55% 38%;
+    --sidebar-background: 220 90% 42%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 48 100% 55%;
+    --sidebar-primary-foreground: 220 70% 14%;
+    --sidebar-accent: 215 95% 56%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 220 90% 32%;
+    --sidebar-ring: 48 100% 55%;
   }
 
   .dark {
-    --background: 220 18% 6%;
-    --foreground: 40 12% 88%;
-    --card: 220 16% 11%;
-    --card-foreground: 40 12% 90%;
-    --popover: 220 16% 11%;
-    --popover-foreground: 40 12% 90%;
-    --primary: 218 55% 32%;
-    --primary-foreground: 40 20% 94%;
-    --secondary: 220 12% 16%;
-    --secondary-foreground: 40 12% 88%;
-    --muted: 220 10% 14%;
-    --muted-foreground: 40 6% 62%;
-    --accent: 0 55% 36%;
-    --accent-foreground: 40 20% 94%;
-    --border: 220 14% 20%;
-    --input: 220 14% 16%;
-    --ring: 218 55% 40%;
+    /* "Daily Planet at night" — same hero palette, deeper canvas */
+    --background: 220 70% 10%;
+    --foreground: 210 40% 96%;
+    --card: 220 60% 14%;
+    --card-foreground: 210 40% 96%;
+    --popover: 220 60% 14%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 215 95% 58%;
+    --primary-foreground: 220 70% 10%;
+    --secondary: 220 50% 20%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 220 40% 18%;
+    --muted-foreground: 210 25% 70%;
+    --accent: 48 100% 58%;
+    --accent-foreground: 220 70% 10%;
+    --destructive: 358 78% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 40% 24%;
+    --input: 220 40% 22%;
+    --ring: 48 100% 58%;
   }
 }
 
