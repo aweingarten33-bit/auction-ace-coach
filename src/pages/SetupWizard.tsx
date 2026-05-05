@@ -202,6 +202,9 @@ export default function SetupWizard() {
                     Budget left: <span className="text-primary font-semibold">${settings.totalBudget - keeperSpend}</span>
                   </span>
                 </div>
+                <p className="text-[11px] text-muted-foreground">
+                  Once ESPN is connected, your keepers will be pulled in automatically — you won't need to enter them by hand.
+                </p>
                 <div className="grid grid-cols-[1fr_80px_80px_auto] gap-2">
                   <PlayerAutocomplete
                     value={keeperName}
@@ -253,8 +256,7 @@ export default function SetupWizard() {
                 )}
               </section>
 
-              <section className="space-y-2">
-                <h2 className="text-sm font-semibold text-foreground">Player Prices</h2>
+              <section>
                 <PriceSheetEditor
                   prices={prices}
                   setPrices={setPrices}
