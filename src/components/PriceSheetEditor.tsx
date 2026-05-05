@@ -392,45 +392,6 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </>
       )}
 
-      {/* Bulk paste */}
-      <div className="rounded-md border border-border/60 bg-secondary/20">
-        <button
-          onClick={() => setShowRaw((v) => !v)}
-          className="flex w-full items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground hover:text-foreground"
-        >
-          <span className="flex items-center gap-1.5">
-            <FileText className="h-3.5 w-3.5" /> Paste a sheet
-            {validCount > 0 && (
-              <span className="ml-2 normal-case text-primary">({validCount} parsed{skipped ? `, ${skipped} skipped` : ""})</span>
-            )}
-          </span>
-          {showRaw ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-        </button>
-        {showRaw && (
-          <div className="border-t border-border/60 p-3 space-y-2">
-            <p className="text-[11px] text-muted-foreground">
-              Accepts almost anything: <code>Name - 65</code>, <code>Name $65</code>, <code>Name, QB, 65</code>, tab-separated FantasyPros/ESPN exports. We grab the last number on each line as the price.
-            </p>
-            <Textarea
-              rows={10}
-              placeholder={"Christian McCaffrey - 70\nJalen Hurts $45\nCeeDee Lamb, WR, 55\nJustin Jefferson\tWR\t62"}
-              value={pricesText}
-              onChange={(e) => setPricesText(e.target.value)}
-              className="font-mono text-xs"
-            />
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] text-muted-foreground">
-                {validCount} valid · {skipped} skipped
-              </p>
-              <Button size="sm" onClick={syncParsed} disabled={!validCount}>
-                <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                Use parsed list
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-
       <p className="text-[11px] text-muted-foreground">
         Optional — but with prices the assistant can flag steals, reaches, and market inflation in real time.
       </p>
