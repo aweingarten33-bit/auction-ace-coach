@@ -286,10 +286,52 @@ function LogTab(props: {
   priceInput: string; setPriceInput: (s: string) => void;
   position: Position | ""; setPosition: (p: Position | "") => void;
   onUndo: () => void;
+  settings: any; keepers: any[]; prices: any[];
+  pulse: any; myCount: any; requiredCount: any;
 }) {
-  const { events, drafter, setDrafter, playerName, setPlayerName, priceInput, setPriceInput, position, setPosition, onUndo } = props;
+  const {
+    events, drafter, setDrafter, playerName, setPlayerName,
+    priceInput, setPriceInput, position, setPosition, onUndo,
+    settings, keepers, prices, pulse, myCount, requiredCount,
+  } = props;
+
+  const priceNum = parseInt(priceInput, 10);
+  const validPrice = Number.isFinite(priceNum) && priceNum > 0;
+  const verdict = validPrice && playerName
+    ? computeValueFor(playerName, priceNum, prices, pulse)
+    : null;
+  const projection = validPrice
+    ? projectRemainingBuild({
+        settings, keepers, events, prices,
+        hypothetical: { name: playerName, pos: (position as Position) || undefined, price: priceNum },
+      })
+    : null;
+
+  // Open positions strip
+  const posRows = (["QB", "RB", "WR", "TE", "K", "DST"] as Position[])
+    .filter((p) => requiredCount[p] > 0)
+    .map((p) => {
+      const have = myCount[p];
+      const need = requiredCount[p];
+      const short = Math.max(0, need - have);
+      const tone = short >= 2 ? "border-destructive/60 bg-destructive/10 text-destructive"
+        : short === 1 ? "border-warning/50 bg-warning/10 text-warning"
+        : "border-success/40 bg-success/10 text-success";
+      return { p, have, need, tone };
+    });
+
   return (
     <div className="space-y-3">
+      {/* Open positions chip strip */}
+      <div className="grid grid-cols-6 gap-1">
+        {posRows.map(({ p, have, need, tone }) => (
+          <div key={p} className={`rounded-md border px-1 py-1 text-center ${tone}`}>
+            <div className="text-[9px] font-bold leading-none">{p}</div>
+            <div className="font-mono text-[10px] tabular-nums leading-tight">{have}/{need}</div>
+          </div>
+        ))}
+      </div>
+
       <Card className="bg-gradient-card p-3">
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
           <button
