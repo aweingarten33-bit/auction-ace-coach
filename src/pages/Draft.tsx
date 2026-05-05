@@ -878,7 +878,7 @@ export default function Draft() {
             </div>
             <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
               <Input
-                placeholder="Message Auction Assistant…"
+                placeholder='Ask Matthew Berry… e.g. "Should I bid on Bijan?"'
                 value={followUp}
                 onChange={(e) => setFollowUp(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}
