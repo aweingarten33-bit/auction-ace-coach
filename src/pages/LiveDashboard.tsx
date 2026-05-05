@@ -450,6 +450,39 @@ export default function LiveDashboard() {
     }
   };
 
+  const fetchAiNominations = async () => {
+    setAiNomsLoading(true);
+    try {
+      const resp = await fetch(NOMINATE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          budget,
+          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
+          myRoster: myItems,
+          events,
+          prices,
+        }),
+      });
+      if (!resp.ok) {
+        if (resp.status === 429) toast.error("Rate limited.");
+        else if (resp.status === 402) toast.error("AI credits exhausted.");
+        else toast.error("Suggestions unavailable.");
+        return;
+      }
+      const data = await resp.json();
+      if (Array.isArray(data?.suggestions)) setAiNoms(data.suggestions);
+    } catch (e) {
+      console.error(e);
+      toast.error("Suggestion error");
+    } finally {
+      setAiNomsLoading(false);
+    }
+  };
+
   // (Nomination forecast removed — TierBreakAlerts replaces it deterministically.)
 
   const submitPick = () => {
@@ -774,6 +807,17 @@ export default function LiveDashboard() {
           <NominationCard
             drain={computeDrain({ settings, keepers, events, prices })}
             get={computeGet({ settings, keepers, events, prices })}
+            aiSuggestions={aiNoms}
+            aiLoading={aiNomsLoading}
+            onAskAi={fetchAiNominations}
+            onPickAi={(s) => {
+              setPlayerName(s.name);
+              setPosition(s.position);
+              setDrafter("other");
+              setPriceInput(String(s.price));
+              setManualOpen(true);
+              toast(`${s.name} loaded — ${s.strategy}`);
+            }}
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full">
