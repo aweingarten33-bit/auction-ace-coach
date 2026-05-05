@@ -44,6 +44,7 @@ interface DraftState {
   vetriAutoSync: boolean;   // re-merge into prices when settings/tiers change
   priceOverrides: string[]; // normalized player names where user manually set price (Vetri won't overwrite)
   quickPrompts: QuickPrompt[]; // editable assistant quick-question buttons
+  showMath: boolean;           // when true, assistant always shows the full math behind each rec
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -68,6 +69,7 @@ interface DraftState {
   // Quick prompts
   setQuickPrompts: (p: QuickPrompt[]) => void;
   resetQuickPrompts: () => void;
+  setShowMath: (b: boolean) => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -87,6 +89,8 @@ export const useDraftStore = create<DraftState>()(
       quickPrompts: DEFAULT_QUICK_PROMPTS,
       setQuickPrompts: (p) => set({ quickPrompts: p }),
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
+      showMath: false,
+      setShowMath: (b) => set({ showMath: b }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };

@@ -117,7 +117,17 @@ interface CoachPayload {
   userQuestion?: string;
   history?: { role: "user" | "assistant"; content: string }[];
   draftedPlayers?: string[];
+  showMath?: boolean;
 }
+
+const MATH_ADDENDUM = `
+
+USER PREFERENCE: ALWAYS SHOW THE MATH.
+When this preference is on, your **Why** bullets MUST explicitly show:
+- Budget remaining $X − planned $Y per slot × N slots left = $Z bank for this bid
+- Roster: <POS> filled A/B (need C more starters)
+- Value: sheet $S × market multiplier xM = going $G; your max bid $B → ${"GREAT DEAL" + ' / ' + "GOOD DEAL" + ' / ' + "FAIR PRICE" + ' / ' + "TOO MUCH"}
+Use plain numbers. Up to 4 bullets allowed in this mode (instead of 2-3). Total response can go up to 800 characters.`;
 
 function buildUserMessage(p: CoachPayload): string {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -184,7 +194,8 @@ Deno.serve(async (req: Request) => {
 
     const payload = (await req.json()) as CoachPayload;
 
-    const messages: { role: string; content: string }[] = [{ role: "system", content: SYSTEM_PROMPT }];
+    const sysPrompt = payload.showMath ? SYSTEM_PROMPT + MATH_ADDENDUM : SYSTEM_PROMPT;
+    const messages: { role: string; content: string }[] = [{ role: "system", content: sysPrompt }];
     if (payload.history?.length) {
       for (const h of payload.history.slice(-6)) {
         messages.push({ role: h.role, content: h.content });

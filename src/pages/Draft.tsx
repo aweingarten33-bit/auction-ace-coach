@@ -29,6 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 import {
@@ -76,6 +77,7 @@ export default function Draft() {
     settings, keepers, prices, events, setupComplete, watchlist, dismissed,
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
     quickPrompts, setQuickPrompts, resetQuickPrompts,
+    showMath, setShowMath,
   } = useDraftStore();
 
   const [playerName, setPlayerName] = useState("");
@@ -284,6 +286,7 @@ export default function Draft() {
           vetriTakes: [],
           history: coachHistory.slice(-6),
           draftedPlayers: events.map((e) => e.player),
+          showMath,
         },
         (chunk) => {
           acc += chunk;
@@ -752,6 +755,17 @@ export default function Draft() {
               </span>
             </SheetTitle>
           </SheetHeader>
+
+          {/* Show-the-math toggle */}
+          <div className="flex items-center justify-between gap-3 border-b border-border/60 bg-secondary/20 px-4 py-2">
+            <label htmlFor="show-math" className="flex flex-col text-xs leading-tight">
+              <span className="font-semibold text-foreground">Always show the math</span>
+              <span className="text-[10px] text-muted-foreground">
+                Budget left, roster spots, and price vs. value on every recommendation
+              </span>
+            </label>
+            <Switch id="show-math" checked={showMath} onCheckedChange={setShowMath} />
+          </div>
 
           <div ref={coachRef} className="coach-md flex flex-1 flex-col gap-4 overflow-auto px-4 py-4 text-sm leading-relaxed">
             {coachHistory.length === 0 && !streaming && (
