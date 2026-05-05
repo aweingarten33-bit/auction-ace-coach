@@ -399,16 +399,10 @@ export default function Draft() {
       <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
-            <div
-              className="flex h-8 w-8 shrink-0 items-center justify-center bg-gradient-primary shadow-glow"
-              style={{ clipPath: "polygon(0 0, 100% 0, 85% 100%, 0 100%)" }}
-            >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary">
               <Trophy className="h-4 w-4 text-primary-foreground" />
             </div>
-            <div className="min-w-0 leading-none">
-              <h1 className="truncate text-[18px] font-bold tracking-tight text-foreground">Auction Assistant</h1>
-              <p className="mt-0.5 truncate text-[10px] text-muted-foreground">Live draft helper</p>
-            </div>
+            <h1 className="truncate text-[16px] font-semibold tracking-tight text-foreground">Draft</h1>
           </div>
           <div className="flex items-center gap-0.5">
             <Button
