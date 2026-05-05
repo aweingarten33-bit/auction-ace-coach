@@ -959,34 +959,6 @@ Keep it tight. No fluff, no closing line.`;
                 </Button>
               )}
             </div>
-
-
-          <div className="border-t border-border/60 bg-secondary/20 px-3 py-3">
-            <div className="mb-2 flex flex-wrap items-center gap-1.5">
-              {quickPrompts.map((b) => (
-                <Button
-                  key={b.id} size="sm" variant="outline" disabled={streaming}
-                  onClick={() => askCoach(undefined, b.prompt)}
-                  className="h-7 rounded-full text-xs"
-                >
-                  {b.label}
-                </Button>
-              ))}
-              <QuickPromptsEditor
-                prompts={quickPrompts}
-                onSave={setQuickPrompts}
-                onReset={resetQuickPrompts}
-              />
-              {(coachHistory.length > 0 || coachText) && !streaming && (
-                <Button
-                  size="sm" variant="ghost"
-                  onClick={() => { setCoachHistory([]); setCoachText(""); }}
-                  className="ml-auto h-7 text-[10px] text-muted-foreground hover:text-destructive"
-                >
-                  Clear
-                </Button>
-              )}
-            </div>
             {pendingBid && (
               <div className="mb-2 flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-[12px]">
                 <span className="min-w-0 flex-1 truncate">
