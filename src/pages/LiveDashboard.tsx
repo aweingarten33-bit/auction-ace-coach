@@ -59,6 +59,7 @@ import { computeDrain, computeGet } from "@/lib/nomination";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
+const NOMINATE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/nominate-suggest`;
 
 export default function LiveDashboard() {
   const navigate = useNavigate();
@@ -94,6 +95,8 @@ export default function LiveDashboard() {
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [queueLoading, setQueueLoading] = useState(false);
   const [manualOpen, setManualOpen] = useState(false);
+  const [aiNoms, setAiNoms] = useState<import("@/components/NominationCard").AiNomination[]>([]);
+  const [aiNomsLoading, setAiNomsLoading] = useState(false);
   
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
