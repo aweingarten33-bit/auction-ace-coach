@@ -100,11 +100,19 @@
 @layer base {
   * { @apply border-border; }
 
-  html { font-size: 16px; }
+  html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    font-size: 16px;
+  }
   @media (max-width: 640px) { html { font-size: 16px; } }
 
   body {
     @apply bg-background text-foreground;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
     font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
@@ -118,6 +126,12 @@
       linear-gradient(to bottom, var(--grid-line-strong) 1px, transparent 1px);
     background-size: 8px 8px, 8px 8px, 64px 64px, 64px 64px;
     background-attachment: fixed;
+  }
+
+  #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4 {

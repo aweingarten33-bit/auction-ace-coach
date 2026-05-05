@@ -49,7 +49,7 @@ export default function PlayerAutocomplete({
   };
 
   return (
-    <div ref={wrapRef} className={`relative ${className || ""}`}>
+    <div ref={wrapRef} className={`relative min-w-0 ${className || ""}`}>
       <Input
         placeholder={placeholder}
         value={value}
@@ -89,7 +89,7 @@ export default function PlayerAutocomplete({
         className="font-medium"
       />
       {open && suggestions.length > 0 && (
-        <div className="absolute z-50 mt-1 left-0 w-[min(22rem,90vw)] max-h-80 overflow-auto rounded-md border border-border bg-popover shadow-lg">
+        <div className="absolute left-0 z-50 mt-1 max-h-80 w-full max-w-[calc(100vw-1.5rem)] overflow-auto rounded-md border border-border bg-popover shadow-lg sm:w-[min(22rem,90vw)]">
           {suggestions.map((p, i) => (
             <button
               key={p.player_id}
@@ -99,12 +99,12 @@ export default function PlayerAutocomplete({
                 choose(p);
               }}
               onMouseEnter={() => setHighlight(i)}
-              className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-accent/40 ${
+              className={`flex w-full min-w-0 items-center justify-between gap-3 px-3 py-2.5 text-left hover:bg-accent/40 ${
                 i === highlight ? "bg-accent/30" : ""
               }`}
             >
-              <span className="font-medium text-sm">{p.full_name}</span>
-              <span className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
+              <span className="min-w-0 truncate text-sm font-medium">{p.full_name}</span>
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
                 {p.team && <span>{p.team}</span>}
                 {p.position && (
                   <Badge variant="outline" className={`${POS_COLORS[p.position as keyof typeof POS_COLORS] || ""} text-[10px] px-1.5 py-0`}>

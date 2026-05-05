@@ -95,14 +95,14 @@ export default function VetriPlayerSummary() {
   }
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2 overflow-x-hidden">
       {notes.map((row) => {
         const takes: VetriTake[] = Array.isArray(row.takes) ? row.takes : [];
         const isOpen = !!open[row.video_id];
         return (
           <div
             key={row.video_id}
-            className="overflow-hidden rounded-lg border border-border bg-secondary/20"
+            className="min-w-0 overflow-hidden rounded-lg border border-border bg-secondary/20"
           >
             <button
               type="button"
@@ -124,7 +124,7 @@ export default function VetriPlayerSummary() {
             </button>
 
             {isOpen && (
-              <ul className="divide-y divide-border border-t border-border bg-background/40">
+              <ul className="min-w-0 divide-y divide-border border-t border-border bg-background/40">
                 {takes.map((t, i) => {
                   const price = priceFor(prices, t.player);
                   const tone = LEAN_TONE[t.lean] ?? LEAN_TONE.neutral;
@@ -140,13 +140,13 @@ export default function VetriPlayerSummary() {
                       {t.position && (
                         <Badge
                           variant="outline"
-                          className={`${POS_COLORS[t.position as Position] ?? ""} px-1.5 py-0 text-[9px]`}
+                          className={`${POS_COLORS[t.position as Position] ?? ""} shrink-0 px-1.5 py-0 text-[9px]`}
                         >
                           {t.position}
                         </Badge>
                       )}
                       <span
-                        className={`ml-auto text-[12px] font-bold tabular-nums ${
+                        className={`ml-auto shrink-0 text-[12px] font-bold tabular-nums ${
                           price != null ? "text-primary" : "text-muted-foreground"
                         }`}
                       >

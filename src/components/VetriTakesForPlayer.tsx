@@ -66,25 +66,25 @@ export default function VetriTakesForPlayer({
   }
 
   const list = (
-    <div className="space-y-1.5">
+    <div className="min-w-0 space-y-1.5 overflow-x-hidden">
       {matches.map((m, i) => {
         const tone = LEAN_TONE[m.take.lean] ?? LEAN_TONE.neutral;
         const Icon = tone.icon;
         return (
-          <div key={i} className={`rounded-md border px-2 py-1.5 ${tone.bg}`}>
-            <div className="flex items-center gap-1.5">
-              <Badge variant="outline" className={`${tone.text} border-current text-[9px] px-1.5 py-0 uppercase`}>
+          <div key={i} className={`min-w-0 overflow-hidden rounded-md border px-2 py-1.5 ${tone.bg}`}>
+            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+              <Badge variant="outline" className={`${tone.text} shrink-0 border-current px-1.5 py-0 text-[9px] uppercase`}>
                 {Icon && <Icon className="mr-0.5 inline h-2.5 w-2.5" />}
                 {m.take.lean}
               </Badge>
               {m.take.tier && (
-                <span className="text-[9px] text-muted-foreground">{m.take.tier}</span>
+                <span className="min-w-0 break-words text-[9px] text-muted-foreground">{m.take.tier}</span>
               )}
               <a
                 href={m.videoUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="ml-auto flex items-center gap-0.5 text-[9px] text-muted-foreground hover:text-foreground"
+                className="ml-auto flex shrink-0 items-center gap-0.5 text-[9px] text-muted-foreground hover:text-foreground"
                 title={m.videoTitle}
               >
                 <Youtube className="h-2.5 w-2.5" />
@@ -92,7 +92,7 @@ export default function VetriTakesForPlayer({
                 <ExternalLink className="h-2.5 w-2.5" />
               </a>
             </div>
-            <p className={`mt-1 leading-snug ${compact ? "text-[10px]" : "text-[11px]"}`}>
+            <p className={`mt-1 min-w-0 break-words leading-snug ${compact ? "text-[10px]" : "text-[11px]"}`}>
               {m.take.reasoning}
             </p>
             {(() => {
