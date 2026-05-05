@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -85,9 +85,29 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [quickName, setQuickName] = useState("");
   const [quickPrice, setQuickPrice] = useState("");
   const [filter, setFilter] = useState("");
+  const [posFilter, setPosFilter] = useState<"ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DST">("ALL");
+  const [sortBy, setSortBy] = useState<"default" | "price-desc" | "price-asc" | "name">("default");
+  const [posByName, setPosByName] = useState<Map<string, string>>(new Map());
   const [uploading, setUploading] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Pull positions from cached ESPN ranks so we can filter the list by position
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("espn_player_ranks")
+        .select("player_name, position");
+      if (cancelled || !data) return;
+      const m = new Map<string, string>();
+      for (const r of data) {
+        if (r.player_name && r.position) m.set(r.player_name.toLowerCase(), r.position);
+      }
+      setPosByName(m);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const autoFillFromEspn = async () => {
     setAutoBusy(true);
@@ -263,9 +283,24 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   };
 
   // Inline list edits operate directly on `prices` (committed state)
-  const filtered = filter
-    ? prices.filter((p) => p.name.toLowerCase().includes(filter.toLowerCase()))
-    : prices;
+  const filtered = useMemo(() => {
+    let arr = prices;
+    if (filter) {
+      const q = filter.toLowerCase();
+      arr = arr.filter((p) => p.name.toLowerCase().includes(q));
+    }
+    if (posFilter !== "ALL") {
+      arr = arr.filter((p) => {
+        const pos = posByName.get(p.name.toLowerCase());
+        if (posFilter === "DST") return pos === "DST" || pos === "DEF" || pos === "D/ST";
+        return pos === posFilter;
+      });
+    }
+    if (sortBy === "price-desc") arr = [...arr].sort((a, b) => b.price - a.price);
+    else if (sortBy === "price-asc") arr = [...arr].sort((a, b) => a.price - b.price);
+    else if (sortBy === "name") arr = [...arr].sort((a, b) => a.name.localeCompare(b.name));
+    return arr;
+  }, [prices, filter, posFilter, sortBy, posByName]);
 
   const updatePrice = (idx: number, value: number) => {
     const next = [...prices];
@@ -363,6 +398,36 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             onChange={(e) => setFilter(e.target.value)}
             className="h-8 text-sm"
           />
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex gap-1">
+              {(["ALL", "QB", "RB", "WR", "TE", "K", "DST"] as const).map((p) => (
+                <Button
+                  key={p}
+                  type="button"
+                  size="sm"
+                  variant={posFilter === p ? "default" : "outline"}
+                  className="h-7 px-2 text-[11px]"
+                  onClick={() => setPosFilter(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="ml-auto h-7 rounded-md border border-input bg-background px-2 text-[11px]"
+            >
+              <option value="default">Sort: list order</option>
+              <option value="price-desc">Sort: price (high → low)</option>
+              <option value="price-asc">Sort: price (low → high)</option>
+              <option value="name">Sort: name (A → Z)</option>
+            </select>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Showing {filtered.length} of {prices.length}
+            {posFilter !== "ALL" ? ` · ${posFilter} only` : ""}
+          </p>
           <div className="max-h-72 space-y-1 overflow-auto rounded-md border border-border/60 bg-secondary/20 p-1">
             {filtered.map((p) => {
               const idx = prices.findIndex((x) => x.name === p.name);
