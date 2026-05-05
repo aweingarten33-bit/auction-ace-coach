@@ -98,6 +98,8 @@ export const useDraftStore = create<DraftState>()(
       vetriDecay: 0.55,
       vetriAutoSync: true,
       priceOverrides: [],
+      strategyId: "none",
+      setStrategyId: (id) => set({ strategyId: id }),
       quickPrompts: DEFAULT_QUICK_PROMPTS,
       setQuickPrompts: (p) => set({ quickPrompts: p }),
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
