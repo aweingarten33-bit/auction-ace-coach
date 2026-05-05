@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
                 for (const p of players) {
                   if (p?.id) {
                     playerMap.set(p.id, {
-                      name: p.fullName ?? `${p.firstName ?? ""} ${p.lastName ?? ""}`.trim() || `Player ${p.id}`,
+                      name: p.fullName ?? (`${p.firstName ?? ""} ${p.lastName ?? ""}`.trim() || `Player ${p.id}`),
                       pos: posCode(p.defaultPositionId),
                     });
                   }
