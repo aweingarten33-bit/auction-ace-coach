@@ -635,7 +635,7 @@ export default function Draft() {
             drain={computeDrain({ settings, keepers, events, prices })}
             get={computeGet({ settings, keepers, events, prices })}
             aiSuggestions={aiNoms}
-            aiLoading={aiNomsLoading}
+            aiLoading={nominationsMutation.isPending}
             onAskAi={fetchAiNominations}
             onPickAi={(s) => {
               setPlayerName(s.name); setPosition(s.position); setDrafter("other");
@@ -653,7 +653,7 @@ export default function Draft() {
               <UpNextQueue
                 targets={queue}
                 openMan={openMan}
-                loading={queueLoading}
+                loading={targetsMutation.isPending}
                 empty={!queue.length}
                 pulseMultiplier={pulse.multiplier}
                 pulseConfident={pulse.confident}
