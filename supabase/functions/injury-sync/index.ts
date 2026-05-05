@@ -117,12 +117,17 @@ Deno.serve(async (req) => {
     }
 
     let updated = 0;
-    for (let i = 0; i < updates.length; i += 200) {
-      const chunk = updates.slice(i, i + 200);
-      // upsert by primary key
-      const { error } = await sb.from("espn_player_ranks").upsert(chunk, { onConflict: "id" });
-      if (error) return j({ error: `upsert: ${error.message}`, updated }, 500);
-      updated += chunk.length;
+    for (const u of updates) {
+      const { error } = await sb.from("espn_player_ranks")
+        .update({
+          injury_status: u.injury_status,
+          injury_note: u.injury_note,
+          injury_source: u.injury_source,
+          injury_updated_at: u.injury_updated_at,
+        })
+        .eq("id", u.id);
+      if (error) return j({ error: `update: ${error.message}`, updated }, 500);
+      updated += 1;
     }
 
     if (clearIds.length) {
