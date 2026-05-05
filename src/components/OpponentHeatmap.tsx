@@ -212,20 +212,20 @@ export default function OpponentHeatmap({ settings, myTeamName }: Props) {
   }
 
   return (
-    <Card className="bg-gradient-card p-4">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Flame className="h-4 w-4 text-primary" />
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+    <Card className="bg-gradient-card p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-1.5">
+          <Flame className="h-3.5 w-3.5 text-primary" />
+          <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
             Opponent Heatmap
           </h2>
         </div>
         <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-          <Users className="h-3 w-3" /> {teams.length} team{teams.length === 1 ? "" : "s"}
+          <Users className="h-3 w-3" /> {teams.length}
         </span>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="max-h-[320px] overflow-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="text-[9px] uppercase tracking-wider text-muted-foreground">
