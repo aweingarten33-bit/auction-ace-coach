@@ -960,6 +960,7 @@ Keep it tight. No fluff, no closing line.`;
               )}
             </div>
 
+
           <div className="border-t border-border/60 bg-secondary/20 px-3 py-3">
             <div className="mb-2 flex flex-wrap items-center gap-1.5">
               {quickPrompts.map((b) => (
