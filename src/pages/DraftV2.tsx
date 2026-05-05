@@ -260,7 +260,7 @@ export default function DraftV2() {
 
   // ---------- render ----------
   return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
+    <div className={`${theme === "light" ? "theme-light" : ""} flex h-screen flex-col bg-background text-foreground`}>
       {/* TOP BAR */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6 text-sm">
         <div className="flex items-center gap-3 md:gap-6 min-w-0">
@@ -275,12 +275,21 @@ export default function DraftV2() {
             </span>
           )}
         </div>
-        <button
-          onClick={() => navigate("/planner")}
-          className="text-xs font-semibold text-primary hover:underline"
-        >
-          Strategy
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground"
+            title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+          >
+            {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+          </button>
+          <button
+            onClick={() => navigate("/planner")}
+            className="text-xs font-semibold text-primary hover:underline"
+          >
+            Strategy
+          </button>
+        </div>
       </header>
 
       {/* CARD RAIL */}
