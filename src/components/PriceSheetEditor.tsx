@@ -320,7 +320,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           {uploading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> Fallback: upload CSV / Excel / PDF / screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> AND/OR upload CSV / Excel / PDF / screenshot</>
           )}
         </Button>
         <p className="mt-1.5 text-[10px] text-muted-foreground">
