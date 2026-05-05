@@ -118,6 +118,24 @@ export default function Admin() {
         <h1 className="text-2xl font-bold">Usage Report</h1>
       </div>
 
+      <Card className={`mb-4 p-4 ${locked ? "border-destructive/60 bg-destructive/5" : ""}`}>
+        <div className="flex items-start gap-3">
+          <Lock className={`mt-0.5 h-4 w-4 ${locked ? "text-destructive" : "text-muted-foreground"}`} />
+          <div className="flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold">Site lockdown</p>
+              <Switch checked={locked} disabled={togglingLock} onCheckedChange={toggleLock} />
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {locked
+                ? "🔒 LOCKED — everyone except you sees a 404. You can still use /admin to unlock."
+                : "Off. Flip on the day before your draft to make the site appear broken (404) to everyone but you."}
+            </p>
+          </div>
+        </div>
+      </Card>
+
+
       <div className="mb-4 grid grid-cols-3 gap-3">
         <Card className="p-3">
           <p className="text-[11px] text-muted-foreground">Total users</p>
