@@ -203,7 +203,7 @@ export default function MobileDraft() {
                 tab === t ? "bg-background text-primary border-b-2 border-primary" : "text-muted-foreground"
               }`}
             >
-              {t === "log" ? "Log" : t === "roster" ? "Roster" : "Coach"}
+              {t === "log" ? "Log" : t === "roster" ? "Roster" : "Assistant"}
             </button>
           ))}
         </div>
