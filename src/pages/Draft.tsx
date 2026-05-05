@@ -67,6 +67,7 @@ import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
 import QuickPromptsEditor from "@/components/QuickPromptsEditor";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
+import DraftPlanCard from "@/components/DraftPlanCard";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
 
@@ -77,8 +78,9 @@ export default function Draft() {
     settings, keepers, prices, events, setupComplete, watchlist, dismissed,
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
     quickPrompts, setQuickPrompts, resetQuickPrompts,
-    showMath, setShowMath,
+    showMath, setShowMath, setDraftPlan,
   } = useDraftStore();
+  const [planGenerating, setPlanGenerating] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
   const [priceInput, setPriceInput] = useState("");
@@ -304,6 +306,61 @@ export default function Draft() {
       setStreaming(false);
     }
     if (acc) setCoachHistory((h) => [...h, { role: "assistant", content: acc }]);
+  };
+
+  const generateDraftPlan = async () => {
+    setPlanGenerating(true);
+    let acc = "";
+    try {
+      const planPrompt = `Generate my SAVED DRAFT PLAN. This is a sticky reference I'll re-read between picks during long gaps, so make it scannable and decisive.
+
+Format EXACTLY like this (markdown, no preamble):
+
+**Strategy:** <2-3 sentences max — what shape is this team taking, what's the core approach from here based on budget left, roster gaps, and how the room is bidding>
+
+**Top targets (by priority):**
+- <Player> (POS) — up to $X — <one short reason>
+- <Player> (POS) — up to $X — <one short reason>
+- <Player> (POS) — up to $X — <one short reason>
+- <Player> (POS) — up to $X — <one short reason>
+- <Player> (POS) — up to $X — <one short reason>
+
+**Avoid / let others overpay:** <2-3 names, comma-separated, one short reason each>
+
+**Budget plan:** <one line — how to allocate remaining $$ across remaining slots>
+
+Keep it tight. No fluff, no closing line.`;
+      await streamCoach(
+        {
+          settings: {
+            totalBudget: settings.totalBudget, numTeams: settings.numTeams,
+            scoring: settings.scoring, leagueType: settings.leagueType,
+            format: settings.format, keeperIncrease: settings.keeperIncrease,
+            context: settings.context,
+          },
+          budget, keepers, myRoster: myItems,
+          rosterRequired: requiredCount, rosterFilled: myCount,
+          events, prices, spendByPosition: spend, recentRuns: runs,
+          userQuestion: planPrompt,
+          vetriTakes: [],
+          history: [],
+          draftedPlayers: events.map((e) => e.player),
+          showMath: false,
+        },
+        (chunk) => { acc += chunk; }
+      );
+      if (acc.trim()) {
+        setDraftPlan(acc.trim(), events.length);
+        toast.success("Draft plan saved");
+      } else {
+        toast.error("Couldn't generate plan — try again");
+      }
+    } catch (e) {
+      const msg = e instanceof ApiError ? e.message : "Plan generation failed";
+      toast.error(msg);
+    } finally {
+      setPlanGenerating(false);
+    }
   };
 
   const targetsMutation = useMutation({
@@ -806,6 +863,10 @@ export default function Draft() {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="border-b border-border/60 bg-secondary/10 px-3 py-3">
+            <DraftPlanCard onGenerate={generateDraftPlan} generating={planGenerating} />
           </div>
 
           <div ref={coachRef} className="coach-md flex flex-1 flex-col gap-4 overflow-auto px-4 py-4 text-sm leading-relaxed">

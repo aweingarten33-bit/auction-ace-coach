@@ -49,6 +49,8 @@ interface DraftState {
   priceOverrides: string[]; // normalized player names where user manually set price (Vetri won't overwrite)
   quickPrompts: QuickPrompt[]; // editable assistant quick-question buttons
   showMath: boolean;           // when true, assistant always shows the full math behind each rec
+  // Saved draft plan — sticky strategy + targets the user can refer to between picks
+  draftPlan: { content: string; updatedAt: number; pickCountAtSave: number } | null;
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -74,6 +76,8 @@ interface DraftState {
   setQuickPrompts: (p: QuickPrompt[]) => void;
   resetQuickPrompts: () => void;
   setShowMath: (b: boolean) => void;
+  setDraftPlan: (content: string, pickCountAtSave: number) => void;
+  clearDraftPlan: () => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -95,6 +99,10 @@ export const useDraftStore = create<DraftState>()(
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
       showMath: true,
       setShowMath: (b) => set({ showMath: b }),
+      draftPlan: null,
+      setDraftPlan: (content, pickCountAtSave) =>
+        set({ draftPlan: { content, updatedAt: Date.now(), pickCountAtSave } }),
+      clearDraftPlan: () => set({ draftPlan: null }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
