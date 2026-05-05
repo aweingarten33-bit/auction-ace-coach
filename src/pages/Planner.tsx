@@ -250,6 +250,17 @@ export default function Planner() {
               </span>
             )}
           </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={refreshFromEspn}
+            disabled={refreshing}
+            className="ml-auto h-7 gap-1 text-[11px]"
+            title="Re-pull league settings from ESPN"
+          >
+            <RotateCcw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Syncing…" : "Refresh league"}
+          </Button>
         </Card>
       </div>
 
