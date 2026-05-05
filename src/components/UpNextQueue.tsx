@@ -162,8 +162,8 @@ export default function UpNextQueue({
                       )}
                       {isPinned && <Pin className="h-3 w-3 shrink-0 fill-primary text-primary" />}
                       {t.grade != null && (
-                        <span className="ml-auto flex shrink-0 items-center gap-0.5 text-[10px] font-bold tabular-nums text-warning" title="Assistant grade">
-                          <Star className="h-2.5 w-2.5 fill-warning" />{t.grade}
+                        <span className="ml-auto flex shrink-0 items-center gap-0.5 text-[10px] font-bold tabular-nums text-warning" title={`Pick quality: ${t.grade} out of 5 stars (5 = elite call at this price, 1 = desperate)`}>
+                          <Star className="h-2.5 w-2.5 fill-warning" />{t.grade}/5
                         </span>
                       )}
                     </div>
