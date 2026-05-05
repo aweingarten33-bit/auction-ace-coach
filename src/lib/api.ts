@@ -55,6 +55,8 @@ export interface CoachInput {
   vetriTakes?: unknown;
   history?: { role: "user" | "assistant"; content: string }[];
   draftedPlayers?: string[];
+  /** When true, force the assistant to spell out the full math behind every recommendation. */
+  showMath?: boolean;
 }
 
 /**
