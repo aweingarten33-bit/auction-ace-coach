@@ -49,6 +49,8 @@ interface DraftState {
   draftPlan: { content: string; updatedAt: number; pickCountAtSave: number } | null;
   // Slot $ allocations for the Planner page (id => dollars). Generated lazily from settings.roster.
   slotAllocations: Record<string, number>;
+  // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
+  strategyId: string;
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -79,6 +81,7 @@ interface DraftState {
   setSlotAllocation: (id: string, amount: number) => void;
   setSlotAllocations: (a: Record<string, number>) => void;
   clearSlotAllocations: () => void;
+  setStrategyId: (id: string) => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -95,6 +98,8 @@ export const useDraftStore = create<DraftState>()(
       vetriDecay: 0.55,
       vetriAutoSync: true,
       priceOverrides: [],
+      strategyId: "none",
+      setStrategyId: (id) => set({ strategyId: id }),
       quickPrompts: DEFAULT_QUICK_PROMPTS,
       setQuickPrompts: (p) => set({ quickPrompts: p }),
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),

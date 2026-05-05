@@ -57,6 +57,8 @@ export interface CoachInput {
   draftedPlayers?: string[];
   /** When true, force the assistant to spell out the full math behind every recommendation. */
   showMath?: boolean;
+  /** Chosen draft strategy: id + label + coach guidance to pin into the system prompt. */
+  strategy?: { id: string; label: string; guidance: string };
 }
 
 /**

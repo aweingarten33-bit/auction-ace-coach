@@ -119,6 +119,7 @@ interface CoachPayload {
   history?: { role: "user" | "assistant"; content: string }[];
   draftedPlayers?: string[];
   showMath?: boolean;
+  strategy?: { id: string; label: string; guidance: string };
 }
 
 const MATH_ADDENDUM = ``;
@@ -220,10 +221,14 @@ Deno.serve(async (req: Request) => {
     }
 
     const sysBase = SYSTEM_PROMPT + (payload.showMath ? MATH_ADDENDUM : "");
+    const strategyAddendum = payload.strategy && payload.strategy.id !== "none"
+      ? `\n\nUSER STRATEGY: ${payload.strategy.label}.\n${payload.strategy.guidance}\nIf a recommendation breaks this plan, label it clearly as "this breaks your ${payload.strategy.label} plan" before approving it.`
+      : `\n\nUSER STRATEGY: None chosen. Judge bids on raw value and roster gaps. Don't lecture about plans.`;
+    const sysWithStrategy = sysBase + strategyAddendum;
     const sysPrompt = webContext
-      ? sysBase +
+      ? sysWithStrategy +
         `\n\nWEB SEARCH RESULTS — use these to inform your answer when relevant. If you quote or rely on one, cite it inline like "(per ESPN — <url>)" so the user can click through.\n\n${webContext}`
-      : sysBase;
+      : sysWithStrategy;
     const messages: { role: string; content: string }[] = [{ role: "system", content: sysPrompt }];
     if (payload.history?.length) {
       for (const h of payload.history.slice(-6)) {

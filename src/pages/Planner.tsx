@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
 import PricedPlayerAutocomplete from "@/components/PricedPlayerAutocomplete";
+import { STRATEGIES, getStrategy } from "@/lib/strategies";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -57,10 +58,9 @@ function defaultAlloc(slot: Slot, idx: number, total: number, budget: number): R
   return {}; // unused — calculator below produces values directly
 }
 
-function suggestedAllocations(slots: Slot[], budget: number): Record<string, number> {
-  // Simple weighted suggestion. K/DST/Bench = $1, Bench last = $1.
-  // Remaining split by position weights.
-  const weights: Record<Slot["pos"], number[]> = {
+function suggestedAllocations(slots: Slot[], budget: number, strategyWeights?: Partial<Record<Slot["pos"], number[]>>): Record<string, number> {
+  // Baseline weights (no-strategy default)
+  const base: Record<Slot["pos"], number[]> = {
     QB: [9, 3, 1],
     RB: [8, 5, 2.5, 1.5, 1],
     WR: [7, 5, 3, 1.5, 1],
@@ -71,6 +71,14 @@ function suggestedAllocations(slots: Slot[], budget: number): Record<string, num
     DST: [0.05],
     BENCH: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
   };
+  // Apply per-position multipliers from the chosen strategy (if any)
+  const weights: Record<Slot["pos"], number[]> = { ...base };
+  if (strategyWeights) {
+    for (const k of Object.keys(strategyWeights) as (keyof typeof base)[]) {
+      const mult = strategyWeights[k] ?? [];
+      weights[k] = base[k].map((w, i) => w * (mult[i] ?? mult[mult.length - 1] ?? 1));
+    }
+  }
   const counters: Record<string, number> = {};
   const raw: number[] = slots.map((s) => {
     const idx = counters[s.pos] ?? 0;
@@ -78,7 +86,6 @@ function suggestedAllocations(slots: Slot[], budget: number): Record<string, num
     const w = weights[s.pos]?.[idx] ?? weights[s.pos]?.[weights[s.pos].length - 1] ?? 0.1;
     return w;
   });
-  // Reserve $1 floor per slot
   const floor = slots.length;
   if (budget <= floor) return Object.fromEntries(slots.map((s) => [s.id, 1]));
   const pool = budget - floor;
@@ -90,7 +97,6 @@ function suggestedAllocations(slots: Slot[], budget: number): Record<string, num
     out[s.id] = v;
     allocated += v;
   });
-  // Reconcile rounding to exact budget by adjusting the largest slot
   const diff = budget - allocated;
   if (diff !== 0) {
     const biggestId = [...slots].sort((a, b) => out[b.id] - out[a.id])[0].id;
@@ -104,7 +110,9 @@ export default function Planner() {
   const {
     settings, keepers, events, prices, setupComplete,
     slotAllocations, setSlotAllocation, setSlotAllocations, clearSlotAllocations,
+    strategyId, setStrategyId,
   } = useDraftStore();
+  const strategy = getStrategy(strategyId);
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
@@ -119,7 +127,7 @@ export default function Planner() {
     const slotIds = new Set(slots.map((s) => s.id));
     const sameSet = known.size === slotIds.size && [...slotIds].every((id) => known.has(id));
     if (!sameSet) {
-      setSlotAllocations(suggestedAllocations(slots, settings.totalBudget));
+      setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slots.length, settings.totalBudget]);
@@ -222,6 +230,52 @@ export default function Planner() {
         {/* ---------- Step 1: Setup ---------- */}
         <SetupChecklist />
 
+        {/* ---------- Strategy picker ---------- */}
+        <Card className="p-3">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">★</span>
+            <h2 className="text-sm font-semibold">Draft strategy</h2>
+            {strategyId !== "none" && (
+              <span className="ml-auto rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                {strategy.label}
+              </span>
+            )}
+          </div>
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Pick a build to lock in. The $ allocations and Coach AI will follow it. Pick <strong>No strategy</strong> if you want to stay flexible.
+          </p>
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+            {STRATEGIES.map((s) => {
+              const active = s.id === strategyId;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => {
+                    setStrategyId(s.id);
+                    setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, s.weights));
+                  }}
+                  className={`rounded-md border px-2.5 py-2 text-left transition-colors ${
+                    active
+                      ? "border-primary bg-primary/10 ring-1 ring-primary/40"
+                      : "border-border bg-card/40 hover:bg-card/70"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 text-xs font-semibold">
+                    {s.label}
+                    {active && <Check className="h-3 w-3 text-primary" />}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground leading-tight">{s.short}</div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[11px] italic text-muted-foreground/80">
+            {strategy.description}
+          </p>
+        </Card>
+
+
         {/* ---------- Step 2: Slot allocation ---------- */}
 
         <Card className="p-3">
@@ -234,8 +288,8 @@ export default function Planner() {
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost" size="sm"
-                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget))}
-                title="Auto-suggest"
+                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights))}
+                title="Auto-suggest from chosen strategy"
               >
                 <RotateCcw className="mr-1 h-3.5 w-3.5" /> Suggest
               </Button>
@@ -245,7 +299,8 @@ export default function Planner() {
             </div>
           </div>
           <p className="mb-3 text-[11px] text-muted-foreground">
-            Edit any slot. Auto-suggest splits your <span className="font-mono">${settings.totalBudget}</span> by position weight.
+            Edit any slot. Auto-suggest splits your <span className="font-mono">${settings.totalBudget}</span> using your{" "}
+            <span className="font-semibold text-foreground">{strategy.label}</span> shape.
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {slots.map((s) => (
