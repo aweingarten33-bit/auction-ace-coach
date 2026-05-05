@@ -796,23 +796,21 @@ export default function Draft() {
           </div>
 
           <div className="border-t border-border/60 bg-secondary/20 px-3 py-3">
-            <div className="mb-2 flex flex-wrap gap-1.5">
-              {[
-                { label: "Who should I bid on next?", q: "Based on my roster, budget, and what's left on the board, who should I go after next and how much should I pay?" },
-                { label: "Who should I nominate?", q: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
-                { label: "Should I change my plan?", q: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
-                { label: "Am I spending too much?", q: "Am I overspending so far? Compare what I've spent to what's normal for this point in the draft and tell me what to do." },
-                { label: "What's my biggest hole?", q: "What's the biggest weakness on my roster right now and what's the cheapest way to fix it?" },
-                { label: "Any sleepers I'm missing?", q: "Give me 2-3 sleeper or value picks I should be watching for later in the draft based on what's still available." },
-              ].map((b) => (
+            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+              {quickPrompts.map((b) => (
                 <Button
-                  key={b.label} size="sm" variant="outline" disabled={streaming}
-                  onClick={() => askCoach(undefined, b.q)}
+                  key={b.id} size="sm" variant="outline" disabled={streaming}
+                  onClick={() => askCoach(undefined, b.prompt)}
                   className="h-7 rounded-full text-xs"
                 >
                   {b.label}
                 </Button>
               ))}
+              <QuickPromptsEditor
+                prompts={quickPrompts}
+                onSave={setQuickPrompts}
+                onReset={resetQuickPrompts}
+              />
               {(coachHistory.length > 0 || coachText) && !streaming && (
                 <Button
                   size="sm" variant="ghost"
