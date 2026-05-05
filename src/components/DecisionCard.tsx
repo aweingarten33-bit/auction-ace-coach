@@ -61,7 +61,7 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
       {/* GO UP TO / STOP AT */}
       <div className="mt-3 grid grid-cols-2 gap-2">
         <div className="rounded-md border border-success/40 bg-success/10 px-3 py-2">
-          <p className="text-[9px] font-bold uppercase tracking-widest text-success/80">Go up to</p>
+          <p className="text-[9px] font-bold uppercase tracking-widest text-success/80">You can go up to</p>
           <p className="font-mono text-2xl font-extrabold tabular-nums text-success">${d.goUpTo}</p>
         </div>
         <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2">
@@ -69,10 +69,14 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
           <p className="font-mono text-2xl font-extrabold tabular-nums text-destructive">${d.stopAt}</p>
         </div>
       </div>
+      <p className="mt-1 text-center text-[11px] font-semibold text-destructive/90">
+        If you go above ${d.stopAt}, your plan no longer works
+      </p>
 
       {/* PRICE LADDER */}
       <div className="mt-2 grid grid-cols-3 gap-1">
         {d.ladder.map((p) => {
+          const label = p.label === "GOOD" ? "GOOD" : p.label === "FAIR" ? "BE CAREFUL" : "STOP";
           const tone = p.label === "GOOD"
             ? "border-success/40 bg-success/5 text-success"
             : p.label === "FAIR"
@@ -81,7 +85,7 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
           return (
             <div key={p.label} className={`rounded border px-2 py-1 text-center ${tone}`}>
               <p className="font-mono text-sm font-bold tabular-nums">${p.price}</p>
-              <p className="text-[9px] font-bold tracking-wider">{p.label}</p>
+              <p className="text-[9px] font-bold tracking-wider">{label}</p>
             </div>
           );
         })}
