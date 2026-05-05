@@ -444,62 +444,7 @@ export default function LiveDashboard() {
     }
   };
 
-  const refreshNominations = async (filtersOverride?: typeof forecastFilters) => {
-    setNominationsLoading(true);
-    try {
-      const f = filtersOverride ?? forecastFilters;
-      const filters = {
-        positions: f.positions.length ? f.positions : undefined,
-        tier: f.tier !== "any" ? f.tier : undefined,
-        priceMin: f.priceMin ? parseInt(f.priceMin, 10) : undefined,
-        priceMax: f.priceMax ? parseInt(f.priceMax, 10) : undefined,
-      };
-      const resp = await fetch(NOMINATIONS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          settings: {
-            totalBudget: settings.totalBudget,
-            numTeams: settings.numTeams,
-            scoring: settings.scoring,
-            leagueType: settings.leagueType,
-            format: settings.format,
-            context: settings.context,
-          },
-          budget,
-          myRoster: myItems,
-          rosterRequired: requiredCount,
-          rosterFilled: myCount,
-          gaps: gaps.map((g) => ({ pos: g.pos, severity: g.severity, starterShort: g.starterShort })),
-          events,
-          prices,
-          spendByPosition: spend,
-          recentRuns: runs,
-          watchlist,
-          filters,
-        }),
-      });
-      if (!resp.ok) {
-        if (resp.status === 429) toast.error("Rate limited.");
-        else if (resp.status === 402) toast.error("AI credits exhausted.");
-        else toast.error("Forecast unavailable.");
-        return;
-      }
-      const data = await resp.json();
-      if (Array.isArray(data?.nominations)) {
-        setNominations(data.nominations);
-        setRoomRead(data.roomRead);
-      }
-    } catch (e) {
-      console.error(e);
-      toast.error("Forecast error");
-    } finally {
-      setNominationsLoading(false);
-    }
-  };
+  // (Nomination forecast removed — TierBreakAlerts replaces it deterministically.)
 
   const submitPick = () => {
     const name = playerName.trim();
@@ -530,7 +475,6 @@ export default function LiveDashboard() {
     setPosition("");
     // Coach no longer auto-fires — opt-in only via Ask buttons.
     refreshQueue();
-    refreshNominations();
   };
 
   const handlePickFromQueue = (t: QueueTarget) => {
