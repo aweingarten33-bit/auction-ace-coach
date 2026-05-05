@@ -134,7 +134,7 @@ export default function VetriPlayerSummary() {
                         className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone.dot}`}
                         title={t.lean}
                       />
-                      <span className="truncate text-[12px] font-medium text-foreground">
+                      <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-foreground">
                         {t.player}
                       </span>
                       {t.position && (
