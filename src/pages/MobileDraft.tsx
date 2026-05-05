@@ -346,6 +346,9 @@ function LogTab(props: {
 
   return (
     <div className="space-y-3">
+      {/* THE DECISION — one card, five seconds */}
+      {decision && <DecisionCard d={decision} />}
+
       {/* Open positions chip strip */}
       <div className="grid grid-cols-6 gap-1">
         {posRows.map(({ p, have, need, tone }) => (
@@ -407,15 +410,6 @@ function LogTab(props: {
             </span>
           </div>
 
-          {projection && (
-            <RemainingBuildPanel
-              projection={projection}
-              hypoPrice={priceNum}
-              hypoName={playerName || undefined}
-              hypoPos={(position as Position) || undefined}
-              compact
-            />
-          )}
 
           {/* Quick increments */}
           <div className="grid grid-cols-5 gap-1.5">
