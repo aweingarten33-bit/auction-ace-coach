@@ -15,6 +15,21 @@ import {
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
+export interface QuickPrompt {
+  id: string;
+  label: string;   // button text
+  prompt: string;  // full question sent to the assistant
+}
+
+export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
+  { id: "qp-bid",      label: "Who should I bid on next?",  prompt: "Based on my roster, budget, and what's left on the board, who should I go after next and how much should I pay?" },
+  { id: "qp-nominate", label: "Who should I nominate?",     prompt: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
+  { id: "qp-pivot",    label: "Should I change my plan?",   prompt: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
+  { id: "qp-spend",    label: "Am I spending too much?",    prompt: "Am I overspending so far? Compare what I've spent to what's normal for this point in the draft and tell me what to do." },
+  { id: "qp-hole",     label: "What's my biggest hole?",    prompt: "What's the biggest weakness on my roster right now and what's the cheapest way to fix it?" },
+  { id: "qp-sleepers", label: "Any sleepers I'm missing?",  prompt: "Give me 2-3 sleeper or value picks I should be watching for later in the draft based on what's still available." },
+];
+
 interface DraftState {
   settings: LeagueSettings;
   keepers: Keeper[];
@@ -28,6 +43,7 @@ interface DraftState {
   vetriDecay: number;       // tier decay 0.4-0.8 (default 0.55)
   vetriAutoSync: boolean;   // re-merge into prices when settings/tiers change
   priceOverrides: string[]; // normalized player names where user manually set price (Vetri won't overwrite)
+  quickPrompts: QuickPrompt[]; // editable assistant quick-question buttons
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -49,6 +65,9 @@ interface DraftState {
   syncVetriToPrices: () => void;
   clearPriceOverride: (name: string) => void;
   clearVetri: () => void;
+  // Quick prompts
+  setQuickPrompts: (p: QuickPrompt[]) => void;
+  resetQuickPrompts: () => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -65,6 +84,9 @@ export const useDraftStore = create<DraftState>()(
       vetriDecay: 0.55,
       vetriAutoSync: true,
       priceOverrides: [],
+      quickPrompts: DEFAULT_QUICK_PROMPTS,
+      setQuickPrompts: (p) => set({ quickPrompts: p }),
+      resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
