@@ -276,9 +276,6 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             Auto-fill from your ESPN league (last 3 drafts × this year's ranks). Upload/paste only if you want to override.
           </p>
         </div>
-        <Badge variant="outline" className="border-primary/40 text-primary text-[10px]">
-          {prices.length} players · ${prices.reduce((s, p) => s + p.price, 0)} total
-        </Badge>
       </div>
 
       {/* PRIMARY: Auto-fill from ESPN */}
