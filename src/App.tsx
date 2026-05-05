@@ -4,11 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import LiveDashboard from "./pages/LiveDashboard.tsx";
+import Draft from "./pages/Draft.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
-import MobileDraft from "./pages/MobileDraft.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -30,11 +29,12 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<AuthPage />} />
-            <Route path="/draft" element={<LiveDashboard />} />
-            <Route path="/dashboard" element={<Protected><LiveDashboard /></Protected>} />
+            <Route path="/draft" element={<Protected><Draft /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
-            <Route path="/m" element={<MobileDraft />} />
-            <Route path="/mobile" element={<MobileDraft />} />
+            {/* Legacy redirects */}
+            <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
+            <Route path="/m" element={<Navigate to="/draft" replace />} />
+            <Route path="/mobile" element={<Navigate to="/draft" replace />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
