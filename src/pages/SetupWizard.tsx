@@ -23,7 +23,7 @@ import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
 
-const STEPS = ["League & Roster", "Players & Context"];
+const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 
 export default function SetupWizard() {
   const navigate = useNavigate();
