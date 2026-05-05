@@ -868,12 +868,18 @@ export default function LiveDashboard() {
 
         {/* COACH COLUMN — its own column at xl, stacks below at lg */}
         <section className="space-y-4 lg:col-span-2 xl:col-span-1">
-          {/* Coach */}
-          <Card className="bg-gradient-card p-4 shadow-glow">
-            <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
-              <Sparkles className="h-3.5 w-3.5" /> AI Assistant
-              
-              {streaming && <span className="text-muted-foreground">· thinking...</span>}
+          {/* Coach — ChatGPT style */}
+          <Card className="flex flex-col overflow-hidden bg-card p-0 shadow-glow">
+            <div className="flex items-center gap-2 border-b border-border/60 px-4 py-3">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <Sparkles className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="text-sm font-semibold">Auction Assistant</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {streaming ? "typing…" : "online"}
+                </span>
+              </div>
               {(coachHistory.length > 0 || coachText) && !streaming && (
                 <button
                   onClick={() => { setCoachHistory([]); setCoachText(""); }}
@@ -883,66 +889,86 @@ export default function LiveDashboard() {
                   Clear
                 </button>
               )}
-            </h2>
-            <div ref={coachRef} className="coach-md max-h-96 space-y-3 overflow-auto text-sm leading-relaxed">
+            </div>
+
+            <div ref={coachRef} className="coach-md flex max-h-[28rem] flex-col gap-4 overflow-auto px-4 py-4 text-sm leading-relaxed">
               {coachHistory.length === 0 && !streaming && (
-                <ReactMarkdown>{coachText || "_..._"}</ReactMarkdown>
+                <div className="flex gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <div className="prose prose-sm max-w-none text-foreground">
+                    <ReactMarkdown>{coachText || "How can I help you with your draft?"}</ReactMarkdown>
+                  </div>
+                </div>
               )}
               {coachHistory.map((m, i) => {
                 const isUser = m.role === "user";
-                const isLastAssistant = !isUser && i === coachHistory.length - 1 && !streaming;
-                return (
-                  <div
-                    key={i}
-                    className={`rounded-md border px-2.5 py-2 ${
-                      isUser
-                        ? "border-primary/30 bg-primary/5"
-                        : "border-border/60 bg-secondary/30"
-                    }`}
-                  >
-                    <p className={`mb-1 text-[9px] font-bold uppercase tracking-wider ${isUser ? "text-primary" : "text-muted-foreground"}`}>
-                      {isUser ? "You" : "Assistant"}
-                    </p>
-                    <ReactMarkdown>{m.content}</ReactMarkdown>
-                    {isLastAssistant && null}
+                return isUser ? (
+                  <div key={i} className="flex justify-end">
+                    <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2 text-primary-foreground">
+                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                    </div>
+                  </div>
+                ) : (
+                  <div key={i} className="flex gap-3">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Sparkles className="h-4 w-4" />
+                    </div>
+                    <div className="prose prose-sm max-w-none text-foreground">
+                      <ReactMarkdown>{m.content}</ReactMarkdown>
+                    </div>
                   </div>
                 );
               })}
               {streaming && coachText && (
-                <div className="rounded-md border border-border/60 bg-secondary/30 px-2.5 py-2">
-                  <p className="mb-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Assistant · typing</p>
-                  <ReactMarkdown>{coachText}</ReactMarkdown>
+                <div className="flex gap-3">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <Sparkles className="h-4 w-4 animate-pulse" />
+                  </div>
+                  <div className="prose prose-sm max-w-none text-foreground">
+                    <ReactMarkdown>{coachText}</ReactMarkdown>
+                  </div>
                 </div>
               )}
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {[
-                { label: "Should I pivot?", q: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
-                { label: "Nominate who?", q: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
-              ].map((b) => (
-                <Button
-                  key={b.label}
-                  size="sm"
-                  variant="secondary"
+
+            <div className="border-t border-border/60 bg-secondary/20 px-3 py-3">
+              <div className="mb-2 flex flex-wrap gap-1.5">
+                {[
+                  { label: "Should I pivot?", q: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
+                  { label: "Nominate who?", q: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
+                ].map((b) => (
+                  <Button
+                    key={b.label}
+                    size="sm"
+                    variant="outline"
+                    disabled={streaming}
+                    onClick={() => askCoach(undefined, b.q)}
+                    className="h-7 rounded-full text-xs"
+                  >
+                    {b.label}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
+                <Input
+                  placeholder="Message Auction Assistant…"
+                  value={followUp}
+                  onChange={(e) => setFollowUp(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}
                   disabled={streaming}
-                  onClick={() => askCoach(undefined, b.q)}
-                  className="h-7 text-xs"
+                  className="h-8 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+                />
+                <Button
+                  onClick={handleFollowUp}
+                  disabled={streaming || !followUp.trim()}
+                  size="sm"
+                  className="h-8 w-8 shrink-0 rounded-full p-0"
                 >
-                  {b.label}
+                  ↑
                 </Button>
-              ))}
-            </div>
-            <div className="mt-2 flex gap-2">
-              <Input
-                placeholder="Ask the assistant a question..."
-                value={followUp}
-                onChange={(e) => setFollowUp(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}
-                disabled={streaming}
-              />
-              <Button onClick={handleFollowUp} disabled={streaming || !followUp.trim()} variant="outline">
-                Ask
-              </Button>
+              </div>
             </div>
           </Card>
         </section>
