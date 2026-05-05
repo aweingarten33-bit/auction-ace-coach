@@ -537,7 +537,7 @@ export default function LiveDashboard() {
     setPlayerName("");
     setPriceInput("");
     setPosition("");
-    askCoach(ev);
+    // Coach no longer auto-fires — opt-in only via Ask buttons.
     refreshQueue();
     refreshNominations();
   };
