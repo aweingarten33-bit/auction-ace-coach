@@ -876,8 +876,6 @@ export default function Draft() {
         </SheetContent>
       </Sheet>
 
-      {/* Visually hide unused progress import warning suppressor — kept for future budget bar */}
-      <Progress className="hidden" value={0} />
     </div>
   );
 }
