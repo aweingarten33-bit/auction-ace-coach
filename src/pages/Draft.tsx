@@ -79,7 +79,9 @@ export default function Draft() {
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
     quickPrompts, setQuickPrompts, resetQuickPrompts,
     showMath, setShowMath, setDraftPlan,
+    strategyId,
   } = useDraftStore();
+  const strategy = getStrategy(strategyId);
   const [planGenerating, setPlanGenerating] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
