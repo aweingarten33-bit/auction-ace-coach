@@ -98,77 +98,68 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
     : "—";
 
   return (
-    <Card className="bg-gradient-card p-4 shadow-glow">
-      <div className="mb-2 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-warning">
-          <Flame className="h-3.5 w-3.5" /> Hot Players Right Now
+    <Card className="bg-gradient-card p-3 shadow-glow">
+      <div className="mb-1.5 flex items-center justify-between">
+        <h2 className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-warning">
+          <Flame className="h-3 w-3" /> Hot Right Now
         </h2>
         <div className="flex items-center gap-1">
           <Button
             size="sm" variant="ghost"
             onClick={() => setShowHelp((s) => !s)}
-            className="h-7 px-2"
+            className="h-6 px-1.5"
             title="What is this?"
           >
-            <HelpCircle className="h-3.5 w-3.5" />
+            <HelpCircle className="h-3 w-3" />
           </Button>
-          <span className="text-[10px] text-muted-foreground">{updatedLabel}</span>
+          <span className="text-[9px] text-muted-foreground">{updatedLabel}</span>
           <Button
-            size="sm" variant="ghost" onClick={load} disabled={loading} className="h-7 px-2"
+            size="sm" variant="ghost" onClick={load} disabled={loading} className="h-6 px-1.5"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
           </Button>
         </div>
       </div>
 
-      <p className="mb-3 text-[11px] leading-snug text-muted-foreground">
-        Players that <span className="font-semibold text-foreground">tons of other fantasy managers</span> just grabbed.
-        If they're hot here, expect your league to <span className="font-semibold text-warning">overpay</span> for them too.
-      </p>
-
       {showHelp && (
-        <div className="mb-3 space-y-1.5 rounded-md border border-border bg-secondary/40 p-2.5 text-[11px] leading-relaxed">
-          <p className="font-semibold">Quick guide — what each label means:</p>
-          <p><span className="rounded border border-success/50 bg-success/15 px-1 py-0.5 text-[9px] font-bold text-success">TARGET</span> You need this position + you can afford him → <b>BID</b>.</p>
-          <p><span className="rounded border border-warning/50 bg-warning/15 px-1 py-0.5 text-[9px] font-bold text-warning">STRETCH</span> You need him but he costs more than your max → only if you have a backup plan.</p>
-          <p><span className="rounded border border-destructive/50 bg-destructive/10 px-1 py-0.5 text-[9px] font-bold text-destructive">SKIP</span> Too expensive — you don't have the money.</p>
-          <p><span className="rounded border border-muted-foreground/30 bg-muted/20 px-1 py-0.5 text-[9px] font-bold text-muted-foreground">FADE</span> You don't need him — let someone else overpay.</p>
-          <p className="pt-1 text-muted-foreground">🔥 The flame number = how many people just added him. Bigger = hotter.</p>
+        <div className="mb-2 space-y-1 rounded-md border border-border bg-secondary/40 p-2 text-[10px] leading-relaxed">
+          <p className="font-semibold">Players tons of managers just grabbed → expect overpays.</p>
+          <p><span className="rounded border border-success/50 bg-success/15 px-1 py-0.5 text-[9px] font-bold text-success">TARGET</span> Need + can afford → <b>BID</b>.</p>
+          <p><span className="rounded border border-warning/50 bg-warning/15 px-1 py-0.5 text-[9px] font-bold text-warning">STRETCH</span> Over your max — only with backup plan.</p>
+          <p><span className="rounded border border-destructive/50 bg-destructive/10 px-1 py-0.5 text-[9px] font-bold text-destructive">SKIP</span> Out of budget.</p>
+          <p><span className="rounded border border-muted-foreground/30 bg-muted/20 px-1 py-0.5 text-[9px] font-bold text-muted-foreground">FADE</span> Not a need — let others overpay.</p>
         </div>
       )}
 
       {spikes.length > 0 && (
-        <div className="mb-2 flex flex-wrap items-center gap-1.5 rounded-md border border-warning/30 bg-warning/10 px-2 py-1.5 text-[11px]">
+        <div className="mb-1.5 flex flex-wrap items-center gap-1 rounded-md border border-warning/30 bg-warning/10 px-1.5 py-1 text-[10px]">
           <TrendingUp className="h-3 w-3 text-warning" />
-          <span className="font-semibold text-warning">Everyone's grabbing:</span>
+          <span className="font-semibold text-warning">Run on:</span>
           {spikes.map((s) => (
-            <Badge key={s.pos} variant="outline" className={`${POS_COLORS[s.pos]} px-1.5 py-0 text-[10px]`}>
+            <Badge key={s.pos} variant="outline" className={`${POS_COLORS[s.pos]} px-1 py-0 text-[9px]`}>
               {s.pos}
             </Badge>
           ))}
-          <span className="ml-1 text-muted-foreground">
-            → next {spikes[0].pos} will go for too much. Either grab one fast or skip the bidding war.
-          </span>
         </div>
       )}
 
       {error && (
-        <p className="py-3 text-center text-xs text-destructive">{error}</p>
+        <p className="py-2 text-center text-[11px] text-destructive">{error}</p>
       )}
 
       {loading && !top.length && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {[0, 1, 2, 3, 4].map((i) => (
             <div
               key={i}
-              className="h-[52px] animate-pulse rounded-md border border-border bg-secondary/40"
+              className="h-[44px] animate-pulse rounded-md border border-border bg-secondary/40"
             />
           ))}
         </div>
       )}
 
       {!loading && !top.length && !error && (
-        <p className="py-4 text-center text-xs text-muted-foreground">
+        <p className="py-3 text-center text-[11px] text-muted-foreground">
           No trending adds right now.
         </p>
       )}
