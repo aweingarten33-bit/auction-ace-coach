@@ -103,7 +103,7 @@ export default function PlayerAutocomplete({
                 i === highlight ? "bg-accent/30" : ""
               }`}
             >
-              <span className="whitespace-nowrap font-medium text-base">{p.full_name}</span>
+              <span className="truncate font-medium text-sm">{p.full_name}</span>
               <span className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                 {p.team && <span>{p.team}</span>}
                 {p.position && (
