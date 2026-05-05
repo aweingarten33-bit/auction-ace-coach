@@ -95,6 +95,8 @@ Deno.serve(async (req) => {
           pos_rank: ranks?.positionalRank ?? null,
           auction_value: ranks?.auctionValue ?? null,
           projected_points: null,
+          prior_ppg: null as number | null,
+          prior_season: null as number | null,
         };
       })
       .filter(Boolean) as Array<{ season: number; espn_player_id: number; player_name: string; player_name_norm: string; position: string | null; overall_rank: number | null; pos_rank: number | null; auction_value: number | null; projected_points: number | null; prior_ppg: number | null; prior_season: number | null }>;
