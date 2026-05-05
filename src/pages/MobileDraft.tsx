@@ -365,8 +365,7 @@ function LogTab(props: {
       </button>
 
       {manualOpen && (
-      <Card className="bg-gradient-card p-3"></Card>
-      )}
+      <Card className="bg-gradient-card p-3">
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
           <button
             onClick={() => setDrafter("me")}
@@ -497,6 +496,7 @@ function LogTab(props: {
           </Button>
         </div>
       </Card>
+      )}
 
       <Card className="bg-gradient-card p-3">
         <div className="mb-2 flex items-center justify-between">
