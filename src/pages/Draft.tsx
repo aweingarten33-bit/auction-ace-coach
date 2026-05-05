@@ -531,7 +531,15 @@ Keep it tight. No fluff, no closing line.`;
             </div>
             <h1 className="truncate text-[16px] font-semibold tracking-tight text-foreground">Draft</h1>
           </div>
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-1">
+            <Button
+              size="sm"
+              onClick={() => navigate("/planner")}
+              className="h-8 gap-1.5 px-2.5 text-[11px] font-semibold"
+              title="Budget Planner"
+            >
+              <Calculator className="h-3.5 w-3.5" /> Planner
+            </Button>
             <AlertDialog>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
