@@ -9,6 +9,7 @@ import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
+import Admin from "./pages/Admin.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
