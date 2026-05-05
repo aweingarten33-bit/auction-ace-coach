@@ -34,6 +34,7 @@ const App = () => (
             <Route path="/draft" element={<Protected><Draft /></Protected>} />
             <Route path="/planner" element={<Protected><Planner /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+            <Route path="/admin" element={<Protected><Admin /></Protected>} />
             {/* Legacy redirects */}
             <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
             <Route path="/m" element={<Navigate to="/draft" replace />} />
