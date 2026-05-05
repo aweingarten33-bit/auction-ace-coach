@@ -193,7 +193,7 @@ export default function Planner() {
             </p>
           </div>
         </div>
-        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
+        <SyncHistoryButton />
       </header>
 
       {/* Summary bar */}
