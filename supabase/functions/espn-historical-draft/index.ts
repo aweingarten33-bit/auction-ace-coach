@@ -101,10 +101,48 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // For any picks missing from team rosters (dropped players), fetch
+        // player metadata in bulk from the players endpoint with x-fantasy-filter.
+        const missingIds = auctionPicks
+          .map((p: any) => p.playerId)
+          .filter((id: number) => id && !playerMap.has(id));
+        if (missingIds.length > 0) {
+          try {
+            const playersUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}/players?view=players_wl`;
+            const pr = await fetch(playersUrl, {
+              headers: {
+                cookie,
+                accept: "application/json",
+                "accept-language": "en-US,en;q=0.9",
+                referer: "https://fantasy.espn.com/",
+                origin: "https://fantasy.espn.com",
+                "user-agent":
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+                "x-fantasy-filter": JSON.stringify({ players: { filterIds: { value: missingIds }, limit: missingIds.length } }),
+                "x-fantasy-source": "kona",
+                "x-fantasy-platform": "kona-PROD",
+              },
+            });
+            const ptext = await pr.text();
+            if (pr.ok && !ptext.trimStart().startsWith("<")) {
+              const players = JSON.parse(ptext);
+              if (Array.isArray(players)) {
+                for (const p of players) {
+                  if (p?.id) {
+                    playerMap.set(p.id, {
+                      name: p.fullName ?? `${p.firstName ?? ""} ${p.lastName ?? ""}`.trim() || `Player ${p.id}`,
+                      pos: posCode(p.defaultPositionId),
+                    });
+                  }
+                }
+              }
+            }
+          } catch (_) { /* best-effort */ }
+        }
+
         const rows = auctionPicks
           .map((p: any) => {
-            const meta = playerMap.get(p.playerId);
-            if (!meta) return null;
+            const meta = playerMap.get(p.playerId) ?? { name: `Player ${p.playerId}`, pos: null };
             return {
               user_id: u.user.id,
               league_id: creds.league_id,
@@ -117,8 +155,7 @@ Deno.serve(async (req) => {
               pick_overall: p.overallPickNumber ?? null,
               raw: p,
             };
-          })
-          .filter(Boolean);
+          });
 
         // Wipe + reinsert this season's data so re-syncs are idempotent.
         await sb
