@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { POS_COLORS } from "@/lib/positions";
-import { Position, PriceEstimate } from "@/lib/draft-types";
+import { Position } from "@/lib/draft-types";
 import { Target, Zap } from "lucide-react";
 import AnimatedNumber from "./AnimatedNumber";
 
@@ -11,7 +11,7 @@ interface SlotRow {
   have: number;
   need: number;
   short: number;
-  maxBid: number;       // per-slot max bid for this position
+  maxBid: number;
   severity: "critical" | "need" | "depth" | "done";
 }
 
@@ -33,10 +33,10 @@ interface RosterHeroProps {
 }
 
 const sevTone: Record<SlotRow["severity"], string> = {
-  critical: "border-destructive/60 bg-destructive/10 text-destructive",
-  need: "border-warning/50 bg-warning/10 text-warning",
-  depth: "border-border bg-secondary/40 text-muted-foreground",
-  done: "border-success/40 bg-success/10 text-success",
+  critical: "border-destructive/50 bg-destructive/5 text-destructive",
+  need: "border-warning/40 bg-warning/5 text-warning",
+  depth: "border-border bg-secondary/30 text-muted-foreground",
+  done: "border-success/30 bg-success/5 text-success",
 };
 
 export default function RosterHero({
@@ -51,125 +51,107 @@ export default function RosterHero({
   const openRows = rows.filter((r) => r.short > 0 || r.severity !== "done");
 
   return (
-    <Card className="relative overflow-hidden border-primary/30 bg-gradient-card p-4 shadow-glow">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.07]"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, hsl(var(--primary)) 0 1px, transparent 1px 12px)",
-        }}
-      />
-      <div className="relative">
-        {/* Top stat strip */}
-        <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/50 pb-3">
-          <div>
-            <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-primary/80">
-              ⚡ Your Build · Live
+    <Card className="p-4">
+      {/* Top stat strip */}
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border/50 pb-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            Your Build
+          </p>
+          <h2 className="text-base font-semibold text-foreground">
+            Roster &amp; Needs
+          </h2>
+        </div>
+        <div className="flex items-center gap-4 tabular-nums">
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Bank</p>
+            <AnimatedNumber value={remaining} prefix="$" className="block text-base font-semibold text-primary" />
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Bid</p>
+            <AnimatedNumber value={maxBid} prefix="$" className="block text-base font-semibold text-foreground" />
+          </div>
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Slots</p>
+            <p className="text-base font-semibold text-foreground">
+              <AnimatedNumber value={slotsLeft} />
+              <span className="text-xs text-muted-foreground">/{slotsTotal}</span>
             </p>
-            <h2 className="font-chyron text-lg font-extrabold uppercase italic tracking-tight text-foreground neon-text">
-              Roster + Needs
-            </h2>
-          </div>
-          <div className="flex items-center gap-4 font-mono text-[11px] tabular-nums text-muted-foreground">
-            <div className="text-right">
-              <p className="text-[9px] uppercase tracking-wide">Bank</p>
-              <AnimatedNumber
-                value={remaining}
-                prefix="$"
-                className="block text-base font-bold text-primary"
-              />
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] uppercase tracking-wide">Max Bid</p>
-              <AnimatedNumber
-                value={maxBid}
-                prefix="$"
-                className="block text-base font-bold text-foreground"
-              />
-            </div>
-            <div className="text-right">
-              <p className="text-[9px] uppercase tracking-wide">Slots</p>
-              <p className="text-base font-bold tabular-nums text-foreground">
-                <AnimatedNumber value={slotsLeft} />
-                <span className="text-xs text-muted-foreground">/{slotsTotal}</span>
-              </p>
-            </div>
           </div>
         </div>
+      </div>
 
-        {/* Per-slot grid */}
-        <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
-          {(openRows.length ? openRows : rows).map((r) => (
-            <div
-              key={r.pos}
-              className={`flex flex-col rounded-md border px-2 py-1.5 ${sevTone[r.severity]}`}
-            >
-              <div className="flex items-center justify-between">
-                <Badge
-                  variant="outline"
-                  className={`${
-                    r.pos === "FLEX" || r.pos === "BENCH"
-                      ? "bg-muted text-foreground border-border"
-                      : POS_COLORS[r.pos as Position]
-                  } px-1.5 py-0 text-[10px]`}
-                >
-                  {r.pos}
-                </Badge>
-                <span className="font-mono text-[10px] tabular-nums text-foreground/80">
-                  {r.have}/{r.need}
-                </span>
+      {/* Per-slot grid */}
+      <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
+        {(openRows.length ? openRows : rows).map((r) => (
+          <div
+            key={r.pos}
+            className={`flex flex-col rounded-md border px-2 py-1.5 ${sevTone[r.severity]}`}
+          >
+            <div className="flex items-center justify-between">
+              <Badge
+                variant="outline"
+                className={`${
+                  r.pos === "FLEX" || r.pos === "BENCH"
+                    ? "bg-muted text-foreground border-border"
+                    : POS_COLORS[r.pos as Position]
+                } px-1.5 py-0 text-[10px]`}
+              >
+                {r.pos}
+              </Badge>
+              <span className="text-[10px] tabular-nums text-foreground/80">
+                {r.have}/{r.need}
+              </span>
+            </div>
+            {r.severity !== "done" && (
+              <div className="mt-0.5 flex items-center justify-between text-[10px] tabular-nums">
+                <span className="text-[9px] uppercase tracking-wider opacity-70">max</span>
+                <span className="font-semibold">${r.maxBid}</span>
               </div>
-              {r.severity !== "done" && (
-                <div className="mt-0.5 flex items-center justify-between font-mono text-[10px] tabular-nums">
-                  <span className="text-[8px] uppercase tracking-wider opacity-70">max</span>
-                  <span className="font-bold">${r.maxBid}</span>
-                </div>
-              )}
-            </div>
+            )}
+          </div>
+        ))}
+      </div>
 
-          ))}
-        </div>
-
-        {/* Best next target — only when we have one */}
-        {bestTarget && (
-        <div className="mt-3 flex items-stretch gap-2 rounded-md border border-primary/40 bg-primary/5 p-2.5">
-          <div className="flex h-auto w-9 shrink-0 items-center justify-center rounded bg-primary/15">
+      {/* Best next target */}
+      {bestTarget && (
+        <div className="mt-3 flex items-stretch gap-2 rounded-md border border-primary/30 bg-primary/5 p-2.5">
+          <div className="flex h-auto w-9 shrink-0 items-center justify-center rounded bg-primary/10">
             <Target className="h-4 w-4 text-primary" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-[9px] uppercase tracking-[0.25em] text-primary/90">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
               Best Next Target
             </p>
-                <div className="flex items-center gap-2">
-                  <span className="truncate text-sm font-bold text-foreground">
-                    {bestTarget.name}
-                  </span>
-                  <Badge
-                    variant="outline"
-                    className={`${POS_COLORS[bestTarget.position]} px-1.5 py-0 text-[10px]`}
-                  >
-                    {bestTarget.position}
-                  </Badge>
-                  <span className="ml-auto font-mono text-sm font-bold text-primary">
-                    ≤ ${bestTarget.maxBid}
-                  </span>
-                </div>
-                <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-                  {bestTarget.reason}
-                </p>
+            <div className="flex items-center gap-2">
+              <span className="truncate text-sm font-semibold text-foreground">
+                {bestTarget.name}
+              </span>
+              <Badge
+                variant="outline"
+                className={`${POS_COLORS[bestTarget.position]} px-1.5 py-0 text-[10px]`}
+              >
+                {bestTarget.position}
+              </Badge>
+              <span className="ml-auto text-sm font-semibold text-primary tabular-nums">
+                ≤ ${bestTarget.maxBid}
+              </span>
+            </div>
+            <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
+              {bestTarget.reason}
+            </p>
           </div>
           {onLoadTarget && (
             <Button
               size="sm"
-              className="self-center bg-gradient-primary text-primary-foreground"
+              className="self-center"
               onClick={() => onLoadTarget(bestTarget.name, bestTarget.position)}
             >
               <Zap className="mr-1 h-3 w-3" /> Load
             </Button>
           )}
         </div>
-        )}
-      </div>
+      )}
     </Card>
   );
 }
