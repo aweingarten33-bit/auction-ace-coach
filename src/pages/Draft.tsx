@@ -752,7 +752,9 @@ Keep it tight. No fluff, no closing line.`;
                     Analyst players · projected $
                   </span>
                 </div>
-                <VetriPlayerSummary />
+                <div className="max-h-[320px] overflow-y-auto pr-1">
+                  <VetriPlayerSummary />
+                </div>
               </Card>
               <Card className="p-3">
                 <div className="mb-2 flex items-center justify-between">
@@ -772,16 +774,18 @@ Keep it tight. No fluff, no closing line.`;
                     placeholder="Search a player for analyst takes…"
                   />
                 </div>
-                {(takesQuery || playerName || bestTarget?.name) ? (
-                  <VetriTakesForPlayer
-                    player={takesQuery || playerName || bestTarget!.name}
-                    emptyText="No analyst takes on this player yet."
-                  />
-                ) : (
-                  <p className="text-[11px] italic text-muted-foreground">
-                    Start typing a player name above to see analyst takes.
-                  </p>
-                )}
+                <div className="max-h-[300px] overflow-y-auto pr-1">
+                  {(takesQuery || playerName || bestTarget?.name) ? (
+                    <VetriTakesForPlayer
+                      player={takesQuery || playerName || bestTarget!.name}
+                      emptyText="No analyst takes on this player yet."
+                    />
+                  ) : (
+                    <p className="text-[11px] italic text-muted-foreground">
+                      Start typing a player name above to see analyst takes.
+                    </p>
+                  )}
+                </div>
               </Card>
             </TabsContent>
           </Tabs>
