@@ -39,7 +39,7 @@ Rules:
 
 For EACH target also emit (all required):
 - "grade" (1-5 integer): consensus quality score for this player at the suggested bid given current draft state. 5 = elite call, 1 = desperate.
-- "worstCase" (max ~80 chars): MiniMax-style downside if user PASSES, grounded in their ACTUAL state. MUST reference (a) the specific roster gap this player would have filled (use the Roster Gaps + Roster Filled vs Required), AND (b) the realistic next-best alternative at that position with a concrete $ estimate (pull from price sheet; adjust by recent market multiplier from Spend/Runs). Format: "Stuck with <Alt Name> ~$X at <POS> — <gap consequence>". Example: "Stuck with Pollard ~$14 at RB2 — leaves zero RB depth vs bye weeks". No generic fluff like "you'll regret it".
+- "worstCase" (max ~90 chars): plain-English downside if user PASSES. Must name the realistic next-best player at that position with a $ estimate, and say what it costs the roster in everyday words. Format: "You'll likely settle for <Alt Name> at ~$X, and you'd still be short a starting <POS>." Example: "You'll likely settle for Pollard at ~$14, and you'd still be short a starting RB." No jargon like "starter shorts", "critical", or "leaves N".
 - "knockoff" ({ "name": string, "position": same enum, "price": int >= 1 }): a meaningfully cheaper DHgate-style alternative at the SAME position. Knockoff price MUST be < maxBid * 0.6 and >= 1. Pull from the price sheet when possible. If literally no cheaper alternative exists, repeat the player with price = maxBid (rare).
 - "dossier" (max ~110 chars): IMDb-style one-liner — role, team if known, key trait, why-now. No fluff.`;
 
