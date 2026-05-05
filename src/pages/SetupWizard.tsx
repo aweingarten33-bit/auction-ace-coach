@@ -28,7 +28,7 @@ const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 export default function SetupWizard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup } =
+  const { settings, setSettings, setRoster, keepers, setKeepers, prices, setPrices, completeSetup, setupComplete } =
     useDraftStore();
   const [step, setStep] = useState(() => {
     const s = searchParams.get("step");
@@ -85,14 +85,21 @@ export default function SetupWizard() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-2xl">
-        <header className="mb-6 flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
-            <Trophy className="h-5 w-5 text-primary-foreground" />
+        <header className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
+              <Trophy className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold">Draft Setup</h1>
+              <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-lg font-semibold">Draft Setup</h1>
-            <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
-          </div>
+          {setupComplete && (
+            <Button size="sm" onClick={() => navigate("/draft")}>
+              Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
         </header>
 
         <Progress value={progress} className="mb-6 h-1.5" />
