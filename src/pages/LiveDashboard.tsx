@@ -81,7 +81,7 @@ export default function LiveDashboard() {
   const [drafter, setDrafter] = useState<"me" | "other">("other");
   const [position, setPosition] = useState<Position | "">("");
   const [coachText, setCoachText] = useState<string>(
-    "Welcome, coach. Enter your first draft pick above to get live recommendations."
+    "Welcome. Enter your first draft pick above to get live recommendations."
   );
   const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -869,7 +869,7 @@ export default function LiveDashboard() {
                     }`}
                   >
                     <p className={`mb-1 text-[9px] font-bold uppercase tracking-wider ${isUser ? "text-primary" : "text-muted-foreground"}`}>
-                      {isUser ? "You" : "Coach"}
+                      {isUser ? "You" : "Assistant"}
                     </p>
                     <ReactMarkdown>{m.content}</ReactMarkdown>
                     {isLastAssistant && null}
