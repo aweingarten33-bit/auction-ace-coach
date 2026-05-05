@@ -353,6 +353,7 @@ Keep it tight. No fluff, no closing line.`;
           history: [],
           draftedPlayers: events.map((e) => e.player),
           showMath: false,
+          strategy: { id: strategy.id, label: strategy.label, guidance: strategy.coachGuidance },
         },
         (chunk) => { acc += chunk; }
       );
