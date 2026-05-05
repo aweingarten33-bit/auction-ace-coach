@@ -459,6 +459,69 @@ function SyncHistoryButton() {
 
 
 // ============================================================
+// Strategy picker — collapsible
+// ============================================================
+function StrategyPickerCard({
+  strategyId,
+  strategy,
+  onPick,
+}: {
+  strategyId: string;
+  strategy: ReturnType<typeof getStrategy>;
+  onPick: (id: string, weights: ReturnType<typeof getStrategy>["weights"]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Card className="p-3">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 text-left"
+        aria-expanded={open}
+      >
+        <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">★</span>
+        <h2 className="text-sm font-semibold">Draft strategy</h2>
+        <span className="ml-auto rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+          {strategy.label}
+        </span>
+        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="mt-2">
+          <p className="mb-2 text-[11px] text-muted-foreground">
+            Pick a build to lock in. The $ allocations and Coach AI will follow it. Pick <strong>No strategy</strong> if you want to stay flexible.
+          </p>
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+            {STRATEGIES.map((s) => {
+              const active = s.id === strategyId;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => onPick(s.id, s.weights)}
+                  className={`rounded-md border px-2.5 py-2 text-left transition-colors ${
+                    active
+                      ? "border-primary bg-primary/10 ring-1 ring-primary/40"
+                      : "border-border bg-card/40 hover:bg-card/70"
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 text-xs font-semibold">
+                    {s.label}
+                    {active && <Check className="h-3 w-3 text-primary" />}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground leading-tight">{s.short}</div>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[11px] italic text-muted-foreground/80">{strategy.description}</p>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+
 // Step 1: Setup checklist — 1a Connect ESPN, 1b Sync history, 1c Upload cheat sheet
 // ============================================================
 function SetupChecklist() {
