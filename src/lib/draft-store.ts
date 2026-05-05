@@ -99,6 +99,10 @@ export const useDraftStore = create<DraftState>()(
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
       showMath: true,
       setShowMath: (b) => set({ showMath: b }),
+      draftPlan: null,
+      setDraftPlan: (content, pickCountAtSave) =>
+        set({ draftPlan: { content, updatedAt: Date.now(), pickCountAtSave } }),
+      clearDraftPlan: () => set({ draftPlan: null }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
