@@ -752,7 +752,7 @@ Keep it tight. No fluff, no closing line.`;
                     Analyst players · projected $
                   </span>
                 </div>
-                <div className="max-h-[320px] overflow-y-auto pr-1">
+                <div className="h-[320px] overflow-y-auto pr-1">
                   <VetriPlayerSummary />
                 </div>
               </Card>
