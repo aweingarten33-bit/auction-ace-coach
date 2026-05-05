@@ -615,32 +615,45 @@ function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk, onC
   ];
   return (
     <div className="space-y-3">
-      <Card className="bg-gradient-card p-3 shadow-glow">
-        <h2 className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-          <Sparkles className="h-3 w-3" /> AI Assistant {streaming && <span className="text-muted-foreground">· thinking…</span>}
+      <Card className="flex flex-col overflow-hidden bg-card p-0 shadow-glow">
+        <div className="flex items-center gap-2 border-b border-border/60 px-3 py-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+            <Sparkles className="h-4 w-4" />
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-semibold">Auction Assistant</span>
+            <span className="text-[10px] text-muted-foreground">{streaming ? "typing…" : "online"}</span>
+          </div>
           {!streaming && onClear && (
             <button onClick={onClear} className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-destructive">
               Clear
             </button>
           )}
-        </h2>
-        <div ref={coachRef} className="coach-md max-h-[55vh] overflow-auto text-sm leading-relaxed">
-          <ReactMarkdown>{text || "_..._"}</ReactMarkdown>
+        </div>
+        <div ref={coachRef} className="coach-md flex max-h-[55vh] flex-col gap-3 overflow-auto px-3 py-3 text-sm leading-relaxed">
+          <div className="flex gap-2.5">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <Sparkles className={`h-3.5 w-3.5 ${streaming ? "animate-pulse" : ""}`} />
+            </div>
+            <div className="prose prose-sm max-w-none text-foreground">
+              <ReactMarkdown>{text || "How can I help you with your draft?"}</ReactMarkdown>
+            </div>
+          </div>
         </div>
       </Card>
 
-      <Card className="bg-gradient-card p-3">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Quick asks</p>
-        <div className="flex flex-wrap gap-1.5">
+      <Card className="bg-card p-3">
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Suggestions</p>
+        <div className="mb-3 flex flex-wrap gap-1.5">
           {presets.map((q) => (
-            <Button key={q} size="sm" variant="secondary" disabled={streaming} onClick={() => onAsk(q)} className="h-8 text-xs">
+            <Button key={q} size="sm" variant="outline" disabled={streaming} onClick={() => onAsk(q)} className="h-8 rounded-full text-xs">
               {q.split(" ").slice(0, 3).join(" ")}…
             </Button>
           ))}
         </div>
-        <div className="mt-3 flex gap-2">
+        <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
           <Input
-            placeholder="Ask anything…"
+            placeholder="Message Auction Assistant…"
             value={followUp}
             onChange={(e) => setFollowUp(e.target.value)}
             onKeyDown={(e) => {
@@ -649,13 +662,15 @@ function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk, onC
               }
             }}
             disabled={streaming}
-            className="h-11 text-base"
+            className="h-9 flex-1 border-0 bg-transparent p-0 text-base shadow-none focus-visible:ring-0"
           />
           <Button
             disabled={streaming || !followUp.trim()}
             onClick={() => { onAsk(followUp.trim()); setFollowUp(""); }}
+            size="sm"
+            className="h-9 w-9 shrink-0 rounded-full p-0"
           >
-            Ask
+            ↑
           </Button>
         </div>
       </Card>
