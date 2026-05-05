@@ -83,7 +83,8 @@ Deno.serve(async (req) => {
         const name = p.fullName ?? `${p.firstName ?? ""} ${p.lastName ?? ""}`.trim();
         if (!id || !name) return null;
         const position = POS[p.defaultPositionId] ?? null;
-        const ranks = p.draftRanksByRankType?.STANDARD ?? p.draftRanksByRankType?.PPR ?? null;
+        // Prefer PPR (most leagues, incl. half-PPR which ESPN doesn't publish separately).
+        const ranks = p.draftRanksByRankType?.PPR ?? p.draftRanksByRankType?.STANDARD ?? null;
         return {
           season,
           espn_player_id: id,
