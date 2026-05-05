@@ -30,10 +30,27 @@ Deno.serve(async (req) => {
     }
 
     const cookie = `SWID=${creds.swid}; espn_s2=${creds.espn_s2}`;
-    const espnUrl = `https://fantasy.espn.com/apis/v3/games/ffl/seasons/${creds.season_id}/segments/0/leagues/${creds.league_id}?view=mTeam&view=mRoster&view=mSettings&view=mDraftDetail&view=mStandings`;
+    // ESPN moved fantasy endpoints under lm-api-reads.fantasy.espn.com for recent seasons.
+    const espnUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${creds.season_id}/segments/0/leagues/${creds.league_id}?view=mTeam&view=mRoster&view=mSettings&view=mDraftDetail&view=mStandings`;
 
-    const r = await fetch(espnUrl, { headers: { cookie, accept: "application/json" } });
-    if (!r.ok) return j({ error: `ESPN ${r.status}` }, 400);
+    const r = await fetch(espnUrl, {
+      headers: {
+        cookie,
+        accept: "application/json",
+        "user-agent": "Mozilla/5.0",
+      },
+    });
+    const ctype = r.headers.get("content-type") ?? "";
+    if (!r.ok || !ctype.includes("application/json")) {
+      const body = await r.text();
+      return j({
+        error: `ESPN ${r.status}`,
+        detail: body.slice(0, 300),
+        hint: r.status === 401 || r.status === 403
+          ? "Cookies expired — re-paste SWID + espn_s2."
+          : "ESPN returned a non-JSON response (likely a login/redirect page).",
+      }, 400);
+    }
     const data = await r.json();
 
     const settings = data?.settings ?? {};
