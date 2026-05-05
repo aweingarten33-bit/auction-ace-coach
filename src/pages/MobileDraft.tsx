@@ -332,6 +332,8 @@ function LogTab(props: {
         ))}
       </div>
 
+      <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
+
       <Card className="bg-gradient-card p-3">
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
           <button
