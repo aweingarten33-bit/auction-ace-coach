@@ -268,15 +268,15 @@ export default function Planner() {
           <div className="mb-2 flex items-center gap-2">
             <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">3</span>
             <Check className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Can I afford…?</h2>
+            <h2 className="text-sm font-semibold">Can I afford X + Y + Z?</h2>
           </div>
           <p className="mb-2 text-[11px] text-muted-foreground">
-            Type 1–3 players you want. Prices come from your sheet.
+            Add up to 3 players you're thinking about (e.g. Josh Jacobs <span className="text-muted-foreground/60">+</span> Josh Allen <span className="text-muted-foreground/60">+</span> Justin Herbert). I'll add their prices, subtract from your bank, and tell you yes or no with the exact math.
           </p>
           <div className="space-y-2">
-            <PricedPlayerAutocomplete value={checkA} onChange={setCheckA} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 1 (e.g. Jalen Hurts)" />
-            <PricedPlayerAutocomplete value={checkB} onChange={setCheckB} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 2 (optional)" />
-            <PricedPlayerAutocomplete value={checkC} onChange={setCheckC} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 3 (optional)" />
+            <PricedPlayerAutocomplete value={checkA} onChange={setCheckA} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 1 (e.g. Josh Jacobs)" />
+            <PricedPlayerAutocomplete value={checkB} onChange={setCheckB} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="+ Player 2 (e.g. Josh Allen)" />
+            <PricedPlayerAutocomplete value={checkC} onChange={setCheckC} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="+ Player 3 (e.g. Justin Herbert)" />
           </div>
           {checkRows.length > 0 && (
             <div className="mt-3 space-y-2 rounded-md border bg-muted/30 p-3 text-sm">
