@@ -194,11 +194,17 @@ export default function UpNextQueue({
                     )}
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums ${matchTone(t.matchPct)}`}>
-                      {t.matchPct}%
+                    <span
+                      className={`rounded-full border px-2 py-0.5 text-[10px] font-bold tabular-nums ${matchTone(t.matchPct)}`}
+                      title={`Fit score: ${t.matchPct}% — how well this player matches your roster needs and budget right now`}
+                    >
+                      {t.matchPct}% fit
                     </span>
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                      ≤ <span className="font-bold text-foreground">${t.maxBid}</span>
+                    <span
+                      className="rounded border border-border bg-background/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground"
+                      title="Don't bid more than this — your max bid for this player"
+                    >
+                      Max bid <span className="ml-0.5 font-bold text-foreground">${t.maxBid}</span>
                     </span>
                   </div>
                 </div>
