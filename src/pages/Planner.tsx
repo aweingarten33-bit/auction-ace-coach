@@ -109,7 +109,9 @@ export default function Planner() {
   const {
     settings, keepers, events, prices, setupComplete,
     slotAllocations, setSlotAllocation, setSlotAllocations, clearSlotAllocations,
+    strategyId, setStrategyId,
   } = useDraftStore();
+  const strategy = getStrategy(strategyId);
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
@@ -124,7 +126,7 @@ export default function Planner() {
     const slotIds = new Set(slots.map((s) => s.id));
     const sameSet = known.size === slotIds.size && [...slotIds].every((id) => known.has(id));
     if (!sameSet) {
-      setSlotAllocations(suggestedAllocations(slots, settings.totalBudget));
+      setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slots.length, settings.totalBudget]);
