@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { searchVetriTakes, VetriTakeMatch } from "@/lib/vetri-search";
-import { scaledEstBid } from "@/components/VetriNotesPanel";
+import { scaledEstBid } from "@/lib/vetri-types";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Youtube, TrendingUp, TrendingDown, Sparkles } from "lucide-react";
 
