@@ -1,15 +1,34 @@
 // One compact card. Two answers: who to nominate to drain, and how to get yours.
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Megaphone, Target, Check, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Megaphone, Target, Check, X, Sparkles, Loader2 } from "lucide-react";
 import type { DrainPlan, GetPlan } from "@/lib/nomination";
+
+export interface AiNomination {
+  name: string;
+  position: "QB" | "RB" | "WR" | "TE" | "K" | "DST";
+  strategy: "drain" | "plug" | "enforcer";
+  price: number;
+  reason: string;
+}
 
 interface Props {
   drain: DrainPlan;
   get: GetPlan;
+  aiSuggestions?: AiNomination[];
+  aiLoading?: boolean;
+  onAskAi?: () => void;
+  onPickAi?: (s: AiNomination) => void;
 }
 
-export default function NominationCard({ drain, get }: Props) {
+const STRATEGY_STYLE: Record<AiNomination["strategy"], { label: string; cls: string }> = {
+  drain:    { label: "DRAIN",    cls: "bg-accent/15 text-accent" },
+  plug:     { label: "PLUG",     cls: "bg-primary/15 text-primary" },
+  enforcer: { label: "ENFORCER", cls: "bg-warning/15 text-warning" },
+};
+
+export default function NominationCard({ drain, get, aiSuggestions, aiLoading, onAskAi, onPickAi }: Props) {
   return (
     <Card className="bg-gradient-card p-3">
       <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
