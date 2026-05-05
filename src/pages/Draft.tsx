@@ -41,7 +41,7 @@ import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS } from "@/lib/positions";
 import {
   Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2,
-  User, Users, Download, MoreVertical,
+  User, Users, Download, MoreVertical, ChevronLeft,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
@@ -733,9 +733,19 @@ export default function Draft() {
         <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
           <SheetHeader className="border-b border-border/60 px-4 py-3">
             <SheetTitle className="flex items-center gap-2 text-sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCoachOpen(false)}
+                className="-ml-2 h-8 gap-1 px-2 text-xs"
+                title="Back to draft"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back
+              </Button>
               <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
               Auction Assistant
-              <span className="ml-auto text-[10px] font-normal text-muted-foreground">
+              <span className="ml-auto mr-6 text-[10px] font-normal text-muted-foreground">
                 {streaming ? "typing…" : "online"}
               </span>
             </SheetTitle>
