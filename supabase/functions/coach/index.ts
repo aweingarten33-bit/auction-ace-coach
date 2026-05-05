@@ -43,6 +43,29 @@ function callerKey(req: Request): string {
   return `ip:${ip}`;
 }
 const BUCKETS = new Map<string, { count: number; resetAt: number }>();
+
+// ---------- Response cache (60s, in-memory per isolate) ----------
+const CACHE = new Map<string, { body: string; expiresAt: number }>();
+const CACHE_TTL_MS = 60_000;
+async function hashKey(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function cacheGet(key: string): string | null {
+  const hit = CACHE.get(key);
+  if (!hit) return null;
+  if (hit.expiresAt <= Date.now()) { CACHE.delete(key); return null; }
+  return hit.body;
+}
+function cacheSet(key: string, body: string) {
+  CACHE.set(key, { body, expiresAt: Date.now() + CACHE_TTL_MS });
+  if (CACHE.size > 200) {
+    // evict oldest
+    const oldest = [...CACHE.entries()].sort((a, b) => a[1].expiresAt - b[1].expiresAt)[0];
+    if (oldest) CACHE.delete(oldest[0]);
+  }
+}
+
 function rateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
   const b = BUCKETS.get(key);
