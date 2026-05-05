@@ -41,7 +41,7 @@ import { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { POSITIONS } from "@/lib/positions";
 import {
   Undo2, Trophy, RotateCcw, Send, Sparkles, Settings2,
-  User, Users, Download, MoreVertical,
+  User, Users, Download, MoreVertical, ChevronLeft,
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
