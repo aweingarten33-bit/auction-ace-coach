@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
-import PlayerAutocomplete from "@/components/PlayerAutocomplete";
+import PricedPlayerAutocomplete from "@/components/PricedPlayerAutocomplete";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
