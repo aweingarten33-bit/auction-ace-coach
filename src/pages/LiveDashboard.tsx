@@ -912,10 +912,7 @@ export default function LiveDashboard() {
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {[
-                { label: "Max bid?", q: "What's my realistic max bid for the next pick I should target, and on whom?" },
-                { label: "Next position", q: "Which position should I target next and why?" },
                 { label: "Should I pivot?", q: "Should I pivot my strategy given how the draft is unfolding? If yes, to what?" },
-                { label: "Sleepers", q: "Give me 3 sleeper/value picks I should target right now with reasoning." },
                 { label: "Nominate who?", q: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
               ].map((b) => (
                 <Button
