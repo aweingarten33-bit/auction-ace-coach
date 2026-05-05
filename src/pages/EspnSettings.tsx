@@ -166,6 +166,17 @@ export default function EspnSettings() {
 
   const webhookUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/draft-webhook`;
 
+  const joinLeague = async () => {
+    if (!user) return toast.error("Please sign in first");
+    const id = Number(joinLeagueId);
+    if (!Number.isFinite(id) || id <= 0) return toast.error("Enter a valid ESPN League ID");
+    const { error } = await supabase
+      .from("profiles").update({ league_id: id }).eq("user_id", user.id);
+    if (error) return toast.error(error.message);
+    setSavedLeagueId(id);
+    toast.success("Joined! You'll see your league mate's draft history.");
+  };
+
   return (
     <div className="mx-auto max-w-3xl p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
