@@ -36,8 +36,20 @@ export default function EspnSettings() {
         .maybeSingle();
       if (c) {
         setSwid(c.swid); setS2(c.espn_s2);
+        const seasonToUse = c.season_id ?? new Date().getFullYear();
         if (c.season_id) setSeason(c.season_id);
         setVerified(c.last_verified_at);
+        // Auto-list leagues so the user can pick one
+        const { data } = await supabase.functions.invoke("espn-connect", {
+          body: { swid: c.swid, espn_s2: c.espn_s2, season: seasonToUse },
+        });
+        if (data?.leagues) {
+          setLeagues(data.leagues);
+          if (c.league_id) {
+            const match = data.leagues.find((l: League) => l.leagueId === Number(c.league_id));
+            if (match) setSelected(match);
+          }
+        }
       }
       const { data: t } = await supabase
         .from("extension_tokens").select("token").maybeSingle();
