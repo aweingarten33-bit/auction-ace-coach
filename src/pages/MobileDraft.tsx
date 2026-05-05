@@ -66,6 +66,7 @@ export default function MobileDraft() {
   const [playerName, setPlayerName] = useState("");
   const [priceInput, setPriceInput] = useState("");
   const [position, setPosition] = useState<Position | "">("");
+  const [manualOpen, setManualOpen] = useState(false);
 
   const [coachText, setCoachText] = useState("Tap **Ask assistant** below for a recommendation.");
   const [streaming, setStreaming] = useState(false);
@@ -223,6 +224,7 @@ export default function MobileDraft() {
             onUndo={() => { undoEvent(); toast("Undone"); }}
             settings={settings} keepers={keepers} prices={prices}
             pulse={pulse} myCount={myCount} requiredCount={requiredCount}
+            manualOpen={manualOpen} setManualOpen={setManualOpen}
           />
         )}
         {tab === "roster" && (
@@ -239,8 +241,8 @@ export default function MobileDraft() {
         )}
       </main>
 
-      {/* Sticky bottom action bar — thumb zone */}
-      {tab === "log" && (
+      {/* Sticky bottom action bar — thumb zone. Manual log only when fallback toggled on. */}
+      {tab === "log" && manualOpen && (
         <div
           className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-card/95 px-3 py-2 backdrop-blur"
           style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}
@@ -262,6 +264,21 @@ export default function MobileDraft() {
               <Sparkles className="h-5 w-5 text-primary" />
             </Button>
           </div>
+        </div>
+      )}
+      {tab === "log" && !manualOpen && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-card/95 px-3 py-2 backdrop-blur"
+          style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 8px)" }}
+        >
+          <Button
+            size="lg" variant="outline"
+            className="h-12 w-full text-sm font-semibold"
+            onClick={() => askCoach()}
+            disabled={streaming}
+          >
+            <Sparkles className="mr-2 h-5 w-5 text-primary" /> Ask assistant
+          </Button>
         </div>
       )}
     </div>
@@ -289,11 +306,13 @@ function LogTab(props: {
   onUndo: () => void;
   settings: any; keepers: any[]; prices: any[];
   pulse: any; myCount: any; requiredCount: any;
+  manualOpen: boolean; setManualOpen: (v: boolean) => void;
 }) {
   const {
     events, drafter, setDrafter, playerName, setPlayerName,
     priceInput, setPriceInput, position, setPosition, onUndo,
     settings, keepers, prices, pulse, myCount, requiredCount,
+    manualOpen, setManualOpen,
   } = props;
 
   const priceNum = parseInt(priceInput, 10);
@@ -335,6 +354,17 @@ function LogTab(props: {
 
       <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
 
+      {/* ESPN sync is primary. Manual entry is a fallback — collapsed by default. */}
+      <button
+        type="button"
+        onClick={() => setManualOpen(!manualOpen)}
+        className="flex w-full items-center justify-between rounded-md border border-dashed border-border/60 bg-secondary/30 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:bg-secondary/50"
+      >
+        <span>{manualOpen ? "Hide manual fallback" : "Manual fallback (if ESPN drops)"}</span>
+        <ChevronDown className={`h-4 w-4 transition ${manualOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {manualOpen && (
       <Card className="bg-gradient-card p-3">
         <div className="grid grid-cols-2 gap-1.5 rounded-lg bg-secondary/50 p-1">
           <button
@@ -466,6 +496,7 @@ function LogTab(props: {
           </Button>
         </div>
       </Card>
+      )}
 
       <Card className="bg-gradient-card p-3">
         <div className="mb-2 flex items-center justify-between">
