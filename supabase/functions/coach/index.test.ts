@@ -146,6 +146,7 @@ function makePayload(budget: CoachBudget, userQuestion: string) {
     events: [
       { player: "Christian McCaffrey", position: "RB", price: 55, drafter: "other" },
       { player: "Justin Jefferson",    position: "WR", price: 58, drafter: "other" },
+      { player: "Tyreek Hill",         position: "WR", price: 42, drafter: "other" },
     ],
     prices: [
       { name: "Bijan Robinson",  price: 52, position: "RB" },
