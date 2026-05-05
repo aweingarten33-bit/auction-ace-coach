@@ -4,11 +4,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2, Zap } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate } from "@/lib/draft-types";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { buildTierPrices, tierForPosRank, type AuctionRow } from "@/lib/league-tier-prices";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
@@ -84,7 +86,62 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [quickPrice, setQuickPrice] = useState("");
   const [filter, setFilter] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [autoBusy, setAutoBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const autoFillFromEspn = async () => {
+    setAutoBusy(true);
+    try {
+      // 1) Make sure last 3 drafts + this year's ranks are cached
+      const [hist, ranks] = await Promise.all([
+        supabase.functions.invoke("espn-historical-draft", { body: { seasonsBack: 3 } }),
+        supabase.functions.invoke("espn-player-ranks", {}),
+      ]);
+      if (hist.error || (hist.data as { error?: string })?.error) {
+        throw new Error((hist.data as { error?: string })?.error || hist.error?.message || "Couldn't pull ESPN draft history");
+      }
+      if (ranks.error || (ranks.data as { error?: string })?.error) {
+        throw new Error((ranks.data as { error?: string })?.error || ranks.error?.message || "Couldn't pull ESPN player ranks");
+      }
+
+      // 2) Build league tier prices from history
+      const { data: hRows, error: hErr } = await supabase
+        .from("league_auction_history")
+        .select("season, player_name, position, bid_amount");
+      if (hErr) throw hErr;
+      const tierPrices = buildTierPrices((hRows ?? []) as AuctionRow[]);
+      if (!tierPrices.length) {
+        throw new Error("No auction history found in your last 3 ESPN drafts. Connect ESPN first.");
+      }
+
+      // 3) Pull this year's ranks
+      const { data: rRows, error: rErr } = await supabase
+        .from("espn_player_ranks")
+        .select("player_name, position, pos_rank, auction_value");
+      if (rErr) throw rErr;
+      if (!rRows?.length) {
+        throw new Error("No player ranks cached. Try again in a moment.");
+      }
+
+      // 4) For each ranked player → tier → league avg $
+      const built: { name: string; price: number }[] = [];
+      for (const r of rRows) {
+        if (!r.position || !r.pos_rank) continue;
+        const tier = tierForPosRank(r.position, r.pos_rank);
+        const tp = tierPrices.find((t) => t.position === r.position && t.tier === tier);
+        const price = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
+        if (price > 0) built.push({ name: r.player_name, price });
+      }
+      if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
+      mergeImported(built, "ESPN auto-fill");
+      toast.success(`Auto-filled ${built.length} players from your last 3 ESPN drafts`);
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Auto-fill failed");
+    } finally {
+      setAutoBusy(false);
+    }
+  };
 
   const mergeImported = (incoming: { name: string; price: number }[], filename: string) => {
     if (!incoming.length) {
@@ -210,7 +267,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div>
           <p className="text-sm font-medium">Player Price Estimates</p>
           <p className="text-[11px] text-muted-foreground">
-            Upload a PDF/screenshot of last year's results, or paste/type below.
+            Auto-fill from your ESPN league (last 3 drafts × this year's ranks). Upload/paste only if you want to override.
           </p>
         </div>
         <Badge variant="outline" className="border-primary/40 text-primary text-[10px]">
@@ -218,8 +275,26 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </Badge>
       </div>
 
-      {/* Upload CSV / XLSX / PDF / image */}
-      <div className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-3">
+      {/* PRIMARY: Auto-fill from ESPN */}
+      <div className="rounded-md border border-primary/50 bg-primary/10 p-3">
+        <Button
+          className="w-full bg-gradient-primary text-primary-foreground"
+          onClick={autoFillFromEspn}
+          disabled={autoBusy}
+        >
+          {autoBusy ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Pulling from ESPN...</>
+          ) : (
+            <><Zap className="mr-2 h-4 w-4" /> Auto-fill from ESPN (last 3 drafts)</>
+          )}
+        </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          Uses your league's actual auction history + ESPN's current positional ranks. Requires ESPN connected on the ESPN page.
+        </p>
+      </div>
+
+      {/* FALLBACK: Upload CSV / XLSX / PDF / image */}
+      <div className="rounded-md border border-dashed border-border/60 bg-secondary/20 p-3">
         <input
           ref={fileRef}
           type="file"
@@ -232,18 +307,18 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         />
         <Button
           variant="outline"
-          className="w-full border-primary/40 hover:bg-primary/10"
+          className="w-full"
           onClick={() => fileRef.current?.click()}
           disabled={uploading}
         >
           {uploading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> Upload CSV, Excel, PDF or screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> Fallback: upload CSV / Excel / PDF / screenshot</>
           )}
         </Button>
         <p className="mt-1.5 text-[10px] text-muted-foreground">
-          CSV/Excel parses instantly (free). PDFs &amp; screenshots use AI. Auto-detects which columns are name and price.
+          Only needed if ESPN isn't connected or you want to override with a custom sheet.
         </p>
       </div>
 
