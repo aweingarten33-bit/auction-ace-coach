@@ -3,92 +3,93 @@
 @tailwind utilities;
 
 /*
-  FENG SHUI / WATER FLOW
-  ----------------------
-  White space first. Calm neutrals. A single quiet accent that flows like water.
-  Type breathes. Surfaces float. Nothing shouts.
+  BOLD & CONFIDENT — dark, high-contrast, opinionated.
+  Think Linear / Vercel / Arc. Sharp typography, deep canvas, electric accent.
 */
 
 @layer base {
   :root {
-    --background: 210 20% 99%;
-    --foreground: 215 25% 18%;
+    /* Deep ink canvas */
+    --background: 222 25% 7%;
+    --foreground: 210 20% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 18%;
+    --card: 222 22% 10%;
+    --card-foreground: 210 20% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 18%;
+    --popover: 222 22% 10%;
+    --popover-foreground: 210 20% 98%;
 
-    /* Water — calm teal-blue. Single accent. */
-    --primary: 200 55% 42%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 195 60% 62%;
+    /* Electric cyan-blue — confident, not wimpy */
+    --primary: 195 100% 55%;
+    --primary-foreground: 222 30% 8%;
+    --primary-glow: 190 100% 65%;
 
-    --secondary: 210 25% 96%;
-    --secondary-foreground: 215 25% 22%;
+    --secondary: 222 18% 14%;
+    --secondary-foreground: 210 20% 98%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 12% 48%;
+    --muted: 222 18% 14%;
+    --muted-foreground: 215 15% 65%;
 
-    --accent: 38 45% 88%;
-    --accent-foreground: 215 25% 22%;
+    /* Hot accent — punchy magenta-red for emphasis */
+    --accent: 350 95% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 60% 52%;
+    --destructive: 0 85% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 35 80% 55%;
-    --warning-foreground: 215 25% 18%;
+    --warning: 38 100% 58%;
+    --warning-foreground: 222 30% 8%;
 
-    --success: 155 40% 42%;
+    --success: 145 70% 48%;
     --success-foreground: 0 0% 100%;
 
-    --border: 215 20% 92%;
-    --input: 215 20% 94%;
-    --ring: 200 55% 50%;
+    --border: 222 18% 18%;
+    --input: 222 18% 16%;
+    --ring: 195 100% 55%;
 
-    --radius: 0.875rem;
+    --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(180deg, hsl(200 55% 48%) 0%, hsl(200 55% 38%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 25% 99%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(210 20% 98%) 0%, hsl(210 18% 94%) 100%);
-    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 97%) 100%);
-    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.6) 0%, hsl(0 0% 100% / 0) 60%);
+    --gradient-primary: linear-gradient(135deg, hsl(195 100% 55%) 0%, hsl(220 100% 60%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(222 22% 11%), hsl(222 22% 9%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(222 20% 14%), hsl(222 22% 10%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(222 22% 12%), hsl(222 25% 8%));
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.06) 0%, hsl(0 0% 100% / 0) 60%);
+    --gradient-hero: radial-gradient(ellipse at top, hsl(195 100% 55% / 0.18), transparent 60%), radial-gradient(ellipse at bottom right, hsl(350 95% 60% / 0.12), transparent 50%);
 
-    --shadow-glow: 0 1px 2px hsl(215 30% 20% / 0.04), 0 8px 24px -12px hsl(200 55% 42% / 0.18);
-    --shadow-aqua: 0 1px 2px hsl(215 30% 20% / 0.06);
-    --shadow-card: 0 1px 2px hsl(215 30% 20% / 0.04), 0 4px 16px -8px hsl(215 30% 20% / 0.08);
+    --shadow-glow: 0 0 0 1px hsl(195 100% 55% / 0.3), 0 8px 32px -8px hsl(195 100% 55% / 0.4);
+    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.05) inset, 0 4px 12px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 8px 24px -8px hsl(0 0% 0% / 0.5);
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 25% 22%;
-    --sidebar-primary: 200 55% 42%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 25% 96%;
-    --sidebar-accent-foreground: 215 25% 22%;
-    --sidebar-border: 215 20% 92%;
-    --sidebar-ring: 200 55% 50%;
+    --sidebar-background: 222 25% 6%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 195 100% 55%;
+    --sidebar-primary-foreground: 222 30% 8%;
+    --sidebar-accent: 222 18% 14%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 222 18% 16%;
+    --sidebar-ring: 195 100% 55%;
   }
 
   .dark {
-    --background: 215 28% 10%;
-    --foreground: 210 20% 94%;
-    --card: 215 25% 13%;
-    --card-foreground: 210 20% 94%;
-    --popover: 215 25% 13%;
-    --popover-foreground: 210 20% 94%;
-    --primary: 195 60% 58%;
-    --primary-foreground: 215 28% 10%;
-    --secondary: 215 22% 18%;
-    --secondary-foreground: 210 20% 94%;
-    --muted: 215 22% 16%;
-    --muted-foreground: 215 12% 65%;
-    --accent: 38 25% 22%;
-    --accent-foreground: 210 20% 94%;
-    --destructive: 0 60% 55%;
+    --background: 222 25% 7%;
+    --foreground: 210 20% 98%;
+    --card: 222 22% 10%;
+    --card-foreground: 210 20% 98%;
+    --popover: 222 22% 10%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 195 100% 55%;
+    --primary-foreground: 222 30% 8%;
+    --secondary: 222 18% 14%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 222 18% 14%;
+    --muted-foreground: 215 15% 65%;
+    --accent: 350 95% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 85% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 215 22% 20%;
-    --input: 215 22% 18%;
-    --ring: 195 60% 58%;
+    --border: 222 18% 18%;
+    --input: 222 18% 16%;
+    --ring: 195 100% 55%;
   }
 }
 
@@ -103,20 +104,23 @@
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-image: none;
     background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, hsl(195 100% 55% / 0.12), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 100%, hsl(350 95% 60% / 0.08), transparent 60%);
+    background-attachment: fixed;
   }
 
   h1, h2, h3, h4 {
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.015em;
+    font-weight: 800;
+    letter-spacing: -0.025em;
     color: hsl(var(--foreground));
   }
 
-  h1 { line-height: 1.15; }
-  h2 { line-height: 1.2; }
-  p  { line-height: 1.6; }
+  h1 { line-height: 1.05; letter-spacing: -0.035em; }
+  h2 { line-height: 1.1; }
+  p  { line-height: 1.55; }
 
   .font-chyron, .font-lower-third {
     font-family: "Inter", "Helvetica Neue", sans-serif;
