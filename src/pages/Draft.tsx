@@ -745,24 +745,24 @@ Keep it tight. No fluff, no closing line.`;
               />
               <OpponentHeatmap settings={settings} />
             </TabsContent>
-            <TabsContent value="vetri" className="mt-3 space-y-3">
-              <Card className="p-3">
+            <TabsContent value="vetri" className="mt-3 space-y-3 min-w-0 overflow-hidden">
+              <Card className="min-w-0 overflow-hidden p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Analyst players · projected $
                   </span>
                 </div>
-                <div className="h-[320px] overflow-y-auto pr-1">
+                <div className="h-[320px] overflow-y-auto overflow-x-hidden pr-1 [&_*]:min-w-0 [overflow-wrap:anywhere]">
                   <VetriPlayerSummary />
                 </div>
               </Card>
-              <Card className="p-3">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <Card className="min-w-0 overflow-hidden p-3">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                     Takes on this player
                   </span>
                   {(takesQuery || playerName || bestTarget?.name) && (
-                    <span className="text-[10px] text-foreground/80 truncate max-w-[60%]">
+                    <span className="min-w-0 truncate text-[10px] text-foreground/80">
                       {takesQuery || playerName || bestTarget?.name}
                     </span>
                   )}
@@ -774,7 +774,7 @@ Keep it tight. No fluff, no closing line.`;
                     placeholder="Search a player for analyst takes…"
                   />
                 </div>
-                <div className="h-[280px] overflow-y-auto pr-1">
+                <div className="h-[280px] overflow-y-auto overflow-x-hidden pr-1 [&_*]:min-w-0 [overflow-wrap:anywhere]">
                   {(takesQuery || playerName || bestTarget?.name) ? (
                     <VetriTakesForPlayer
                       player={takesQuery || playerName || bestTarget!.name}
