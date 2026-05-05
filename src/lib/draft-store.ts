@@ -81,6 +81,7 @@ interface DraftState {
   setSlotAllocation: (id: string, amount: number) => void;
   setSlotAllocations: (a: Record<string, number>) => void;
   clearSlotAllocations: () => void;
+  setStrategyId: (id: string) => void;
 }
 
 export const useDraftStore = create<DraftState>()(
