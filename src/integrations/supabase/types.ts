@@ -60,6 +60,8 @@ export type Database = {
           player_name_norm: string
           pos_rank: number | null
           position: string | null
+          prior_ppg: number | null
+          prior_season: number | null
           projected_points: number | null
           season: number
           updated_at: string
@@ -73,6 +75,8 @@ export type Database = {
           player_name_norm: string
           pos_rank?: number | null
           position?: string | null
+          prior_ppg?: number | null
+          prior_season?: number | null
           projected_points?: number | null
           season: number
           updated_at?: string
@@ -86,6 +90,8 @@ export type Database = {
           player_name_norm?: string
           pos_rank?: number | null
           position?: string | null
+          prior_ppg?: number | null
+          prior_season?: number | null
           projected_points?: number | null
           season?: number
           updated_at?: string
