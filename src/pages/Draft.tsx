@@ -741,7 +741,7 @@ export default function Draft() {
                 title="Back to draft"
               >
                 <ChevronLeft className="h-4 w-4" />
-                Back
+                Back to draft
               </Button>
               <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
               Auction Assistant
