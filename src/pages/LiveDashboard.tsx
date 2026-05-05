@@ -45,16 +45,15 @@ import AnimatedNumber from "@/components/AnimatedNumber";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import NominationForecast, { NominationPrediction } from "@/components/NominationForecast";
 import VetriTierSheet from "@/components/VetriTierSheet";
 import VetriNotesPanel, { VetriTake } from "@/components/VetriNotesPanel";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
-import TargetedForecastButton from "@/components/TargetedForecastButton";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 import { projectRemainingBuild } from "@/lib/simulator";
 import RemainingBuildPanel from "@/components/RemainingBuildPanel";
 import ValueVerdict from "@/components/ValueVerdict";
+import TierBreakAlerts from "@/components/TierBreakAlerts";
 
 const COACH_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/coach`;
 const UPNEXT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/up-next`;
