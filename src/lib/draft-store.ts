@@ -51,6 +51,8 @@ interface DraftState {
   showMath: boolean;           // when true, assistant always shows the full math behind each rec
   // Saved draft plan — sticky strategy + targets the user can refer to between picks
   draftPlan: { content: string; updatedAt: number; pickCountAtSave: number } | null;
+  // Slot $ allocations for the Planner page (id => dollars). Generated lazily from settings.roster.
+  slotAllocations: Record<string, number>;
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -78,6 +80,9 @@ interface DraftState {
   setShowMath: (b: boolean) => void;
   setDraftPlan: (content: string, pickCountAtSave: number) => void;
   clearDraftPlan: () => void;
+  setSlotAllocation: (id: string, amount: number) => void;
+  setSlotAllocations: (a: Record<string, number>) => void;
+  clearSlotAllocations: () => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -103,6 +108,11 @@ export const useDraftStore = create<DraftState>()(
       setDraftPlan: (content, pickCountAtSave) =>
         set({ draftPlan: { content, updatedAt: Date.now(), pickCountAtSave } }),
       clearDraftPlan: () => set({ draftPlan: null }),
+      slotAllocations: {},
+      setSlotAllocation: (id, amount) =>
+        set((s) => ({ slotAllocations: { ...s.slotAllocations, [id]: amount } })),
+      setSlotAllocations: (a) => set({ slotAllocations: a }),
+      clearSlotAllocations: () => set({ slotAllocations: {} }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
