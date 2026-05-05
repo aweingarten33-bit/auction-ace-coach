@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import coachBotImg from "@/assets/coach-bot.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -722,17 +723,17 @@ export default function Draft() {
         <SheetTrigger asChild>
           <Button
             size="lg"
-            className="fixed bottom-4 right-4 z-30 h-14 w-14 rounded-full bg-gradient-primary p-0 shadow-glow"
+            className="fixed bottom-4 right-4 z-30 h-14 w-14 overflow-hidden rounded-full p-0 shadow-glow ring-2 ring-primary/40"
             style={{ marginBottom: "env(safe-area-inset-bottom)" }}
             title="Ask the coach"
           >
-            <Sparkles className="h-6 w-6" />
+            <img src={coachBotImg} alt="Auction Assistant" className="h-full w-full object-cover" />
           </Button>
         </SheetTrigger>
         <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
           <SheetHeader className="border-b border-border/60 px-4 py-3">
             <SheetTitle className="flex items-center gap-2 text-sm">
-              <Sparkles className="h-4 w-4 text-primary" />
+              <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
               Auction Assistant
               <span className="ml-auto text-[10px] font-normal text-muted-foreground">
                 {streaming ? "typing…" : "online"}
