@@ -225,8 +225,11 @@ export default function UpNextQueue({
                       {v.goingRate != null && <span className="ml-1 font-mono opacity-80">${v.goingRate}</span>}
                     </span>
                   ) : (
-                    <span className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-muted-foreground">
-                      NO REF
+                    <span
+                      className="rounded border border-border bg-secondary/40 px-1.5 py-0.5 text-[9px] font-bold tracking-wider text-muted-foreground"
+                      title="No price info for this player on your sheet"
+                    >
+                      NO PRICE INFO
                     </span>
                   )}
                 </div>
