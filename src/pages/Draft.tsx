@@ -95,6 +95,8 @@ export default function Draft() {
   const [coachHistory, setCoachHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
+  const [pendingBid, setPendingBid] = useState<{ player: string } | null>(null);
+  const [pendingBidPrice, setPendingBidPrice] = useState("");
   const [coachOpen, setCoachOpen] = useState(false);
   const coachRef = useRef<HTMLDivElement>(null);
   const [queue, setQueue] = useState<QueueTarget[]>([]);
