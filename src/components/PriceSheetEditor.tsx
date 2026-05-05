@@ -398,6 +398,36 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             onChange={(e) => setFilter(e.target.value)}
             className="h-8 text-sm"
           />
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="flex gap-1">
+              {(["ALL", "QB", "RB", "WR", "TE", "K", "DST"] as const).map((p) => (
+                <Button
+                  key={p}
+                  type="button"
+                  size="sm"
+                  variant={posFilter === p ? "default" : "outline"}
+                  className="h-7 px-2 text-[11px]"
+                  onClick={() => setPosFilter(p)}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+              className="ml-auto h-7 rounded-md border border-input bg-background px-2 text-[11px]"
+            >
+              <option value="default">Sort: list order</option>
+              <option value="price-desc">Sort: price (high → low)</option>
+              <option value="price-asc">Sort: price (low → high)</option>
+              <option value="name">Sort: name (A → Z)</option>
+            </select>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Showing {filtered.length} of {prices.length}
+            {posFilter !== "ALL" ? ` · ${posFilter} only` : ""}
+          </p>
           <div className="max-h-72 space-y-1 overflow-auto rounded-md border border-border/60 bg-secondary/20 p-1">
             {filtered.map((p) => {
               const idx = prices.findIndex((x) => x.name === p.name);
