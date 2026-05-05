@@ -241,6 +241,7 @@ export default function MobileDraft() {
             text={coachText} streaming={streaming} coachRef={coachRef}
             followUp={followUp} setFollowUp={setFollowUp}
             onAsk={(q) => askCoach(undefined, q)}
+            onClear={() => setCoachText("Tap **Ask assistant** below for a recommendation.")}
           />
         )}
       </main>
@@ -604,7 +605,7 @@ function RosterTab({ myItems, myCount, requiredCount, budget }: any) {
   );
 }
 
-function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk }: any) {
+function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk, onClear }: any) {
   const presets = [
     "What's my realistic max bid for the next pick I should target?",
     "Which position should I target next and why?",
@@ -617,6 +618,11 @@ function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk }: a
       <Card className="bg-gradient-card p-3 shadow-glow">
         <h2 className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
           <Sparkles className="h-3 w-3" /> AI Assistant {streaming && <span className="text-muted-foreground">· thinking…</span>}
+          {!streaming && onClear && (
+            <button onClick={onClear} className="ml-auto text-[10px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-destructive">
+              Clear
+            </button>
+          )}
         </h2>
         <div ref={coachRef} className="coach-md max-h-[55vh] overflow-auto text-sm leading-relaxed">
           <ReactMarkdown>{text || "_..._"}</ReactMarkdown>
