@@ -129,7 +129,7 @@ export default function VetriPlayerSummary() {
                   const price = priceFor(prices, t.player);
                   const tone = LEAN_TONE[t.lean] ?? LEAN_TONE.neutral;
                   return (
-                    <li key={i} className="flex items-center gap-2 px-3 py-2">
+                    <li key={i} className="flex min-w-0 items-center gap-2 px-3 py-2">
                       <span
                         className={`h-1.5 w-1.5 shrink-0 rounded-full ${tone.dot}`}
                         title={t.lean}
