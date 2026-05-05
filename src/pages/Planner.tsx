@@ -5,8 +5,10 @@
 //   3) "What can I get for $X at POS?" lookup against the price sheet
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Calculator, Check, Plus, RotateCcw, Search, Trash2, X } from "lucide-react";
+import { ArrowLeft, Calculator, Check, Download, Plus, RotateCcw, Search, Trash2, X } from "lucide-react";
 import { useDraftStore } from "@/lib/draft-store";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { computeBudget } from "@/lib/draft-math";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { Button } from "@/components/ui/button";
@@ -191,7 +193,7 @@ export default function Planner() {
             </p>
           </div>
         </div>
-        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
+        <SyncHistoryButton />
       </header>
 
       {/* Summary bar */}
@@ -351,3 +353,46 @@ export default function Planner() {
     </div>
   );
 }
+
+function SyncHistoryButton() {
+  const [busy, setBusy] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
+
+  const run = async () => {
+    setBusy(true);
+    setSummary(null);
+    try {
+      const [draftRes, ranksRes] = await Promise.all([
+        supabase.functions.invoke("espn-historical-draft", { body: { seasonsBack: 3 } }),
+        supabase.functions.invoke("espn-historical-ranks", { body: { seasonsBack: 3 } }),
+      ]);
+      const dErr = draftRes.error || (draftRes.data as any)?.error;
+      const rErr = ranksRes.error || (ranksRes.data as any)?.error;
+      if (dErr || rErr) {
+        toast.error(`Sync issue: ${dErr?.message || dErr || rErr?.message || rErr}`);
+      } else {
+        const ds = (draftRes.data as any)?.summary ?? [];
+        const rs = (ranksRes.data as any)?.summary ?? [];
+        const okSeasons = ds.filter((s: any) => s.status === "ok").map((s: any) => s.season);
+        const rankSeasons = rs.filter((s: any) => s.status === "ok").map((s: any) => s.season);
+        toast.success(`Synced drafts: ${okSeasons.join(", ") || "none"} · ranks: ${rankSeasons.join(", ") || "none"}`);
+        setSummary(`Drafts ${okSeasons.length}/${ds.length} · Ranks ${rankSeasons.length}/${rs.length}`);
+      }
+    } catch (e: any) {
+      toast.error(`Sync failed: ${e?.message ?? e}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-end gap-0.5">
+      <Button size="sm" variant="outline" onClick={run} disabled={busy} className="h-7 text-xs">
+        <Download className="mr-1 h-3 w-3" />
+        {busy ? "Syncing…" : "Sync 3yr history"}
+      </Button>
+      {summary && <span className="text-[10px] text-muted-foreground">{summary}</span>}
+    </div>
+  );
+}
+
