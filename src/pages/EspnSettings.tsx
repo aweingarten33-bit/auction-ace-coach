@@ -56,6 +56,12 @@ export default function EspnSettings() {
       const { data: t } = await supabase
         .from("extension_tokens").select("token").maybeSingle();
       if (t) setToken(t.token);
+      const { data: prof } = await supabase
+        .from("profiles").select("league_id").maybeSingle();
+      if (prof?.league_id) {
+        setSavedLeagueId(Number(prof.league_id));
+        setJoinLeagueId(String(prof.league_id));
+      }
     })();
   }, []);
 
