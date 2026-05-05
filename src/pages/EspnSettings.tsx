@@ -57,8 +57,27 @@ export default function EspnSettings() {
     })();
   }, []);
 
+  const validateCookies = (rawSwid: string, rawS2: string): string | null => {
+    // Strip "SWID=" / "espn_s2=" prefix if pasted, trim whitespace
+    const swidVal = rawSwid.trim().replace(/^SWID=/i, "").replace(/;$/, "").trim();
+    const s2Val = rawS2.trim().replace(/^espn_s2=/i, "").replace(/;$/, "").replace(/\s+/g, "");
+    const fanId = swidVal.replace(/^\{|\}$/g, "");
+    if (!/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(fanId)) {
+      return "SWID format is invalid. It should look like {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} (UUID with braces).";
+    }
+    if (!/^[\x21-\x7E]+$/.test(s2Val)) {
+      return "espn_s2 contains invalid characters. Re-copy directly from DevTools → Cookies (bottom panel).";
+    }
+    if (s2Val.length < 200) {
+      return `espn_s2 looks truncated (${s2Val.length} chars). The real value is 300+ chars — copy from the "Cookie Value" panel at the bottom of DevTools, not the table cell.`;
+    }
+    return null;
+  };
+
   const connect = async () => {
     if (!swid || !s2) return toast.error("Both cookies required");
+    const err = validateCookies(swid, s2);
+    if (err) return toast.error(err);
     setBusy(true);
     const { data, error } = await supabase.functions.invoke("espn-connect", {
       body: { swid, espn_s2: s2, season, clear_selection: true },
