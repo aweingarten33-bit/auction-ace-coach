@@ -128,6 +128,7 @@ export default function MobileDraft() {
           rosterRequired: requiredCount, rosterFilled: myCount,
           events, prices, spendByPosition: spend, recentRuns: runs,
           latestEvent, userQuestion,
+          draftedPlayers: events.map((e) => e.player),
         }),
       });
       if (!resp.ok || !resp.body) {
