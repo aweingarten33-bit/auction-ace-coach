@@ -157,12 +157,7 @@ function makePayload(budget: CoachBudget, userQuestion: string) {
     ],
     spendByPosition: { RB: 0, WR: 0, QB: 0, TE: 0, K: 0, DST: 0 },
     recentRuns: { window: 5, counts: { RB: 1, WR: 1 } },
-    latestEvent: {
-      player: "Bijan Robinson",
-      position: "RB",
-      price: 50,
-      drafter: "other",
-    },
+    // no latestEvent — these prompts are about hypothetical/upcoming bids
     userQuestion,
     showMath: false,
   };
