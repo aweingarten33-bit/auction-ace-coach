@@ -1,11 +1,28 @@
 // Predict next 10 likely NOMINATED players (by anyone in the room) with confidence + signal breakdown.
 // Uses deterministic signals: position runs, tier breaks, who's hoarding what, recent paid-vs-sheet,
 // then asks the model to pick exact names from the user's price sheet via a tool call.
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+const RAW_ALLOWED = (Deno.env.get("ALLOWED_ORIGINS") ?? "").trim();
+const ALLOWED_ORIGINS: string[] = RAW_ALLOWED ? RAW_ALLOWED.split(",").map((s) => s.trim()).filter(Boolean) : [];
+const ALLOW_HEADERS = "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version";
+function corsFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  if (ALLOWED_ORIGINS.length === 0) return { "Access-Control-Allow-Origin": origin || "*", "Access-Control-Allow-Headers": ALLOW_HEADERS, "Access-Control-Allow-Methods": "POST, OPTIONS", "Vary": "Origin" };
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return { "Access-Control-Allow-Origin": allowed, "Access-Control-Allow-Headers": ALLOW_HEADERS, "Access-Control-Allow-Methods": "POST, OPTIONS", "Vary": "Origin" };
+}
+function callerKey(req: Request): string {
+  const auth = req.headers.get("authorization") ?? ""; const m = auth.match(/^Bearer\s+(.+)$/i);
+  if (m) { try { const parts = m[1].split("."); if (parts.length >= 2) { const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/"))); if (payload?.sub) return `u:${payload.sub}`; } } catch { /* */ } }
+  return `ip:${req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "anon"}`;
+}
+const BUCKETS = new Map<string, { count: number; resetAt: number }>();
+function rateLimit(key: string, limit: number, windowMs: number) {
+  const now = Date.now(); const b = BUCKETS.get(key);
+  if (!b || b.resetAt <= now) { BUCKETS.set(key, { count: 1, resetAt: now + windowMs }); return { ok: true as const }; }
+  if (b.count >= limit) return { ok: false as const, retryAfterSec: Math.max(1, Math.ceil((b.resetAt - now) / 1000)) };
+  b.count++; return { ok: true as const };
+}
+const corsHeaders = { /* legacy alias kept for minimal diff */ };
 
 const SYSTEM_PROMPT = `You are an elite fantasy football auction draft strategist.
 
