@@ -117,7 +117,11 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       if (hErr) throw hErr;
       const tierPrices = buildTierPrices((hRows ?? []) as AuctionRow[]);
       if (!tierPrices.length) {
-        throw new Error("No auction history found in your last 3 ESPN drafts. Connect ESPN first.");
+        const summary = (hist.data as { summary?: { season: number; picks: number; status: string; error?: string }[] })?.summary ?? [];
+        const detail = summary.length
+          ? summary.map((s) => `${s.season}: ${s.status}${s.error ? ` (${s.error})` : ""}`).join(" • ")
+          : "no draft data returned";
+        throw new Error(`No auction history pulled. ESPN says — ${detail}`);
       }
 
       // 3) Pull this year's ranks
