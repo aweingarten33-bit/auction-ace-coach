@@ -877,7 +877,7 @@ Keep it tight. No fluff, no closing line.`;
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <img src={coachBotImg} alt="" className="h-6 w-6 rounded-full object-cover" />
-              <span>Ask Coach</span>
+              <span>Coach AI</span>
               <span className="ml-auto mr-6 flex items-center gap-1.5 text-[10px] font-normal text-muted-foreground">
                 <span className={`h-1.5 w-1.5 rounded-full ${streaming ? "bg-amber-500 animate-pulse" : "bg-emerald-500"}`} />
                 {streaming ? "thinking…" : "Live draft context on"}
