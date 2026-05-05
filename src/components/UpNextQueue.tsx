@@ -239,12 +239,13 @@ export default function UpNextQueue({
                     <Pin className={`h-3 w-3 ${isPinned ? "fill-primary text-primary" : ""}`} />
                   </Button>
                   <Button
-                    size="sm" variant="ghost"
+                    size="sm" variant="outline"
                     onClick={(e) => { e.stopPropagation(); setDetailFor(t); }}
-                    className="h-6 w-6 px-0"
+                    className="h-6 gap-1 border-primary/40 bg-primary/10 px-2 text-[10px] font-semibold text-primary hover:bg-primary/20"
                     title="Player details"
                   >
                     <Info className="h-3 w-3" />
+                    Details
                   </Button>
                   <Button
                     size="sm" variant="ghost"
