@@ -24,8 +24,10 @@ interface Slot {
   pos: Position | "FLEX" | "SUPERFLEX" | "BENCH";
 }
 
-function buildSlots(roster: ReturnType<typeof useDraftStore>["settings"]["roster"]): Slot[] {
-  const order: { key: keyof typeof roster; pos: Slot["pos"]; pretty: string }[] = [
+type RosterShape = ReturnType<typeof useDraftStore.getState>["settings"]["roster"];
+
+function buildSlots(roster: RosterShape): Slot[] {
+  const order: { key: keyof RosterShape; pos: Slot["pos"]; pretty: string }[] = [
     { key: "QB", pos: "QB", pretty: "QB" },
     { key: "RB", pos: "RB", pretty: "RB" },
     { key: "WR", pos: "WR", pretty: "WR" },
@@ -40,7 +42,7 @@ function buildSlots(roster: ReturnType<typeof useDraftStore>["settings"]["roster
   for (const row of order) {
     const n = roster[row.key];
     for (let i = 1; i <= n; i++) {
-      slots.push({ id: `${row.key}-${i}`, label: n > 1 ? `${row.pretty}${i}` : row.pretty, pos: row.pos });
+      slots.push({ id: `${String(row.key)}-${i}`, label: n > 1 ? `${row.pretty}${i}` : row.pretty, pos: row.pos });
     }
   }
   return slots;
@@ -264,9 +266,9 @@ export default function Planner() {
             Type 1–3 players you want. Prices come from your sheet.
           </p>
           <div className="space-y-2">
-            <PlayerAutocomplete prices={prices} value={checkA} onChange={setCheckA} placeholder="Player 1 (e.g. Jalen Hurts)" />
-            <PlayerAutocomplete prices={prices} value={checkB} onChange={setCheckB} placeholder="Player 2 (optional)" />
-            <PlayerAutocomplete prices={prices} value={checkC} onChange={setCheckC} placeholder="Player 3 (optional)" />
+            <PlayerAutocomplete value={checkA} onChange={setCheckA} placeholder="Player 1 (e.g. Jalen Hurts)" />
+            <PlayerAutocomplete value={checkB} onChange={setCheckB} placeholder="Player 2 (optional)" />
+            <PlayerAutocomplete value={checkC} onChange={setCheckC} placeholder="Player 3 (optional)" />
           </div>
           {checkRows.length > 0 && (
             <div className="mt-3 space-y-1.5 rounded-md border bg-muted/30 p-2 text-sm">
