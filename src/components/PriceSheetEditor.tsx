@@ -327,9 +327,6 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             <><Upload className="mr-2 h-4 w-4" /> Upload CSV / Excel / PDF / screenshot</>
           )}
         </Button>
-        <p className="mt-1.5 text-[10px] italic text-muted-foreground">
-          *Only needed if ESPN isn't connected or you want to override with a custom sheet.
-        </p>
       </div>
 
       {/* Quick-add */}
