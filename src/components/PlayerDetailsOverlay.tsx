@@ -167,20 +167,20 @@ export default function PlayerDetailsOverlay({
             <Block label="Why now">{reason}</Block>
           )}
           {dossier && (
-            <Block label="Dossier">{dossier}</Block>
+            <Block label="About this player">{dossier}</Block>
           )}
           {worstCase && (
             <Block label="If you pass" tone="warning">{worstCase}</Block>
           )}
           {knockoff ? (
-            <Block label="Knockoff" tone="success">
+            <Block label="Cheaper option" tone="success">
               {knockoff.name} — <span className="font-mono">${knockoff.price}</span>
               {maxBid != null && (
-                <span className="ml-1 opacity-70">(save ${Math.max(0, maxBid - knockoff.price)})</span>
+                <span className="ml-1 opacity-70">(saves ${Math.max(0, maxBid - knockoff.price)})</span>
               )}
             </Block>
           ) : knockoffNote ? (
-            <Block label="Knockoff">
+            <Block label="Cheaper option">
               <span className="italic text-muted-foreground">{knockoffNote}</span>
             </Block>
           ) : null}
