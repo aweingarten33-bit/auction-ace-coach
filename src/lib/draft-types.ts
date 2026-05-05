@@ -53,18 +53,18 @@ export const DEFAULT_ROSTER: RosterSlots = {
   WR: 2,
   TE: 1,
   FLEX: 1,
-  SUPERFLEX: 0,
+  SUPERFLEX: 1,
   K: 0,
   DST: 0,
   BENCH: 6,
 };
 
 export const DEFAULT_SETTINGS: LeagueSettings = {
-  totalBudget: 200,
+  totalBudget: 225,
   numTeams: 12,
   scoring: "PPR",
-  leagueType: "Standard",
-  format: "Redraft",
+  leagueType: "Superflex",
+  format: "Keeper",
   roster: DEFAULT_ROSTER,
   keeperIncrease: "+5 per year of being kept",
   context: "",
