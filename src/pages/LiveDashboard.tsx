@@ -724,12 +724,12 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
+          <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-9">
+            <TabsList className="grid w-full grid-cols-3 h-9">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
               <TabsTrigger value="vetri" className="text-[11px]">Notes</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
-              <TabsTrigger value="forecast" className="text-[11px]">Forecast</TabsTrigger>
             </TabsList>
 
             <TabsContent value="targets" className="mt-3 space-y-4">
@@ -781,29 +781,6 @@ export default function LiveDashboard() {
                 pulseMultiplier={pulse.multiplier}
               />
               <OpponentHeatmap settings={settings} />
-            </TabsContent>
-
-            <TabsContent value="forecast" className="mt-3 space-y-2">
-              <div className="flex items-center justify-end">
-                <TargetedForecastButton
-                  value={forecastFilters}
-                  onChange={setForecastFilters}
-                  onRun={(f) => refreshNominations(f)}
-                  loading={nominationsLoading}
-                />
-              </div>
-              <NominationForecast
-                predictions={nominations}
-                roomRead={roomRead}
-                loading={nominationsLoading}
-                onRefresh={() => refreshNominations()}
-                onPick={(name, position) => {
-                  setPlayerName(name);
-                  setPosition(position);
-                  setDrafter("other");
-                  toast(`${name} loaded — ready to log when nominated`);
-                }}
-              />
             </TabsContent>
           </Tabs>
 
