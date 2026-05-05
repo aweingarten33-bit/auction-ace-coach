@@ -108,8 +108,7 @@ export default function MobileDraft() {
     addEvent(ev);
     setPlayerName(""); setPriceInput(""); setPosition("");
     toast.success(`${name} → $${price}`);
-    // Auto-ask coach after my picks; otherwise just log
-    if (drafter === "me") askCoach(ev);
+    // Coach is opt-in (Sparkles button) — don't auto-burn credits on every pick.
   };
 
   const askCoach = async (latestEvent?: DraftEvent, userQuestion?: string) => {
