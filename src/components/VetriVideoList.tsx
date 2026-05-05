@@ -54,7 +54,7 @@ export default function VetriVideoList() {
   if (videos === null) {
     return (
       <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-        <Loader2 className="h-3 w-3 animate-spin" /> Loading Sal Vetri videos…
+        <Loader2 className="h-3 w-3 animate-spin" /> Loading analyst videos…
       </div>
     );
   }
