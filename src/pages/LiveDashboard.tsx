@@ -757,6 +757,10 @@ export default function LiveDashboard() {
               toast(`${name} loaded — best next target`);
             }}
           />
+          <NominationCard
+            drain={computeDrain({ settings, keepers, events, prices })}
+            get={computeGet({ settings, keepers, events, prices })}
+          />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full">
             <TabsList className="grid w-full grid-cols-3 h-9">
