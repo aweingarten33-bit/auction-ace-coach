@@ -11,13 +11,26 @@ import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+import { LockProvider, useLock } from "@/hooks/useLock";
 
 const queryClient = new QueryClient();
 
-function Protected({ children }: { children: JSX.Element }) {
+function Protected({ children, allowWhenLocked = false }: { children: JSX.Element; allowWhenLocked?: boolean }) {
   const { user, loading } = useAuth();
-  if (loading) return null;
+  const { locked, isAdmin, loading: lockLoading } = useLock();
+  if (loading || lockLoading) return null;
   if (!user) return <Navigate to="/auth" replace />;
+  // Site-wide lock — show fake 404 to non-admins (admins always get through)
+  if (locked && !isAdmin && !allowWhenLocked) return <NotFound />;
+  return children;
+}
+
+function PublicGate({ children }: { children: JSX.Element }) {
+  const { locked, isAdmin, loading } = useLock();
+  const { user, loading: authLoading } = useAuth();
+  if (loading || authLoading) return null;
+  // Hide auth/landing behind fake 404 too when locked, unless admin
+  if (locked && !(user && isAdmin)) return <NotFound />;
   return children;
 }
 
@@ -28,19 +41,22 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/draft" element={<Protected><Draft /></Protected>} />
-            <Route path="/planner" element={<Protected><Planner /></Protected>} />
-            <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
-            <Route path="/admin" element={<Protected><Admin /></Protected>} />
-            {/* Legacy redirects */}
-            <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
-            <Route path="/m" element={<Navigate to="/draft" replace />} />
-            <Route path="/mobile" element={<Navigate to="/draft" replace />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <LockProvider>
+            <Routes>
+              <Route path="/" element={<PublicGate><Index /></PublicGate>} />
+              <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
+              <Route path="/draft" element={<Protected><Draft /></Protected>} />
+              <Route path="/planner" element={<Protected><Planner /></Protected>} />
+              <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+              {/* Admin always reachable so you can unlock */}
+              <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
+              {/* Legacy redirects */}
+              <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
+              <Route path="/m" element={<Navigate to="/draft" replace />} />
+              <Route path="/mobile" element={<Navigate to="/draft" replace />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </LockProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

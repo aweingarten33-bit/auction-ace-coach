@@ -3,9 +3,12 @@ import { Link, Navigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Loader2, RefreshCw, Users } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { ArrowLeft, Loader2, Lock, RefreshCw, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useLock } from "@/hooks/useLock";
+import { toast } from "sonner";
 
 interface Row {
   user_id: string;
@@ -34,9 +37,23 @@ const fmt = (iso: string | null) => {
 
 export default function Admin() {
   const { user, loading: authLoading } = useAuth();
+  const { locked, refresh: refreshLock } = useLock();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const [togglingLock, setTogglingLock] = useState(false);
+
+  const toggleLock = async (next: boolean) => {
+    setTogglingLock(true);
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ locked: next, updated_at: new Date().toISOString() })
+      .eq("id", true);
+    setTogglingLock(false);
+    if (error) return toast.error(error.message);
+    await refreshLock();
+    toast.success(next ? "Site locked — non-admins now see 404" : "Site unlocked");
+  };
 
   const load = async () => {
     setLoading(true);
@@ -100,6 +117,24 @@ export default function Admin() {
         <Users className="h-5 w-5" />
         <h1 className="text-2xl font-bold">Usage Report</h1>
       </div>
+
+      <Card className={`mb-4 p-4 ${locked ? "border-destructive/60 bg-destructive/5" : ""}`}>
+        <div className="flex items-start gap-3">
+          <Lock className={`mt-0.5 h-4 w-4 ${locked ? "text-destructive" : "text-muted-foreground"}`} />
+          <div className="flex-1">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold">Site lockdown</p>
+              <Switch checked={locked} disabled={togglingLock} onCheckedChange={toggleLock} />
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              {locked
+                ? "🔒 LOCKED — everyone except you sees a 404. You can still use /admin to unlock."
+                : "Off. Flip on the day before your draft to make the site appear broken (404) to everyone but you."}
+            </p>
+          </div>
+        </div>
+      </Card>
+
 
       <div className="mb-4 grid grid-cols-3 gap-3">
         <Card className="p-3">

@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          id: boolean
+          locked: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: boolean
+          locked?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: boolean
+          locked?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       espn_credentials: {
         Row: {
           created_at: string
