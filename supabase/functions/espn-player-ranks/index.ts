@@ -95,9 +95,11 @@ Deno.serve(async (req) => {
           pos_rank: ranks?.positionalRank ?? null,
           auction_value: ranks?.auctionValue ?? null,
           projected_points: null,
+          prior_ppg: null as number | null,
+          prior_season: null as number | null,
         };
       })
-      .filter(Boolean) as Array<{ season: number; espn_player_id: number; player_name: string; player_name_norm: string; position: string | null; overall_rank: number | null; pos_rank: number | null; auction_value: number | null; projected_points: number | null }>;
+      .filter(Boolean) as Array<{ season: number; espn_player_id: number; player_name: string; player_name_norm: string; position: string | null; overall_rank: number | null; pos_rank: number | null; auction_value: number | null; projected_points: number | null; prior_ppg: number | null; prior_season: number | null }>;
 
     // Compute pos_rank ourselves when ESPN omits positionalRank: rank players
     // within each position by overall_rank ascending. This is what the auto-fill
@@ -114,9 +116,61 @@ Deno.serve(async (req) => {
       arr.forEach((r, i) => { if (r.pos_rank == null) r.pos_rank = i + 1; });
     }
 
+    // Fetch last season's actual fantasy stats so the auto-fill can sanity-check
+    // ESPN's preseason rank against real production (e.g. ESPN ranks a guy WR15
+    // but he was WR4 in PPG -> bump his tier).
+    const priorSeason = season - 1;
+    try {
+      const priorUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${priorSeason}/segments/0/leaguedefaults/3?view=kona_player_info`;
+      const priorFilter = {
+        players: {
+          limit: 1000,
+          filterStatsForTopScoringPeriodIds: { value: 17, additionalValue: [`00${priorSeason}`] },
+        },
+      };
+      const pr = await fetch(priorUrl, {
+        headers: {
+          accept: "application/json",
+          referer: "https://fantasy.espn.com/",
+          origin: "https://fantasy.espn.com",
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          ...(cookie ? { cookie } : {}),
+          "x-fantasy-filter": JSON.stringify(priorFilter),
+          "x-fantasy-source": "kona",
+          "x-fantasy-platform": "kona-PROD",
+        },
+      });
+      const ptext = await pr.text();
+      if (pr.ok && !ptext.trimStart().startsWith("<")) {
+        const pparsed = JSON.parse(ptext);
+        const ppl: any[] = Array.isArray(pparsed?.players)
+          ? pparsed.players.map((e: any) => e.player ?? e)
+          : Array.isArray(pparsed) ? pparsed : [];
+        const ppgById = new Map<number, number>();
+        for (const p of ppl) {
+          if (!p?.id || !Array.isArray(p.stats)) continue;
+          // statSourceId 0 = actual, statSplitTypeId 0 = full season
+          const actual = p.stats.find((s: any) =>
+            s.seasonId === priorSeason && s.statSourceId === 0 && s.statSplitTypeId === 0
+          );
+          const ppg = actual?.appliedAverage;
+          if (typeof ppg === "number" && ppg > 0) ppgById.set(p.id, Math.round(ppg * 10) / 10);
+        }
+        for (const r of rows) {
+          const ppg = ppgById.get(r.espn_player_id);
+          if (ppg != null) {
+            r.prior_ppg = ppg;
+            r.prior_season = priorSeason;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(`prior-season stats fetch failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+
     // Use service role for upsert (bypasses RLS write block on this read-only-public table).
     const sbAdmin = createClient(url, serviceKey);
-    // Upsert in chunks to stay under payload limits.
     let upserted = 0;
     for (let i = 0; i < rows.length; i += 200) {
       const chunk = rows.slice(i, i + 200);
