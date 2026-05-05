@@ -45,22 +45,35 @@ Deno.serve(async (req) => {
       },
     };
 
-    const espnUrl = `https://fantasy.espn.com/apis/v3/games/ffl/seasons/${season}/players?scoringPeriodId=0&view=players_wl`;
+    // lm-api-reads is the read-only mirror that doesn't return HTML login pages
+    // when called from datacenter IPs.
+    const espnUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${season}/players?scoringPeriodId=0&view=players_wl`;
     const r = await fetch(espnUrl, {
       headers: {
         accept: "application/json",
+        "accept-language": "en-US,en;q=0.9",
+        referer: "https://fantasy.espn.com/",
+        origin: "https://fantasy.espn.com",
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+          "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         ...(cookie ? { cookie } : {}),
         "x-fantasy-filter": JSON.stringify(filter),
         "x-fantasy-source": "kona",
         "x-fantasy-platform": "kona-PROD",
       },
     });
-    if (!r.ok) {
-      const text = await r.text();
-      return j({ error: `ESPN ${r.status}`, body: text.slice(0, 200) }, 502);
+    const text = await r.text();
+    if (!r.ok) return j({ error: `ESPN ${r.status}`, body: text.slice(0, 200) }, 502);
+    // ESPN sometimes serves an HTML error/login page with status 200 from edge IPs.
+    if (text.trimStart().startsWith("<")) {
+      return j({ error: "ESPN returned HTML instead of JSON (likely auth/WAF block)", body: text.slice(0, 200) }, 502);
     }
-    const players = await r.json();
-    if (!Array.isArray(players)) return j({ error: "Unexpected ESPN response shape" }, 502);
+    let players: any;
+    try { players = JSON.parse(text); } catch (e) {
+      return j({ error: `Bad JSON from ESPN: ${e instanceof Error ? e.message : String(e)}`, body: text.slice(0, 200) }, 502);
+    }
+    if (!Array.isArray(players)) return j({ error: "Unexpected ESPN response shape", body: JSON.stringify(players).slice(0, 200) }, 502);
 
     const rows = players
       .map((p: any) => {
