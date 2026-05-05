@@ -1006,6 +1006,45 @@ Keep it tight. No fluff, no closing line.`;
                 </Button>
               )}
             </div>
+            {pendingBid && (
+              <div className="mb-2 flex items-center gap-2 rounded-xl border border-primary/40 bg-primary/10 px-3 py-2 text-[12px]">
+                <span className="min-w-0 flex-1 truncate">
+                  Current bid on <span className="font-semibold text-foreground">{pendingBid.player}</span>?
+                </span>
+                <div className="relative w-20 shrink-0">
+                  <span className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    autoFocus
+                    placeholder="0"
+                    value={pendingBidPrice}
+                    onChange={(e) => setPendingBidPrice(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") { e.preventDefault(); confirmPendingBid(); }
+                      if (e.key === "Escape") { setPendingBid(null); setPendingBidPrice(""); }
+                    }}
+                    disabled={streaming}
+                    className="h-7 pl-5 text-right font-mono tabular-nums"
+                  />
+                </div>
+                <Button
+                  onClick={confirmPendingBid}
+                  disabled={streaming || !pendingBidPrice.trim()}
+                  size="sm"
+                  className="h-7 px-2 text-[11px]"
+                >
+                  Ask
+                </Button>
+                <Button
+                  onClick={() => { setPendingBid(null); setPendingBidPrice(""); }}
+                  size="sm" variant="ghost"
+                  className="h-7 px-1.5 text-[11px] text-muted-foreground"
+                >
+                  ✕
+                </Button>
+              </div>
+            )}
             <div className="flex items-end gap-2 rounded-3xl border border-border bg-background px-3 py-2 shadow-sm focus-within:border-primary">
               <Input
                 placeholder='Ask Matthew Berry… e.g. "Should I bid on Bijan?"'
