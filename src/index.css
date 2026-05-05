@@ -15,14 +15,14 @@
     /* EVIL SUPERMAN (Superman III) — grimy, desaturated, dark.
        Suit = muted dark navy. Cape/shield = blood red. Belt = tarnished gold. */
 
-    --background: 220 18% 8%;          /* near-black with cool blue undertone */
-    --foreground: 40 12% 86%;          /* dingy off-white */
+    --background: 218 42% 18%;         /* lifted dark navy — clearly blue */
+    --foreground: 40 12% 90%;          /* dingy off-white */
 
-    --card: 220 16% 12%;
-    --card-foreground: 40 12% 88%;
+    --card: 218 38% 22%;
+    --card-foreground: 40 12% 92%;
 
-    --popover: 220 16% 12%;
-    --popover-foreground: 40 12% 88%;
+    --popover: 218 38% 22%;
+    --popover-foreground: 40 12% 92%;
 
     /* Lighter muted navy — the evil suit */
     --primary: 218 60% 42%;
