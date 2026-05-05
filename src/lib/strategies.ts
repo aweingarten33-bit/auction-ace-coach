@@ -167,10 +167,10 @@ export const STRATEGIES: Strategy[] = [
   },
   {
     id: "modified-zero-rb",
-    label: "Modified Zero RB (Superflex)",
-    short: "One mid-tier RB, 2 QBs, heavy WR.",
+    label: "Anchor RB (Superflex)",
+    short: "One mid-tier RB anchor, 2 QBs, heavy WR.",
     description:
-      "Skip the top RB tier but grab one solid RB2-type for stability. Lock 2 startable QBs (it's superflex), then spend the rest on a deep WR group plus a strong TE.",
+      "Not true Zero RB — you grab ONE mid-tier RB ($10–$20ish) as a safety-net anchor so you're not naked at the position. Skip the top RB tier, lock 2 startable QBs (it's superflex), then spend the rest on a deep WR group plus a strong TE.",
     weights: {
       QB: [1.5, 1.1, 0.2],
       RB: [0.7, 0.5, 0.3, 0.25, 0.2],
@@ -178,7 +178,7 @@ export const STRATEGIES: Strategy[] = [
       TE: [1.0],
     },
     coachGuidance:
-      "User is going Modified Zero RB in a SUPERFLEX: one mid-tier RB anchor (~10–15% of budget), TWO startable QBs, then heavy WR + TE. Approve ONE moderate RB buy, then fade RBs. Push WR depth hard but never at the cost of QB2.",
+      "User is going Anchor RB in a SUPERFLEX (a softer Zero RB — one mid-tier RB anchor, not pure zero): one RB anchor (~10–15% of budget), TWO startable QBs, then heavy WR + TE. Approve ONE moderate RB buy, then fade RBs. Push WR depth hard but never at the cost of QB2.",
   },
 ];
 
