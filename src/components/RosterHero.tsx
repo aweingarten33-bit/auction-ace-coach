@@ -119,6 +119,12 @@ export default function RosterHero({
                   {r.have}/{r.need}
                 </span>
               </div>
+              {r.severity !== "done" && (
+                <div className="mt-0.5 flex items-center justify-between font-mono text-[10px] tabular-nums">
+                  <span className="text-[8px] uppercase tracking-wider opacity-70">max</span>
+                  <span className="font-bold">${r.maxBid}</span>
+                </div>
+              )}
             </div>
 
           ))}
