@@ -359,13 +359,26 @@ function LogTab(props: {
             onSelect={(p) => p.position && POSITIONS.includes(p.position as Position) && setPosition(p.position as Position)}
           />
 
-          {/* Big price display + increment chips */}
+          {/* Big price display + live verdict */}
           <div className="flex items-center justify-between rounded-lg border border-border/60 bg-secondary/40 px-3 py-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Price</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Price</span>
+              {verdict && verdict.hasRef && <ValueVerdict value={verdict} />}
+            </div>
             <span className="font-mono text-2xl font-bold tabular-nums text-primary">
               ${priceInput || "0"}
             </span>
           </div>
+
+          {projection && (
+            <RemainingBuildPanel
+              projection={projection}
+              hypoPrice={priceNum}
+              hypoName={playerName || undefined}
+              hypoPos={(position as Position) || undefined}
+              compact
+            />
+          )}
 
           {/* Quick increments */}
           <div className="grid grid-cols-5 gap-1.5">
