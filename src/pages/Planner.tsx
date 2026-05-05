@@ -112,9 +112,34 @@ export default function Planner() {
   const {
     settings, keepers, events, prices, setupComplete,
     slotAllocations, setSlotAllocation, setSlotAllocations, clearSlotAllocations,
-    strategyId, setStrategyId,
+    strategyId, setStrategyId, setSettings,
   } = useDraftStore();
   const strategy = getStrategy(strategyId);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const refreshFromEspn = async () => {
+    setRefreshing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("espn-sync", {});
+      if (error || data?.error) {
+        toast.error(data?.error ?? error?.message ?? "ESPN refresh failed");
+        return;
+      }
+      const lg = data.league;
+      const newBudget = lg?.budget;
+      if (typeof newBudget === "number" && newBudget > 0 && newBudget !== settings.totalBudget) {
+        setSettings({ totalBudget: newBudget });
+        toast.success(`League refreshed — auction budget is $${newBudget}`);
+      } else {
+        toast.success(`League refreshed — auction budget is $${newBudget ?? settings.totalBudget}`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Refresh failed");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!setupComplete) navigate("/");
@@ -225,6 +250,17 @@ export default function Planner() {
               </span>
             )}
           </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={refreshFromEspn}
+            disabled={refreshing}
+            className="ml-auto h-7 gap-1 text-[11px]"
+            title="Re-pull league settings from ESPN"
+          >
+            <RotateCcw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
+            {refreshing ? "Syncing…" : "Refresh league"}
+          </Button>
         </Card>
       </div>
 
