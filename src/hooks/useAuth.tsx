@@ -18,10 +18,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       setLoading(false);
+      if (s?.user) {
+        // Fire-and-forget activity ping for the admin report
+        supabase.rpc("touch_last_seen").then(() => {});
+      }
     });
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
+      if (data.session?.user) {
+        supabase.rpc("touch_last_seen").then(() => {});
+      }
     });
     return () => sub.subscription.unsubscribe();
   }, []);

@@ -9,6 +9,7 @@ import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
+import Admin from "./pages/Admin.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/draft" element={<Protected><Draft /></Protected>} />
             <Route path="/planner" element={<Protected><Planner /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+            <Route path="/admin" element={<Protected><Admin /></Protected>} />
             {/* Legacy redirects */}
             <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
             <Route path="/m" element={<Navigate to="/draft" replace />} />
