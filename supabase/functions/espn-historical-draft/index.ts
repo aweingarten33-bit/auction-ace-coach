@@ -75,14 +75,21 @@ Deno.serve(async (req) => {
           summary.push({ season, picks: 0, status: "skipped", error: "ESPN returned HTML (auth/WAF block)" });
           continue;
         }
-        let data: any;
-        try { data = JSON.parse(text); } catch (e) {
+        let raw: any;
+        try { raw = JSON.parse(text); } catch (e) {
           summary.push({ season, picks: 0, status: "skipped", error: `Bad JSON: ${e instanceof Error ? e.message : String(e)}` });
+          continue;
+        }
+        // /leagueHistory/ returns an array; /seasons/ returns an object.
+        const data: any = Array.isArray(raw) ? raw[0] : raw;
+        if (!data) {
+          summary.push({ season, picks: 0, status: "no_draft_data" });
           continue;
         }
 
         const draftType = data?.settings?.draftSettings?.type;
         const picks = data?.draftDetail?.picks ?? [];
+        console.log(`[espn-historical-draft] season=${season} draftType=${JSON.stringify(draftType)} picks=${picks.length} sample=${JSON.stringify(picks[0] ?? null)}`);
         if (!Array.isArray(picks) || picks.length === 0) {
           summary.push({ season, picks: 0, status: "no_draft_data" });
           continue;
@@ -99,10 +106,15 @@ Deno.serve(async (req) => {
           }
         }
 
-        // Auction picks have bidAmount > 0; snake picks don't.
-        const auctionPicks = picks.filter((p: any) => typeof p.bidAmount === "number" && p.bidAmount > 0);
+        // Include keepers (bidAmount may be 0) AND real auction picks (bidAmount > 0).
+        const auctionPicks = picks.filter((p: any) =>
+          p?.keeper === true || (typeof p?.bidAmount === "number" && p.bidAmount > 0)
+        );
         if (auctionPicks.length === 0) {
-          summary.push({ season, picks: 0, status: draftType === 1 ? "snake_draft" : "no_auction_data" });
+          // draftSettings.type is a string ("AUCTION" | "SNAKE") on modern responses,
+          // but historically was a numeric enum. Handle both.
+          const isSnake = draftType === "SNAKE" || draftType === 1;
+          summary.push({ season, picks: 0, status: isSnake ? "snake_draft" : "no_auction_data" });
           continue;
         }
 
