@@ -115,7 +115,8 @@ export function computeDrain(input: Input): DrainPlan {
           ? `${pos} you can skip — others will pay`
           : `You don't need ${pos} — let others overpay`;
 
-      return { pick: { name: p.name, position: pos, price: p.price, reason }, score };
+      const pick: DrainPick = { name: p.name, position: pos, price: p.price, reason };
+      return { pick, score };
     })
     .filter((x): x is { pick: DrainPick; score: number } => x !== null)
     .sort((a, b) => b.score - a.score);
