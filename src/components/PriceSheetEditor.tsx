@@ -392,6 +392,9 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       {/* Filter / list */}
       {prices.length > 0 && (
         <>
+          <p className="text-[11px] font-medium text-primary">
+            Values are for the 2026 auction draft (based on 2023–2025 league data).
+          </p>
           <Input
             placeholder={`Filter ${prices.length} players...`}
             value={filter}
