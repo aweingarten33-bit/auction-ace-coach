@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     // Fan API → list leagues for the user
-    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(fanId)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
+    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
     const cookie = `SWID=${swid}; espn_s2=${s2}`;
 
     const fanRes = await fetch(fanUrl, {
