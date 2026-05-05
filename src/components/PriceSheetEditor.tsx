@@ -283,9 +283,24 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   };
 
   // Inline list edits operate directly on `prices` (committed state)
-  const filtered = filter
-    ? prices.filter((p) => p.name.toLowerCase().includes(filter.toLowerCase()))
-    : prices;
+  const filtered = useMemo(() => {
+    let arr = prices;
+    if (filter) {
+      const q = filter.toLowerCase();
+      arr = arr.filter((p) => p.name.toLowerCase().includes(q));
+    }
+    if (posFilter !== "ALL") {
+      arr = arr.filter((p) => {
+        const pos = posByName.get(p.name.toLowerCase());
+        if (posFilter === "DST") return pos === "DST" || pos === "DEF" || pos === "D/ST";
+        return pos === posFilter;
+      });
+    }
+    if (sortBy === "price-desc") arr = [...arr].sort((a, b) => b.price - a.price);
+    else if (sortBy === "price-asc") arr = [...arr].sort((a, b) => a.price - b.price);
+    else if (sortBy === "name") arr = [...arr].sort((a, b) => a.name.localeCompare(b.name));
+    return arr;
+  }, [prices, filter, posFilter, sortBy, posByName]);
 
   const updatePrice = (idx: number, value: number) => {
     const next = [...prices];
