@@ -7,14 +7,31 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Fan API "abbrev" → game slug. Anything not in this map (FFLPK pickem,
+// FFLM tournament challenge, etc.) is filtered out.
+const GAME_SLUG: Record<string, string> = {
+  FFL: "ffl", FBA: "fba", FLB: "flb", FHL: "fhl",
+};
+
 interface Body {
   swid: string;
   espn_s2: string;
   season: number;
+  sport?: string;
   league_id?: number;
   team_id?: number;
   save?: boolean;
   clear_selection?: boolean;
+}
+
+interface League {
+  sport: string;
+  game: string;
+  season: number;
+  leagueId: number;
+  leagueName: string;
+  teamId: number;
+  teamName?: string;
 }
 
 Deno.serve(async (req) => {
@@ -34,79 +51,31 @@ Deno.serve(async (req) => {
     if (!body.swid || !body.espn_s2 || !body.season) {
       return j({ error: "swid, espn_s2, season required" }, 400);
     }
-    // Accept either raw values or copied Cookie rows like "SWID={...}" / "espn_s2=...".
-    // Also fix common screenshot/OCR homoglyphs, but never silently drop bad characters.
-    const normalizeHomoglyphs = (v: string) => v.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[\u0410]/g, "A").replace(/[\u0412]/g, "B").replace(/[\u0421]/g, "C").replace(/[\u0415]/g, "E").replace(/[\u041D]/g, "H").replace(/[\u041A]/g, "K").replace(/[\u041C]/g, "M").replace(/[\u041E]/g, "O").replace(/[\u0420]/g, "P").replace(/[\u0422]/g, "T").replace(/[\u0425]/g, "X").replace(/[\u0430]/g, "a").replace(/[\u0441]/g, "c").replace(/[\u0435]/g, "e").replace(/[\u043E]/g, "o").replace(/[\u0440]/g, "p").replace(/[\u0445]/g, "x").replace(/[\u0443]/g, "y");
-    const clean = (v: string) => normalizeHomoglyphs(v).trim().replace(/^['"]|['"]$/g, "");
-    const cookieValue = (raw: string, name: string) => {
-      const value = clean(raw);
-      const match = value.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`, "i"));
-      return clean(match?.[1] ?? value);
-    };
-    let swid = cookieValue(body.swid, "SWID").replace(/\s+/g, "").replace(/^%7B/i, "{").replace(/%7D$/i, "}");
-    const s2 = cookieValue(body.espn_s2, "espn_s2").replace(/\s+/g, "");
-    console.log("[espn-connect] swid in/out:", body.swid, "->", swid, "| s2 len in/out:", body.espn_s2.length, "->", s2.length, "| s2 head:", s2.slice(0, 16), "tail:", s2.slice(-16));
-    // ESPN wants braces in the Cookie header, but not in the fan id URL path.
-    if (!swid.startsWith("{")) swid = `{${swid}`;
-    if (!swid.endsWith("}")) swid = `${swid}}`;
+
+    const { swid, s2 } = normalizeCookies(body.swid, body.espn_s2);
     const fanId = swid.replace(/[{}]/g, "");
+    console.log("[espn-connect] swid:", swid, "| s2 len:", s2.length, "| s2 head:", s2.slice(0, 16), "tail:", s2.slice(-16));
+
     if (!/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/.test(fanId)) {
-      return j({ error: "Invalid SWID", hint: "The SWID is not a valid ESPN cookie value. Copy it directly from browser DevTools > Application > Cookies, not from a screenshot/OCR scan." }, 400);
+      return j({ error: "Invalid SWID", hint: "The SWID must be a valid UUID. Copy it directly from Chrome DevTools → Application → Cookies → espn.com." }, 400);
     }
     if (!/^[\x21-\x7E]+$/.test(s2)) {
-      return j({ error: "Invalid espn_s2", hint: "The espn_s2 cookie contains non-cookie characters. Copy the raw value directly from browser DevTools, not from a screenshot/OCR scan." }, 400);
+      return j({ error: "Invalid espn_s2", hint: "The espn_s2 cookie contains invalid characters. Copy the raw value from DevTools." }, 400);
     }
     if (s2.length < 200) {
-      return j({ error: "espn_s2 looks truncated", hint: `Got ${s2.length} characters; a real espn_s2 cookie is usually 300+ characters. In Chrome DevTools → Application → Cookies → https://www.espn.com, click the espn_s2 row, then copy the full value from the "Cookie Value" panel at the bottom (the table column truncates it).` }, 400);
+      return j({ error: "espn_s2 looks truncated", hint: `Got ${s2.length} chars; a real espn_s2 is 300+ chars. In Chrome DevTools → Application → Cookies → espn.com, click the espn_s2 row and copy the full value from the "Cookie Value" panel at the bottom (the table column truncates it).` }, 400);
     }
 
-    // Fan API → list leagues for the user. The URL path needs the bare fan id;
-    // the Cookie header needs the braced SWID value.
-    const fanUrl = `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(fanId)}?lang=en&region=us&section=fantasy&device=desktop&displayHiddenPrefs=true&featureFlags=challengeEntries&context=fantasy&useCookieAuth=true`;
-    const cookie = `SWID=${swid}; espn_s2=${s2}`;
+    const allLeagues = await fetchLeagues(swid, s2);
 
-    const fanRes = await fetch(fanUrl, {
-      headers: {
-        cookie,
-        accept: "application/json",
-        "user-agent": "Mozilla/5.0",
-      },
-    });
-    if (!fanRes.ok) {
-      const text = await fanRes.text();
-      return j({ error: `ESPN auth failed (${fanRes.status})`, detail: text.slice(0, 300), hint: "Paste only the cookie values: SWID can include braces, espn_s2 should not include spaces or line breaks." }, 400);
-    }
-    const fanData = await fanRes.json();
+    // Filter for the requested season (and optional sport)
+    const seasonLeagues = allLeagues.filter((l) =>
+      l.season === Number(body.season) && (!body.sport || l.sport === body.sport)
+    );
 
-    const allEntries = (fanData?.preferences ?? [])
-      .map((p: any) => p?.metaData?.entry)
-      .filter((e: any) => e && e.groups?.[0]?.groupId);
-
-    // Loose filter: match season as number-or-string; allow any sport but prefer FFL
-    const seasonMatch = (e: any) => Number(e.seasonId) === Number(body.season);
-    const ffl = allEntries.filter((e: any) => seasonMatch(e) && e.abbrev === "FFL");
-    const chosen = ffl.length > 0 ? ffl : allEntries.filter(seasonMatch);
-
-    const leagues = chosen.map((e: any) => ({
-      leagueId: Number(e.groups[0].groupId),
-      leagueName: e.groups[0].groupName,
-      teamId: Number(e.entryId),
-      teamName: e.entryMetadata?.teamName ?? `Team ${e.entryId}`,
-      seasonId: Number(e.seasonId),
-      sport: e.abbrev,
-    }));
-
-    // Debug summary so we can see what ESPN actually returned
-    const debug = {
-      totalPreferences: (fanData?.preferences ?? []).length,
-      totalEntries: allEntries.length,
-      seasons: [...new Set(allEntries.map((e: any) => e.seasonId))],
-      sports: [...new Set(allEntries.map((e: any) => e.abbrev))],
-    };
-
-    // Persist creds when explicitly verifying/selecting. Initial page load can list only.
+    // Persist creds + optional selection
     if (body.save !== false) {
-      const upsertRow: any = {
+      const upsertRow: Record<string, unknown> = {
         user_id: u.user.id,
         swid, espn_s2: s2,
         season_id: body.season,
@@ -118,24 +87,116 @@ Deno.serve(async (req) => {
         upsertRow.league_id = null;
         upsertRow.team_id = null;
       }
-
       const { error } = await sb.from("espn_credentials").upsert(upsertRow, { onConflict: "user_id" });
       if (error) return j({ error: error.message }, 500);
     }
 
     return j({
       ok: true,
-      leagues,
       season: body.season,
-      debug,
-      hint: leagues.length === 0
-        ? `ESPN returned ${debug.totalEntries} fantasy entries (seasons: ${JSON.stringify(debug.seasons)}, sports: ${JSON.stringify(debug.sports)}). None matched season ${body.season}. Try a different season, or re-copy a fresh espn_s2 cookie.`
+      leagues: seasonLeagues,
+      debug: {
+        totalEntries: allLeagues.length,
+        seasons: [...new Set(allLeagues.map((l) => l.season))],
+        sports: [...new Set(allLeagues.map((l) => l.sport))],
+      },
+      hint: seasonLeagues.length === 0
+        ? `ESPN returned ${allLeagues.length} fantasy entries but none matched season ${body.season}.`
         : undefined,
     });
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });
+
+// ─────────────────────────── helpers ───────────────────────────
+
+function normalizeCookies(rawSwid: string, rawS2: string) {
+  const clean = (v: string) => v.trim().replace(/^['"]|['"]$/g, "");
+  const cookieValue = (raw: string, name: string) => {
+    const value = clean(raw);
+    const m = value.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`, "i"));
+    return clean(m?.[1] ?? value);
+  };
+
+  let swid = cookieValue(rawSwid, "SWID")
+    .replace(/\s+/g, "")
+    .replace(/^%7B/i, "{")
+    .replace(/%7D$/i, "}");
+  if (!swid.startsWith("{")) swid = `{${swid}`;
+  if (!swid.endsWith("}")) swid = `${swid}}`;
+
+  const s2 = cookieValue(rawS2, "espn_s2").replace(/\s+/g, "");
+  return { swid, s2 };
+}
+
+async function fetchLeagues(swid: string, s2: string): Promise<League[]> {
+  // CRITICAL: encodeURIComponent(swid) keeps the braces → %7BGUID%7D in the path.
+  // Stripping the braces returns 404 "fan not found".
+  const fanUrl =
+    `https://fan.api.espn.com/apis/v2/fans/${encodeURIComponent(swid)}` +
+    `?context=fantasy&featureFlags=expandAthlete&showAirings=buy,live,replay` +
+    `&source=ESPN.com+-+FAM`;
+
+  const res = await fetch(fanUrl, {
+    headers: {
+      cookie: `SWID=${swid}; espn_s2=${s2}`,
+      accept: "application/json",
+      "accept-language": "en-US,en;q=0.9",
+      referer: "https://fantasy.espn.com/",
+      origin: "https://fantasy.espn.com",
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    },
+  });
+
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 300);
+    throw new Error(`ESPN fan API ${res.status}: ${detail || "(empty body)"}`);
+  }
+
+  return parseLeagues(await res.json());
+}
+
+function parseLeagues(fan: unknown): League[] {
+  // deno-lint-ignore no-explicit-any
+  const prefs: any[] = Array.isArray((fan as any)?.preferences) ? (fan as any).preferences : [];
+  const out: League[] = [];
+
+  for (const p of prefs) {
+    const entry = p?.metaData?.entry;
+    if (!entry) continue;
+    const abbrev: string = entry.abbrev ?? "";
+    const game = GAME_SLUG[abbrev];
+    if (!game) continue;
+    // deno-lint-ignore no-explicit-any
+    const groups: any[] = Array.isArray(entry.groups) ? entry.groups : [];
+    const group = groups[0];
+    if (!group?.groupId) continue;
+    const seasonId = Number(entry.seasonId);
+    const leagueId = Number(group.groupId);
+    const teamId = Number(entry.entryId);
+    if (!seasonId || !leagueId || !teamId) continue;
+    out.push({
+      sport: abbrev,
+      game,
+      season: seasonId,
+      leagueId,
+      leagueName: String(group.groupName ?? "").trim(),
+      teamId,
+      teamName: entry.entryMetadata?.teamName ?? undefined,
+    });
+  }
+
+  const seen = new Set<string>();
+  return out.filter((l) => {
+    const k = `${l.season}-${l.leagueId}-${l.teamId}`;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+}
 
 function j(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), {
