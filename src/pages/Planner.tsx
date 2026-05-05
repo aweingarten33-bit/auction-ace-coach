@@ -227,6 +227,7 @@ export default function Planner() {
         <Card className="p-3">
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
+              <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">2</span>
               <Calculator className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-semibold">$ per roster slot</h2>
             </div>
@@ -265,6 +266,7 @@ export default function Planner() {
         {/* ---------- Affordability checker ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center gap-2">
+            <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">3</span>
             <Check className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Can I afford…?</h2>
           </div>
@@ -309,6 +311,7 @@ export default function Planner() {
         {/* ---------- $ → players lookup ---------- */}
         <Card className="p-3">
           <div className="mb-2 flex items-center gap-2">
+            <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">4</span>
             <Search className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">What can I get for $X?</h2>
           </div>
