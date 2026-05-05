@@ -194,7 +194,8 @@ Deno.serve(async (req: Request) => {
 
     const payload = (await req.json()) as CoachPayload;
 
-    const messages: { role: string; content: string }[] = [{ role: "system", content: SYSTEM_PROMPT }];
+    const sysPrompt = payload.showMath ? SYSTEM_PROMPT + MATH_ADDENDUM : SYSTEM_PROMPT;
+    const messages: { role: string; content: string }[] = [{ role: "system", content: sysPrompt }];
     if (payload.history?.length) {
       for (const h of payload.history.slice(-6)) {
         messages.push({ role: h.role, content: h.content });
