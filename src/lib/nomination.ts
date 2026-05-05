@@ -117,8 +117,7 @@ export function computeDrain(input: Input): DrainPlan {
 
       return { pick: { name: p.name, position: pos, price: p.price, reason }, score };
     })
-    .filter((x) => x !== null) as { pick: DrainPick; score: number }[];
-  scored
+    .filter((x): x is { pick: DrainPick; score: number } => x !== null)
     .sort((a, b) => b.score - a.score);
 
   if (scored.length === 0) return { primary: null, backups: [] };
