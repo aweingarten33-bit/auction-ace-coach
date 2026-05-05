@@ -220,6 +220,8 @@ export default function MobileDraft() {
             priceInput={priceInput} setPriceInput={setPriceInput}
             position={position} setPosition={setPosition}
             onUndo={() => { undoEvent(); toast("Undone"); }}
+            settings={settings} keepers={keepers} prices={prices}
+            pulse={pulse} myCount={myCount} requiredCount={requiredCount}
           />
         )}
         {tab === "roster" && (
