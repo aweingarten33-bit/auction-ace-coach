@@ -124,27 +124,48 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         throw new Error(`No auction history pulled. ESPN says — ${detail}`);
       }
 
-      // 3) Pull this year's ranks
+      // 3) Pull this year's ranks (incl. last season's actual PPG)
       const { data: rRows, error: rErr } = await supabase
         .from("espn_player_ranks")
-        .select("player_name, position, pos_rank, auction_value");
+        .select("player_name, position, pos_rank, auction_value, prior_ppg");
       if (rErr) throw rErr;
       if (!rRows?.length) {
         throw new Error("No player ranks cached. Try again in a moment.");
       }
 
+      // 3b) Re-rank within position by last season's PPG so we can sanity-check
+      // ESPN's preseason rank against real production.
+      const ppgRankByName = new Map<string, number>();
+      const byPos = new Map<string, typeof rRows>();
+      for (const r of rRows) {
+        if (!r.position || r.prior_ppg == null) continue;
+        const arr = byPos.get(r.position) ?? [];
+        arr.push(r);
+        byPos.set(r.position, arr);
+      }
+      for (const arr of byPos.values()) {
+        arr.sort((a, b) => (b.prior_ppg ?? 0) - (a.prior_ppg ?? 0));
+        arr.forEach((r, i) => ppgRankByName.set(r.player_name, i + 1));
+      }
+
       // 4) For each ranked player → tier → league avg $
+      // Blend ESPN preseason rank (70%) with last year's PPG rank (30%) so a
+      // proven producer ESPN is sleeping on still gets bumped up a tier.
       const built: { name: string; price: number }[] = [];
       for (const r of rRows) {
         if (!r.position || !r.pos_rank) continue;
-        const tier = tierForPosRank(r.position, r.pos_rank);
+        const ppgRank = ppgRankByName.get(r.player_name);
+        const blendedRank = ppgRank
+          ? Math.round(r.pos_rank * 0.7 + ppgRank * 0.3)
+          : r.pos_rank;
+        const tier = tierForPosRank(r.position, blendedRank);
         const tp = tierPrices.find((t) => t.position === r.position && t.tier === tier);
         const price = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
         if (price > 0) built.push({ name: r.player_name, price });
       }
       if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
       mergeImported(built, "ESPN auto-fill");
-      toast.success(`Auto-filled ${built.length} players from your last 3 ESPN drafts`);
+      toast.success(`Auto-filled ${built.length} players (ESPN ranks + last season's PPG)`);
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Auto-fill failed");
