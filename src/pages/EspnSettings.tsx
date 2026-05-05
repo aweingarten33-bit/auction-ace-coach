@@ -41,7 +41,7 @@ export default function EspnSettings() {
         setVerified(c.last_verified_at);
         // Auto-list leagues so the user can pick one
         const { data } = await supabase.functions.invoke("espn-connect", {
-          body: { swid: c.swid, espn_s2: c.espn_s2, season: seasonToUse },
+          body: { swid: c.swid, espn_s2: c.espn_s2, season: seasonToUse, save: false },
         });
         if (data?.leagues) {
           setLeagues(data.leagues);
@@ -61,7 +61,7 @@ export default function EspnSettings() {
     if (!swid || !s2) return toast.error("Both cookies required");
     setBusy(true);
     const { data, error } = await supabase.functions.invoke("espn-connect", {
-      body: { swid, espn_s2: s2, season },
+      body: { swid, espn_s2: s2, season, clear_selection: true },
     });
     setBusy(false);
     if (error || data?.error) {
@@ -69,6 +69,7 @@ export default function EspnSettings() {
       return;
     }
     setLeagues(data.leagues ?? []);
+    setSelected(null);
     setVerified(new Date().toISOString());
     toast.success(`Found ${data.leagues?.length ?? 0} league(s)`);
   };
@@ -85,7 +86,15 @@ export default function EspnSettings() {
   };
 
   const sync = async () => {
+    if (!selected) return toast.error("Pick a league first");
     setBusy(true);
+    const { data: saved, error: saveError } = await supabase.functions.invoke("espn-connect", {
+      body: { swid, espn_s2: s2, season, league_id: selected.leagueId, team_id: selected.teamId },
+    });
+    if (saveError || saved?.error) {
+      setBusy(false);
+      return toast.error(saved?.error ?? saveError?.message ?? "Could not save league selection");
+    }
     const { data, error } = await supabase.functions.invoke("espn-sync", {});
     setBusy(false);
     if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Sync failed");
