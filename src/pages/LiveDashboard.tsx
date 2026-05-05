@@ -583,16 +583,28 @@ export default function LiveDashboard() {
             <Button variant="ghost" size="sm" onClick={() => navigate("/espn")} className="h-8 px-2 text-[10px] font-semibold" title="ESPN connection & live sync">
               ESPN
             </Button>
-            <Button variant="ghost" size="sm" onClick={exportCsv} className="h-8 w-8 p-0" title="Export draft as CSV" disabled={!events.length}>
-              <Download className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => navigate("/?step=league-basics")} className="h-8 w-8 p-0" title="Setup wizard — Budget">
-              <Settings2 className="h-4 w-4" />
-            </Button>
             <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0"><RotateCcw className="h-4 w-4" /></Button>
-              </AlertDialogTrigger>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="More">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
+                    <Download className="mr-2 h-4 w-4" /> Export CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
+                    <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
+                      <RotateCcw className="mr-2 h-4 w-4" /> Reset draft…
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Reset draft?</AlertDialogTitle>
