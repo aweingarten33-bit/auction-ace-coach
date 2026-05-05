@@ -43,6 +43,29 @@ function callerKey(req: Request): string {
   return `ip:${ip}`;
 }
 const BUCKETS = new Map<string, { count: number; resetAt: number }>();
+
+// ---------- Response cache (60s, in-memory per isolate) ----------
+const CACHE = new Map<string, { body: string; expiresAt: number }>();
+const CACHE_TTL_MS = 60_000;
+async function hashKey(input: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+function cacheGet(key: string): string | null {
+  const hit = CACHE.get(key);
+  if (!hit) return null;
+  if (hit.expiresAt <= Date.now()) { CACHE.delete(key); return null; }
+  return hit.body;
+}
+function cacheSet(key: string, body: string) {
+  CACHE.set(key, { body, expiresAt: Date.now() + CACHE_TTL_MS });
+  if (CACHE.size > 200) {
+    // evict oldest
+    const oldest = [...CACHE.entries()].sort((a, b) => a[1].expiresAt - b[1].expiresAt)[0];
+    if (oldest) CACHE.delete(oldest[0]);
+  }
+}
+
 function rateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
   const b = BUCKETS.get(key);
@@ -167,7 +190,16 @@ Deno.serve(async (req: Request) => {
         messages.push({ role: h.role, content: h.content });
       }
     }
-    messages.push({ role: "user", content: buildUserMessage(payload) });
+    const userMsg = buildUserMessage(payload);
+    messages.push({ role: "user", content: userMsg });
+
+    // 60s response cache keyed by full message stack
+    const cacheKey = await hashKey(JSON.stringify(messages));
+    const cached = cacheGet(cacheKey);
+    if (cached) {
+      const sse = `data: ${JSON.stringify({ choices: [{ delta: { content: cached } }] })}\n\ndata: [DONE]\n\n`;
+      return new Response(sse, { headers: { ...cors, "Content-Type": "text/event-stream", "X-Cache": "HIT" } });
+    }
 
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -190,7 +222,41 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: "AI gateway error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    return new Response(resp.body, { headers: { ...cors, "Content-Type": "text/event-stream" } });
+    if (!resp.body) {
+      return new Response(JSON.stringify({ error: "Empty AI response" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+    // Tee stream: forward to client AND accumulate completion for cache
+    const [forwardStream, captureStream] = resp.body.tee();
+    (async () => {
+      try {
+        const reader = captureStream.getReader();
+        const decoder = new TextDecoder();
+        let buf = "", acc = "";
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buf += decoder.decode(value, { stream: true });
+          let idx: number;
+          while ((idx = buf.indexOf("\n")) !== -1) {
+            let line = buf.slice(0, idx); buf = buf.slice(idx + 1);
+            if (line.endsWith("\r")) line = line.slice(0, -1);
+            if (!line.startsWith("data: ")) continue;
+            const json = line.slice(6).trim();
+            if (json === "[DONE]") break;
+            try {
+              const parsed = JSON.parse(json);
+              const c = parsed.choices?.[0]?.delta?.content;
+              if (c) acc += c;
+            } catch { /* ignore partial */ }
+          }
+        }
+        if (acc.trim().length > 0) cacheSet(cacheKey, acc);
+      } catch (err) {
+        console.error("cache capture failed", err);
+      }
+    })();
+
+    return new Response(forwardStream, { headers: { ...cors, "Content-Type": "text/event-stream", "X-Cache": "MISS" } });
   } catch (e) {
     console.error("coach error", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
