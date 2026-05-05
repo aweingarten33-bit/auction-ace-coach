@@ -23,16 +23,16 @@ interface Props {
 }
 
 const STRATEGY_STYLE: Record<AiNomination["strategy"], { label: string; cls: string }> = {
-  drain:    { label: "MAKE THEM SPEND", cls: "bg-accent/15 text-accent" },
-  plug:     { label: "CHEAP FILL",      cls: "bg-primary/15 text-primary" },
-  enforcer: { label: "PUSH PRICE UP",   cls: "bg-warning/15 text-warning" },
+  drain:    { label: "WASTE THEIR MONEY", cls: "bg-accent/15 text-accent" },
+  plug:     { label: "CHEAP PICK",        cls: "bg-primary/15 text-primary" },
+  enforcer: { label: "RAISE THE PRICE",   cls: "bg-warning/15 text-warning" },
 };
 
 export default function NominationCard({ drain, get, aiSuggestions, aiLoading, onAskAi, onPickAi }: Props) {
   return (
     <Card className="bg-gradient-card p-3">
       <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-        Nomination
+        Who to call out next
       </p>
 
       {/* DRAIN */}
@@ -40,7 +40,7 @@ export default function NominationCard({ drain, get, aiSuggestions, aiLoading, o
         <div className="flex items-center gap-1.5">
           <Megaphone className="h-3.5 w-3.5 text-accent" />
           <p className="text-[9px] font-bold uppercase tracking-widest text-accent">
-            Throw out — make others spend
+            Call out — waste their money
           </p>
         </div>
         {drain.primary ? (
@@ -72,7 +72,7 @@ export default function NominationCard({ drain, get, aiSuggestions, aiLoading, o
             )}
           </>
         ) : (
-          <p className="mt-1 text-[11px] text-muted-foreground">No good name to throw out yet.</p>
+          <p className="mt-1 text-[11px] text-muted-foreground">No good player to call out yet.</p>
         )}
       </div>
 
@@ -81,7 +81,7 @@ export default function NominationCard({ drain, get, aiSuggestions, aiLoading, o
         <div className="flex items-center gap-1.5">
           <Target className="h-3.5 w-3.5 text-primary" />
           <p className="text-[9px] font-bold uppercase tracking-widest text-primary">
-            Get your guy · target
+            Player you want
           </p>
         </div>
         {get.target ? (
