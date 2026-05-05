@@ -342,7 +342,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       </div>
 
       <p className="text-[11px] text-muted-foreground">
-        Optional — but with prices the coach can flag steals, reaches, and market inflation in real time.
+        Optional — but with prices the assistant can flag steals, reaches, and market inflation in real time.
       </p>
     </div>
   );

@@ -105,7 +105,7 @@ export default function SetupWizard() {
             <Trophy className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Auction Draft AI Coach</h1>
+            <h1 className="text-xl font-bold">Auction Draft AI Assistant</h1>
             <p className="text-xs text-muted-foreground">Setup · Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
           </div>
         </header>
@@ -174,7 +174,7 @@ export default function SetupWizard() {
                   </SelectContent>
                 </Select>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Dynasty/Keeper shifts the coach toward youth, long-term value, and contract awareness.
+                  Dynasty/Keeper shifts the assistant toward youth, long-term value, and contract awareness.
                 </p>
               </div>
             </div>
@@ -273,7 +273,7 @@ export default function SetupWizard() {
             <div className="space-y-3">
               <Label>League Context</Label>
               <p className="text-xs text-muted-foreground">
-                Anything the coach should know — owner tendencies, who overspends on QBs, positional run patterns, etc.
+                Anything the assistant should know — owner tendencies, who overspends on QBs, positional run patterns, etc.
               </p>
               <Textarea
                 rows={10}

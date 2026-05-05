@@ -63,7 +63,7 @@ export default function MobileDraft() {
   const [priceInput, setPriceInput] = useState("");
   const [position, setPosition] = useState<Position | "">("");
 
-  const [coachText, setCoachText] = useState("Tap **Ask coach** below for a recommendation.");
+  const [coachText, setCoachText] = useState("Tap **Ask assistant** below for a recommendation.");
   const [streaming, setStreaming] = useState(false);
   const [followUp, setFollowUp] = useState("");
   const coachRef = useRef<HTMLDivElement>(null);
@@ -128,8 +128,8 @@ export default function MobileDraft() {
         }),
       });
       if (!resp.ok || !resp.body) {
-        toast.error(resp.status === 429 ? "Rate limited" : resp.status === 402 ? "AI credits exhausted" : "Coach unavailable");
-        setCoachText("⚠️ Coach unavailable.");
+        toast.error(resp.status === 429 ? "Rate limited" : resp.status === 402 ? "AI credits exhausted" : "Assistant unavailable");
+        setCoachText("⚠️ Assistant unavailable.");
         return;
       }
       const reader = resp.body.getReader();
@@ -156,7 +156,7 @@ export default function MobileDraft() {
         }
       }
     } catch (e) {
-      toast.error("Coach error");
+      toast.error("Assistant error");
     } finally {
       setStreaming(false);
     }
@@ -203,7 +203,7 @@ export default function MobileDraft() {
                 tab === t ? "bg-background text-primary border-b-2 border-primary" : "text-muted-foreground"
               }`}
             >
-              {t === "log" ? "Log" : t === "roster" ? "Roster" : "Coach"}
+              {t === "log" ? "Log" : t === "roster" ? "Roster" : "Assistant"}
             </button>
           ))}
         </div>
@@ -251,7 +251,7 @@ export default function MobileDraft() {
               size="lg" variant="outline" className="h-12 w-12 p-0"
               onClick={() => askCoach()}
               disabled={streaming}
-              title="Ask coach"
+              title="Ask assistant"
             >
               <Sparkles className="h-5 w-5 text-primary" />
             </Button>
@@ -517,7 +517,7 @@ function CoachTab({ text, streaming, coachRef, followUp, setFollowUp, onAsk }: a
     <div className="space-y-3">
       <Card className="bg-gradient-card p-3 shadow-glow">
         <h2 className="mb-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-          <Sparkles className="h-3 w-3" /> AI Coach {streaming && <span className="text-muted-foreground">· thinking…</span>}
+          <Sparkles className="h-3 w-3" /> AI Assistant {streaming && <span className="text-muted-foreground">· thinking…</span>}
         </h2>
         <div ref={coachRef} className="coach-md max-h-[55vh] overflow-auto text-sm leading-relaxed">
           <ReactMarkdown>{text || "_..._"}</ReactMarkdown>

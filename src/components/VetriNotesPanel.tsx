@@ -130,7 +130,7 @@ export default function VetriNotesPanel({ onTakesUpdate, onLoadPlayer }: Props) 
             <span className="font-mono text-[9px] tracking-[0.2em] text-primary/80">— THE TAKE TAPE</span>
           </h2>
           <p className="mt-0.5 font-mono text-[10px] text-muted-foreground">
-            {totalTakes} takes from {notes.filter((n) => n.status === "ready").length} videos · feeds the coach
+            {totalTakes} takes from {notes.filter((n) => n.status === "ready").length} videos · feeds the assistant
           </p>
         </div>
         <Button
