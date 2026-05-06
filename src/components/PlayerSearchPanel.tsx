@@ -155,6 +155,11 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
                   {p.position}
                 </Badge>
               )}
+              {tierByName.get(norm(p.name)) != null && (
+                <span className="rounded border border-border/60 px-1 text-[10px] font-mono text-muted-foreground">
+                  T{tierByName.get(norm(p.name))}
+                </span>
+              )}
               <span className="w-12 text-right font-mono text-xs tabular-nums">${p.price}</span>
               <span
                 role="button"
