@@ -34,6 +34,7 @@ import Watchlist from "@/components/Watchlist";
 import MarketHeat from "@/components/MarketHeat";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import CoachMessage from "@/components/CoachMessage";
+import BudgetPlannerV2 from "@/components/BudgetPlannerV2";
 
 
 type MobileTab = "decision" | "planner" | "targets" | "market" | "log";
@@ -554,6 +555,7 @@ export default function DraftV2() {
           </div>
         </SheetContent>
       </Sheet>
+      <BudgetPlannerV2 bank={settings.totalBudget} />
     </div>
   );
 }
