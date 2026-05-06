@@ -1,70 +1,139 @@
-// STRATEGY — the chalkboard dream. A field unfolds, plays drawn in chalk.
-import EditorialShell from "@/components/EditorialShell";
+// STRATEGY — pick one, write your own, or skip it entirely.
+// Every recommendation downstream listens to this choice.
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const PLAYS = [
-  { label: "Draft Plan",          desc: "the written attack",            to: "/draft#plan",      x: 18, y: 12, rot: -3 },
-  { label: "Team Build",          desc: "the slots fill in",             to: "/draft#roster",    x: 60, y: 22, rot: 2 },
-  { label: "Position Needs",      desc: "where you are thin",            to: "/draft#roster",    x: 10, y: 44, rot: -1 },
-  { label: "Tier Analysis",       desc: "the cliff before the break",    to: "/draft#tiers",     x: 55, y: 56, rot: -4 },
-  { label: "Nomination Strategy", desc: "drain them, land yours",        to: "/draft#nominate",  x: 22, y: 76, rot: 3 },
-];
+import { Check, ArrowRight, Pencil, X } from "lucide-react";
+import WarRoomShell from "@/components/WarRoomShell";
+import { useDraftStore } from "@/lib/draft-store";
+import { STRATEGIES, getStrategy } from "@/lib/strategies";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 export default function Strategy() {
   const navigate = useNavigate();
+  const { strategyId, setStrategyId, settings, setSettings } = useDraftStore();
+  const current = getStrategy(strategyId);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesDraft, setNotesDraft] = useState(settings.context || "");
+
+  const saveNotes = () => {
+    setSettings({ context: notesDraft });
+    setEditingNotes(false);
+    toast.success("Strategy notes saved");
+  };
+
   return (
-    <EditorialShell activeCategory="Strategy">
-      <div className="px-4 pt-2">
-        {/* The painted field */}
-        <div className="relative mx-auto max-w-xl h-[78vh] rounded-[2rem] field-paint erase-edge overflow-hidden">
-          {/* yard lines, drifting */}
-          <div className="absolute inset-0 wobble-slow opacity-40">
-            {[20, 35, 50, 65, 80].map(y => (
-              <div key={y} className="absolute left-6 right-6 h-px bg-foreground/30" style={{ top: `${y}%` }}>
-                <span className="absolute -top-2 left-0 dream-hand text-[9px] text-foreground/50">{(50 - Math.abs(y - 50)) | 0}</span>
-              </div>
-            ))}
+    <WarRoomShell
+      title="The Plan"
+      eyebrow="Choose a build, write your own, or stay flexible"
+      activeCategory="Strategy"
+    >
+      <div className="px-4 md:px-8 max-w-4xl mx-auto pt-3 space-y-4">
+
+        {/* Current pick — banner */}
+        <div className="room-card room-card-lift p-5 relative overflow-hidden">
+          <div className="absolute -top-12 -right-10 w-56 h-56 rounded-full opacity-25 blur-3xl"
+               style={{ background: "radial-gradient(circle, hsl(38 95% 60%), transparent 70%)" }} />
+          <div className="room-eyebrow">Currently running</div>
+          <div className="flex items-baseline gap-3 mt-1">
+            <h2 className="room-display text-2xl md:text-3xl">{current.label}</h2>
+            {strategyId !== "none" && (
+              <button onClick={() => { setStrategyId("none"); toast("Switched to no fixed strategy"); }}
+                className="text-xs room-label text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+                <X className="h-3 w-3" /> Clear
+              </button>
+            )}
           </div>
-          {/* hash marks */}
-          <div className="absolute inset-0 pointer-events-none">
-            {Array.from({ length: 14 }).map((_, i) => (
-              <div key={i} className="absolute w-1 h-1 bg-foreground/30 rounded-full"
-                style={{ left: `${(i * 7) % 100}%`, top: `${(i * 13) % 100}%` }} />
-            ))}
-          </div>
-          {/* chalked plays */}
-          {PLAYS.map((p, i) => (
-            <button
-              key={p.label}
-              onClick={() => navigate(p.to)}
-              className="absolute group wobble-slow"
-              style={{ left: `${p.x}%`, top: `${p.y}%`, transform: `rotate(${p.rot}deg)`, animationDelay: `${i * 0.3}s` }}
-            >
-              <div className="relative">
-                {/* the orb */}
-                <div className="w-12 h-12 rounded-full halo-grass flex items-center justify-center backdrop-blur-sm"
-                     style={{ background: "hsl(38 40% 94% / 0.10)" }}>
-                  <span className="dream-display text-xl text-foreground/90">{i + 1}</span>
-                </div>
-                {/* chalk-drawn route */}
-                <svg className="absolute -top-3 -left-3 pointer-events-none opacity-60" width="120" height="80" viewBox="0 0 120 80">
-                  <path d={`M 24 24 Q ${30 + i * 8} ${10 + i * 4} ${60 + i * 5} ${30 + i * 6}`}
-                        stroke="hsl(38 40% 94% / 0.5)" strokeWidth="1.2" fill="none" strokeDasharray="3 4" />
-                  <circle cx={60 + i * 5} cy={30 + i * 6} r="2" fill="hsl(138 70% 60%)" />
-                </svg>
-                {/* label */}
-                <div className="mt-1 text-left">
-                  <div className="dream-display text-[15px] text-foreground leading-tight">{p.label}</div>
-                  <div className="dream-hand text-[10px] text-foreground/65">{p.desc}</div>
-                </div>
-              </div>
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{current.description}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button onClick={() => navigate("/draft")}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold text-[hsl(var(--primary-foreground))]"
+              style={{ background: "linear-gradient(160deg, hsl(38 95% 60%), hsl(16 88% 56%))" }}>
+              Take it to the draft <ArrowRight className="h-4 w-4" />
             </button>
-          ))}
+            <button onClick={() => setEditingNotes(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium border border-foreground/15 text-foreground hover:bg-foreground/5">
+              <Pencil className="h-4 w-4" /> {settings.context ? "Edit your notes" : "Add your own notes"}
+            </button>
+          </div>
         </div>
-        <p className="mt-4 text-center dream-hand text-[11px] text-foreground/55 wobble-slow">
-          the blueprint — before the bidding heats up
+
+        {/* Free-form notes — for users who don't want a preset */}
+        <div className="room-card p-5">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <div className="room-eyebrow">Your own words</div>
+              <div className="room-display text-xl mt-0.5">How you want to draft</div>
+            </div>
+            {!editingNotes && settings.context && (
+              <button onClick={() => { setNotesDraft(settings.context); setEditingNotes(true); }}
+                className="text-xs room-label text-[hsl(var(--primary))] hover:underline">Edit</button>
+            )}
+          </div>
+          {editingNotes ? (
+            <div className="mt-3 space-y-2">
+              <Textarea
+                value={notesDraft}
+                onChange={(e) => setNotesDraft(e.target.value)}
+                rows={6}
+                placeholder={"e.g. Don't want a strict plan. Stay flexible. Pay up for elite WRs if they fall, fade rookies, never end up with one QB. Frank always overpays for QBs early — let him."}
+                className="text-sm"
+              />
+              <div className="flex gap-2">
+                <button onClick={saveNotes}
+                  className="px-3 py-1.5 rounded-md text-xs font-medium bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]">
+                  Save notes
+                </button>
+                <button onClick={() => { setEditingNotes(false); setNotesDraft(settings.context || ""); }}
+                  className="px-3 py-1.5 rounded-md text-xs font-medium border border-foreground/15 hover:bg-foreground/5">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : settings.context ? (
+            <p className="mt-2 text-sm text-foreground/85 leading-relaxed whitespace-pre-wrap italic">"{settings.context}"</p>
+          ) : (
+            <p className="mt-2 text-sm text-muted-foreground">
+              No notes yet. Some teams don't want a preset — just describe how you want to draft and the brain will respect it.
+            </p>
+          )}
+        </div>
+
+        {/* Strategy chooser */}
+        <div>
+          <div className="room-eyebrow">Pick a build</div>
+          <div className="room-display text-xl mt-0.5 mb-3">Or stick with no fixed plan</div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {STRATEGIES.map((s) => {
+              const active = s.id === strategyId;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => { setStrategyId(s.id); toast.success(`Strategy: ${s.label}`); }}
+                  className={`text-left room-card p-4 transition-all ${active ? "room-card-lift ring-1 ring-[hsl(var(--primary))]" : "hover:bg-foreground/5"}`}
+                >
+                  <div className="flex items-start gap-2">
+                    <div className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                      active ? "bg-[hsl(var(--primary))]" : "border border-foreground/25"
+                    }`}>
+                      {active && <Check className="h-3 w-3 text-[hsl(var(--primary-foreground))]" strokeWidth={3} />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-semibold text-foreground">{s.label}</div>
+                      <div className="text-xs text-muted-foreground room-label mt-0.5">{s.short}</div>
+                      <p className="text-xs text-foreground/70 mt-2 leading-relaxed line-clamp-3">{s.description}</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <p className="text-center text-[11px] text-muted-foreground italic pt-2">
+          The brain reads this on every recommendation. Change it any time — even mid-draft.
         </p>
       </div>
-    </EditorialShell>
+    </WarRoomShell>
   );
 }
