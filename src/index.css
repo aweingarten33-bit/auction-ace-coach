@@ -12,31 +12,33 @@
 
 @layer base {
   :root {
-    /* KILLING JOKE: ink-black night, bone paper, blood red, sodium amber.
-       Pulpy, high-contrast, comic-noir. Halftone dots, hard shadows. */
-    --background: 0 0% 6%;
-    --foreground: 38 18% 88%;
+    /* SIN CITY × STREET FIGHTER 6:
+       Pure ink black, bone white, single spot color — blood red.
+       Yellow reserved for "Yellow Bastard" highlights. Rain. Silhouettes.
+       Chromatic aberration / RGB split / hit-spark from SF6 cinematics. */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 9%;
-    --card-foreground: 38 18% 90%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 38 18% 90%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Blood red — the Joker's grin. */
-    --primary: 358 78% 48%;
-    --primary-foreground: 38 18% 94%;
-    --primary-glow: 358 90% 58%;
+    /* Spot red — the only true color in Basin City. */
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 100% 60%;
 
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 38 18% 88%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 11%;
-    --muted-foreground: 38 8% 58%;
+    --muted: 0 0% 6%;
+    --muted-foreground: 0 0% 62%;
 
-    /* Sodium-lamp amber — Gotham streetlight. */
-    --accent: 38 85% 55%;
-    --accent-foreground: 0 0% 6%;
+    /* Yellow Bastard — second spot color, used sparingly. */
+    --accent: 52 100% 50%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 358 78% 48%;
     --destructive-foreground: 38 18% 94%;
@@ -47,11 +49,11 @@
     --success: 150 35% 42%;
     --success-foreground: 38 18% 94%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 12%;
-    --ring: 358 78% 48%;
+    --border: 0 0% 100%;
+    --input: 0 0% 8%;
+    --ring: 0 100% 50%;
 
-    --radius: 0.125rem;
+    --radius: 0rem;
 
     --gradient-primary: linear-gradient(180deg, hsl(358 80% 52%), hsl(358 78% 38%));
     --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 7%));
@@ -351,49 +353,184 @@
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
 
 /* ============================================================
-   KILLING JOKE — comic noir utilities
-   Halftone dots, hard shadows, ink-stamped headlines.
+   SIN CITY × STREET FIGHTER 6 — noir comic + fight FX
+   Pure B/W canvas, spot color (red/yellow), rain, RGB split,
+   hit-sparks, ink splatter, sumi-e brush strokes, frame bursts.
    ============================================================ */
 @layer utilities {
+  /* --- INK / HALFTONE --- */
   .halftone {
-    background-image: radial-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+    background-image: radial-gradient(hsl(0 0% 100% / 0.05) 1px, transparent 1.2px);
     background-size: 4px 4px;
   }
   .halftone-red {
-    background-image: radial-gradient(hsl(358 78% 48% / 0.18) 1px, transparent 1px);
+    background-image: radial-gradient(hsl(0 100% 50% / 0.35) 1px, transparent 1.4px);
     background-size: 5px 5px;
   }
-  .halftone-amber {
-    background-image: radial-gradient(hsl(38 85% 55% / 0.22) 1px, transparent 1px);
+  .halftone-yellow {
+    background-image: radial-gradient(hsl(52 100% 50% / 0.45) 1px, transparent 1.4px);
     background-size: 5px 5px;
   }
+
+  /* Hard B/W ink edge — no gray ramp */
   .ink-edge {
-    border: 1px solid hsl(0 0% 0%);
-    box-shadow: 4px 4px 0 hsl(0 0% 0%), 0 0 0 1px hsl(0 0% 18%);
+    border: 2px solid hsl(0 0% 100%);
+    box-shadow: 6px 6px 0 hsl(0 0% 100%), 0 0 0 2px hsl(0 0% 0%);
   }
   .ink-edge-sm {
-    border: 1px solid hsl(0 0% 0%);
-    box-shadow: 2px 2px 0 hsl(0 0% 0%);
+    border: 1.5px solid hsl(0 0% 100%);
+    box-shadow: 3px 3px 0 hsl(0 0% 100%);
   }
+  .ink-edge-red {
+    border: 2px solid hsl(0 100% 50%);
+    box-shadow: 4px 4px 0 hsl(0 100% 50%), 0 0 0 1px hsl(0 0% 0%);
+  }
+
+  /* --- TYPE --- */
   .text-stamp {
     font-family: "Special Elite", "Courier New", monospace;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
   .headline-noir {
     font-family: "Bebas Neue", "Oswald", "Impact", sans-serif;
-    letter-spacing: 0.02em;
-    line-height: 0.9;
+    letter-spacing: 0.015em;
+    line-height: 0.88;
     text-transform: uppercase;
   }
+  /* Sin City title slab — chunky stencil */
+  .title-slab {
+    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    line-height: 0.82;
+    font-weight: 400;
+    -webkit-text-stroke: 1px hsl(0 0% 0%);
+  }
+
+  /* --- SF6 / SIN CITY FX --- */
+
+  /* RGB chromatic split (SF6 hit cinematic) */
+  .rgb-split {
+    text-shadow:
+      -1.5px 0 0 hsl(0 100% 50% / 0.85),
+       1.5px 0 0 hsl(190 100% 55% / 0.85);
+  }
+  .rgb-split-strong {
+    text-shadow:
+      -3px 0 0 hsl(0 100% 50% / 0.9),
+       3px 0 0 hsl(190 100% 55% / 0.9),
+       0 0 12px hsl(0 0% 0%);
+  }
+
+  /* Spot-color highlight: only the word in red */
+  .spot-red { color: hsl(0 100% 50%); }
+  .spot-yellow { color: hsl(52 100% 50%); }
+
+  /* Rain streaks (Sin City rooftop) */
+  .rain {
+    background-image:
+      repeating-linear-gradient(
+        100deg,
+        transparent 0 6px,
+        hsl(0 0% 100% / 0.04) 6px 7px,
+        transparent 7px 18px
+      );
+    animation: rain-fall 0.8s linear infinite;
+  }
+  @keyframes rain-fall {
+    0% { background-position: 0 0; }
+    100% { background-position: -40px 80px; }
+  }
+
+  /* Film grain (cinematic noir) */
   .grain::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.35;
     mix-blend-mode: overlay;
-    background-image: radial-gradient(hsl(0 0% 100% / 0.04) 1px, transparent 1px);
-    background-size: 3px 3px;
+    background-image:
+      radial-gradient(hsl(0 0% 100% / 0.18) 0.5px, transparent 0.5px),
+      radial-gradient(hsl(0 0% 0% / 0.25) 0.5px, transparent 0.5px);
+    background-size: 3px 3px, 5px 5px;
+    background-position: 0 0, 1px 1px;
+  }
+
+  /* Ink splatter blob (CSS only) */
+  .splatter {
+    position: absolute;
+    border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%;
+    filter: blur(0.4px);
+  }
+
+  /* Hit spark / SF6 impact frame */
+  @keyframes hit-spark {
+    0%   { transform: scale(0.6) rotate(0deg); opacity: 0; }
+    20%  { transform: scale(1.15) rotate(8deg); opacity: 1; }
+    60%  { transform: scale(1) rotate(-4deg); opacity: 0.95; }
+    100% { transform: scale(1.05) rotate(0deg); opacity: 1; }
+  }
+  .hit-spark { animation: hit-spark 320ms cubic-bezier(.2,.9,.2,1) both; }
+
+  /* SF6 "FIGHT!" style flash */
+  @keyframes fight-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; filter: brightness(1.6); }
+  }
+  .fight-flash { animation: fight-flash 1.4s ease-in-out infinite; }
+
+  /* Diagonal speed lines (SF6 super) */
+  .speedlines {
+    background-image: repeating-linear-gradient(
+      -22deg,
+      transparent 0 8px,
+      hsl(0 0% 100% / 0.06) 8px 9px,
+      transparent 9px 22px
+    );
+  }
+  .speedlines-red {
+    background-image: repeating-linear-gradient(
+      -22deg,
+      transparent 0 8px,
+      hsl(0 100% 50% / 0.18) 8px 10px,
+      transparent 10px 24px
+    );
+  }
+
+  /* Comic burst frame (jagged star outline via clip-path) */
+  .burst-frame {
+    clip-path: polygon(
+      0% 8%, 8% 0%, 22% 6%, 36% 0%, 50% 5%, 64% 0%, 78% 6%, 92% 0%, 100% 10%,
+      96% 24%, 100% 38%, 94% 52%, 100% 66%, 96% 80%, 100% 92%,
+      88% 100%, 74% 96%, 60% 100%, 46% 95%, 32% 100%, 18% 96%, 6% 100%, 0% 90%,
+      4% 76%, 0% 62%, 6% 48%, 0% 34%, 4% 20%
+    );
+  }
+
+  /* Silhouette / cutout: black shape on lit panel */
+  .silhouette {
+    background: hsl(0 0% 0%);
+    color: hsl(0 0% 100%);
+    mix-blend-mode: normal;
+  }
+
+  /* Vignette — basin city night */
+  .vignette::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, hsl(0 0% 0% / 0.85) 100%);
+  }
+
+  /* Diagonal red slash (Sin City accent) */
+  .red-slash {
+    position: absolute;
+    height: 3px;
+    background: hsl(0 100% 50%);
+    transform: rotate(-8deg);
+    box-shadow: 0 0 12px hsl(0 100% 50% / 0.7);
   }
 }

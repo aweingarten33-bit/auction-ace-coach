@@ -19,14 +19,14 @@ const CATEGORIES = [
 
 const QUICK_ACTIONS = [
   { label: "Planner", icon: Calculator, to: "/" },
-  { label: "Research", icon: Search, to: "/draft#upnext" },
-  { label: "Watchlist", icon: Star, to: "/draft#watchlist" },
+  { label: "Scout", icon: Search, to: "/draft#upnext" },
+  { label: "Watch", icon: Star, to: "/draft#watchlist" },
   { label: "Coach", icon: Bot, to: "/draft?coach=open" },
 ];
 
 export default function EditorialShell({
   children,
-  masthead = "The Auction Room",
+  masthead = "Basin City Auction",
   activeCategory,
 }: Props) {
   const navigate = useNavigate();
@@ -39,43 +39,62 @@ export default function EditorialShell({
   };
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground flex flex-col antialiased halftone">
-      {/* Masthead — pulp comic cover */}
-      <header className="relative bg-background border-b-[3px] border-foreground">
-        <div className="px-4 pt-3 pb-2">
-          <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
-            <span className="text-stamp">No. 01</span>
-            <span className="text-stamp text-primary">·  Auction Night  ·</span>
-            <span className="text-stamp">$2.99</span>
-          </div>
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col antialiased">
+      {/* MASTHEAD — Sin City rooftop, rain, spot-color title */}
+      <header className="relative bg-background border-b-2 border-foreground overflow-hidden">
+        {/* Rain layer */}
+        <div className="absolute inset-0 rain pointer-events-none opacity-70" />
+        {/* Halftone wash */}
+        <div className="absolute inset-0 halftone pointer-events-none" />
+        {/* Vignette */}
+        <div className="absolute inset-0 vignette pointer-events-none" />
+        {/* Diagonal red slash */}
+        <div className="red-slash" style={{ top: "38%", left: "-10%", width: "55%" }} />
+
+        <div className="relative px-4 pt-3 pb-1 flex items-center justify-between text-stamp text-[9px] tracking-[0.3em] text-foreground/60">
+          <span>Round 01</span>
+          <span className="spot-red">·  RAIN  ·</span>
+          <span>$ AUCTION</span>
         </div>
-        <div className="bg-foreground text-background py-3 px-4 border-y-2 border-foreground">
+
+        <div className="relative px-4 py-5 text-center">
+          <p className="text-stamp text-[10px] tracking-[0.45em] text-foreground/70 mb-1">
+            A Tale From
+          </p>
           <h1
-            className="headline-noir text-center text-background"
-            style={{ fontSize: "2.4rem" }}
+            className="title-slab rgb-split-strong text-foreground"
+            style={{ fontSize: "2.6rem" }}
           >
-            {masthead}
+            {masthead.split(" ").map((w, i) => (
+              <span key={i} className={i === 1 ? "spot-red" : ""}>
+                {w}{" "}
+              </span>
+            ))}
           </h1>
-          <p className="mt-1 text-center text-[9px] uppercase tracking-[0.4em] text-background/70 text-stamp">
-            « A draft-room thriller in one panel »
+          <p className="text-stamp text-[9px] tracking-[0.4em] text-foreground/60 mt-2">
+            « It always rains on draft night »
           </p>
         </div>
 
-        <nav className="overflow-x-auto no-scrollbar bg-background">
-          <ul className="flex items-stretch justify-start gap-0 px-2 min-w-max">
+        {/* NAV — SF6 character select strip */}
+        <nav className="relative overflow-x-auto no-scrollbar bg-foreground border-t-2 border-foreground">
+          <ul className="flex items-stretch min-w-max">
             {CATEGORIES.map((c) => {
               const active = activeCategory ? activeCategory === c.label : isCatActive(c.to);
               return (
-                <li key={c.label} className="flex-1">
+                <li key={c.label} className="flex-1 relative">
                   <button
                     onClick={() => navigate(c.to)}
-                    className={`headline-noir w-full px-3 py-2.5 text-[13px] transition-colors border-r border-border last:border-r-0 ${
+                    className={`headline-noir w-full px-4 py-2.5 text-[13px] transition-all border-r-2 border-background last:border-r-0 relative ${
                       active
-                        ? "bg-primary text-primary-foreground"
-                        : "text-foreground hover:bg-secondary"
+                        ? "bg-primary text-primary-foreground rgb-split"
+                        : "bg-foreground text-background hover:bg-primary hover:text-primary-foreground"
                     }`}
                   >
                     {c.label}
+                    {active && (
+                      <span className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-accent" />
+                    )}
                   </button>
                 </li>
               );
@@ -86,18 +105,19 @@ export default function EditorialShell({
 
       <main className="flex-1 pb-28 bg-background relative">{children}</main>
 
-      {/* Bottom dock — black ink slab */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 border-t-[3px] border-foreground bg-foreground text-background">
-        <ul className="grid grid-cols-4 max-w-md mx-auto">
+      {/* DOCK — silhouette skyline */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 border-t-2 border-foreground bg-foreground text-background overflow-hidden">
+        <div className="absolute inset-0 speedlines opacity-40 pointer-events-none" />
+        <ul className="relative grid grid-cols-4 max-w-md mx-auto">
           {QUICK_ACTIONS.map((a) => {
             const Icon = a.icon;
             return (
               <li key={a.label}>
                 <button
                   onClick={() => navigate(a.to)}
-                  className="w-full flex flex-col items-center justify-center gap-1 py-3 text-[9px] uppercase tracking-[0.24em] text-background/80 hover:text-primary transition-colors text-stamp"
+                  className="group w-full flex flex-col items-center justify-center gap-1 py-3 text-[9px] uppercase tracking-[0.28em] text-background hover:text-primary transition-colors text-stamp"
                 >
-                  <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+                  <Icon className="h-[20px] w-[20px] group-hover:scale-110 transition-transform" strokeWidth={2.25} />
                   <span>{a.label}</span>
                 </button>
               </li>
