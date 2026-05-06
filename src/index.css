@@ -358,153 +358,264 @@
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
 
 /* ============================================================
-   SIN CITY × STREET FIGHTER 6 — noir comic + fight FX
-   Pure B/W canvas, spot color (red/yellow), rain, RGB split,
-   hit-sparks, ink splatter, sumi-e brush strokes, frame bursts.
+   TOON-NOIR — Dick Tracy × Roger Rabbit × '89 Batman ×
+   Clockwork Orange × American Psycho × Fight Club.
+   CG-cel: bold black outlines, flat fills, art-deco curves,
+   neon signs, dossier stamps, midnight-purple skies.
    ============================================================ */
 @layer utilities {
-  /* --- INK / HALFTONE --- */
-  .halftone {
-    background-image: radial-gradient(hsl(0 0% 100% / 0.05) 1px, transparent 1.2px);
-    background-size: 4px 4px;
-  }
-  .halftone-red {
-    background-image: radial-gradient(hsl(0 100% 50% / 0.35) 1px, transparent 1.4px);
-    background-size: 5px 5px;
-  }
-  .halftone-yellow {
-    background-image: radial-gradient(hsl(52 100% 50% / 0.45) 1px, transparent 1.4px);
-    background-size: 5px 5px;
-  }
 
-  /* Hard B/W ink edge — no gray ramp */
-  .ink-edge {
-    border: 2px solid hsl(0 0% 100%);
-    box-shadow: 6px 6px 0 hsl(0 0% 100%), 0 0 0 2px hsl(0 0% 0%);
-  }
-  .ink-edge-sm {
-    border: 1.5px solid hsl(0 0% 100%);
-    box-shadow: 3px 3px 0 hsl(0 0% 100%);
-  }
-  .ink-edge-red {
-    border: 2px solid hsl(0 100% 50%);
-    box-shadow: 4px 4px 0 hsl(0 100% 50%), 0 0 0 1px hsl(0 0% 0%);
-  }
-
-  /* --- TYPE --- */
+  /* ---------- TYPE ---------- */
   .text-stamp {
     font-family: "Special Elite", "Courier New", monospace;
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
-  .headline-noir {
-    font-family: "Bebas Neue", "Oswald", "Impact", sans-serif;
-    letter-spacing: 0.015em;
-    line-height: 0.88;
-    text-transform: uppercase;
-  }
-  /* Sin City title slab — chunky stencil */
-  .title-slab {
+  /* Dick Tracy / Batman '89 art-deco display */
+  .toon-display {
     font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
     text-transform: uppercase;
-    letter-spacing: 0.005em;
-    line-height: 0.82;
+    letter-spacing: 0.01em;
+    line-height: 0.86;
     font-weight: 400;
-    -webkit-text-stroke: 1px hsl(0 0% 0%);
+    -webkit-text-stroke: 2px hsl(0 0% 0%);
+    paint-order: stroke fill;
+  }
+  /* Roger Rabbit "WHO" cartoon — playful but inked */
+  .toon-cartoon {
+    font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 0.9;
+    -webkit-text-stroke: 1.5px hsl(0 0% 0%);
+    paint-order: stroke fill;
+  }
+  /* American Psycho business card — Silian Rail */
+  .biz-card {
+    font-family: "Playfair Display", Georgia, serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
   }
 
-  /* --- SF6 / SIN CITY FX --- */
+  /* ---------- INK / OUTLINE ---------- */
+  /* The toon-noir signature: thick black outline + offset flat-color shadow */
+  .ink-edge {
+    border: 2.5px solid hsl(0 0% 0%);
+    box-shadow:
+      5px 5px 0 hsl(0 0% 0%),
+      0 0 0 1px hsl(0 0% 0%);
+    border-radius: 0.5rem;
+  }
+  .ink-edge-sm {
+    border: 2px solid hsl(0 0% 0%);
+    box-shadow: 3px 3px 0 hsl(0 0% 0%);
+    border-radius: 0.375rem;
+  }
+  .ink-edge-yellow {
+    border: 2.5px solid hsl(0 0% 0%);
+    box-shadow: 5px 5px 0 hsl(48 100% 52%), 6px 6px 0 hsl(0 0% 0%);
+    border-radius: 0.5rem;
+  }
+  .ink-edge-purple {
+    border: 2.5px solid hsl(0 0% 0%);
+    box-shadow: 5px 5px 0 hsl(285 75% 58%), 6px 6px 0 hsl(0 0% 0%);
+    border-radius: 0.5rem;
+  }
 
-  /* RGB chromatic split (SF6 hit cinematic) */
-  .rgb-split {
+  /* ---------- BACKDROPS ---------- */
+  /* '89 Gotham — midnight indigo radial */
+  .gotham-sky {
+    background:
+      radial-gradient(ellipse at 30% 0%, hsl(285 60% 22%) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, hsl(48 90% 45% / 0.18) 0%, transparent 45%),
+      linear-gradient(180deg, hsl(252 50% 12%), hsl(252 60% 6%));
+  }
+  /* Dick Tracy yellow night sky */
+  .tracy-sky {
+    background:
+      radial-gradient(ellipse at 70% 10%, hsl(48 100% 60% / 0.35) 0%, transparent 50%),
+      linear-gradient(180deg, hsl(252 55% 12%), hsl(252 65% 6%));
+  }
+  /* Roger Rabbit cel-toon backdrop */
+  .toon-sky {
+    background:
+      radial-gradient(circle at 20% 100%, hsl(192 90% 50% / 0.25), transparent 55%),
+      radial-gradient(circle at 80% 0%, hsl(48 100% 55% / 0.18), transparent 50%),
+      linear-gradient(180deg, hsl(252 35% 13%), hsl(252 40% 8%));
+  }
+  /* Clockwork Orange milkbar — soft glow with sickly tint */
+  .milkbar {
+    background:
+      radial-gradient(ellipse at center, hsl(48 70% 90% / 0.06) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(252 30% 10%), hsl(252 40% 6%));
+  }
+
+  /* ---------- HALFTONE / DOTS / BENDAY ---------- */
+  .halftone {
+    background-image: radial-gradient(hsl(48 100% 70% / 0.05) 1px, transparent 1.2px);
+    background-size: 5px 5px;
+  }
+  .halftone-yellow {
+    background-image: radial-gradient(hsl(48 100% 55% / 0.35) 1.2px, transparent 1.4px);
+    background-size: 6px 6px;
+  }
+  .halftone-purple {
+    background-image: radial-gradient(hsl(285 75% 60% / 0.32) 1.2px, transparent 1.4px);
+    background-size: 6px 6px;
+  }
+  .halftone-red {
+    background-image: radial-gradient(hsl(358 85% 55% / 0.32) 1.2px, transparent 1.4px);
+    background-size: 6px 6px;
+  }
+
+  /* ---------- NEON / BAT SIGNAL ---------- */
+  .neon-yellow {
+    color: hsl(48 100% 60%);
     text-shadow:
-      -1.5px 0 0 hsl(0 100% 50% / 0.85),
-       1.5px 0 0 hsl(190 100% 55% / 0.85);
+      0 0 4px hsl(48 100% 60% / 0.9),
+      0 0 14px hsl(48 100% 60% / 0.6),
+      0 0 28px hsl(48 100% 50% / 0.5);
   }
-  .rgb-split-strong {
+  .neon-purple {
+    color: hsl(285 90% 70%);
     text-shadow:
-      -3px 0 0 hsl(0 100% 50% / 0.9),
-       3px 0 0 hsl(190 100% 55% / 0.9),
-       0 0 12px hsl(0 0% 0%);
+      0 0 4px hsl(285 90% 70% / 0.9),
+      0 0 14px hsl(285 80% 60% / 0.6),
+      0 0 28px hsl(285 80% 55% / 0.5);
+  }
+  .bat-glow {
+    box-shadow:
+      0 0 0 2px hsl(0 0% 0%),
+      0 0 24px hsl(48 100% 55% / 0.55),
+      0 0 56px hsl(48 100% 50% / 0.35);
   }
 
-  /* Spot-color highlight: only the word in red */
-  .spot-red { color: hsl(0 100% 50%); }
-  .spot-yellow { color: hsl(52 100% 50%); }
+  /* ---------- SPOT COLORS ---------- */
+  .spot-yellow { color: hsl(48 100% 55%); }
+  .spot-purple { color: hsl(285 85% 68%); }
+  .spot-red    { color: hsl(358 85% 60%); }
+  .spot-cyan   { color: hsl(192 90% 55%); }
 
-  /* Rain streaks (Sin City rooftop) */
-  .rain {
+  /* ---------- AMERICAN PSYCHO BUSINESS CARD ---------- */
+  .psycho-card {
+    background: hsl(48 30% 94%);
+    color: hsl(252 40% 12%);
+    border: 1px solid hsl(252 40% 12%);
+    box-shadow: 4px 4px 0 hsl(252 40% 12% / 0.25);
+    padding: 0.9rem 1.1rem;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- FIGHT CLUB DOSSIER STAMP ---------- */
+  .stamp-red {
+    display: inline-block;
+    color: hsl(358 85% 55%);
+    border: 2px solid hsl(358 85% 55%);
+    padding: 0.15rem 0.5rem;
+    font-family: "Special Elite", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    transform: rotate(-4deg);
+    opacity: 0.92;
+    box-shadow: inset 0 0 0 1px hsl(358 85% 55% / 0.35);
+  }
+
+  /* ---------- ROGER RABBIT WIGGLE ---------- */
+  @keyframes toon-wiggle {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-1.2deg) scale(1.01); }
+    75% { transform: rotate(1.2deg) scale(0.99); }
+  }
+  .toon-wiggle { animation: toon-wiggle 2.6s ease-in-out infinite; }
+
+  /* ---------- ART-DECO RAY BURST (Superman '78 / Batman '89) ---------- */
+  .deco-rays {
     background-image:
-      repeating-linear-gradient(
-        100deg,
-        transparent 0 6px,
-        hsl(0 0% 100% / 0.04) 6px 7px,
-        transparent 7px 18px
+      repeating-conic-gradient(
+        from 0deg at 50% 100%,
+        hsl(48 100% 55% / 0.10) 0deg 6deg,
+        transparent 6deg 14deg
       );
-    animation: rain-fall 0.8s linear infinite;
   }
-  @keyframes rain-fall {
-    0% { background-position: 0 0; }
-    100% { background-position: -40px 80px; }
+  .deco-rays-purple {
+    background-image:
+      repeating-conic-gradient(
+        from 0deg at 50% 100%,
+        hsl(285 75% 60% / 0.12) 0deg 6deg,
+        transparent 6deg 14deg
+      );
   }
 
-  /* Film grain (cinematic noir) */
+  /* ---------- FILM GRAIN ---------- */
   .grain::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.35;
+    opacity: 0.28;
     mix-blend-mode: overlay;
     background-image:
-      radial-gradient(hsl(0 0% 100% / 0.18) 0.5px, transparent 0.5px),
-      radial-gradient(hsl(0 0% 0% / 0.25) 0.5px, transparent 0.5px);
+      radial-gradient(hsl(48 100% 90% / 0.18) 0.5px, transparent 0.5px),
+      radial-gradient(hsl(252 60% 6% / 0.30) 0.5px, transparent 0.5px);
     background-size: 3px 3px, 5px 5px;
     background-position: 0 0, 1px 1px;
   }
 
-  /* Ink splatter blob (CSS only) */
+  /* ---------- VIGNETTE ---------- */
+  .vignette::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 45%, hsl(252 60% 4% / 0.85) 100%);
+  }
+
+  /* ---------- SPLATTER ---------- */
   .splatter {
     position: absolute;
     border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%;
     filter: blur(0.4px);
   }
 
-  /* Hit spark / SF6 impact frame */
-  @keyframes hit-spark {
-    0%   { transform: scale(0.6) rotate(0deg); opacity: 0; }
-    20%  { transform: scale(1.15) rotate(8deg); opacity: 1; }
-    60%  { transform: scale(1) rotate(-4deg); opacity: 0.95; }
-    100% { transform: scale(1.05) rotate(0deg); opacity: 1; }
+  /* ---------- BACK-COMPAT (legacy classnames used elsewhere) ---------- */
+  .headline-noir {
+    font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
+    letter-spacing: 0.015em;
+    line-height: 0.9;
+    text-transform: uppercase;
   }
-  .hit-spark { animation: hit-spark 320ms cubic-bezier(.2,.9,.2,1) both; }
-
-  /* SF6 "FIGHT!" style flash */
-  @keyframes fight-flash {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.55; filter: brightness(1.6); }
+  .title-slab { /* legacy alias */
+    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    line-height: 0.84;
+    -webkit-text-stroke: 1.5px hsl(0 0% 0%);
+    paint-order: stroke fill;
   }
-  .fight-flash { animation: fight-flash 1.4s ease-in-out infinite; }
-
-  /* Diagonal speed lines (SF6 super) */
-  .speedlines {
+  .rgb-split, .rgb-split-strong { text-shadow: none; }
+  .silhouette {
+    background: hsl(0 0% 0%);
+    color: hsl(48 100% 96%);
+  }
+  .rain { background-image: none; }
+  .speedlines, .speedlines-red {
     background-image: repeating-linear-gradient(
-      -22deg,
-      transparent 0 8px,
-      hsl(0 0% 100% / 0.06) 8px 9px,
-      transparent 9px 22px
+      -22deg, transparent 0 9px, hsl(48 100% 55% / 0.10) 9px 10px, transparent 10px 24px
     );
   }
-  .speedlines-red {
-    background-image: repeating-linear-gradient(
-      -22deg,
-      transparent 0 8px,
-      hsl(0 100% 50% / 0.18) 8px 10px,
-      transparent 10px 24px
-    );
+  .red-slash {
+    position: absolute;
+    height: 3px;
+    background: hsl(48 100% 55%);
+    transform: rotate(-6deg);
+    box-shadow: 0 0 14px hsl(48 100% 55% / 0.7);
   }
-
-  /* Comic burst frame (jagged star outline via clip-path) */
+  .ink-edge-red {
+    border: 2.5px solid hsl(0 0% 0%);
+    box-shadow: 5px 5px 0 hsl(358 85% 55%), 6px 6px 0 hsl(0 0% 0%);
+    border-radius: 0.5rem;
+  }
   .burst-frame {
     clip-path: polygon(
       0% 8%, 8% 0%, 22% 6%, 36% 0%, 50% 5%, 64% 0%, 78% 6%, 92% 0%, 100% 10%,
@@ -512,30 +623,5 @@
       88% 100%, 74% 96%, 60% 100%, 46% 95%, 32% 100%, 18% 96%, 6% 100%, 0% 90%,
       4% 76%, 0% 62%, 6% 48%, 0% 34%, 4% 20%
     );
-  }
-
-  /* Silhouette / cutout: black shape on lit panel */
-  .silhouette {
-    background: hsl(0 0% 0%);
-    color: hsl(0 0% 100%);
-    mix-blend-mode: normal;
-  }
-
-  /* Vignette — basin city night */
-  .vignette::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 40%, hsl(0 0% 0% / 0.85) 100%);
-  }
-
-  /* Diagonal red slash (Sin City accent) */
-  .red-slash {
-    position: absolute;
-    height: 3px;
-    background: hsl(0 100% 50%);
-    transform: rotate(-8deg);
-    box-shadow: 0 0 12px hsl(0 100% 50% / 0.7);
   }
 }
