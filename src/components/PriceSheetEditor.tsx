@@ -471,7 +471,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </>
       )}
 
-      <PlayerDetailsOverlay
+      <PlayerDecisionOverlay
         open={!!detailFor}
         onOpenChange={(o) => !o && setDetailFor(null)}
         name={detailFor?.name ?? ""}
