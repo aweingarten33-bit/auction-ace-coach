@@ -116,8 +116,20 @@ function suggestedAllocations(
 /* =========================
    🚀 ENTRY
 ========================= */
-export default function BudgetPlannerV2() {
-  const [open, setOpen] = useState(false);
+interface BudgetPlannerV2Props {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showFab?: boolean;
+}
+
+export default function BudgetPlannerV2({ open: openProp, onOpenChange, showFab = true }: BudgetPlannerV2Props = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const setOpen = (v: boolean) => {
+    if (!isControlled) setInternalOpen(v);
+    onOpenChange?.(v);
+  };
 
   useEffect(() => {
     if (!open) return;
