@@ -216,21 +216,18 @@ export default function Planner() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-3 py-2 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/draft")} aria-label="Back to draft">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-base font-semibold leading-tight">Budget Planner</h1>
-            <p className="text-[11px] text-muted-foreground leading-tight">
-              Setup · Allocate · Check · Find
-            </p>
-          </div>
+    <EditorialShell activeCategory="Home">
+    <div className="bg-background text-foreground">
+      <div className="mx-auto max-w-3xl px-4 pt-5">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Home</p>
+        <h2 className="mt-1 text-2xl font-bold tracking-tight" style={{ fontFamily: '"Playfair Display", Georgia, serif' }}>
+          Budget Planner
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">Allocate · Check · Find — your decision engine.</p>
+        <div className="mt-3">
+          <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
         </div>
-        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
-      </header>
+      </div>
 
       {/* Summary bar */}
       <div className="mx-auto max-w-3xl px-3 pt-3">
