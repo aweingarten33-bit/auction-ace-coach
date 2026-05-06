@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2, Zap } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
-import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
+import PlayerDecisionOverlay from "@/components/PlayerDecisionOverlay";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate, Position } from "@/lib/draft-types";
 import { toast } from "sonner";
