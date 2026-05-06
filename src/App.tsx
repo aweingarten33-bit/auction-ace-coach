@@ -12,6 +12,7 @@ import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
+import ComicCity from "@/components/ComicCity";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <ComicCity />
       <BrowserRouter>
         <AuthProvider>
           <LockProvider>
