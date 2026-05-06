@@ -178,24 +178,26 @@ export default function BudgetPlannerV2({ open: openProp, onOpenChange, showFab 
         )}
       </AnimatePresence>
 
-      <motion.button
-        onClick={() => setOpen((o) => !o)}
-        whileHover={{ scale: 1.06 }}
-        whileTap={{ scale: 0.94 }}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={{ type: "spring", damping: 18, stiffness: 280 }}
-        aria-label={open ? "Close planner" : "Open planner"}
-        style={{
-          position: "fixed", bottom: 84, right: 16, zIndex: 50,
-          width: 56, height: 56, borderRadius: "50%",
-          background: C.ink, color: C.page, border: "none", cursor: "pointer",
-          boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
-          display: "grid", placeItems: "center",
-          fontFamily: SERIF, fontSize: 26, fontWeight: 400,
-        }}
-      >
-        $
-      </motion.button>
+      {showFab && (
+        <motion.button
+          onClick={() => setOpen(!open)}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+          animate={{ rotate: open ? 45 : 0 }}
+          transition={{ type: "spring", damping: 18, stiffness: 280 }}
+          aria-label={open ? "Close planner" : "Open planner"}
+          style={{
+            position: "fixed", bottom: 84, right: 16, zIndex: 50,
+            width: 56, height: 56, borderRadius: "50%",
+            background: C.ink, color: C.page, border: "none", cursor: "pointer",
+            boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
+            display: "grid", placeItems: "center",
+            fontFamily: SERIF, fontSize: 26, fontWeight: 400,
+          }}
+        >
+          $
+        </motion.button>
+      )}
     </>
   );
 }
