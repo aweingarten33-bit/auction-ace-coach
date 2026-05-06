@@ -181,14 +181,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
-    /* Blueprint grid — fine 8px lattice, slightly stronger every 64px */
-    background-image:
-      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
-      linear-gradient(to right, var(--grid-line-strong) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--grid-line-strong) 1px, transparent 1px);
-    background-size: 8px 8px, 8px 8px, 64px 64px, 64px 64px;
-    background-attachment: fixed;
+    /* Editorial: clean matte canvas, no grid */
   }
 
   #root {
