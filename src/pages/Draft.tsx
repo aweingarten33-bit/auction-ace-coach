@@ -2,7 +2,7 @@
 // Three vertical zones (input → decision → context) on mobile,
 // two-column grid on md+, with the coach accessible from a Sheet (FAB).
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import CoachMessage from "@/components/CoachMessage";
 import { parseBidQuery } from "@/lib/bid-query";
@@ -66,6 +66,7 @@ import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import DecisionCard from "@/components/DecisionCard";
 import NominationCard from "@/components/NominationCard";
+import DraftPlanCard from "@/components/DraftPlanCard";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
@@ -76,6 +77,7 @@ import { getStrategy } from "@/lib/strategies";
 
 export default function Draft() {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     settings, keepers, prices, events, setupComplete, watchlist, dismissed,
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
@@ -105,12 +107,32 @@ export default function Draft() {
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [manualOpen, setManualOpen] = useState(false);
   const [aiNoms, setAiNoms] = useState<import("@/components/NominationCard").AiNomination[]>([]);
+  const [researchTab, setResearchTab] = useState("targets");
 
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
-    if (!setupComplete) navigate("/");
-  }, [setupComplete, navigate]);
+    const hash = location.hash.replace("#", "");
+    const params = new URLSearchParams(location.search);
+    if (params.has("coach")) setCoachOpen(true);
+    if (["market", "heat", "opponents", "runs", "trends", "log"].includes(hash)) setResearchTab("market");
+    if (["targets", "upnext", "watchlist", "queue", "sleepers"].includes(hash)) setResearchTab("targets");
+    if (["analyst", "vetri"].includes(hash)) setResearchTab("vetri");
+    if (hash) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }));
+      });
+    }
+  }, [location.hash, location.search]);
+
+  const activeCategory = useMemo(() => {
+    const hash = location.hash.replace("#", "");
+    if (["plan", "roster", "tiers", "nominate"].includes(hash)) return "Strategy";
+    if (["market", "heat", "opponents", "runs", "trends", "log"].includes(hash)) return "Market";
+    if (["targets", "upnext", "watchlist", "queue", "sleepers"].includes(hash)) return "Targets";
+    if (location.search.includes("coach=")) return "Coach";
+    return "Home";
+  }, [location.hash, location.search]);
 
   const budget = useMemo(() => computeBudget(settings, keepers, events), [settings, keepers, events]);
 
@@ -523,7 +545,7 @@ Keep it tight. No fluff, no closing line.`;
     : null;
 
   return (
-    <EditorialShell activeCategory="Home">
+    <EditorialShell activeCategory={activeCategory}>
     <div className="overflow-x-hidden bg-background pb-4">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 px-3 pt-2">
             <Button
@@ -684,7 +706,7 @@ Keep it tight. No fluff, no closing line.`;
           {decision && <DecisionCard d={decision} />}
 
           {/* Draft Log */}
-          <Card className="bg-gradient-card p-3">
+          <Card id="log" className="scroll-mt-28 bg-gradient-card p-3">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 Draft Log{" "}
@@ -732,70 +754,87 @@ Keep it tight. No fluff, no closing line.`;
 
         {/* RIGHT: State + targets */}
         <section className="min-w-0 space-y-4">
-          <RosterHero
-            remaining={budget.remaining}
-            slotsLeft={budget.slotsLeft}
-            slotsTotal={budget.slotsTotal}
-            maxBid={budget.maxBid}
-            rows={heroRows}
-            bestTarget={bestTarget}
-            onLoadTarget={(name, pos) => {
-              setPlayerName(name); setPosition(pos); setDrafter("me");
-              toast(`${name} loaded — best next target`);
-            }}
-          />
-          <NominationCard
-            drain={computeDrain({ settings, keepers, events, prices })}
-            get={computeGet({ settings, keepers, events, prices })}
-            aiSuggestions={aiNoms}
-            aiLoading={nominationsMutation.isPending}
-            onAskAi={fetchAiNominations}
-            onPickAi={(s) => {
-              setPlayerName(s.name); setPosition(s.position); setDrafter("other");
-              setPriceInput(String(s.price)); setManualOpen(true);
-              toast(`${s.name} loaded — ${s.strategy}`);
-            }}
-          />
-          <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
-          <Tabs defaultValue="targets" className="w-full min-w-0 overflow-hidden">
+          <div id="plan" className="scroll-mt-28">
+            <DraftPlanCard onGenerate={generateDraftPlan} generating={planGenerating} />
+          </div>
+          <div id="roster" className="scroll-mt-28">
+            <RosterHero
+              remaining={budget.remaining}
+              slotsLeft={budget.slotsLeft}
+              slotsTotal={budget.slotsTotal}
+              maxBid={budget.maxBid}
+              rows={heroRows}
+              bestTarget={bestTarget}
+              onLoadTarget={(name, pos) => {
+                setPlayerName(name); setPosition(pos); setDrafter("me");
+                toast(`${name} loaded — best next target`);
+              }}
+            />
+          </div>
+          <div id="nominate" className="scroll-mt-28">
+            <NominationCard
+              drain={computeDrain({ settings, keepers, events, prices })}
+              get={computeGet({ settings, keepers, events, prices })}
+              aiSuggestions={aiNoms}
+              aiLoading={nominationsMutation.isPending}
+              onAskAi={fetchAiNominations}
+              onPickAi={(s) => {
+                setPlayerName(s.name); setPosition(s.position); setDrafter("other");
+                setPriceInput(String(s.price)); setManualOpen(true);
+                toast(`${s.name} loaded — ${s.strategy}`);
+              }}
+            />
+          </div>
+          <div id="tiers" className="scroll-mt-28">
+            <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
+          </div>
+          <Tabs value={researchTab} onValueChange={setResearchTab} className="w-full min-w-0 overflow-hidden">
             <TabsList className="grid h-9 w-full min-w-0 grid-cols-3">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
               <TabsTrigger value="vetri" className="text-[11px]">Analyst</TabsTrigger>
             </TabsList>
             <TabsContent value="targets" className="mt-3 space-y-4">
-              <UpNextQueue
-                targets={queue}
-                openMan={openMan}
-                loading={targetsMutation.isPending}
-                empty={!queue.length}
-                pulseMultiplier={pulse.multiplier}
-                pulseConfident={pulse.confident}
-                watchlist={watchlist}
-                onRefresh={refreshQueue}
-                onPick={handlePickFromQueue}
-                onPin={handlePin}
-                onUnpin={handleUnpin}
-                onDismiss={handleDismiss}
-                valueFor={valueFor}
-                whatIfFor={whatIfFor}
-              />
-              <Watchlist
-                watchlist={watchlist}
-                onUnpin={handleUnpin}
-                onLoad={handleLoadFromWatchlist}
-                valueFor={valueFor}
-                maxBid={budget.maxBid}
-              />
+              <div id="upnext" className="scroll-mt-28">
+                <UpNextQueue
+                  targets={queue}
+                  openMan={openMan}
+                  loading={targetsMutation.isPending}
+                  empty={!queue.length}
+                  pulseMultiplier={pulse.multiplier}
+                  pulseConfident={pulse.confident}
+                  watchlist={watchlist}
+                  onRefresh={refreshQueue}
+                  onPick={handlePickFromQueue}
+                  onPin={handlePin}
+                  onUnpin={handleUnpin}
+                  onDismiss={handleDismiss}
+                  valueFor={valueFor}
+                  whatIfFor={whatIfFor}
+                />
+              </div>
+              <div id="watchlist" className="scroll-mt-28">
+                <Watchlist
+                  watchlist={watchlist}
+                  onUnpin={handleUnpin}
+                  onLoad={handleLoadFromWatchlist}
+                  valueFor={valueFor}
+                  maxBid={budget.maxBid}
+                />
+              </div>
             </TabsContent>
             <TabsContent value="market" className="mt-3 space-y-4">
-              <MarketHeat
-                events={events} prices={prices}
-                gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
-                maxBid={budget.maxBid} remaining={budget.remaining}
-                pulseMultiplier={pulse.multiplier}
-              />
-              <OpponentHeatmap settings={settings} />
+              <div id="heat" className="scroll-mt-28">
+                <MarketHeat
+                  events={events} prices={prices}
+                  gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
+                  maxBid={budget.maxBid} remaining={budget.remaining}
+                  pulseMultiplier={pulse.multiplier}
+                />
+              </div>
+              <div id="opponents" className="scroll-mt-28">
+                <OpponentHeatmap settings={settings} />
+              </div>
             </TabsContent>
             <TabsContent value="vetri" className="mt-3 space-y-3 min-w-0 overflow-hidden">
               <Card className="min-w-0 overflow-hidden p-3">

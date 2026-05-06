@@ -21,9 +21,9 @@ const CATEGORIES = [
 // Bottom dock = research shortcuts. ESPN handles actual picks/nominations.
 const QUICK_ACTIONS = [
   { label: "Planner", icon: Calculator, to: "/" },
-  { label: "Look Up", icon: Search, to: "/targets" },
-  { label: "Watchlist", icon: Star, to: "/targets" },
-  { label: "Ask Coach", icon: Bot, to: "/coach" },
+  { label: "Research", icon: Search, to: "/draft#upnext" },
+  { label: "Watchlist", icon: Star, to: "/draft#watchlist" },
+  { label: "Ask Coach", icon: Bot, to: "/draft?coach=open" },
 ];
 
 export default function EditorialShell({

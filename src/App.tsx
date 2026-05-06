@@ -50,6 +50,7 @@ const App = () => (
             <Routes>
               {/* Home = Budget Planner / Decision engine */}
               <Route path="/" element={<PublicGate><Protected><Planner /></Protected></PublicGate>} />
+              <Route path="/index" element={<Navigate to="/" replace />} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
               <Route path="/setup" element={<Protected><Index /></Protected>} />
               <Route path="/draft" element={<Protected><Draft /></Protected>} />
