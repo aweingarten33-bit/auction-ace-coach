@@ -15,7 +15,7 @@ export default function FlowPlanner({ positions, remaining }: FlowPlannerProps) 
       {/* FLOW BAR (always visible, above bottom nav) */}
       <div
         onClick={() => setOpen(true)}
-        className="fixed bottom-12 md:bottom-12 left-0 right-0 h-12 bg-card border-t border-border flex items-center px-4 text-xs z-40 overflow-x-auto cursor-pointer"
+        className="fixed bottom-16 md:bottom-12 left-0 right-0 h-12 bg-card border-t border-border flex items-center px-4 text-xs z-40 overflow-x-auto cursor-pointer"
       >
         <div className="flex gap-6 whitespace-nowrap">
           {positions.map((p, i) => (
