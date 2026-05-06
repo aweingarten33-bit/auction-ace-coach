@@ -38,9 +38,9 @@ export default function AuthPage() {
     if (error) toast.error(error.message);
     else { toast.success("Account created"); nav("/dashboard"); }
   };
-  const google = async () => {
+  const google = async (dest: "/dashboard" | "/espn" = "/dashboard") => {
     const r = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/dashboard`,
+      redirect_uri: `${window.location.origin}${dest}`,
     });
     if (r.error) toast.error(r.error.message);
   };
