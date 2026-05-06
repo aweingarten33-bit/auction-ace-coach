@@ -472,6 +472,19 @@ export default function DraftV2() {
         )}
       </main>
 
+      {/* FLOW PLANNER (ticker bar above bottom nav, expands on tap) */}
+      <FlowPlanner
+        remaining={budget.remaining}
+        positions={[
+          { label: "QB", value: spend.QB ?? 0 },
+          { label: "RB", value: spend.RB ?? 0 },
+          { label: "WR", value: spend.WR ?? 0 },
+          { label: "TE", value: spend.TE ?? 0 },
+          { label: "K",  value: spend.K  ?? 0 },
+          { label: "DST", value: spend.DST ?? 0 },
+        ]}
+      />
+
       {/* DESKTOP BOTTOM NAV */}
       <nav className="hidden md:flex h-12 shrink-0 items-center gap-6 border-t border-border bg-card px-6 text-sm">
         <button onClick={() => navigate("/planner")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
