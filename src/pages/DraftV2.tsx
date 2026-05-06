@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Sparkles, ChevronLeft, MessageSquare, Target, Layers, Users, History, ArrowUp, Sun, Moon } from "lucide-react";
+import { Sparkles, ChevronLeft, MessageSquare, Target, Layers, Users, History, ArrowUp, Sun, Moon, Trophy } from "lucide-react";
 import coachBotImg from "@/assets/coach-bot.png";
 
 import { useDraftStore } from "@/lib/draft-store";
@@ -261,45 +261,84 @@ export default function DraftV2() {
   // ---------- render ----------
   return (
     <div className={`${theme === "light" ? "theme-light" : ""} font-manly flex h-screen flex-col bg-background text-foreground`}>
-      {/* TOP BAR */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6 text-sm">
-        <div className="flex items-center gap-3 md:gap-6 min-w-0">
-          <button onClick={() => navigate("/draft")} className="text-xs text-muted-foreground hover:text-foreground" title="Back to v1">
-            <ChevronLeft className="inline h-4 w-4" /> v1
-          </button>
-          <span className="font-mono font-semibold tabular-nums">${budget.remaining}</span>
-          <span className="font-mono text-muted-foreground tabular-nums">{budget.slotsLeft}/{budget.slotsTotal}</span>
-          {liveBid?.player && (
-            <span className="hidden md:inline truncate text-muted-foreground">
-              {liveBid.player} <span className="font-mono text-foreground">${liveBid.price}</span>
-            </span>
-          )}
+      {/* SCOREBUG TOP BAR — broadcast lower-third feel */}
+      <header className="relative flex h-16 shrink-0 items-stretch border-b-4 border-primary bg-card text-sm overflow-hidden">
+        {/* Diagonal accent stripe (Fox-broadcast feel) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-2 bg-primary"
+          style={{ clipPath: "polygon(0 0, 100% 0, 60% 100%, 0 100%)" }}
+        />
+        {/* TEAM tag — like home team box */}
+        <div className="flex items-center gap-2 bg-primary text-primary-foreground px-4 ml-3" style={{ clipPath: "polygon(0 0, 100% 0, 92% 100%, 0 100%)" }}>
+          <Trophy className="h-4 w-4" strokeWidth={3} />
+          <span className="font-black uppercase tracking-widest text-[13px]">YOU</span>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Score / cash on hand */}
+        <div className="flex items-center gap-1 bg-foreground text-background px-4">
+          <span className="text-[9px] font-black uppercase tracking-widest opacity-70">CASH</span>
+          <span className="font-black text-2xl tabular-nums leading-none">${budget.remaining}</span>
+        </div>
+        {/* Down & distance — slots / max bid */}
+        <div className="hidden sm:flex items-center gap-3 px-4 border-l-2 border-border">
+          <div className="flex flex-col leading-none">
+            <span className="text-[9px] font-black uppercase tracking-widest opacity-60">SPOTS</span>
+            <span className="font-black text-base tabular-nums">{budget.slotsLeft}/{budget.slotsTotal}</span>
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="text-[9px] font-black uppercase tracking-widest opacity-60">MAX</span>
+            <span className="font-black text-base tabular-nums text-primary">${budget.maxBid}</span>
+          </div>
+        </div>
+        {/* Live bid ticker (chyron) */}
+        {liveBid?.player && (
+          <div className="hidden md:flex flex-1 items-center gap-2 bg-destructive text-destructive-foreground px-4 min-w-0">
+            <span className="flex h-2 w-2 shrink-0 rounded-full bg-current animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-widest shrink-0">ON THE BLOCK</span>
+            <span className="truncate font-bold uppercase tracking-wide">{liveBid.player}</span>
+            <span className="ml-auto font-black tabular-nums">${liveBid.price}</span>
+          </div>
+        )}
+        {/* Right-side controls */}
+        <div className="ml-auto flex items-center gap-1 px-3 border-l-2 border-border">
+          <button
+            onClick={() => navigate("/draft")}
+            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground px-2"
+            title="v1"
+          >
+            <ChevronLeft className="inline h-3 w-3" />V1
+          </button>
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground"
-            title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+            className="flex h-8 w-8 items-center justify-center border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary"
+            title={theme === "dark" ? "Day game" : "Night game"}
           >
             {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
           <button
             onClick={() => navigate("/planner")}
-            className="text-xs font-semibold text-primary hover:underline"
+            className="bg-primary text-primary-foreground px-3 h-8 font-black uppercase tracking-widest text-[10px] hover:opacity-90"
           >
-            Strategy
+            Playbook
           </button>
         </div>
       </header>
 
-      {/* CARD RAIL */}
-      <div className="flex shrink-0 gap-3 overflow-x-auto border-b border-border bg-background px-3 md:px-6 py-3">
+      {/* CHYRON RAIL — broadcast lower-third cards */}
+      <div className="flex shrink-0 gap-0 overflow-x-auto border-b-2 border-border bg-card">
         {railCards.map((c, i) => (
-          <Card key={i} className={`min-w-[220px] md:min-w-[260px] shrink-0 border p-3 ${c.tone}`}>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{c.kind}</div>
-            <div className="mt-1 text-sm font-semibold truncate">{c.title}</div>
-            <div className="text-xs text-muted-foreground truncate">{c.body}</div>
-          </Card>
+          <div
+            key={i}
+            className={`relative min-w-[240px] md:min-w-[280px] shrink-0 border-r-2 border-border px-4 py-2.5 ${c.tone}`}
+          >
+            {/* left accent bar */}
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
+            <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+              {c.kind}
+            </div>
+            <div className="mt-0.5 text-base font-black uppercase tracking-wide truncate">{c.title}</div>
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground truncate">{c.body}</div>
+          </div>
         ))}
       </div>
 
@@ -465,42 +504,44 @@ export default function DraftV2() {
         )}
       </main>
 
-      {/* DESKTOP BOTTOM NAV */}
-      <nav className="hidden md:flex h-12 shrink-0 items-center gap-6 border-t border-border bg-card px-6 text-sm">
-        <button onClick={() => targetsMutation.mutate()} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-          <Target className="h-4 w-4" /> Targets
-        </button>
-        <button onClick={() => askCoach("Who should I nominate next?")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-          <Layers className="h-4 w-4" /> Nomination
-        </button>
-        <button onClick={() => navigate("/draft")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-          <Users className="h-4 w-4" /> Players
-        </button>
-        <button onClick={() => navigate("/draft")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-          <History className="h-4 w-4" /> History
-        </button>
-        <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
-          RB ${spend.RB ?? 0} · WR ${spend.WR ?? 0} · QB ${spend.QB ?? 0}
+      {/* DESKTOP BOTTOM NAV — broadcast bottom bug */}
+      <nav className="hidden md:flex h-12 shrink-0 items-center border-t-4 border-primary bg-foreground text-background text-sm">
+        {[
+          { label: "TARGETS", Icon: Target, action: () => targetsMutation.mutate() },
+          { label: "NOMINATE", Icon: Layers, action: () => askCoach("Who should I nominate next?") },
+          { label: "PLAYERS", Icon: Users, action: () => navigate("/draft") },
+          { label: "HISTORY", Icon: History, action: () => navigate("/draft") },
+        ].map(({ label, Icon, action }) => (
+          <button
+            key={label}
+            onClick={action}
+            className="flex h-full items-center gap-2 px-5 border-r-2 border-background/20 hover:bg-primary hover:text-primary-foreground transition-colors font-black uppercase tracking-widest text-[11px]"
+          >
+            <Icon className="h-3.5 w-3.5" strokeWidth={2.5} /> {label}
+          </button>
+        ))}
+        <span className="ml-auto px-5 font-mono font-bold text-[11px] tabular-nums opacity-80">
+          RB ${spend.RB ?? 0} · WR ${spend.WR ?? 0} · QB ${spend.QB ?? 0} · TE ${spend.TE ?? 0}
         </span>
       </nav>
 
-      {/* MOBILE BOTTOM TAB BAR */}
-      <nav className="flex md:hidden h-16 shrink-0 items-center justify-around border-t border-border bg-card text-[11px]">
+      {/* MOBILE BOTTOM TAB BAR — scoreboard buttons */}
+      <nav className="flex md:hidden h-16 shrink-0 items-stretch border-t-4 border-primary bg-foreground text-background">
         {([
-          { id: "decision", label: "Decide", Icon: Sparkles },
-          { id: "planner",  label: "Plan",   Icon: Layers },
-          { id: "targets",  label: "Targets",Icon: Target },
-          { id: "market",   label: "Market", Icon: Users },
-          { id: "log",      label: "Log",    Icon: History },
+          { id: "decision", label: "DECIDE",  Icon: Sparkles },
+          { id: "planner",  label: "PLAN",    Icon: Layers },
+          { id: "targets",  label: "TARGETS", Icon: Target },
+          { id: "market",   label: "MARKET",  Icon: Users },
+          { id: "log",      label: "LOG",     Icon: History },
         ] as const).map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 ${
-              tab === id ? "text-primary" : "text-muted-foreground"
+            className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 border-r-2 border-background/20 last:border-r-0 font-black uppercase tracking-widest text-[10px] ${
+              tab === id ? "bg-primary text-primary-foreground" : "text-background/70"
             }`}
           >
-            <Icon className="h-4 w-4" />
+            <Icon className="h-4 w-4" strokeWidth={2.5} />
             {label}
           </button>
         ))}
