@@ -555,7 +555,7 @@ export default function DraftV2() {
           </div>
         </SheetContent>
       </Sheet>
-      <BudgetPlannerV2 bank={settings.totalBudget} />
+      <BudgetPlannerV2 />
     </div>
   );
 }
