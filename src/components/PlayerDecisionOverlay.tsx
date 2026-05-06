@@ -70,7 +70,17 @@ export default function PlayerDecisionOverlay({
             Pre-draft card for {name}
           </DialogPrimitive.Title>
 
-          {decision && <DecisionCard d={decision} />}
+          {decision ? (
+            <DecisionCard d={decision} />
+          ) : (
+            <div className="rounded-md border border-border bg-secondary/30 p-4 text-center">
+              <p className="text-sm font-semibold text-foreground">{name || "Player"}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Couldn't build a decision card for this player. Make sure you've completed setup
+                (budget, roster, prices) — then try again from the Draft room.
+              </p>
+            </div>
+          )}
 
           <DialogPrimitive.Close
             aria-label="Close"
