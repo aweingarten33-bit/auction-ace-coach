@@ -186,10 +186,11 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
         </div>
       )}
 
-      {/* Deterministic max-h so the inner list always scrolls on mobile (viewport-relative units don't engage reliably here). */}
+      {/* Cap to ~55% of dynamic viewport so the inner list reliably wins the scroll on phones, */}
+      {/* with a 256px floor so very short windows still show several rows. */}
       <div
-        className="max-h-96 space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1"
-        style={{ WebkitOverflowScrolling: "touch" }}
+        className="space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1"
+        style={{ WebkitOverflowScrolling: "touch", maxHeight: "max(16rem, 55dvh)" }}
       >
         {results.map((p) => {
           const isDrafted = draftedSet.has(norm(p.name));
