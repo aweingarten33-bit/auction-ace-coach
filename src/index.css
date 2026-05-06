@@ -677,3 +677,90 @@
   .splatter { position: absolute; border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%; filter: blur(20px); }
 }
 
+
+/* ============================================================
+   WAR ROOM — cinematic football auction OS
+   Two motion modes: idle (calm breathing) + urgent (bid pressure)
+   ============================================================ */
+@layer utilities {
+  /* TYPE */
+  .room-display { font-family: "Playfair Display", Georgia, serif; font-weight: 900; letter-spacing: -0.025em; line-height: 0.95; }
+  .room-eyebrow { font-family: "Inter", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; font-size: 10px; color: hsl(var(--muted-foreground)); }
+  .room-mono    { font-family: "JetBrains Mono", ui-monospace, monospace; font-feature-settings: "tnum"; letter-spacing: -0.01em; }
+  .room-label   { font-family: "Inter", sans-serif; font-weight: 500; letter-spacing: 0.04em; }
+
+  /* SURFACES */
+  .room-card {
+    background:
+      linear-gradient(170deg, hsl(222 30% 11% / 0.92), hsl(222 38% 7% / 0.95));
+    border: 1px solid hsl(38 30% 92% / 0.08);
+    border-radius: 0.875rem;
+    backdrop-filter: blur(14px) saturate(135%);
+    -webkit-backdrop-filter: blur(14px) saturate(135%);
+    box-shadow:
+      0 1px 0 hsl(38 30% 92% / 0.04) inset,
+      0 22px 44px -22px hsl(222 90% 2% / 0.85),
+      0 0 0 1px hsl(0 0% 0% / 0.2);
+  }
+  .room-card-lift {
+    box-shadow:
+      0 1px 0 hsl(38 30% 92% / 0.05) inset,
+      0 30px 60px -24px hsl(222 90% 2% / 0.95),
+      0 0 0 1px hsl(38 80% 55% / 0.10),
+      0 0 60px -10px hsl(38 90% 55% / 0.18);
+  }
+  .room-divider { height: 1px; background: linear-gradient(90deg, transparent, hsl(38 30% 92% / 0.18), transparent); }
+
+  /* HEAT TONES */
+  .heat-good   { color: hsl(138 75% 55%); }
+  .heat-fair   { color: hsl(38 90% 60%); }
+  .heat-warn   { color: hsl(16 88% 58%); }
+  .heat-bad    { color: hsl(0 78% 58%); }
+  .bg-good     { background: hsl(138 75% 48% / 0.14); border: 1px solid hsl(138 75% 48% / 0.35); }
+  .bg-fair     { background: hsl(38 90% 60% / 0.14);  border: 1px solid hsl(38 90% 60% / 0.35); }
+  .bg-warn     { background: hsl(16 88% 58% / 0.14);  border: 1px solid hsl(16 88% 58% / 0.4); }
+  .bg-bad      { background: hsl(0 78% 58% / 0.14);   border: 1px solid hsl(0 78% 58% / 0.4); }
+
+  /* IDLE — calm breathing */
+  @keyframes room-breathe {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%      { transform: scale(1.008); opacity: 0.97; }
+  }
+  .room-breathe { animation: room-breathe 6s ease-in-out infinite; }
+
+  /* URGENT — bid pressure */
+  @keyframes pressure-flicker {
+    0%, 100% { box-shadow: 0 0 0 1px hsl(0 78% 58% / 0.5), 0 0 32px hsl(0 78% 58% / 0.45); }
+    47%      { box-shadow: 0 0 0 1px hsl(16 88% 58% / 0.6), 0 0 48px hsl(16 88% 58% / 0.55); }
+    52%      { box-shadow: 0 0 0 1px hsl(0 78% 58% / 0.4), 0 0 22px hsl(0 78% 58% / 0.35); }
+  }
+  .pressure { animation: pressure-flicker 1.4s ease-in-out infinite; }
+
+  @keyframes value-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px hsl(138 75% 48% / 0.45), 0 0 24px hsl(138 75% 48% / 0.35); }
+    50%      { box-shadow: 0 0 0 1px hsl(138 75% 55% / 0.65), 0 0 56px hsl(138 75% 55% / 0.55); }
+  }
+  .value-glow { animation: value-pulse 3.4s ease-in-out infinite; }
+
+  @keyframes bid-tick {
+    0%   { transform: translateY(8px); opacity: 0; }
+    40%  { transform: translateY(-2px); opacity: 1; }
+    100% { transform: translateY(0);   opacity: 1; }
+  }
+  .bid-tick { animation: bid-tick 220ms cubic-bezier(.2,.7,.3,1.2); }
+
+  /* MEMORY FADE — missed targets */
+  @keyframes memory-fade { 0%,100% { opacity: 0.55; } 50% { opacity: 0.35; } }
+  .memory-fade { animation: memory-fade 4s ease-in-out infinite; filter: grayscale(0.4) blur(0.2px); }
+
+  /* TICKER — recent sales */
+  @keyframes room-ticker { from { transform: translateX(0);} to { transform: translateX(-50%);} }
+  .room-ticker { animation: room-ticker 38s linear infinite; }
+
+  /* BURNT EDGES — newspaper feel */
+  .editorial-rule { border-top: 1px solid hsl(38 30% 92% / 0.18); border-bottom: 3px double hsl(38 30% 92% / 0.18); padding: 8px 0; }
+  .editorial-kicker { font-family: "Playfair Display", Georgia, serif; font-style: italic; color: hsl(38 78% 56%); }
+
+  /* PRESSURE BAR */
+  .pressure-bar { background: linear-gradient(90deg, hsl(138 75% 48%), hsl(38 90% 58%) 50%, hsl(0 78% 58%)); }
+}
