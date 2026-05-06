@@ -15,6 +15,20 @@ interface Props {
   price?: number;
 }
 
+/**
+ * Mobile-first player decision popup.
+ *
+ * IMPORTANT: this bypasses the shared <DialogContent> from
+ * `@/components/ui/dialog` because that component hard-codes
+ * `top-[50%] translate-y-[-50%]`. On a 402×598 phone screen with a tall
+ * card, the dialog ended up positioned mostly below the fold — user
+ * only saw the dimmed overlay (the "black screen" bug).
+ *
+ * Here we render Radix primitives directly with:
+ *   - `inset-x-2 top-4`               → no transforms, deterministic spot
+ *   - `max-h-[calc(100dvh-2rem)]`     → always fits the dynamic viewport
+ *   - inner `overflow-y-auto`         → tall content scrolls inside
+ */
 export default function PlayerDecisionOverlay({
   open,
   onOpenChange,
@@ -27,42 +41,50 @@ export default function PlayerDecisionOverlay({
   const events = useDraftStore((s) => s.events);
   const prices = useDraftStore((s) => s.prices);
 
-  const decision = useMemo(() => {
-    if (!name) return null;
+  // Run the engine. Capture errors so the popup never silently blanks.
+  const { decision, error } = useMemo(() => {
+    if (!name) return { decision: null, error: null as string | null };
     try {
-      return decide({
-        settings,
-        keepers,
-        events,
-        prices,
-        player: name,
-        position,
-        currentPrice: price ?? 0,
-      });
+      return {
+        decision: decide({
+          settings,
+          keepers,
+          events,
+          prices,
+          player: name,
+          position,
+          currentPrice: price ?? 0,
+        }),
+        error: null,
+      };
     } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
       console.error("[PlayerDecisionOverlay] decide() threw:", e);
-      return null;
+      return { decision: null, error: msg };
     }
   }, [name, position, price, settings, keepers, events, prices]);
+
+  // Setup completeness — most common reason the engine has nothing useful to say
+  const setupComplete =
+    settings &&
+    settings.totalBudget > 0 &&
+    settings.numTeams > 0 &&
+    settings.roster &&
+    Object.values(settings.roster).some((v) => Number(v) > 0);
 
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        {/* Full-screen dimmer */}
         <DialogPrimitive.Overlay
           className={cn(
-            "fixed inset-0 z-50 bg-black/80",
+            "fixed inset-0 z-[100] bg-black/80",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           )}
         />
-        {/* FIX: pin to top of screen with inset-x-2 + top-4 instead of the
-            translate(-50%,-50%) centering trick. On a ~400×600 phone the centered
-            math pushes the content below the visible area. top-4 keeps it fully
-            on-screen and max-h caps it so it stays scrollable inside the viewport. */}
         <DialogPrimitive.Content
           className={cn(
-            "fixed inset-x-2 top-4 z-50 mx-auto w-auto max-w-md",
+            "fixed inset-x-2 top-4 z-[101] mx-auto w-auto max-w-md",
             "max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain",
             "rounded-lg border bg-background p-4 shadow-lg",
             "data-[state=open]:animate-in data-[state=closed]:animate-out",
@@ -71,26 +93,66 @@ export default function PlayerDecisionOverlay({
           )}
           style={{ WebkitOverflowScrolling: "touch" }}
         >
+          {/* Required for Radix a11y. Visually hidden because DecisionCard renders its own header. */}
           <DialogPrimitive.Title className="sr-only">
-            Decision card for {name}
+            Pre-draft card for {name || "player"}
           </DialogPrimitive.Title>
 
           {decision ? (
             <DecisionCard d={decision} />
           ) : (
-            <div className="rounded-md border border-border bg-secondary/30 p-4 text-center">
-              <p className="text-sm font-semibold text-foreground">{name || "Player"}</p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Couldn't build a decision card for this player. Make sure you've completed setup
-                (budget, roster, prices) — then try again from the Draft room.
-              </p>
+            <div className="space-y-3 rounded-md border border-border bg-secondary/30 p-4">
+              <div className="text-center">
+                <p className="text-base font-semibold text-foreground">{name || "Player"}</p>
+                {position && (
+                  <p className="mt-0.5 text-xs text-muted-foreground">{position}</p>
+                )}
+                {price != null && price > 0 && (
+                  <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+                    sheet ${price}
+                  </p>
+                )}
+              </div>
+
+              <div className="border-t border-border/50 pt-3 text-center">
+                {!setupComplete ? (
+                  <>
+                    <p className="text-sm font-medium text-foreground">
+                      Finish setup to see decisions
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Complete the budget, roster, and prices in the setup wizard so the
+                      engine can compute a recommendation.
+                    </p>
+                  </>
+                ) : error ? (
+                  <>
+                    <p className="text-sm font-medium text-destructive">
+                      Decision engine error
+                    </p>
+                    <p className="mt-1 break-words font-mono text-[11px] text-muted-foreground">
+                      {error}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm font-medium text-foreground">
+                      No decision available
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      The engine returned nothing for this player. Try reloading the
+                      Draft page, or double-check that prices and roster are saved.
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
           )}
 
           <DialogPrimitive.Close
             aria-label="Close"
             className={cn(
-              "absolute right-3 top-3 rounded-sm opacity-70",
+              "absolute right-3 top-3 rounded-sm bg-background/80 p-1 opacity-80",
               "ring-offset-background transition-opacity hover:opacity-100",
               "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
               "disabled:pointer-events-none",
