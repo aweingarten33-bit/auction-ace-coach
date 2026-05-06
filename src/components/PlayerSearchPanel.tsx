@@ -97,12 +97,40 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
             size="sm"
             variant={pos === p ? "default" : "outline"}
             className="h-7 px-2 text-[11px]"
-            onClick={() => setPos(p)}
+            onClick={() => { setPos(p); setTier("ALL"); }}
           >
             {p}
           </Button>
         ))}
       </div>
+      {availableTiers.length > 1 && (
+        <div className="mb-2 flex flex-wrap items-center gap-1">
+          <span className="mr-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Tier
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant={tier === "ALL" ? "default" : "outline"}
+            className="h-6 px-2 text-[10px]"
+            onClick={() => setTier("ALL")}
+          >
+            ALL
+          </Button>
+          {availableTiers.map((t) => (
+            <Button
+              key={t}
+              type="button"
+              size="sm"
+              variant={tier === t ? "default" : "outline"}
+              className="h-6 px-2 text-[10px]"
+              onClick={() => setTier(t)}
+            >
+              T{t}
+            </Button>
+          ))}
+        </div>
+      )}
       <p className="mb-1 text-[10px] text-muted-foreground">
         Showing {results.length}{results.length === 100 ? "+" : ""} of {prices.length}
       </p>
