@@ -473,6 +473,9 @@ export default function DraftV2() {
 
       {/* DESKTOP BOTTOM NAV */}
       <nav className="hidden md:flex h-12 shrink-0 items-center gap-6 border-t border-border bg-card px-6 text-sm">
+        <button onClick={() => navigate("/planner")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <Layers className="h-4 w-4" /> Budget Planner
+        </button>
         <button onClick={() => targetsMutation.mutate()} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
           <Target className="h-4 w-4" /> Targets
         </button>
@@ -493,15 +496,16 @@ export default function DraftV2() {
       {/* MOBILE BOTTOM TAB BAR */}
       <nav className="flex md:hidden h-16 shrink-0 items-center justify-around border-t border-border bg-card text-[11px]">
         {([
-          { id: "decision", label: "Decide", Icon: Sparkles },
-          { id: "planner",  label: "Plan",   Icon: Layers },
-          { id: "targets",  label: "Targets",Icon: Target },
-          { id: "market",   label: "Market", Icon: Users },
-          { id: "log",      label: "Log",    Icon: History },
-        ] as const).map(({ id, label, Icon }) => (
+          { id: "decision", label: "Decide",  Icon: Sparkles, action: () => setTab("decision") },
+          { id: "budget",   label: "Budget",  Icon: Trophy,   action: () => navigate("/planner") },
+          { id: "planner",  label: "Plan",    Icon: Layers,   action: () => setTab("planner") },
+          { id: "targets",  label: "Targets", Icon: Target,   action: () => setTab("targets") },
+          { id: "market",   label: "Market",  Icon: Users,    action: () => setTab("market") },
+          { id: "log",      label: "Log",     Icon: History,  action: () => setTab("log") },
+        ] as const).map(({ id, label, Icon, action }) => (
           <button
             key={id}
-            onClick={() => setTab(id)}
+            onClick={action}
             className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 ${
               tab === id ? "text-primary" : "text-muted-foreground"
             }`}
