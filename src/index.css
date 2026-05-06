@@ -12,31 +12,33 @@
 
 @layer base {
   :root {
-    /* KILLING JOKE: ink-black night, bone paper, blood red, sodium amber.
-       Pulpy, high-contrast, comic-noir. Halftone dots, hard shadows. */
-    --background: 0 0% 6%;
-    --foreground: 38 18% 88%;
+    /* SIN CITY × STREET FIGHTER 6:
+       Pure ink black, bone white, single spot color — blood red.
+       Yellow reserved for "Yellow Bastard" highlights. Rain. Silhouettes.
+       Chromatic aberration / RGB split / hit-spark from SF6 cinematics. */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 9%;
-    --card-foreground: 38 18% 90%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 38 18% 90%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Blood red — the Joker's grin. */
-    --primary: 358 78% 48%;
-    --primary-foreground: 38 18% 94%;
-    --primary-glow: 358 90% 58%;
+    /* Spot red — the only true color in Basin City. */
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 100% 60%;
 
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 38 18% 88%;
+    --secondary: 0 0% 8%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 11%;
-    --muted-foreground: 38 8% 58%;
+    --muted: 0 0% 6%;
+    --muted-foreground: 0 0% 62%;
 
-    /* Sodium-lamp amber — Gotham streetlight. */
-    --accent: 38 85% 55%;
-    --accent-foreground: 0 0% 6%;
+    /* Yellow Bastard — second spot color, used sparingly. */
+    --accent: 52 100% 50%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 358 78% 48%;
     --destructive-foreground: 38 18% 94%;
@@ -47,11 +49,11 @@
     --success: 150 35% 42%;
     --success-foreground: 38 18% 94%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 12%;
-    --ring: 358 78% 48%;
+    --border: 0 0% 100%;
+    --input: 0 0% 8%;
+    --ring: 0 100% 50%;
 
-    --radius: 0.125rem;
+    --radius: 0rem;
 
     --gradient-primary: linear-gradient(180deg, hsl(358 80% 52%), hsl(358 78% 38%));
     --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 7%));
