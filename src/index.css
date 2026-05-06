@@ -131,6 +131,32 @@
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
+
+  /* Manly font stack — applied via .font-manly wrapper (used in /draft-v2). */
+  .font-manly {
+    font-family: "Oswald", "Anton", "Impact", "Helvetica Neue", sans-serif;
+    letter-spacing: 0.01em;
+  }
+  .font-manly h1, .font-manly h2, .font-manly h3, .font-manly h4,
+  .font-manly .font-bold, .font-manly .font-semibold, .font-manly .font-extrabold {
+    font-family: "Anton", "Oswald", "Impact", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 400;
+  }
+  .font-manly button, .font-manly .uppercase {
+    font-family: "Oswald", "Impact", sans-serif;
+    letter-spacing: 0.06em;
+  }
+  .font-manly .font-mono, .font-manly [class*="tabular-nums"] {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: 0;
+  }
+  /* Stencil/typewriter accent for small labels */
+  .font-manly .text-\[10px\], .font-manly .text-\[11px\] {
+    font-family: "Special Elite", "Courier New", monospace;
+    letter-spacing: 0.05em;
+  }
 }
 
 @layer base {
