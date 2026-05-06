@@ -391,8 +391,8 @@ export default function DraftV2() {
           </div>
         </section>
 
-        {/* RIGHT / DESKTOP — Planner (mobile = tab=planner) */}
-        <section className={`${tab === "planner" ? "block" : "hidden"} md:block w-full md:w-[40%] overflow-y-auto bg-muted/20 p-4 space-y-4`}>
+        {/* RIGHT / DESKTOP — Planner (desktop only; mobile uses dock) */}
+        <section className="hidden md:block w-full md:w-[40%] overflow-y-auto bg-muted/20 p-4 space-y-4">
           <RosterHero
             remaining={budget.remaining}
             slotsLeft={budget.slotsLeft}
@@ -412,69 +412,92 @@ export default function DraftV2() {
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
         </section>
-
-        {/* MOBILE-ONLY tabs: targets / market / log */}
-        {tab === "targets" && (
-          <section className="block md:hidden w-full overflow-y-auto bg-muted/20 p-4 space-y-4">
-            <UpNextQueue
-              targets={queue}
-              openMan={openMan}
-              loading={targetsMutation.isPending}
-              empty={!queue.length}
-              pulseMultiplier={pulse.multiplier}
-              pulseConfident={pulse.confident}
-              watchlist={watchlist}
-              onRefresh={() => targetsMutation.mutate()}
-              onPick={(t) => askCoach(`Should I bid on ${t.name}? Max?`)}
-              onPin={(n) => { pinPlayer(n); toast(`Pinned ${n}`); }}
-              onUnpin={(n) => unpinPlayer(n)}
-              onDismiss={(n) => { dismissPlayer(n); setQueue((q) => q.filter((t) => t.name !== n)); }}
-              valueFor={valueFor}
-              whatIfFor={whatIfFor}
-            />
-            <Watchlist
-              watchlist={watchlist}
-              onUnpin={(n) => unpinPlayer(n)}
-              onLoad={(n) => askCoach(`Tell me about ${n}.`)}
-              valueFor={valueFor}
-              maxBid={budget.maxBid}
-            />
-          </section>
-        )}
-        {tab === "market" && (
-          <section className="block md:hidden w-full overflow-y-auto bg-muted/20 p-4 space-y-4">
-            <MarketHeat
-              events={events} prices={prices}
-              gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
-              maxBid={budget.maxBid} remaining={budget.remaining}
-              pulseMultiplier={pulse.multiplier}
-            />
-          </section>
-        )}
-        {tab === "log" && (
-          <section className="block md:hidden w-full overflow-y-auto bg-muted/20 p-4">
-            <Card className="p-3">
-              <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Draft Log · {events.length}
-              </div>
-              {events.length ? (
-                <ul className="space-y-0">
-                  {[...events].reverse().map((e) => (
-                    <li key={e.id} className="flex items-baseline gap-2 border-b border-border/30 py-1.5 last:border-b-0">
-                      <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${e.drafter === "me" ? "bg-primary" : "bg-muted-foreground/40"}`} />
-                      <span className="min-w-0 flex-1 truncate text-sm">
-                        <span className={e.drafter === "me" ? "font-medium text-primary" : "text-foreground"}>{e.player}</span>
-                        {e.position && <span className="ml-1.5 text-[10px] uppercase text-muted-foreground">{e.position}</span>}
-                      </span>
-                      <span className="text-xs tabular-nums text-muted-foreground">${e.price}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : <p className="py-4 text-center text-xs text-muted-foreground">No picks yet.</p>}
-            </Card>
-          </section>
-        )}
       </main>
+
+      {/* MOBILE BOTTOM SHEETS — every tab rises from the ground */}
+      <BottomDock
+        open={dockTab === "planner"} onOpenChange={(o) => !o && setDockTab(null)}
+        title="le plan" caption="ROSTER · NOMINATION · TIERS"
+      >
+        <div className="p-4 space-y-4">
+          <RosterHero
+            remaining={budget.remaining} slotsLeft={budget.slotsLeft}
+            slotsTotal={budget.slotsTotal} maxBid={budget.maxBid}
+            rows={heroRows} bestTarget={bestTarget}
+            onLoadTarget={(name) => { setDockTab(null); askCoach(`Should I target ${name}? What's my max bid?`); }}
+          />
+          <NominationCard
+            drain={computeDrain({ settings, keepers, events, prices })}
+            get={computeGet({ settings, keepers, events, prices })}
+            aiSuggestions={[]} aiLoading={false}
+            onAskAi={() => { setDockTab(null); askCoach("Who should I nominate next to drain other teams?"); }}
+            onPickAi={() => {}}
+          />
+          <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
+        </div>
+      </BottomDock>
+
+      <BottomDock
+        open={dockTab === "targets"} onOpenChange={(o) => !o && setDockTab(null)}
+        title="les cibles" caption="QUEUE · WATCHLIST"
+      >
+        <div className="p-4 space-y-4">
+          <UpNextQueue
+            targets={queue} openMan={openMan}
+            loading={targetsMutation.isPending} empty={!queue.length}
+            pulseMultiplier={pulse.multiplier} pulseConfident={pulse.confident}
+            watchlist={watchlist}
+            onRefresh={() => targetsMutation.mutate()}
+            onPick={(t) => { setDockTab(null); askCoach(`Should I bid on ${t.name}? Max?`); }}
+            onPin={(n) => { pinPlayer(n); toast(`Pinned ${n}`); }}
+            onUnpin={(n) => unpinPlayer(n)}
+            onDismiss={(n) => { dismissPlayer(n); setQueue((q) => q.filter((t) => t.name !== n)); }}
+            valueFor={valueFor} whatIfFor={whatIfFor}
+          />
+          <Watchlist
+            watchlist={watchlist}
+            onUnpin={(n) => unpinPlayer(n)}
+            onLoad={(n) => { setDockTab(null); askCoach(`Tell me about ${n}.`); }}
+            valueFor={valueFor} maxBid={budget.maxBid}
+          />
+        </div>
+      </BottomDock>
+
+      <BottomDock
+        open={dockTab === "market"} onOpenChange={(o) => !o && setDockTab(null)}
+        title="le marché" caption="HEAT · POSITION RUNS"
+      >
+        <div className="p-4">
+          <MarketHeat
+            events={events} prices={prices}
+            gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
+            maxBid={budget.maxBid} remaining={budget.remaining}
+            pulseMultiplier={pulse.multiplier}
+          />
+        </div>
+      </BottomDock>
+
+      <BottomDock
+        open={dockTab === "log"} onOpenChange={(o) => !o && setDockTab(null)}
+        title="le journal" caption={`${events.length} PICKS`}
+      >
+        <div className="p-4">
+          {events.length ? (
+            <ul className="space-y-0">
+              {[...events].reverse().map((e) => (
+                <li key={e.id} className="flex items-baseline gap-2 border-b border-border/30 py-1.5 last:border-b-0">
+                  <span className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${e.drafter === "me" ? "bg-primary" : "bg-muted-foreground/40"}`} />
+                  <span className="min-w-0 flex-1 truncate text-sm">
+                    <span className={e.drafter === "me" ? "font-medium text-primary" : "text-foreground"}>{e.player}</span>
+                    {e.position && <span className="ml-1.5 text-[10px] uppercase text-muted-foreground">{e.position}</span>}
+                  </span>
+                  <span className="text-xs tabular-nums text-muted-foreground">${e.price}</span>
+                </li>
+              ))}
+            </ul>
+          ) : <p className="py-4 text-center text-xs text-muted-foreground">No picks yet.</p>}
+        </div>
+      </BottomDock>
 
       {/* DESKTOP BOTTOM NAV */}
       <nav className="hidden md:flex h-12 shrink-0 items-center gap-6 border-t border-border bg-card px-6 text-sm">
