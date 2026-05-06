@@ -91,6 +91,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [posByName, setPosByName] = useState<Map<string, string>>(new Map());
   const [uploading, setUploading] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
+  const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Pull positions from cached ESPN ranks so we can filter the list by position
