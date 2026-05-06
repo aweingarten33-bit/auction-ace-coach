@@ -3,10 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, Pin, PinOff } from "lucide-react";
+import { Search, X, Pin, PinOff, Gavel } from "lucide-react";
 import { DraftEvent, PriceEstimate, Position } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { tierForPosRank } from "@/lib/league-tier-prices";
+import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
