@@ -163,15 +163,22 @@ function PanelHeader({ setOpen }: { setOpen: (b: boolean) => void }) {
 }
 
 /* =========================
-   🎯 PLANNER VIEW (REUSABLE)
+   🎯 PLANNER VIEW (TABBED)
 ========================= */
 function PlannerView({ planner }: { planner: ReturnType<typeof usePlanner> }) {
   const { rows, update, reset, suggestPlan, total, remaining, bank, balanced } = planner;
+  const [tab, setTab] = useState<"plan" | "audit" | "value">("plan");
+
+  const tabs = [
+    { id: "plan" as const, label: "Plan" },
+    { id: "audit" as const, label: "Audit" },
+    { id: "value" as const, label: "Valeur" },
+  ];
 
   return (
-    <div style={{ padding: "20px 24px 28px" }}>
-      {/* SNAPSHOT — Remaining is the hero */}
-      <div style={{ marginBottom: 28 }}>
+    <div style={{ padding: "16px 24px 28px" }}>
+      {/* SNAPSHOT — Remaining is the hero, always visible */}
+      <div style={{ marginBottom: 20 }}>
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint }}>
           RESTE
         </div>
@@ -183,29 +190,57 @@ function PlannerView({ planner }: { planner: ReturnType<typeof usePlanner> }) {
         </div>
       </div>
 
-      {/* ALLOCATIONS */}
-      <SectionHeader title="Allocations" caption="$ PER SLOT">
-        <Linkish onClick={suggestPlan}>Suggest</Linkish>
-        <Linkish onClick={reset}>Reset</Linkish>
-      </SectionHeader>
-
-      <div style={{ marginBottom: 32 }}>
-        {rows.map(([label, val], i) => (
-          <SlotRow key={label} label={label} value={val} isStarter={STARTERS.has(label)}
-            onChange={(v) => update(i, v)}
-          />
-        ))}
+      {/* TABS */}
+      <div style={{ display: "flex", borderBottom: `1px solid ${C.hairlite}`, marginBottom: 20 }}>
+        {tabs.map(t => {
+          const active = tab === t.id;
+          return (
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              background: "transparent", border: "none", cursor: "pointer",
+              padding: "10px 0", marginRight: 24,
+              fontFamily: SANS, fontSize: 13, fontWeight: active ? 500 : 400,
+              color: active ? C.ink : C.muted, position: "relative",
+            }}>
+              {t.label}
+              {active && (
+                <motion.div layoutId="bp-tab-underline" style={{
+                  position: "absolute", left: 0, right: 0, bottom: -1, height: 1, background: C.ink,
+                }} />
+              )}
+            </button>
+          );
+        })}
       </div>
 
-      {/* AUDIT */}
-      <SectionHeader title="Audit" caption="CAN I AFFORD X+Y+Z?" />
-      <AuditTool />
+      {tab === "plan" && (
+        <>
+          <SectionHeader title="Allocations" caption="$ PER SLOT">
+            <Linkish onClick={suggestPlan}>Suggest</Linkish>
+            <Linkish onClick={reset}>Reset</Linkish>
+          </SectionHeader>
+          <div>
+            {rows.map(([label, val], i) => (
+              <SlotRow key={label} label={label} value={val} isStarter={STARTERS.has(label)}
+                onChange={(v) => update(i, v)}
+              />
+            ))}
+          </div>
+        </>
+      )}
 
-      {/* VALEUR */}
-      <div style={{ marginTop: 32 }}>
-        <SectionHeader title="Valeur" caption="WHAT DOES $X BUY?" />
-        <ValueTool />
-      </div>
+      {tab === "audit" && (
+        <>
+          <SectionHeader title="Audit" caption="CAN I AFFORD X+Y+Z?" />
+          <AuditTool />
+        </>
+      )}
+
+      {tab === "value" && (
+        <>
+          <SectionHeader title="Valeur" caption="WHAT DOES $X BUY?" />
+          <ValueTool />
+        </>
+      )}
     </div>
   );
 }
