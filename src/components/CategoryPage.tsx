@@ -20,86 +20,93 @@ export default function CategoryPage({ category, tagline, tools }: Props) {
   return (
     <EditorialShell activeCategory={category}>
       <div className="mx-auto max-w-xl px-5 pt-6 pb-10">
-        {/* CHAPTER PLATE — Sin City title card with rain + spot color */}
-        <div className="relative ink-edge bg-background overflow-hidden">
-          <div className="absolute inset-0 halftone-red opacity-60 pointer-events-none" />
-          <div className="absolute inset-0 rain opacity-40 pointer-events-none" />
-          <div className="absolute inset-0 vignette pointer-events-none" />
-          {/* corner red splatter */}
-          <div className="splatter bg-primary" style={{ top: "-18px", right: "-18px", width: "70px", height: "70px", opacity: 0.85 }} />
-          <div className="splatter bg-primary" style={{ top: "20px", right: "30px", width: "14px", height: "14px" }} />
+        {/* CHAPTER PLATE — Dick Tracy dossier folder */}
+        <div className="relative ink-edge-yellow bg-card overflow-hidden">
+          <div className="absolute inset-0 halftone-yellow opacity-40 pointer-events-none" />
+          <div className="absolute inset-0 deco-rays opacity-50 pointer-events-none" />
+          <div className="absolute inset-0 grain pointer-events-none" />
 
-          <div className="relative p-5">
-            <div className="flex items-center gap-2 text-stamp text-[10px] spot-red">
-              <span className="inline-block h-2 w-2 bg-primary" />
-              CHAPTER · {String(tools.length).padStart(2, "0")} PANELS
+          {/* corner stamp */}
+          <div className="absolute top-3 right-3 stamp-red text-[9px]">
+            Eyes Only
+          </div>
+
+          <div className="relative p-5 pt-6">
+            <div className="flex items-center gap-2 text-stamp text-[10px] spot-yellow">
+              <span className="inline-block h-2 w-2 bg-primary border border-foreground" />
+              FILE · {String(tools.length).padStart(2, "0")} ENTRIES
             </div>
             <h2
-              className="title-slab mt-3 text-foreground rgb-split-strong"
-              style={{ fontSize: "3.2rem" }}
+              className="toon-display mt-3 neon-yellow"
+              style={{ fontSize: "3rem" }}
             >
               {category}
             </h2>
-            <p className="mt-2 text-[12px] leading-snug text-foreground/70 text-stamp max-w-[80%]">
+            <p className="mt-3 text-[12px] leading-snug text-foreground/80 text-stamp max-w-[85%]">
               « {tagline} »
             </p>
           </div>
         </div>
 
-        {/* TOOL PANELS — SF6 character select tiles */}
-        <div className="mt-6 space-y-4">
-          {tools.map((t, i) => (
-            <button
-              key={t.label}
-              onClick={() => t.to && navigate(t.to)}
-              disabled={t.comingSoon}
-              className="group relative w-full ink-edge-sm bg-card text-left transition-all disabled:opacity-30 hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[5px_5px_0_hsl(0_100%_50%)] overflow-hidden"
-            >
-              {/* halftone wash */}
-              <div className="absolute inset-0 halftone opacity-50 pointer-events-none" />
-              {/* speedlines on hover */}
-              <div className="absolute inset-0 speedlines-red opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        {/* TOOL PANELS — pulp dossier cards, alternating yellow / purple drop */}
+        <div className="mt-7 space-y-4">
+          {tools.map((t, i) => {
+            const purple = i % 2 === 1;
+            return (
+              <button
+                key={t.label}
+                onClick={() => t.to && navigate(t.to)}
+                disabled={t.comingSoon}
+                className={`group relative w-full ${
+                  purple ? "ink-edge-purple" : "ink-edge-yellow"
+                } bg-card text-left transition-all disabled:opacity-30 hover:-translate-y-0.5 hover:translate-x-0.5 overflow-hidden`}
+              >
+                <div className={`absolute inset-0 ${purple ? "halftone-purple" : "halftone-yellow"} opacity-25 pointer-events-none`} />
 
-              <div className="relative flex items-stretch">
-                {/* number block — silhouette */}
-                <div className="flex flex-col items-center justify-center silhouette w-14 py-3 border-r-2 border-foreground relative">
-                  <span className="text-stamp text-[8px] tracking-widest text-background/70">No.</span>
-                  <span className="title-slab text-3xl leading-none text-background group-hover:text-primary transition-colors">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-
-                <div className="flex-1 min-w-0 p-4 pr-3">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="headline-noir text-[20px] text-foreground group-hover:rgb-split transition-all">
-                      {t.label}
-                    </h3>
-                    {t.comingSoon && (
-                      <span className="text-stamp text-[8px] px-1.5 py-0.5 bg-accent text-accent-foreground">
-                        K.O. SOON
-                      </span>
-                    )}
+                <div className="relative flex items-stretch">
+                  {/* number block — silhouette panel */}
+                  <div className={`flex flex-col items-center justify-center silhouette w-16 py-3 border-r-[2.5px] border-foreground relative ${purple ? "deco-rays-purple" : "deco-rays"}`}>
+                    <span className="text-stamp text-[8px] tracking-widest text-background/70">No.</span>
+                    <span className={`toon-cartoon text-3xl leading-none ${purple ? "neon-purple" : "neon-yellow"} group-hover:scale-110 transition-transform`}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                   </div>
-                  <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-                    {t.description}
-                  </p>
+
+                  <div className="flex-1 min-w-0 p-4 pr-3">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className={`toon-cartoon text-[22px] ${purple ? "spot-purple" : "spot-yellow"}`}>
+                        {t.label}
+                      </h3>
+                      {t.comingSoon && (
+                        <span className="stamp-red text-[8px] !rotate-3">
+                          Pending
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-1.5 text-[12px] leading-relaxed text-foreground/75">
+                      {t.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center pr-3">
+                    <ChevronRight
+                      className={`h-6 w-6 shrink-0 transition-all group-hover:translate-x-1 ${purple ? "text-accent" : "text-primary"} group-hover:scale-125`}
+                      strokeWidth={3}
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center pr-3">
-                  <ChevronRight
-                    className="h-6 w-6 text-foreground shrink-0 transition-all group-hover:translate-x-1 group-hover:text-primary group-hover:scale-125"
-                    strokeWidth={3}
-                  />
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
 
-        {/* footer stamp */}
-        <div className="mt-8 flex items-center justify-between text-stamp text-[9px] text-foreground/50 border-t border-foreground/30 pt-3">
-          <span>« Continued in next issue »</span>
-          <span className="spot-red">END · CHAPTER</span>
+        {/* American Psycho business-card footer */}
+        <div className="mt-8 psycho-card text-center">
+          <p className="biz-card text-[10px] mb-1">Vetri & Associates</p>
+          <p className="biz-card text-[8px] opacity-70">Fantasy Acquisitions · Auction Counsel</p>
+          <div className="mt-2 flex items-center justify-between text-[8px] biz-card opacity-60">
+            <span>End · Chapter</span>
+            <span>{String(tools.length).padStart(2, "0")} / {String(tools.length).padStart(2, "0")}</span>
+          </div>
         </div>
       </div>
     </EditorialShell>
