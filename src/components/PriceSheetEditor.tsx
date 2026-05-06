@@ -564,6 +564,11 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
               const idx = prices.findIndex((x) => x.name === p.name);
               return (
                 <div key={p.name} className="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-secondary/60">
+                  <span
+                    className={`inline-block h-2 w-2 shrink-0 rounded-full ${p.price > 0 ? "bg-emerald-500" : "bg-muted-foreground/40"}`}
+                    title={p.price > 0 ? "Projected value available" : "No projection — coach lacks data"}
+                    aria-label={p.price > 0 ? "Has projection" : "No projection"}
+                  />
                   <button
                     type="button"
                     onClick={() => {
