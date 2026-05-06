@@ -217,6 +217,18 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         throw new Error("No player ranks cached. Try again in a moment.");
       }
 
+      // 3a) Pull Sleeper players (for rookies + anyone ESPN missed).
+      // Trigger a sync first (best-effort) so data is fresh.
+      try {
+        await supabase.functions.invoke("sleeper-sync", { body: {} });
+      } catch (e) {
+        console.warn("sleeper-sync failed (continuing with cached data)", e);
+      }
+      const { data: sRows } = await supabase
+        .from("sleeper_players")
+        .select("player_name, position, pos_rank, projected_auction_value, is_rookie, injury_status")
+        .not("pos_rank", "is", null);
+
       // 3b) Re-rank within position by last season's PPG so we can sanity-check
       // ESPN's preseason rank against real production.
       const ppgRankByName = new Map<string, number>();
