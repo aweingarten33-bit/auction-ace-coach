@@ -85,8 +85,8 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <EditorialShell activeCategory="Settings">
     <SupermanShell title="the auction room" credit={`step ${step + 1} of ${STEPS.length} · ${STEPS[step]}`}>
+
       <div className="px-4 md:px-8">
       <div className="mx-auto max-w-2xl">
         <header className="mb-5 text-center">
