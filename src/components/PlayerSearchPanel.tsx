@@ -24,6 +24,7 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
   const [q, setQ] = useState("");
   const [pos, setPos] = useState<"ALL" | Position>("ALL");
   const [tier, setTier] = useState<"ALL" | number>("ALL");
+  const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
 
   const draftedSet = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
   const pinnedSet = useMemo(() => new Set(watchlist.map(norm)), [watchlist]);
