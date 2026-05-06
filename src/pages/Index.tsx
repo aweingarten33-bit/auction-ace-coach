@@ -11,7 +11,8 @@ const Index = () => {
   const setupComplete = useDraftStore((s) => s.setupComplete);
   const editing = searchParams.has("step") || searchParams.get("edit") === "1";
   useEffect(() => {
-    if (user && setupComplete && !editing) navigate("/draft");
+    // Only auto-redirect from the bare landing entry, not when intentionally on /setup.
+    if (user && setupComplete && !editing && location.pathname !== "/setup") navigate("/");
   }, [user, setupComplete, navigate, editing]);
   if (loading) return null;
   if (!user) return <Navigate to="/auth" replace />;
