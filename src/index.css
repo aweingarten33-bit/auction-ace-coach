@@ -215,6 +215,9 @@
 }
 
 @layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
   /* ============================================================
      NEUMORPHISM + GLASSMORPHISM SYSTEM
      Applied globally to Cards, Buttons, Inputs via base overrides.
