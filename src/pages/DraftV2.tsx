@@ -216,6 +216,7 @@ export default function DraftV2() {
 
   // ---------- mobile tab + theme ----------
   const [tab, setTab] = useState<MobileTab>("decision");
+  const [dockTab, setDockTab] = useState<null | "planner" | "targets" | "market" | "log">(null);
   const [theme, setTheme] = useState<"dark" | "light">(() =>
     (typeof localStorage !== "undefined" && (localStorage.getItem("draft-v2-theme") as "dark" | "light")) || "dark"
   );
