@@ -22,6 +22,7 @@ import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
+import EditorialShell from "@/components/EditorialShell";
 
 const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 
