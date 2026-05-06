@@ -544,6 +544,208 @@ Keep it tight. No fluff, no closing line.`;
       })
     : null;
 
+  const focusHash = location.hash.replace("#", "");
+  const focusNav: Record<string, { label: string; to: string }[]> = {
+    Strategy: [
+      { label: "Plan", to: "/draft#plan" },
+      { label: "Build", to: "/draft#roster" },
+      { label: "Tiers", to: "/draft#tiers" },
+      { label: "Nominate", to: "/draft#nominate" },
+    ],
+    Market: [
+      { label: "Log", to: "/draft#log" },
+      { label: "Heat", to: "/draft#heat" },
+      { label: "Opponents", to: "/draft#opponents" },
+    ],
+    Targets: [
+      { label: "Up Next", to: "/draft#upnext" },
+      { label: "Watchlist", to: "/draft#watchlist" },
+      { label: "Tiers", to: "/draft#tiers" },
+    ],
+    Coach: [
+      { label: "Chat", to: "/draft?coach=open" },
+      { label: "Bid", to: "/draft?coach=bid" },
+      { label: "Nominate", to: "/draft?coach=nominate" },
+    ],
+  };
+  const focusTitle: Record<string, string> = {
+    plan: "Draft Plan",
+    roster: "Roster & Needs",
+    tiers: "Tier Targets",
+    nominate: "Nomination Strategy",
+    log: "Recent Picks",
+    heat: "Market Heat",
+    opponents: "Opponent Budgets",
+    upnext: "Up Next Targets",
+    watchlist: "Watchlist",
+  };
+  const draftLogCard = (
+    <Card className="bg-gradient-card p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+          Draft Log{" "}
+          <span className="font-normal normal-case text-foreground/50">
+            · {events.length} pick{events.length === 1 ? "" : "s"}
+          </span>
+        </h2>
+      </div>
+      <div className="max-h-[420px] overflow-auto">
+        {events.length ? (
+          <ul className="space-y-0">
+            {[...events].reverse().map((e, idx) => (
+              <li
+                key={e.id}
+                style={{ animationDelay: `${Math.min(idx, 6) * 30}ms` }}
+                className="flex animate-fade-in-up items-baseline gap-2 border-b border-border/30 py-1.5 last:border-b-0"
+              >
+                <span
+                  className={`mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                    e.drafter === "me" ? "bg-primary" : "bg-muted-foreground/40"
+                  }`}
+                />
+                <span className="min-w-0 flex-1 truncate text-sm">
+                  <span className={`font-medium ${e.drafter === "me" ? "text-primary" : "text-foreground"}`}>
+                    {e.player}
+                  </span>
+                  {e.position && (
+                    <span className="ml-1.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                      {e.position}
+                    </span>
+                  )}
+                </span>
+                <span className="text-xs tabular-nums text-muted-foreground">${e.price}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="py-8 text-center text-xs text-muted-foreground">
+            Picks will land here as ESPN updates the room.
+          </p>
+        )}
+      </div>
+    </Card>
+  );
+
+  const targetsPanel = (
+    <div className="space-y-4">
+      <UpNextQueue
+        targets={queue}
+        openMan={openMan}
+        loading={targetsMutation.isPending}
+        empty={!queue.length}
+        pulseMultiplier={pulse.multiplier}
+        pulseConfident={pulse.confident}
+        watchlist={watchlist}
+        onRefresh={refreshQueue}
+        onPick={handlePickFromQueue}
+        onPin={handlePin}
+        onUnpin={handleUnpin}
+        onDismiss={handleDismiss}
+        valueFor={valueFor}
+        whatIfFor={whatIfFor}
+      />
+      <Watchlist
+        watchlist={watchlist}
+        onUnpin={handleUnpin}
+        onLoad={handleLoadFromWatchlist}
+        valueFor={valueFor}
+        maxBid={budget.maxBid}
+      />
+    </div>
+  );
+
+  const coachPanel = (
+    <Card className="overflow-hidden p-0">
+      <div className="border-b border-border/60 px-4 py-3">
+        <div className="flex items-center gap-2">
+          <img src={coachBotImg} alt="" className="h-8 w-8 rounded-full object-cover" />
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Coach AI</h2>
+            <p className="text-[11px] text-muted-foreground">Research support only — ESPN is where picks happen.</p>
+          </div>
+        </div>
+      </div>
+      <div className="max-h-[420px] space-y-3 overflow-auto px-4 py-4 text-sm leading-relaxed">
+        {coachHistory.length === 0 && !streaming && <CoachMessage content={coachText} />}
+        {coachHistory.map((m, i) => (
+          <div key={i} className={m.role === "user" ? "flex justify-end" : ""}>
+            <div className={m.role === "user" ? "max-w-[85%] rounded-2xl rounded-br-md bg-secondary px-3 py-1.5 text-[13px]" : "min-w-0"}>
+              {m.role === "user" ? <ReactMarkdown>{m.content}</ReactMarkdown> : <CoachMessage content={m.content} />}
+            </div>
+          </div>
+        ))}
+        {streaming && coachText && <CoachMessage content={coachText} />}
+      </div>
+      <div className="border-t border-border/60 px-3 pb-3 pt-2">
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          {quickPrompts.slice(0, 4).map((b) => (
+            <Button key={b.id} size="sm" variant="outline" disabled={streaming} onClick={() => askCoach(undefined, b.prompt)} className="h-7 rounded-full px-2.5 text-[11px]">
+              {b.label}
+            </Button>
+          ))}
+        </div>
+        <div className="flex items-end gap-2 rounded-2xl border-2 border-primary/50 bg-background px-3 py-2 shadow-md focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/30">
+          <Input
+            placeholder='Ask Coach AI… e.g. "Best value left?"'
+            value={followUp}
+            onChange={(e) => setFollowUp(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleFollowUp()}
+            disabled={streaming}
+            className="h-10 flex-1 border-0 bg-transparent p-0 text-base font-medium shadow-none focus-visible:ring-0"
+          />
+          <Button onClick={handleFollowUp} disabled={streaming || !followUp.trim()} size="sm" className="h-10 w-10 shrink-0 rounded-full p-0">↑</Button>
+        </div>
+      </div>
+    </Card>
+  );
+
+  const focusedContent = (() => {
+    if (activeCategory === "Strategy") {
+      if (focusHash === "roster") return <RosterHero remaining={budget.remaining} slotsLeft={budget.slotsLeft} slotsTotal={budget.slotsTotal} maxBid={budget.maxBid} rows={heroRows} bestTarget={bestTarget} onLoadTarget={(name, pos) => { setPlayerName(name); setPosition(pos); setDrafter("me"); toast(`${name} loaded — best next target`); }} />;
+      if (focusHash === "tiers") return <TierBreakAlerts prices={prices} events={events} keepers={keepers} />;
+      if (focusHash === "nominate") return <NominationCard drain={computeDrain({ settings, keepers, events, prices })} get={computeGet({ settings, keepers, events, prices })} aiSuggestions={aiNoms} aiLoading={nominationsMutation.isPending} onAskAi={fetchAiNominations} onPickAi={(s) => { setPlayerName(s.name); setPosition(s.position); setDrafter("other"); setPriceInput(String(s.price)); setManualOpen(true); toast(`${s.name} loaded — ${s.strategy}`); }} />;
+      return <DraftPlanCard onGenerate={generateDraftPlan} generating={planGenerating} />;
+    }
+    if (activeCategory === "Market") {
+      if (focusHash === "log") return draftLogCard;
+      if (focusHash === "opponents") return <OpponentHeatmap settings={settings} />;
+      return <MarketHeat events={events} prices={prices} gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))} maxBid={budget.maxBid} remaining={budget.remaining} pulseMultiplier={pulse.multiplier} />;
+    }
+    if (activeCategory === "Targets") {
+      if (focusHash === "watchlist") return <Watchlist watchlist={watchlist} onUnpin={handleUnpin} onLoad={handleLoadFromWatchlist} valueFor={valueFor} maxBid={budget.maxBid} />;
+      if (focusHash === "tiers") return <TierBreakAlerts prices={prices} events={events} keepers={keepers} />;
+      return targetsPanel;
+    }
+    if (activeCategory === "Coach") return coachPanel;
+    return null;
+  })();
+
+  if (activeCategory !== "Home") {
+    return (
+      <EditorialShell activeCategory={activeCategory}>
+        <main className="mx-auto w-full max-w-3xl px-4 py-5">
+          <div className="mb-4">
+            <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Research</p>
+            <h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground" style={{ fontFamily: '"Playfair Display", Georgia, serif' }}>
+              {focusTitle[focusHash] ?? activeCategory}
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Focused research view. No pick buttons, no duplicate navigation, no clutter.
+            </p>
+          </div>
+          <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+            {(focusNav[activeCategory] ?? []).map((item) => (
+              <Button key={item.to} variant={location.pathname + location.hash + location.search === item.to ? "default" : "outline"} size="sm" onClick={() => navigate(item.to)} className="h-8 shrink-0 px-3 text-xs">
+                {item.label}
+              </Button>
+            ))}
+          </div>
+          {focusedContent}
+        </main>
+      </EditorialShell>
+    );
+  }
+
   return (
     <EditorialShell activeCategory={activeCategory}>
     <div className="overflow-x-hidden bg-background pb-4">
