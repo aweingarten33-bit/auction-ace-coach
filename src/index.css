@@ -315,497 +315,127 @@
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
 
 /* =====================================================================
-   RIDDLER PATCH — cinematic enigma overlay
-   Layered ON TOP of the tool palette. Pure presentation. No layout
-   breakage. Adds an acid-green/violet cipher mood, animated grid hum,
-   and "?" watermarks that pulse with the draft.
+   MATURE NOIR — dark, restrained, cinematic
+   Replaces the prior cartoon/comic overlays. Deep blacks, desaturated
+   steel/oxblood accents, fine grain, soft vignette. No neon, no POW,
+   no halftones, no slashes. Built to feel grown-up and serious.
    ===================================================================== */
 @layer base {
   :root {
-    --riddler-green: 140 100% 55%;
-    --riddler-acid:  90 100% 60%;
-    --riddler-violet: 280 80% 60%;
-    --riddler-ink:   220 60% 6%;
-
-    /* Repaint core signal tokens with Riddler hues */
-    --background: var(--riddler-ink);
-    --primary: var(--riddler-green);
-    --primary-foreground: 220 60% 6%;
-    --primary-glow: var(--riddler-acid);
-    --ring: var(--riddler-green);
-    --warning: 50 100% 55%;
-    --success: var(--riddler-green);
-    --destructive: 320 90% 60%;
-    --sidebar-primary: var(--riddler-green);
-    --sidebar-ring: var(--riddler-green);
-
-    --grid-line: hsl(var(--riddler-green) / 0.06);
-    --grid-line-strong: hsl(var(--riddler-violet) / 0.10);
-
-    --shadow-glow: 0 0 0 1px hsl(var(--riddler-green) / 0.35),
-                   0 0 24px -4px hsl(var(--riddler-green) / 0.45);
+    --background: 220 14% 6%;
+    --foreground: 210 14% 86%;
+    --card: 220 12% 9%;
+    --card-foreground: 210 14% 88%;
+    --popover: 220 12% 9%;
+    --popover-foreground: 210 14% 90%;
+    --primary: 12 55% 48%;            /* oxblood */
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 12 60% 55%;
+    --secondary: 220 10% 13%;
+    --secondary-foreground: 210 14% 86%;
+    --muted: 220 10% 12%;
+    --muted-foreground: 215 8% 58%;
+    --accent: 38 22% 58%;             /* aged brass */
+    --accent-foreground: 220 20% 8%;
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --warning: 36 55% 52%;
+    --warning-foreground: 220 20% 8%;
+    --success: 150 25% 42%;
+    --success-foreground: 0 0% 98%;
+    --border: 220 10% 16%;
+    --input: 220 10% 12%;
+    --ring: 12 55% 48%;
+    --grid-line: hsl(220 10% 10%);
+    --grid-line-strong: hsl(220 10% 13%);
+    --gradient-card: linear-gradient(180deg, hsl(220 12% 10%), hsl(220 12% 7%));
+    --gradient-primary: linear-gradient(180deg, hsl(12 55% 48%), hsl(12 55% 38%));
+    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 8px 28px -16px hsl(0 0% 0% / 0.85);
+    --shadow-glow: 0 0 0 1px hsl(12 55% 48% / 0.35);
   }
-  .dark { --background: var(--riddler-ink); }
+  .dark { --background: 220 14% 6%; }
 }
 
-/* Cinematic body wash: vignette + animated cipher grid + "?" watermark */
-html, body, #root { background: hsl(var(--riddler-ink)); }
+html, body, #root { background: hsl(var(--background)); }
 body {
   position: relative;
   color: hsl(var(--foreground));
   background:
-    radial-gradient(1200px 800px at 70% -10%, hsl(var(--riddler-violet) / 0.18), transparent 60%),
-    radial-gradient(900px 700px at -10% 110%, hsl(var(--riddler-green) / 0.14), transparent 60%),
-    linear-gradient(hsl(var(--riddler-ink)), hsl(220 60% 4%));
+    radial-gradient(1200px 800px at 75% -10%, hsl(220 30% 14% / 0.6), transparent 65%),
+    radial-gradient(900px 700px at -10% 110%, hsl(12 35% 14% / 0.45), transparent 65%),
+    linear-gradient(180deg, hsl(220 14% 7%), hsl(220 16% 4%));
+  background-attachment: fixed;
 }
+
+/* Fine film grain — subtle, never busy */
 body::before {
   content: "";
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background-image:
-    linear-gradient(hsl(var(--riddler-green) / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--riddler-green) / 0.05) 1px, transparent 1px);
-  background-size: 32px 32px, 32px 32px;
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
-  animation: riddler-grid-drift 22s linear infinite;
+    radial-gradient(hsl(0 0% 100% / 0.025) 1px, transparent 1px);
+  background-size: 3px 3px;
+  mix-blend-mode: overlay;
+  opacity: 0.6;
 }
+
+/* Soft vignette */
 body::after {
-  content: "?";
+  content: "";
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  font-family: 'Courier New', ui-monospace, monospace;
-  font-weight: 900;
-  font-size: 62vh;
-  line-height: 1;
-  display: flex; align-items: center; justify-content: center;
-  color: hsl(var(--riddler-green) / 0.04);
-  text-shadow: 0 0 60px hsl(var(--riddler-green) / 0.15);
-  animation: riddler-pulse 6s ease-in-out infinite;
+  background: radial-gradient(ellipse at center, transparent 55%, hsl(0 0% 0% / 0.55) 100%);
 }
+
 #root > * { position: relative; z-index: 1; }
 
-/* Make headings feel cipher-like */
-h1, h2 { letter-spacing: -0.01em; }
-h1 { text-shadow: 0 0 24px hsl(var(--riddler-green) / 0.20); }
+/* Typography — restrained serif/sans, no comic */
+h1, h2, h3, h4 {
+  font-family: "Inter", "Helvetica Neue", sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  text-transform: none !important;
+  text-shadow: none !important;
+  color: hsl(var(--foreground)) !important;
+}
+h1 { font-weight: 700 !important; letter-spacing: -0.03em !important; }
 
-/* Buttons & accents pick up an acid-green glow */
-.bg-primary, [data-state="active"].bg-primary { box-shadow: var(--shadow-glow); }
-a:hover, button:hover { text-shadow: 0 0 8px hsl(var(--riddler-green) / 0.45); }
-
-/* Cards get a faint cipher border + scanline sheen */
-.rounded-lg.border, .rounded-md.border, .rounded-xl.border {
-  border-color: hsl(var(--riddler-green) / 0.18);
-  background-image: linear-gradient(180deg, hsl(var(--riddler-violet) / 0.04), transparent 40%);
-}
-
-/* Subtle CRT scanlines for that movie-screen feel */
-.riddler-scan, body > #root::before {
-  content: "";
-  position: fixed; inset: 0; pointer-events: none; z-index: 2;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0 2px,
-    hsl(var(--riddler-green) / 0.03) 2px 3px
-  );
-  mix-blend-mode: overlay;
-}
-
-@keyframes riddler-grid-drift {
-  0%   { background-position: 0 0, 0 0; }
-  100% { background-position: 32px 32px, 32px 32px; }
-}
-@keyframes riddler-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.6; transform: scale(1.02); }
-}
-
-/* =====================================================================
-   COMIC CITY — surreal cartoon-noir overlay
-   Fixed full-viewport layers behind app. pointer-events: none everywhere.
-   ===================================================================== */
-.comic-city {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  overflow: hidden;
-  filter: saturate(1.3) contrast(1.05);
-}
-.comic-city > * { position: absolute; pointer-events: none; }
-
-/* SKY */
-.cc-sky {
-  inset: 0;
-  background:
-    radial-gradient(900px 600px at 80% 10%, hsl(320 95% 55% / 0.35), transparent 60%),
-    radial-gradient(800px 600px at 10% 20%, hsl(200 100% 55% / 0.30), transparent 60%),
-    radial-gradient(1200px 800px at 50% 100%, hsl(45 100% 55% / 0.18), transparent 65%),
-    linear-gradient(180deg, hsl(265 80% 14%) 0%, hsl(230 80% 8%) 55%, hsl(220 90% 4%) 100%);
-  animation: cc-sky-warp 18s ease-in-out infinite;
-}
-@keyframes cc-sky-warp {
-  0%,100% { filter: hue-rotate(0deg); transform: translateY(0); }
-  33%     { filter: hue-rotate(20deg); transform: translateY(-4px) skewY(-0.3deg); }
-  66%     { filter: hue-rotate(-15deg); transform: translateY(3px) skewY(0.4deg); }
-}
-
-.cc-moon {
-  top: 6%; right: 8%; width: 140px; height: 140px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, hsl(50 100% 88%), hsl(40 95% 60%) 60%, hsl(30 85% 35%));
-  box-shadow: 0 0 80px hsl(45 100% 60% / 0.55), inset -20px -20px 50px hsl(20 70% 20% / 0.6);
-  animation: cc-moon-pulse 7s ease-in-out infinite;
-}
-@keyframes cc-moon-pulse { 50% { box-shadow: 0 0 140px hsl(50 100% 70% / 0.8), inset -20px -20px 50px hsl(20 70% 20% / 0.6);} }
-
-.cc-stars {
-  inset: 0;
-  background-image:
-    radial-gradient(1px 1px at 12% 14%, white, transparent),
-    radial-gradient(1px 1px at 28% 22%, white, transparent),
-    radial-gradient(1.5px 1.5px at 44% 8%, white, transparent),
-    radial-gradient(1px 1px at 60% 18%, white, transparent),
-    radial-gradient(1px 1px at 75% 12%, white, transparent),
-    radial-gradient(1px 1px at 88% 26%, white, transparent),
-    radial-gradient(1.5px 1.5px at 18% 30%, white, transparent),
-    radial-gradient(1px 1px at 95% 6%, white, transparent);
-  opacity: 0.7;
-  animation: cc-flicker 3.7s steps(8,end) infinite;
-}
-@keyframes cc-flicker { 0%,100%{opacity:.65} 35%{opacity:.25} 50%{opacity:.9} 70%{opacity:.4} }
-
-/* SKYLINES */
-.cc-skyline { left: 0; width: 100%; }
-.cc-skyline-far  { bottom: 0; height: 55vh; opacity: 0.85; transform-origin: 50% 100%; animation: cc-far-sway 14s ease-in-out infinite; }
-.cc-skyline-near { bottom: 0; height: 42vh; transform-origin: 50% 100%; animation: cc-near-sway 9s ease-in-out infinite; }
-@keyframes cc-far-sway { 0%,100%{transform: skewX(0)} 50%{transform: skewX(-1.2deg) translateY(2px)} }
-@keyframes cc-near-sway { 0%,100%{transform: skewX(0)} 50%{transform: skewX(1.4deg) scaleY(1.01)} }
-
-/* NEON BILLBOARDS */
-.cc-neon {
-  font-family: "Anton","Impact",sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: .25rem .75rem;
-  border-radius: 4px;
-  border: 2px solid currentColor;
-  mix-blend-mode: screen;
-  white-space: nowrap;
-}
-.cc-neon-1 { top: 18%; left: 6%;  font-size: clamp(28px,5vw,72px); color: hsl(330 100% 65%); text-shadow: 0 0 12px hsl(330 100% 65%), 0 0 32px hsl(330 100% 55%); animation: cc-neon-buzz 2.3s steps(6,end) infinite; transform: rotate(-4deg); }
-.cc-neon-2 { top: 28%; right: 8%; font-size: clamp(24px,4vw,60px); color: hsl(170 100% 55%); text-shadow: 0 0 12px hsl(170 100% 55%), 0 0 32px hsl(170 100% 50%); animation: cc-neon-buzz 1.7s steps(5,end) infinite; transform: rotate(3deg); }
-.cc-neon-3 { top: 44%; left: 12%; font-size: clamp(18px,2.6vw,36px); color: hsl(50 100% 60%); text-shadow: 0 0 10px hsl(50 100% 60%), 0 0 24px hsl(50 100% 55%); animation: cc-neon-buzz 3.1s steps(7,end) infinite; transform: rotate(2deg); }
-.cc-neon-4 { top: 52%; right: 14%; font-size: clamp(20px,3vw,42px); color: hsl(0 100% 60%); text-shadow: 0 0 10px hsl(0 100% 60%), 0 0 28px hsl(0 100% 55%); animation: cc-neon-buzz 2s steps(4,end) infinite; transform: rotate(-3deg); }
-@keyframes cc-neon-buzz {
-  0%,100% { opacity: 1; }
-  20% { opacity: 0.2; }
-  22% { opacity: 1; }
-  55% { opacity: 0.55; }
-  60% { opacity: 1; }
-  80% { opacity: 0.1; }
-  82% { opacity: 1; }
-}
-
-/* STREETLAMP POOLS */
-.cc-lamp { bottom: 0; width: 38vw; height: 60vh;
-  background: radial-gradient(ellipse at 50% 100%, hsl(45 100% 70% / 0.30), transparent 70%);
-  mix-blend-mode: screen;
-  animation: cc-flicker 4.2s steps(10,end) infinite;
-}
-.cc-lamp-1 { left: -8vw; }
-.cc-lamp-2 { left: 32vw; background: radial-gradient(ellipse at 50% 100%, hsl(195 100% 65% / 0.28), transparent 70%); animation-duration: 3.3s; }
-.cc-lamp-3 { right: -8vw; background: radial-gradient(ellipse at 50% 100%, hsl(330 100% 65% / 0.28), transparent 70%); animation-duration: 5.1s; }
-
-/* STEAM VENTS */
-.cc-steam { bottom: 0; width: 220px; height: 50vh;
-  background: radial-gradient(ellipse at 50% 100%, hsl(0 0% 100% / 0.15), transparent 70%);
-  filter: blur(14px);
-  mix-blend-mode: screen;
-  animation: cc-steam-rise 9s ease-in-out infinite;
-}
-.cc-steam-1 { left: 18%; }
-.cc-steam-2 { left: 52%; animation-delay: -3s; animation-duration: 11s; }
-.cc-steam-3 { right: 12%; animation-delay: -6s; animation-duration: 7.5s; }
-@keyframes cc-steam-rise {
-  0%   { transform: translateY(20%) scale(0.9); opacity: 0; }
-  30%  { opacity: 0.6; }
-  100% { transform: translateY(-40%) scale(1.4); opacity: 0; }
-}
-
-/* RAIN */
-.cc-rain {
-  inset: 0;
-  background-image: repeating-linear-gradient(
-    100deg,
-    transparent 0 6px,
-    hsl(200 100% 80% / 0.08) 6px 7px,
-    transparent 7px 14px
-  );
-  animation: cc-rain-fall 0.6s linear infinite;
-  mix-blend-mode: screen;
-  opacity: 0.7;
-}
-@keyframes cc-rain-fall {
-  0% { background-position: 0 0; }
-  100% { background-position: -40px 80px; }
-}
-
-/* HALFTONE COMIC DOTS */
-.cc-halftone {
-  inset: 0;
-  background-image: radial-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1.5px);
-  background-size: 6px 6px;
-  mix-blend-mode: overlay;
-}
-
-/* FOG */
-.cc-fog { inset: -10%; opacity: 0.55; mix-blend-mode: screen; filter: blur(40px); }
-.cc-fog-a {
-  background: radial-gradient(60% 40% at 30% 80%, hsl(280 60% 40% / 0.5), transparent 70%);
-  animation: cc-fog-drift 26s ease-in-out infinite;
-}
-.cc-fog-b {
-  background: radial-gradient(50% 35% at 75% 70%, hsl(190 80% 50% / 0.45), transparent 70%);
-  animation: cc-fog-drift 34s ease-in-out infinite reverse;
-}
-@keyframes cc-fog-drift {
-  0%,100% { transform: translate(0,0) scale(1); }
-  50%     { transform: translate(6vw,-3vh) scale(1.1); }
-}
-
-/* GLITCH / SMEAR FRAME */
-.cc-glitch {
-  inset: 0;
-  background:
-    linear-gradient(90deg, transparent 0 30%, hsl(330 100% 60% / 0.10) 30% 31%, transparent 31%),
-    linear-gradient(90deg, transparent 0 62%, hsl(180 100% 60% / 0.10) 62% 63%, transparent 63%);
-  mix-blend-mode: screen;
-  animation: cc-glitch-jump 7s steps(1,end) infinite;
-}
-@keyframes cc-glitch-jump {
-  0%,92%,100% { opacity: 0; transform: translateX(0); }
-  93% { opacity: 1; transform: translateX(-6px) skewX(2deg); }
-  94% { opacity: 1; transform: translateX(8px) skewX(-3deg); }
-  95% { opacity: 0; }
-  97% { opacity: 1; transform: translateX(-4px); }
-  98% { opacity: 0; }
-}
-
-/* SCANLINES */
-.cc-scan {
-  inset: 0;
-  background: repeating-linear-gradient(to bottom, transparent 0 2px, hsl(0 0% 0% / 0.18) 2px 3px);
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
-
-/* VIGNETTE */
-.cc-vignette {
-  inset: 0;
-  background: radial-gradient(ellipse at center, transparent 50%, hsl(0 0% 0% / 0.75) 100%);
-}
-
-/* Respect motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  .comic-city * { animation: none !important; }
-}
-
-/* =====================================================================
-   GRAPHIC NOVEL MODE — app-wide visual takeover
-   Forces every card, panel, button, and header into Frank Miller comic
-   territory: thick ink outlines, halftone fills, hard shadows, slashed
-   asymmetry, cinematic accents. Pure presentation overrides.
-   ===================================================================== */
-
-:root {
-  --ink: 0 0% 4%;
-  --paper: 45 30% 92%;
-  --blood: 358 92% 48%;
-  --acid: 60 100% 55%;
-  --sky: 200 100% 55%;
-  --bruise: 285 60% 45%;
-}
-
-/* Repaint baseline so cards become "newsprint" panels over the noir city */
-body {
-  color: hsl(var(--paper));
-}
-
-/* Hard-edged comic panels — kill rounded SaaS look */
+/* Cards — dark glass panels, thin hairline border */
 .rounded-lg.border, .rounded-md.border, .rounded-xl.border,
 [class*="rounded"][class*="border"] {
-  border-radius: 2px !important;
-  border: 3px solid hsl(var(--ink)) !important;
-  background:
-    linear-gradient(180deg, hsl(var(--paper) / 0.96), hsl(45 25% 86% / 0.96)) !important;
-  color: hsl(var(--ink)) !important;
-  box-shadow:
-    6px 6px 0 0 hsl(var(--ink)),
-    0 0 0 1px hsl(var(--ink) / 0.6) inset !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid hsl(var(--border)) !important;
+  background: var(--gradient-card) !important;
+  color: hsl(var(--card-foreground)) !important;
+  box-shadow: var(--shadow-card) !important;
   position: relative;
   overflow: hidden;
 }
-/* Halftone wash on every panel */
 .rounded-lg.border::before, .rounded-md.border::before, .rounded-xl.border::before,
-[class*="rounded"][class*="border"]::before {
-  content: ""; position: absolute; inset: 0; pointer-events: none;
-  background-image: radial-gradient(hsl(var(--ink) / 0.18) 1px, transparent 1.5px);
-  background-size: 5px 5px;
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
-/* Diagonal ink slash in corner of every panel */
+[class*="rounded"][class*="border"]::before,
 .rounded-lg.border::after, .rounded-md.border::after, .rounded-xl.border::after,
 [class*="rounded"][class*="border"]::after {
-  content: ""; position: absolute; top: -8px; right: -30px;
-  width: 80px; height: 18px;
-  background: hsl(var(--blood));
-  border: 2px solid hsl(var(--ink));
-  transform: rotate(35deg);
-  pointer-events: none;
+  content: none !important;
 }
 
-/* Force foreground text inside panels to ink so it reads on paper */
-.rounded-lg.border *, .rounded-md.border *, .rounded-xl.border *,
-[class*="rounded"][class*="border"] * {
-  color: hsl(var(--ink));
-  border-color: hsl(var(--ink) / 0.7);
-}
-.rounded-lg.border .text-muted-foreground,
-.rounded-md.border .text-muted-foreground,
-[class*="rounded"][class*="border"] .text-muted-foreground {
-  color: hsl(var(--ink) / 0.65) !important;
-}
-
-/* Headings inside panels = giant comic typography */
-.rounded-lg.border h1, .rounded-md.border h1, [class*="rounded"][class*="border"] h1,
-.rounded-lg.border h2, .rounded-md.border h2, [class*="rounded"][class*="border"] h2,
-.rounded-lg.border h3, .rounded-md.border h3, [class*="rounded"][class*="border"] h3 {
-  font-family: "Anton","Bebas Neue","Impact",sans-serif !important;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: hsl(var(--ink));
-  text-shadow: 3px 3px 0 hsl(var(--blood));
-  line-height: 0.95;
-}
-
-/* Buttons → inked stamps */
+/* Buttons — restrained, no acid colors, no big shadows */
 button, .btn, [role="button"] {
-  border-radius: 2px !important;
-  border: 2.5px solid hsl(var(--ink)) !important;
-  background: hsl(var(--acid)) !important;
-  color: hsl(var(--ink)) !important;
-  font-family: "Anton","Impact",sans-serif !important;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  box-shadow: 4px 4px 0 0 hsl(var(--ink)) !important;
-  transition: transform .08s ease, box-shadow .08s ease, background .15s;
+  border-radius: 0.375rem !important;
+  font-family: inherit !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  box-shadow: none !important;
 }
-button:hover, [role="button"]:hover { transform: translate(-1px,-1px); box-shadow: 6px 6px 0 0 hsl(var(--ink)) !important; }
-button:active, [role="button"]:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 0 hsl(var(--ink)) !important; }
-button[data-variant="destructive"], button.destructive { background: hsl(var(--blood)) !important; color: hsl(var(--paper)) !important; }
-button[data-variant="ghost"], button.ghost { background: transparent !important; box-shadow: none !important; }
 
-/* Inputs — typewriter slips */
+/* Inputs — quiet dark fields */
 input, textarea, select {
-  border-radius: 2px !important;
-  border: 2.5px solid hsl(var(--ink)) !important;
-  background: hsl(var(--paper)) !important;
-  color: hsl(var(--ink)) !important;
-  font-family: "Special Elite","Courier New",monospace !important;
-  box-shadow: 3px 3px 0 0 hsl(var(--ink)) !important;
+  border-radius: 0.375rem !important;
+  border: 1px solid hsl(var(--border)) !important;
+  background: hsl(var(--input)) !important;
+  color: hsl(var(--foreground)) !important;
+  font-family: inherit !important;
+  box-shadow: none !important;
 }
-input::placeholder, textarea::placeholder { color: hsl(var(--ink) / 0.5) !important; }
+input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground)) !important; }
 
-/* Top-level page headings get a giant comic title treatment */
-h1 {
-  font-family: "Anton","Bebas Neue","Impact",sans-serif !important;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  color: hsl(var(--paper));
-  text-shadow:
-    3px 3px 0 hsl(var(--ink)),
-    6px 6px 0 hsl(var(--blood)),
-    0 0 24px hsl(var(--acid) / 0.4);
-  line-height: 0.92;
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
 }
-h2 {
-  font-family: "Anton","Impact",sans-serif !important;
-  text-transform: uppercase;
-  color: hsl(var(--paper));
-  text-shadow: 2px 2px 0 hsl(var(--ink));
-}
-
-/* Speed lines — radiating from top-left of every page main container */
-main, [role="main"], .min-h-screen {
-  position: relative;
-}
-main::before, [role="main"]::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background:
-    repeating-conic-gradient(from 0deg at 8% 12%,
-      transparent 0deg 6deg,
-      hsl(var(--paper) / 0.04) 6deg 7deg);
-  mix-blend-mode: screen;
-}
-
-/* INK SPLATTERS — fixed accents across the screen */
-body > #root::after {
-  content: "";
-  position: fixed; pointer-events: none; z-index: 1;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 92% 14%, hsl(var(--ink)) 0 6px, transparent 7px),
-    radial-gradient(circle at 95% 12%, hsl(var(--ink)) 0 3px, transparent 4px),
-    radial-gradient(circle at 90% 18%, hsl(var(--ink)) 0 2px, transparent 3px),
-    radial-gradient(circle at 4% 88%, hsl(var(--blood)) 0 8px, transparent 9px),
-    radial-gradient(circle at 8% 92%, hsl(var(--blood)) 0 3px, transparent 4px),
-    radial-gradient(circle at 12% 86%, hsl(var(--blood)) 0 4px, transparent 5px);
-  opacity: 0.75;
-}
-
-/* Comic "POW" flash — appears intermittently */
-@keyframes pow-flash {
-  0%,96%,100% { opacity: 0; transform: scale(0.6) rotate(-8deg); }
-  97%,99% { opacity: 1; transform: scale(1) rotate(-8deg); }
-}
-body::after {
-  /* override Riddler "?" with KAPOW burst star */
-  content: "POW!";
-  font-family: "Anton","Bangers","Impact",sans-serif !important;
-  font-size: clamp(80px, 18vw, 240px) !important;
-  color: hsl(var(--acid)) !important;
-  -webkit-text-stroke: 4px hsl(var(--ink));
-  text-shadow:
-    8px 8px 0 hsl(var(--blood)),
-    12px 12px 0 hsl(var(--ink)) !important;
-  display: flex; align-items: center; justify-content: center;
-  animation: pow-flash 11s ease-in-out infinite !important;
-  z-index: 3 !important;
-}
-
-/* Asymmetric tilt for first few panels on every screen — break the grid */
-main > * > .grid > :nth-child(3n+1),
-main > * > .grid > :nth-child(3n+2) {
-  transform: rotate(-0.6deg);
-}
-main > * > .grid > :nth-child(3n) {
-  transform: rotate(0.5deg);
-}
-
-/* Animated panel slam-in */
-@keyframes panel-slam {
-  0%   { transform: translateY(-30px) rotate(-3deg) scale(0.95); opacity: 0; }
-  60%  { transform: translateY(6px) rotate(0.6deg) scale(1.02); opacity: 1; }
-  100% { transform: translateY(0) rotate(-0.4deg) scale(1); opacity: 1; }
-}
-.rounded-lg.border, .rounded-md.border, .rounded-xl.border {
-  animation: panel-slam .55s cubic-bezier(.2,.9,.25,1.2) both;
-}
-
-/* WHIP-PAN page transition — applied on route container */
-@keyframes whip-pan {
-  0%   { transform: translateX(-12vw) skewX(8deg); filter: blur(6px); opacity: 0; }
-  40%  { transform: translateX(2vw) skewX(-2deg); filter: blur(2px); opacity: 1; }
-  100% { transform: translateX(0) skewX(0); filter: blur(0); opacity: 1; }
-}
-#root > * { animation: whip-pan .45s cubic-bezier(.2,.8,.2,1) both; }
-
-/* Fonts — load comic essentials */
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Special+Elite&display=swap');
