@@ -85,6 +85,7 @@ export default function Draft() {
   } = useDraftStore();
   const strategy = getStrategy(strategyId);
   const [planGenerating, setPlanGenerating] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
   const [takesQuery, setTakesQuery] = useState("");
