@@ -523,16 +523,9 @@ Keep it tight. No fluff, no closing line.`;
     : null;
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-background pb-24">
-      <header className="sticky top-0 z-20 border-b border-border/60 bg-card/85 backdrop-blur-md">
-        <div className="mx-auto flex w-full max-w-7xl min-w-0 items-center justify-between gap-3 px-3 py-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-md bg-primary/10 ring-1 ring-primary/30">
-              <img src={coachBotImg} alt="Matthew Berry" className="h-full w-full object-cover" />
-            </div>
-            <h1 className="truncate text-[16px] font-semibold tracking-tight text-foreground">Draft</h1>
-          </div>
-          <div className="flex items-center gap-1">
+    <EditorialShell activeTab="Draft">
+    <div className="overflow-x-hidden bg-background pb-4">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 px-3 pt-2">
             <Button
               size="sm"
               onClick={() => navigate("/planner")}
@@ -576,9 +569,7 @@ Keep it tight. No fluff, no closing line.`;
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </div>
-        </div>
-      </header>
+      </div>
 
       <main className="mx-auto grid w-full max-w-7xl min-w-0 gap-3 overflow-x-hidden p-3 md:gap-4 md:p-4 lg:grid-cols-2">
         {/* LEFT: Input → Decision → Log */}
