@@ -48,17 +48,24 @@ const App = () => (
         <AuthProvider>
           <LockProvider>
             <Routes>
-              <Route path="/" element={<PublicGate><Index /></PublicGate>} />
+              {/* Home = Budget Planner / Decision engine */}
+              <Route path="/" element={<PublicGate><Protected><Planner /></Protected></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
+              <Route path="/setup" element={<Protected><Index /></Protected>} />
               <Route path="/draft" element={<Protected><Draft /></Protected>} />
-              <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
-              <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
-              <Route path="/planner" element={<Protected><Planner /></Protected>} />
+              <Route path="/planner" element={<Navigate to="/" replace />} />
+              <Route path="/strategy" element={<Protected><Strategy /></Protected>} />
+              <Route path="/market" element={<Protected><Market /></Protected>} />
+              <Route path="/targets" element={<Protected><Targets /></Protected>} />
+              <Route path="/coach" element={<Protected><Coach /></Protected>} />
+              <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
               {/* Legacy redirects */}
-              <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
+              <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
+              <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/" replace />} />
               <Route path="/m" element={<Navigate to="/draft" replace />} />
               <Route path="/mobile" element={<Navigate to="/draft" replace />} />
               <Route path="*" element={<NotFound />} />
