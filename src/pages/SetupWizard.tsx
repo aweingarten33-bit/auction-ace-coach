@@ -95,11 +95,20 @@ export default function SetupWizard() {
               <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
             </div>
           </div>
-          {setupComplete && (
-            <Button size="sm" onClick={() => navigate("/draft")}>
-              Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => navigate("/espn")}
+              className="bg-primary text-primary-foreground shadow-glow hover:bg-primary/90"
+            >
+              Connect ESPN
             </Button>
-          )}
+            {setupComplete && (
+              <Button size="sm" variant="outline" onClick={() => navigate("/draft")}>
+                Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
+            )}
+          </div>
         </header>
 
         <Progress value={progress} className="mb-6 h-1.5" />
@@ -107,17 +116,7 @@ export default function SetupWizard() {
         <Card className="p-5 md:p-6">
           {step === 0 && (
             <div className="space-y-6">
-              <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => navigate("/espn")}
-                >
-                  Connect ESPN
-                </Button>
-                <EspnImportButton />
-              </div>
+              <EspnImportButton />
 
               <div className="rounded-md border border-border/60 bg-secondary/30 p-3 text-xs text-muted-foreground">
                 <span className="font-semibold text-foreground">Defaults pre-filled:</span> $225 budget · Half PPR · Superflex · Keeper. Change anything below if your league differs.
