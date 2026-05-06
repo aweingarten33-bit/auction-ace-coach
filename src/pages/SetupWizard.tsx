@@ -107,7 +107,17 @@ export default function SetupWizard() {
         <Card className="p-5 md:p-6">
           {step === 0 && (
             <div className="space-y-6">
-              <EspnImportButton />
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => navigate("/espn")}
+                >
+                  Connect ESPN
+                </Button>
+                <EspnImportButton />
+              </div>
 
               <div className="rounded-md border border-border/60 bg-secondary/30 p-3 text-xs text-muted-foreground">
                 <span className="font-semibold text-foreground">Defaults pre-filled:</span> $225 budget · Half PPR · Superflex · Keeper. Change anything below if your league differs.
