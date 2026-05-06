@@ -21,7 +21,7 @@ const TAG_STYLES: Record<Tag, string> = {
 
 export default function Targets() {
   const navigate = useNavigate();
-  const { watchlist, prices, events, settings, keepers, removeFromWatchlist } = useDraftStore();
+  const { watchlist, prices, events, settings, keepers, unpinPlayer } = useDraftStore();
   const budget = computeBudget(settings, keepers, events);
   const pulse = computeMarketPulse(events, prices);
   const draftedSet = new Set(events.map((e) => norm(e.player)));
