@@ -266,11 +266,20 @@ Deno.serve(async (req: Request) => {
 
     const parsed = JSON.parse(call.function.arguments);
 
-    // Filter out any drafted names that snuck through
+    // Snap prices to deterministic going-price (sheet × market multiplier),
+    // and filter out drafted names that snuck through. The model is for picking
+    // *who* to nominate; the *price* must be deterministic so the user sees the
+    // same number on every refresh.
     if (Array.isArray(parsed?.suggestions)) {
-      parsed.suggestions = parsed.suggestions.filter(
-        (s: any) => !draftedSet.has(norm(s?.name ?? "")),
-      );
+      parsed.suggestions = parsed.suggestions
+        .filter((s: any) => !draftedSet.has(norm(s?.name ?? "")))
+        .map((s: any) => {
+          const ref = sheetMap.get(norm(s?.name ?? ""));
+          if (ref && ref.price > 0) {
+            return { ...s, price: Math.max(1, Math.round(ref.price * marketMult)) };
+          }
+          return s;
+        });
     }
 
     return new Response(JSON.stringify(parsed), {
