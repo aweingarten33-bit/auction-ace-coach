@@ -350,6 +350,69 @@ export type Database = {
         }
         Relationships: []
       }
+      sleeper_players: {
+        Row: {
+          age: number | null
+          created_at: string
+          depth_chart_order: number | null
+          id: string
+          injury_notes: string | null
+          injury_status: string | null
+          is_rookie: boolean
+          player_name: string
+          player_name_norm: string
+          pos_rank: number | null
+          position: string | null
+          projected_auction_value: number | null
+          search_rank: number | null
+          sleeper_player_id: string
+          status: string | null
+          team: string | null
+          updated_at: string
+          years_exp: number | null
+        }
+        Insert: {
+          age?: number | null
+          created_at?: string
+          depth_chart_order?: number | null
+          id?: string
+          injury_notes?: string | null
+          injury_status?: string | null
+          is_rookie?: boolean
+          player_name: string
+          player_name_norm: string
+          pos_rank?: number | null
+          position?: string | null
+          projected_auction_value?: number | null
+          search_rank?: number | null
+          sleeper_player_id: string
+          status?: string | null
+          team?: string | null
+          updated_at?: string
+          years_exp?: number | null
+        }
+        Update: {
+          age?: number | null
+          created_at?: string
+          depth_chart_order?: number | null
+          id?: string
+          injury_notes?: string | null
+          injury_status?: string | null
+          is_rookie?: boolean
+          player_name?: string
+          player_name_norm?: string
+          pos_rank?: number | null
+          position?: string | null
+          projected_auction_value?: number | null
+          search_rank?: number | null
+          sleeper_player_id?: string
+          status?: string | null
+          team?: string | null
+          updated_at?: string
+          years_exp?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
