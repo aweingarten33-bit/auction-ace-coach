@@ -436,7 +436,20 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             Showing {filtered.length} of {prices.length}
             {posFilter !== "ALL" ? ` · ${posFilter} only` : ""}
           </p>
-          <div className="max-h-[70vh] space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1" style={{ WebkitOverflowScrolling: "touch" }}>
+          {posFilter !== "ALL" && posByName.size === 0 && (
+            <div className="mb-1 rounded border border-dashed border-border/60 bg-secondary/10 px-2 py-1 text-[11px] italic text-muted-foreground">
+              Loading positions…
+            </div>
+          )}
+          {posFilter !== "ALL" && posByName.size > 0 && filtered.length === 0 && (
+            <div className="mb-1 rounded border border-dashed border-border/60 bg-secondary/10 px-2 py-1 text-[11px] italic text-muted-foreground">
+              No {posFilter} players in your price sheet.
+            </div>
+          )}
+          <div
+            className="max-h-80 space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1"
+            style={{ WebkitOverflowScrolling: "touch" }}
+          >
             {filtered.map((p) => {
               const idx = prices.findIndex((x) => x.name === p.name);
               return (
