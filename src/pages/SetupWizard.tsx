@@ -322,7 +322,6 @@ export default function SetupWizard() {
       </div>
       </div>
     </SupermanShell>
-    </EditorialShell>
 
   );
 }
