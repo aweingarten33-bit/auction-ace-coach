@@ -22,17 +22,47 @@ interface Props {
 export default function PlayerSearchPanel({ prices, events, watchlist, onPick, onPin, onUnpin }: Props) {
   const [q, setQ] = useState("");
   const [pos, setPos] = useState<"ALL" | Position>("ALL");
+  const [tier, setTier] = useState<"ALL" | number>("ALL");
 
   const draftedSet = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
   const pinnedSet = useMemo(() => new Set(watchlist.map(norm)), [watchlist]);
+
+  // Compute tier per player using positional rank within current price list.
+  const tierByName = useMemo(() => {
+    const byPos = new Map<string, PriceEstimate[]>();
+    for (const p of prices) {
+      if (!p.position) continue;
+      const arr = byPos.get(p.position) ?? [];
+      arr.push(p);
+      byPos.set(p.position, arr);
+    }
+    const m = new Map<string, number>();
+    for (const [position, arr] of byPos) {
+      arr.sort((a, b) => (b.price || 0) - (a.price || 0));
+      arr.forEach((p, i) => m.set(norm(p.name), tierForPosRank(position, i + 1)));
+    }
+    return m;
+  }, [prices]);
+
+  // Tiers available for the currently-selected position (so the chips reflect reality).
+  const availableTiers = useMemo(() => {
+    const set = new Set<number>();
+    for (const p of prices) {
+      if (pos !== "ALL" && p.position !== pos) continue;
+      const t = tierByName.get(norm(p.name));
+      if (t != null) set.add(t);
+    }
+    return [...set].sort((a, b) => a - b);
+  }, [prices, pos, tierByName]);
 
   const results = useMemo(() => {
     const qn = norm(q);
     let arr = prices;
     if (pos !== "ALL") arr = arr.filter((p) => p.position === pos);
+    if (tier !== "ALL") arr = arr.filter((p) => tierByName.get(norm(p.name)) === tier);
     if (qn) arr = arr.filter((p) => norm(p.name).includes(qn));
     return [...arr].sort((a, b) => (b.price || 0) - (a.price || 0)).slice(0, 100);
-  }, [prices, q, pos]);
+  }, [prices, q, pos, tier, tierByName]);
 
   return (
     <Card className="min-w-0 overflow-hidden p-3">
