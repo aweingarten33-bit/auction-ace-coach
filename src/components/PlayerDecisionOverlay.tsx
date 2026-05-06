@@ -48,6 +48,7 @@ export default function PlayerDecisionOverlay({
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
+        {/* Full-screen dimmer */}
         <DialogPrimitive.Overlay
           className={cn(
             "fixed inset-0 z-50 bg-black/80",
@@ -55,6 +56,10 @@ export default function PlayerDecisionOverlay({
             "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
           )}
         />
+        {/* FIX: pin to top of screen with inset-x-2 + top-4 instead of the
+            translate(-50%,-50%) centering trick. On a ~400×600 phone the centered
+            math pushes the content below the visible area. top-4 keeps it fully
+            on-screen and max-h caps it so it stays scrollable inside the viewport. */}
         <DialogPrimitive.Content
           className={cn(
             "fixed inset-x-2 top-4 z-50 mx-auto w-auto max-w-md",
@@ -67,7 +72,7 @@ export default function PlayerDecisionOverlay({
           style={{ WebkitOverflowScrolling: "touch" }}
         >
           <DialogPrimitive.Title className="sr-only">
-            Pre-draft card for {name}
+            Decision card for {name}
           </DialogPrimitive.Title>
 
           {decision ? (
