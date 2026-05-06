@@ -261,33 +261,65 @@ export default function DraftV2() {
   // ---------- render ----------
   return (
     <div className={`${theme === "light" ? "theme-light" : ""} font-manly flex h-screen flex-col bg-background text-foreground`}>
-      {/* TOP BAR */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6 text-sm">
-        <div className="flex items-center gap-3 md:gap-6 min-w-0">
-          <button onClick={() => navigate("/draft")} className="text-xs text-muted-foreground hover:text-foreground" title="Back to v1">
-            <ChevronLeft className="inline h-4 w-4" /> v1
-          </button>
-          <span className="font-mono font-semibold tabular-nums">${budget.remaining}</span>
-          <span className="font-mono text-muted-foreground tabular-nums">{budget.slotsLeft}/{budget.slotsTotal}</span>
-          {liveBid?.player && (
-            <span className="hidden md:inline truncate text-muted-foreground">
-              {liveBid.player} <span className="font-mono text-foreground">${liveBid.price}</span>
-            </span>
-          )}
+      {/* SCOREBUG TOP BAR — broadcast lower-third feel */}
+      <header className="relative flex h-16 shrink-0 items-stretch border-b-4 border-primary bg-card text-sm overflow-hidden">
+        {/* Diagonal accent stripe (Fox-broadcast feel) */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 left-0 w-2 bg-primary"
+          style={{ clipPath: "polygon(0 0, 100% 0, 60% 100%, 0 100%)" }}
+        />
+        {/* TEAM tag — like home team box */}
+        <div className="flex items-center gap-2 bg-primary text-primary-foreground px-4 ml-3" style={{ clipPath: "polygon(0 0, 100% 0, 92% 100%, 0 100%)" }}>
+          <Trophy className="h-4 w-4" strokeWidth={3} />
+          <span className="font-black uppercase tracking-widest text-[13px]">YOU</span>
         </div>
-        <div className="flex items-center gap-2">
+        {/* Score / cash on hand */}
+        <div className="flex items-center gap-1 bg-foreground text-background px-4">
+          <span className="text-[9px] font-black uppercase tracking-widest opacity-70">CASH</span>
+          <span className="font-black text-2xl tabular-nums leading-none">${budget.remaining}</span>
+        </div>
+        {/* Down & distance — slots / max bid */}
+        <div className="hidden sm:flex items-center gap-3 px-4 border-l-2 border-border">
+          <div className="flex flex-col leading-none">
+            <span className="text-[9px] font-black uppercase tracking-widest opacity-60">SPOTS</span>
+            <span className="font-black text-base tabular-nums">{budget.slotsLeft}/{budget.slotsTotal}</span>
+          </div>
+          <div className="flex flex-col leading-none">
+            <span className="text-[9px] font-black uppercase tracking-widest opacity-60">MAX</span>
+            <span className="font-black text-base tabular-nums text-primary">${budget.maxBid}</span>
+          </div>
+        </div>
+        {/* Live bid ticker (chyron) */}
+        {liveBid?.player && (
+          <div className="hidden md:flex flex-1 items-center gap-2 bg-destructive text-destructive-foreground px-4 min-w-0">
+            <span className="flex h-2 w-2 shrink-0 rounded-full bg-current animate-pulse" />
+            <span className="text-[9px] font-black uppercase tracking-widest shrink-0">ON THE BLOCK</span>
+            <span className="truncate font-bold uppercase tracking-wide">{liveBid.player}</span>
+            <span className="ml-auto font-black tabular-nums">${liveBid.price}</span>
+          </div>
+        )}
+        {/* Right-side controls */}
+        <div className="ml-auto flex items-center gap-1 px-3 border-l-2 border-border">
+          <button
+            onClick={() => navigate("/draft")}
+            className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground px-2"
+            title="v1"
+          >
+            <ChevronLeft className="inline h-3 w-3" />V1
+          </button>
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="flex h-7 w-7 items-center justify-center rounded-full border border-border text-muted-foreground hover:text-foreground"
-            title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+            className="flex h-8 w-8 items-center justify-center border-2 border-border text-muted-foreground hover:text-foreground hover:border-primary"
+            title={theme === "dark" ? "Day game" : "Night game"}
           >
             {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
           <button
             onClick={() => navigate("/planner")}
-            className="text-xs font-semibold text-primary hover:underline"
+            className="bg-primary text-primary-foreground px-3 h-8 font-black uppercase tracking-widest text-[10px] hover:opacity-90"
           >
-            Strategy
+            Playbook
           </button>
         </div>
       </header>
