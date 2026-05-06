@@ -557,11 +557,10 @@ Keep it tight. No fluff, no closing line.`;
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    // Wait for dropdown to fully unmount before opening dialog
-                    // (avoids Radix pointer-events lock that "blacks out" the screen)
-                    setTimeout(() => setResetOpen(true), 0);
+                  onClick={() => {
+                    // Let the dropdown fully close + remove its overlay before opening the dialog,
+                    // otherwise Radix leaves pointer-events:none on body and the screen looks black.
+                    setTimeout(() => setResetOpen(true), 150);
                   }}
                   className="text-destructive focus:text-destructive"
                 >
