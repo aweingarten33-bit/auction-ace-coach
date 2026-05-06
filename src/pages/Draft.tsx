@@ -34,6 +34,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
+import EditorialShell from "@/components/EditorialShell";
 import {
   computeBudget,
   countByPosition,
