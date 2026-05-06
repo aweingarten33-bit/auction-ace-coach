@@ -414,3 +414,192 @@ a:hover, button:hover { text-shadow: 0 0 8px hsl(var(--riddler-green) / 0.45); }
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.6; transform: scale(1.02); }
 }
+
+/* =====================================================================
+   COMIC CITY — surreal cartoon-noir overlay
+   Fixed full-viewport layers behind app. pointer-events: none everywhere.
+   ===================================================================== */
+.comic-city {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  overflow: hidden;
+  filter: saturate(1.3) contrast(1.05);
+}
+.comic-city > * { position: absolute; pointer-events: none; }
+
+/* SKY */
+.cc-sky {
+  inset: 0;
+  background:
+    radial-gradient(900px 600px at 80% 10%, hsl(320 95% 55% / 0.35), transparent 60%),
+    radial-gradient(800px 600px at 10% 20%, hsl(200 100% 55% / 0.30), transparent 60%),
+    radial-gradient(1200px 800px at 50% 100%, hsl(45 100% 55% / 0.18), transparent 65%),
+    linear-gradient(180deg, hsl(265 80% 14%) 0%, hsl(230 80% 8%) 55%, hsl(220 90% 4%) 100%);
+  animation: cc-sky-warp 18s ease-in-out infinite;
+}
+@keyframes cc-sky-warp {
+  0%,100% { filter: hue-rotate(0deg); transform: translateY(0); }
+  33%     { filter: hue-rotate(20deg); transform: translateY(-4px) skewY(-0.3deg); }
+  66%     { filter: hue-rotate(-15deg); transform: translateY(3px) skewY(0.4deg); }
+}
+
+.cc-moon {
+  top: 6%; right: 8%; width: 140px; height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, hsl(50 100% 88%), hsl(40 95% 60%) 60%, hsl(30 85% 35%));
+  box-shadow: 0 0 80px hsl(45 100% 60% / 0.55), inset -20px -20px 50px hsl(20 70% 20% / 0.6);
+  animation: cc-moon-pulse 7s ease-in-out infinite;
+}
+@keyframes cc-moon-pulse { 50% { box-shadow: 0 0 140px hsl(50 100% 70% / 0.8), inset -20px -20px 50px hsl(20 70% 20% / 0.6);} }
+
+.cc-stars {
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 14%, white, transparent),
+    radial-gradient(1px 1px at 28% 22%, white, transparent),
+    radial-gradient(1.5px 1.5px at 44% 8%, white, transparent),
+    radial-gradient(1px 1px at 60% 18%, white, transparent),
+    radial-gradient(1px 1px at 75% 12%, white, transparent),
+    radial-gradient(1px 1px at 88% 26%, white, transparent),
+    radial-gradient(1.5px 1.5px at 18% 30%, white, transparent),
+    radial-gradient(1px 1px at 95% 6%, white, transparent);
+  opacity: 0.7;
+  animation: cc-flicker 3.7s steps(8,end) infinite;
+}
+@keyframes cc-flicker { 0%,100%{opacity:.65} 35%{opacity:.25} 50%{opacity:.9} 70%{opacity:.4} }
+
+/* SKYLINES */
+.cc-skyline { left: 0; width: 100%; }
+.cc-skyline-far  { bottom: 0; height: 55vh; opacity: 0.85; transform-origin: 50% 100%; animation: cc-far-sway 14s ease-in-out infinite; }
+.cc-skyline-near { bottom: 0; height: 42vh; transform-origin: 50% 100%; animation: cc-near-sway 9s ease-in-out infinite; }
+@keyframes cc-far-sway { 0%,100%{transform: skewX(0)} 50%{transform: skewX(-1.2deg) translateY(2px)} }
+@keyframes cc-near-sway { 0%,100%{transform: skewX(0)} 50%{transform: skewX(1.4deg) scaleY(1.01)} }
+
+/* NEON BILLBOARDS */
+.cc-neon {
+  font-family: "Anton","Impact",sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: .25rem .75rem;
+  border-radius: 4px;
+  border: 2px solid currentColor;
+  mix-blend-mode: screen;
+  white-space: nowrap;
+}
+.cc-neon-1 { top: 18%; left: 6%;  font-size: clamp(28px,5vw,72px); color: hsl(330 100% 65%); text-shadow: 0 0 12px hsl(330 100% 65%), 0 0 32px hsl(330 100% 55%); animation: cc-neon-buzz 2.3s steps(6,end) infinite; transform: rotate(-4deg); }
+.cc-neon-2 { top: 28%; right: 8%; font-size: clamp(24px,4vw,60px); color: hsl(170 100% 55%); text-shadow: 0 0 12px hsl(170 100% 55%), 0 0 32px hsl(170 100% 50%); animation: cc-neon-buzz 1.7s steps(5,end) infinite; transform: rotate(3deg); }
+.cc-neon-3 { top: 44%; left: 12%; font-size: clamp(18px,2.6vw,36px); color: hsl(50 100% 60%); text-shadow: 0 0 10px hsl(50 100% 60%), 0 0 24px hsl(50 100% 55%); animation: cc-neon-buzz 3.1s steps(7,end) infinite; transform: rotate(2deg); }
+.cc-neon-4 { top: 52%; right: 14%; font-size: clamp(20px,3vw,42px); color: hsl(0 100% 60%); text-shadow: 0 0 10px hsl(0 100% 60%), 0 0 28px hsl(0 100% 55%); animation: cc-neon-buzz 2s steps(4,end) infinite; transform: rotate(-3deg); }
+@keyframes cc-neon-buzz {
+  0%,100% { opacity: 1; }
+  20% { opacity: 0.2; }
+  22% { opacity: 1; }
+  55% { opacity: 0.55; }
+  60% { opacity: 1; }
+  80% { opacity: 0.1; }
+  82% { opacity: 1; }
+}
+
+/* STREETLAMP POOLS */
+.cc-lamp { bottom: 0; width: 38vw; height: 60vh;
+  background: radial-gradient(ellipse at 50% 100%, hsl(45 100% 70% / 0.30), transparent 70%);
+  mix-blend-mode: screen;
+  animation: cc-flicker 4.2s steps(10,end) infinite;
+}
+.cc-lamp-1 { left: -8vw; }
+.cc-lamp-2 { left: 32vw; background: radial-gradient(ellipse at 50% 100%, hsl(195 100% 65% / 0.28), transparent 70%); animation-duration: 3.3s; }
+.cc-lamp-3 { right: -8vw; background: radial-gradient(ellipse at 50% 100%, hsl(330 100% 65% / 0.28), transparent 70%); animation-duration: 5.1s; }
+
+/* STEAM VENTS */
+.cc-steam { bottom: 0; width: 220px; height: 50vh;
+  background: radial-gradient(ellipse at 50% 100%, hsl(0 0% 100% / 0.15), transparent 70%);
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  animation: cc-steam-rise 9s ease-in-out infinite;
+}
+.cc-steam-1 { left: 18%; }
+.cc-steam-2 { left: 52%; animation-delay: -3s; animation-duration: 11s; }
+.cc-steam-3 { right: 12%; animation-delay: -6s; animation-duration: 7.5s; }
+@keyframes cc-steam-rise {
+  0%   { transform: translateY(20%) scale(0.9); opacity: 0; }
+  30%  { opacity: 0.6; }
+  100% { transform: translateY(-40%) scale(1.4); opacity: 0; }
+}
+
+/* RAIN */
+.cc-rain {
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    100deg,
+    transparent 0 6px,
+    hsl(200 100% 80% / 0.08) 6px 7px,
+    transparent 7px 14px
+  );
+  animation: cc-rain-fall 0.6s linear infinite;
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+@keyframes cc-rain-fall {
+  0% { background-position: 0 0; }
+  100% { background-position: -40px 80px; }
+}
+
+/* HALFTONE COMIC DOTS */
+.cc-halftone {
+  inset: 0;
+  background-image: radial-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1.5px);
+  background-size: 6px 6px;
+  mix-blend-mode: overlay;
+}
+
+/* FOG */
+.cc-fog { inset: -10%; opacity: 0.55; mix-blend-mode: screen; filter: blur(40px); }
+.cc-fog-a {
+  background: radial-gradient(60% 40% at 30% 80%, hsl(280 60% 40% / 0.5), transparent 70%);
+  animation: cc-fog-drift 26s ease-in-out infinite;
+}
+.cc-fog-b {
+  background: radial-gradient(50% 35% at 75% 70%, hsl(190 80% 50% / 0.45), transparent 70%);
+  animation: cc-fog-drift 34s ease-in-out infinite reverse;
+}
+@keyframes cc-fog-drift {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50%     { transform: translate(6vw,-3vh) scale(1.1); }
+}
+
+/* GLITCH / SMEAR FRAME */
+.cc-glitch {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 30%, hsl(330 100% 60% / 0.10) 30% 31%, transparent 31%),
+    linear-gradient(90deg, transparent 0 62%, hsl(180 100% 60% / 0.10) 62% 63%, transparent 63%);
+  mix-blend-mode: screen;
+  animation: cc-glitch-jump 7s steps(1,end) infinite;
+}
+@keyframes cc-glitch-jump {
+  0%,92%,100% { opacity: 0; transform: translateX(0); }
+  93% { opacity: 1; transform: translateX(-6px) skewX(2deg); }
+  94% { opacity: 1; transform: translateX(8px) skewX(-3deg); }
+  95% { opacity: 0; }
+  97% { opacity: 1; transform: translateX(-4px); }
+  98% { opacity: 0; }
+}
+
+/* SCANLINES */
+.cc-scan {
+  inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, hsl(0 0% 0% / 0.18) 2px 3px);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+/* VIGNETTE */
+.cc-vignette {
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, hsl(0 0% 0% / 0.75) 100%);
+}
+
+/* Respect motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .comic-city * { animation: none !important; }
+}
