@@ -84,7 +84,7 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <EditorialShell activeTab="Setup">
+    <EditorialShell activeCategory="Settings">
       <div className="px-4 md:px-8 pt-5">
       <div className="mx-auto max-w-2xl">
         <header className="mb-5">

@@ -523,7 +523,7 @@ Keep it tight. No fluff, no closing line.`;
     : null;
 
   return (
-    <EditorialShell activeTab="Draft">
+    <EditorialShell activeCategory="Home">
     <div className="overflow-x-hidden bg-background pb-4">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 px-3 pt-2">
             <Button
