@@ -52,7 +52,7 @@ const App = () => (
               <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
               <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
-              <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+              <Route path="/espn" element={<Protected adminOnly><EspnSettings /></Protected>} />
               {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
               {/* Legacy redirects */}
