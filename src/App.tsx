@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
 import Planner from "./pages/Planner.tsx";
+import CommandCenter from "./pages/CommandCenter.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
@@ -48,13 +49,13 @@ const App = () => (
         <AuthProvider>
           <LockProvider>
             <Routes>
-              {/* Home = Budget Planner / Decision engine */}
-              <Route path="/" element={<PublicGate><Protected><Planner /></Protected></PublicGate>} />
+              {/* Home = the cinematic Command Center */}
+              <Route path="/" element={<PublicGate><Protected><CommandCenter /></Protected></PublicGate>} />
               <Route path="/index" element={<Navigate to="/" replace />} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
               <Route path="/setup" element={<Protected><Index /></Protected>} />
               <Route path="/draft" element={<Protected><Draft /></Protected>} />
-              <Route path="/planner" element={<Navigate to="/" replace />} />
+              <Route path="/planner" element={<Protected><Planner /></Protected>} />
               <Route path="/strategy" element={<Protected><Strategy /></Protected>} />
               <Route path="/market" element={<Protected><Market /></Protected>} />
               <Route path="/targets" element={<Protected><Targets /></Protected>} />

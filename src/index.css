@@ -12,74 +12,72 @@
 
 @layer base {
   :root {
-    /* DREAMSCAPE FOOTBALL — Waking Life × What Dreams May Come ×
-       Eternal Sunshine. Wet oil paint, rotoscope wobble, paper memories
-       dissolving at the edges. Field-green stained-glass and twilight
-       petals. Soft, hand-painted, never sharp.                         */
+    /* WAR ROOM — midnight blue, graphite black, faded cream, warm gold,
+       blood orange. Neon green = value / win. Deep red = danger.
+       A football command room you'd find at 2am on draft night.       */
 
-    /* Twilight oil — bruised dusk over a stadium */
-    --background: 232 32% 11%;
-    --foreground: 38 40% 94%;
+    --background: 222 35% 7%;          /* midnight ink */
+    --foreground: 38 30% 92%;          /* faded cream */
 
-    --card: 232 28% 15%;
-    --card-foreground: 38 40% 94%;
+    --card: 222 30% 10%;
+    --card-foreground: 38 30% 92%;
+    --popover: 222 32% 9%;
+    --popover-foreground: 38 30% 92%;
 
-    --popover: 232 30% 13%;
-    --popover-foreground: 38 40% 94%;
+    /* warm gold — primary signal (the editorial brass) */
+    --primary: 38 78% 56%;
+    --primary-foreground: 222 35% 7%;
+    --primary-glow: 38 95% 65%;
 
-    /* Stadium-grass green — Vincent Ward "painted world" */
-    --primary: 138 55% 48%;
-    --primary-foreground: 232 35% 10%;
-    --primary-glow: 138 70% 60%;
+    --secondary: 222 22% 14%;
+    --secondary-foreground: 38 30% 92%;
 
-    --secondary: 232 24% 19%;
-    --secondary-foreground: 38 40% 94%;
+    --muted: 222 18% 13%;
+    --muted-foreground: 38 14% 64%;
 
-    --muted: 232 22% 17%;
-    --muted-foreground: 38 18% 72%;
+    /* blood orange — heat, contention, accent */
+    --accent: 16 88% 56%;
+    --accent-foreground: 222 35% 7%;
 
-    /* Eternal-Sunshine tangerine — that beach-house glow */
-    --accent: 18 88% 60%;
-    --accent-foreground: 232 35% 10%;
+    /* deep red — overpay / danger */
+    --destructive: 0 75% 52%;
+    --destructive-foreground: 38 30% 92%;
 
-    /* Memory rose — the petal that keeps falling */
-    --destructive: 348 75% 58%;
-    --destructive-foreground: 38 40% 94%;
-
+    /* warning amber */
     --warning: 38 92% 60%;
-    --warning-foreground: 232 35% 10%;
+    --warning-foreground: 222 35% 7%;
 
-    /* Waking-life sky-cyan — the rotoscope edge */
-    --success: 188 75% 55%;
-    --success-foreground: 232 35% 10%;
+    /* neon green — value captured / win */
+    --success: 138 75% 48%;
+    --success-foreground: 222 35% 7%;
 
-    --border: 232 22% 26%;
-    --input: 232 24% 17%;
-    --ring: 138 55% 48%;
+    --border: 222 18% 20%;
+    --input: 222 22% 13%;
+    --ring: 38 78% 56%;
 
-    --radius: 1rem;
+    --radius: 0.875rem;
 
-    --gradient-primary: linear-gradient(140deg, hsl(138 60% 55%), hsl(188 70% 50%));
-    --gradient-card: linear-gradient(160deg, hsl(232 28% 16%), hsl(232 35% 11%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(232 26% 19%), hsl(232 32% 13%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(18 70% 30%), hsl(232 35% 14%));
-    --gradient-glossy: linear-gradient(180deg, hsl(38 40% 94% / 0.10) 0%, hsl(38 40% 94% / 0) 55%);
+    --gradient-primary: linear-gradient(160deg, hsl(38 90% 60%), hsl(16 88% 56%));
+    --gradient-card:    linear-gradient(165deg, hsl(222 30% 11%), hsl(222 38% 7%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(222 22% 14%), hsl(222 30% 9%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(222 28% 13%), hsl(222 38% 7%));
+    --gradient-glossy:  linear-gradient(180deg, hsl(38 30% 92% / 0.07), transparent 55%);
 
-    --shadow-glow: 0 0 0 1px hsl(138 60% 55% / 0.4), 0 0 56px -8px hsl(138 60% 55% / 0.55);
-    --shadow-aqua: 0 14px 40px -16px hsl(232 60% 4% / 0.65);
-    --shadow-card: 0 24px 60px -22px hsl(232 60% 4% / 0.65), 0 0 0 1px hsl(38 40% 94% / 0.06);
+    --shadow-glow:  0 0 0 1px hsl(38 90% 60% / 0.30), 0 0 56px -8px hsl(38 95% 60% / 0.45);
+    --shadow-aqua:  0 14px 40px -16px hsl(222 80% 2% / 0.75);
+    --shadow-card:  0 28px 64px -28px hsl(222 80% 2% / 0.85), 0 0 0 1px hsl(38 30% 92% / 0.05);
 
-    --grid-line: hsl(232 22% 22%);
-    --grid-line-strong: hsl(232 22% 30%);
+    --grid-line:        hsl(222 18% 16%);
+    --grid-line-strong: hsl(222 18% 22%);
 
-    --sidebar-background: 232 38% 9%;
-    --sidebar-foreground: 38 35% 92%;
-    --sidebar-primary: 138 55% 48%;
-    --sidebar-primary-foreground: 232 35% 10%;
-    --sidebar-accent: 232 24% 17%;
-    --sidebar-accent-foreground: 38 35% 92%;
-    --sidebar-border: 232 22% 24%;
-    --sidebar-ring: 138 55% 48%;
+    --sidebar-background: 222 38% 6%;
+    --sidebar-foreground: 38 28% 90%;
+    --sidebar-primary: 38 78% 56%;
+    --sidebar-primary-foreground: 222 35% 7%;
+    --sidebar-accent: 222 22% 13%;
+    --sidebar-accent-foreground: 38 28% 90%;
+    --sidebar-border: 222 18% 18%;
+    --sidebar-ring: 38 78% 56%;
   }
 
   .dark {
@@ -387,24 +385,27 @@
   }
 
   /* ---------- BACKDROPS ---------- */
-  /* Twilight oil — bruised dusk, the Vincent Ward painted world */
-  .dream-sky {
+  /* War room — midnight ink with brass-gold lamp glow + blood-orange contention */
+  .dream-sky, .room-bg {
     background:
-      radial-gradient(ellipse at 22% 18%, hsl(18 80% 55% / 0.30) 0%, transparent 45%),
-      radial-gradient(ellipse at 80% 12%, hsl(348 70% 55% / 0.22) 0%, transparent 50%),
-      radial-gradient(ellipse at 60% 95%, hsl(138 65% 35% / 0.30) 0%, transparent 55%),
-      radial-gradient(ellipse at 8% 80%, hsl(188 70% 45% / 0.20) 0%, transparent 50%),
-      linear-gradient(170deg, hsl(232 38% 12%) 0%, hsl(232 45% 7%) 100%);
+      radial-gradient(ellipse at 18% 12%, hsl(38 90% 55% / 0.16) 0%, transparent 40%),
+      radial-gradient(ellipse at 82% 18%, hsl(16 88% 50% / 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 60% 100%, hsl(0 75% 35% / 0.18) 0%, transparent 60%),
+      linear-gradient(170deg, hsl(222 38% 9%) 0%, hsl(222 50% 5%) 100%);
   }
-  /* Stadium-grass field, soft-painted */
+  /* Faint blueprint grid — the strategist's desk */
+  .room-grid {
+    background-image:
+      linear-gradient(hsl(38 30% 92% / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(38 30% 92% / 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
   .field-paint {
     background:
-      radial-gradient(ellipse at 50% 40%, hsl(138 60% 42%) 0%, hsl(138 55% 28%) 50%, hsl(138 65% 16%) 100%);
+      radial-gradient(ellipse at 50% 40%, hsl(138 60% 30%) 0%, hsl(138 55% 18%) 60%, hsl(222 50% 8%) 100%);
   }
-  /* Eternal Sunshine beach */
   .beach-paint {
-    background:
-      radial-gradient(ellipse at 50% 30%, hsl(38 75% 75%) 0%, hsl(18 70% 55%) 60%, hsl(348 55% 35%) 100%);
+    background: radial-gradient(ellipse at 50% 30%, hsl(38 70% 55%), hsl(16 75% 45%) 70%, hsl(222 50% 10%) 100%);
   }
 
   /* ---------- WET PAINT / OIL SMEAR ---------- */
@@ -676,3 +677,90 @@
   .splatter { position: absolute; border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%; filter: blur(20px); }
 }
 
+
+/* ============================================================
+   WAR ROOM — cinematic football auction OS
+   Two motion modes: idle (calm breathing) + urgent (bid pressure)
+   ============================================================ */
+@layer utilities {
+  /* TYPE */
+  .room-display { font-family: "Playfair Display", Georgia, serif; font-weight: 900; letter-spacing: -0.025em; line-height: 0.95; }
+  .room-eyebrow { font-family: "Inter", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; font-size: 10px; color: hsl(var(--muted-foreground)); }
+  .room-mono    { font-family: "JetBrains Mono", ui-monospace, monospace; font-feature-settings: "tnum"; letter-spacing: -0.01em; }
+  .room-label   { font-family: "Inter", sans-serif; font-weight: 500; letter-spacing: 0.04em; }
+
+  /* SURFACES */
+  .room-card {
+    background:
+      linear-gradient(170deg, hsl(222 30% 11% / 0.92), hsl(222 38% 7% / 0.95));
+    border: 1px solid hsl(38 30% 92% / 0.08);
+    border-radius: 0.875rem;
+    backdrop-filter: blur(14px) saturate(135%);
+    -webkit-backdrop-filter: blur(14px) saturate(135%);
+    box-shadow:
+      0 1px 0 hsl(38 30% 92% / 0.04) inset,
+      0 22px 44px -22px hsl(222 90% 2% / 0.85),
+      0 0 0 1px hsl(0 0% 0% / 0.2);
+  }
+  .room-card-lift {
+    box-shadow:
+      0 1px 0 hsl(38 30% 92% / 0.05) inset,
+      0 30px 60px -24px hsl(222 90% 2% / 0.95),
+      0 0 0 1px hsl(38 80% 55% / 0.10),
+      0 0 60px -10px hsl(38 90% 55% / 0.18);
+  }
+  .room-divider { height: 1px; background: linear-gradient(90deg, transparent, hsl(38 30% 92% / 0.18), transparent); }
+
+  /* HEAT TONES */
+  .heat-good   { color: hsl(138 75% 55%); }
+  .heat-fair   { color: hsl(38 90% 60%); }
+  .heat-warn   { color: hsl(16 88% 58%); }
+  .heat-bad    { color: hsl(0 78% 58%); }
+  .bg-good     { background: hsl(138 75% 48% / 0.14); border: 1px solid hsl(138 75% 48% / 0.35); }
+  .bg-fair     { background: hsl(38 90% 60% / 0.14);  border: 1px solid hsl(38 90% 60% / 0.35); }
+  .bg-warn     { background: hsl(16 88% 58% / 0.14);  border: 1px solid hsl(16 88% 58% / 0.4); }
+  .bg-bad      { background: hsl(0 78% 58% / 0.14);   border: 1px solid hsl(0 78% 58% / 0.4); }
+
+  /* IDLE — calm breathing */
+  @keyframes room-breathe {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%      { transform: scale(1.008); opacity: 0.97; }
+  }
+  .room-breathe { animation: room-breathe 6s ease-in-out infinite; }
+
+  /* URGENT — bid pressure */
+  @keyframes pressure-flicker {
+    0%, 100% { box-shadow: 0 0 0 1px hsl(0 78% 58% / 0.5), 0 0 32px hsl(0 78% 58% / 0.45); }
+    47%      { box-shadow: 0 0 0 1px hsl(16 88% 58% / 0.6), 0 0 48px hsl(16 88% 58% / 0.55); }
+    52%      { box-shadow: 0 0 0 1px hsl(0 78% 58% / 0.4), 0 0 22px hsl(0 78% 58% / 0.35); }
+  }
+  .pressure { animation: pressure-flicker 1.4s ease-in-out infinite; }
+
+  @keyframes value-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px hsl(138 75% 48% / 0.45), 0 0 24px hsl(138 75% 48% / 0.35); }
+    50%      { box-shadow: 0 0 0 1px hsl(138 75% 55% / 0.65), 0 0 56px hsl(138 75% 55% / 0.55); }
+  }
+  .value-glow { animation: value-pulse 3.4s ease-in-out infinite; }
+
+  @keyframes bid-tick {
+    0%   { transform: translateY(8px); opacity: 0; }
+    40%  { transform: translateY(-2px); opacity: 1; }
+    100% { transform: translateY(0);   opacity: 1; }
+  }
+  .bid-tick { animation: bid-tick 220ms cubic-bezier(.2,.7,.3,1.2); }
+
+  /* MEMORY FADE — missed targets */
+  @keyframes memory-fade { 0%,100% { opacity: 0.55; } 50% { opacity: 0.35; } }
+  .memory-fade { animation: memory-fade 4s ease-in-out infinite; filter: grayscale(0.4) blur(0.2px); }
+
+  /* TICKER — recent sales */
+  @keyframes room-ticker { from { transform: translateX(0);} to { transform: translateX(-50%);} }
+  .room-ticker { animation: room-ticker 38s linear infinite; }
+
+  /* BURNT EDGES — newspaper feel */
+  .editorial-rule { border-top: 1px solid hsl(38 30% 92% / 0.18); border-bottom: 3px double hsl(38 30% 92% / 0.18); padding: 8px 0; }
+  .editorial-kicker { font-family: "Playfair Display", Georgia, serif; font-style: italic; color: hsl(38 78% 56%); }
+
+  /* PRESSURE BAR */
+  .pressure-bar { background: linear-gradient(90deg, hsl(138 75% 48%), hsl(38 90% 58%) 50%, hsl(0 78% 58%)); }
+}
