@@ -38,7 +38,7 @@ export default function NominationCard({ drain: _drain, get: _get, aiSuggestions
 
       {/* AI SUGGESTIONS */}
       {(onAskAi || aiSuggestions?.length) && (
-        <div className="mt-2 rounded-md border border-border bg-secondary/30 p-2.5">
+        <div className="rounded-md border border-border bg-secondary/30 p-2.5">
           <div className="flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5 text-foreground" />
             <p className="text-[9px] font-bold uppercase tracking-widest text-foreground">
