@@ -568,7 +568,16 @@ Keep it tight. No fluff, no closing line.`;
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
+            <AlertDialog
+              open={resetOpen}
+              onOpenChange={(o) => {
+                setResetOpen(o);
+                if (!o) {
+                  // Belt-and-suspenders: clear any leftover pointer-events lock
+                  setTimeout(() => { document.body.style.pointerEvents = ""; }, 200);
+                }
+              }}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Reset draft?</AlertDialogTitle>
