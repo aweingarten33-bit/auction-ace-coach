@@ -84,20 +84,18 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <EditorialShell activeTab="Setup">
+      <div className="px-4 md:px-8 pt-5">
       <div className="mx-auto max-w-2xl">
-        <header className="mb-6 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
-              <Trophy className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold">Draft Setup</h1>
-              <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
-            </div>
-          </div>
+        <header className="mb-5">
+          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+            Draft Setup · Step {step + 1} of {STEPS.length}
+          </p>
+          <h2 className="mt-1 text-2xl font-bold tracking-tight" style={{ fontFamily: '"Playfair Display", Georgia, serif' }}>
+            {STEPS[step]}
+          </h2>
           {setupComplete && (
-            <Button size="sm" onClick={() => navigate("/draft")}>
+            <Button size="sm" variant="outline" className="mt-3" onClick={() => navigate("/draft")}>
               Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           )}
