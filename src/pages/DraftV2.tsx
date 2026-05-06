@@ -260,7 +260,7 @@ export default function DraftV2() {
 
   // ---------- render ----------
   return (
-    <div className={`${theme === "light" ? "theme-light" : ""} flex h-screen flex-col bg-background text-foreground`}>
+    <div className={`${theme === "light" ? "theme-light" : ""} font-manly flex h-screen flex-col bg-background text-foreground`}>
       {/* TOP BAR */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-3 md:px-6 text-sm">
         <div className="flex items-center gap-3 md:gap-6 min-w-0">
