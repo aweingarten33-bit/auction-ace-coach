@@ -2,7 +2,7 @@
 // Three vertical zones (input → decision → context) on mobile,
 // two-column grid on md+, with the coach accessible from a Sheet (FAB).
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import CoachMessage from "@/components/CoachMessage";
 import { parseBidQuery } from "@/lib/bid-query";
@@ -66,6 +66,7 @@ import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import DecisionCard from "@/components/DecisionCard";
 import NominationCard from "@/components/NominationCard";
+import DraftPlanCard from "@/components/DraftPlanCard";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
@@ -76,6 +77,7 @@ import { getStrategy } from "@/lib/strategies";
 
 export default function Draft() {
   const navigate = useNavigate();
+  const location = useLocation();
   const {
     settings, keepers, prices, events, setupComplete, watchlist, dismissed,
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
@@ -105,12 +107,32 @@ export default function Draft() {
   const [openMan, setOpenMan] = useState<string | undefined>(undefined);
   const [manualOpen, setManualOpen] = useState(false);
   const [aiNoms, setAiNoms] = useState<import("@/components/NominationCard").AiNomination[]>([]);
+  const [researchTab, setResearchTab] = useState("targets");
 
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
 
   useEffect(() => {
-    if (!setupComplete) navigate("/");
-  }, [setupComplete, navigate]);
+    const hash = location.hash.replace("#", "");
+    const params = new URLSearchParams(location.search);
+    if (params.has("coach")) setCoachOpen(true);
+    if (["market", "heat", "opponents", "runs", "trends", "log"].includes(hash)) setResearchTab("market");
+    if (["targets", "upnext", "watchlist", "queue", "sleepers"].includes(hash)) setResearchTab("targets");
+    if (["analyst", "vetri"].includes(hash)) setResearchTab("vetri");
+    if (hash) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => document.getElementById(hash)?.scrollIntoView({ block: "start" }));
+      });
+    }
+  }, [location.hash, location.search]);
+
+  const activeCategory = useMemo(() => {
+    const hash = location.hash.replace("#", "");
+    if (["plan", "roster", "tiers", "nominate"].includes(hash)) return "Strategy";
+    if (["market", "heat", "opponents", "runs", "trends", "log"].includes(hash)) return "Market";
+    if (["targets", "upnext", "watchlist", "queue", "sleepers"].includes(hash)) return "Targets";
+    if (location.search.includes("coach=")) return "Coach";
+    return "Home";
+  }, [location.hash, location.search]);
 
   const budget = useMemo(() => computeBudget(settings, keepers, events), [settings, keepers, events]);
 
