@@ -441,7 +441,16 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
               const idx = prices.findIndex((x) => x.name === p.name);
               return (
                 <div key={p.name} className="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-secondary/60">
-                  <span className="flex-1 truncate font-medium">{p.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pos = posByName.get(p.name.toLowerCase()) as Position | undefined;
+                      setDetailFor({ name: p.name, position: pos, price: p.price });
+                    }}
+                    className="flex-1 truncate text-left font-medium hover:text-primary hover:underline"
+                  >
+                    {p.name}
+                  </button>
                   <span className="text-xs text-muted-foreground">$</span>
                   <Input
                     type="number"
