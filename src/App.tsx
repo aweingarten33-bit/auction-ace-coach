@@ -10,6 +10,11 @@ import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
+import Strategy from "./pages/Strategy.tsx";
+import Market from "./pages/Market.tsx";
+import Targets from "./pages/Targets.tsx";
+import Coach from "./pages/Coach.tsx";
+import SettingsPage from "./pages/Settings.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 
