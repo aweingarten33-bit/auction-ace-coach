@@ -523,7 +523,7 @@ Keep it tight. No fluff, no closing line.`;
     : null;
 
   return (
-    <EditorialShell activeTab="Draft">
+    <EditorialShell activeCategory="Home">
     <div className="overflow-x-hidden bg-background pb-4">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 px-3 pt-2">
             <Button
@@ -545,7 +545,7 @@ Keep it tight. No fluff, no closing line.`;
                   <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
                     <Download className="mr-2 h-4 w-4" /> Export CSV
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
+                  <DropdownMenuItem onClick={() => navigate("/setup?step=0")}>
                     <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
