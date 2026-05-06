@@ -16,13 +16,15 @@ import { LockProvider, useLock } from "@/hooks/useLock";
 
 const queryClient = new QueryClient();
 
-function Protected({ children, allowWhenLocked = false }: { children: JSX.Element; allowWhenLocked?: boolean }) {
+function Protected({ children, allowWhenLocked = false, adminOnly = false }: { children: JSX.Element; allowWhenLocked?: boolean; adminOnly?: boolean }) {
   const { user, loading } = useAuth();
   const { locked, isAdmin, loading: lockLoading } = useLock();
   if (loading || lockLoading) return null;
   if (!user) return <Navigate to="/auth" replace />;
   // Site-wide lock — show fake 404 to non-admins (admins always get through)
   if (locked && !isAdmin && !allowWhenLocked) return <NotFound />;
+  // Admin-only routes — show 404 to non-admins
+  if (adminOnly && !isAdmin) return <NotFound />;
   return children;
 }
 
@@ -50,7 +52,7 @@ const App = () => (
               <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
               <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
-              <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+              <Route path="/espn" element={<Protected adminOnly><EspnSettings /></Protected>} />
               {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
               {/* Legacy redirects */}
