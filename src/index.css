@@ -12,67 +12,66 @@
 
 @layer base {
   :root {
-    /* NYT-style editorial: matte near-black, monochrome, typography-first. */
-    --background: 0 0% 6%;
-    --foreground: 0 0% 96%;
+    /* VIP suite: paper-white, generous air, ink-black type, one gold accent. */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 8%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 210 15% 92%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
 
-    --popover: 220 14% 12%;
-    --popover-foreground: 210 15% 94%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
 
-    /* Restrained, professional palette: a single muted gold accent. */
-    --primary: 40 35% 70%;
-    --primary-foreground: 220 20% 10%;
-    --primary-glow: 40 35% 75%;
+    /* Single restrained champagne-gold accent — used sparingly. */
+    --primary: 38 38% 48%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 38 45% 60%;
 
-    --secondary: 220 12% 15%;
-    --secondary-foreground: 210 15% 92%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 12%;
 
-    --muted: 220 12% 14%;
-    --muted-foreground: 215 10% 65%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 42%;
 
-    /* Accent intentionally matches foreground so stray accent uses stay neutral. */
-    --accent: 210 15% 92%;
-    --accent-foreground: 220 20% 10%;
+    --accent: 0 0% 8%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 90% 70%;
+    --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning: 40 35% 70%;
-    --warning-foreground: 220 20% 10%;
+    --warning: 38 38% 48%;
+    --warning-foreground: 0 0% 100%;
 
-    --success: 150 25% 55%;
+    --success: 150 30% 38%;
     --success-foreground: 0 0% 100%;
 
-    --border: 220 12% 18%;
-    --input: 220 12% 14%;
-    --ring: 40 35% 70%;
+    --border: 0 0% 92%;
+    --input: 0 0% 96%;
+    --ring: 38 38% 48%;
 
-    --radius: 0.375rem;
+    --radius: 0.25rem;
 
-    --gradient-primary: linear-gradient(180deg, hsl(40 35% 70%), hsl(40 30% 62%));
-    --gradient-card: linear-gradient(180deg, hsl(220 14% 12%), hsl(220 14% 10%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(220 12% 16%), hsl(220 14% 11%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(220 14% 13%), hsl(220 15% 9%));
-    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.03) 0%, hsl(0 0% 100% / 0) 50%);
+    --gradient-primary: linear-gradient(180deg, hsl(38 38% 52%), hsl(38 38% 44%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 99%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(0 0% 99%), hsl(0 0% 96%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 0% / 0.02) 0%, hsl(0 0% 0% / 0) 50%);
 
-    --shadow-glow: 0 0 0 1px hsl(40 35% 70% / 0.25);
-    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 2px hsl(0 0% 0% / 0.5);
-    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -12px hsl(0 0% 0% / 0.6);
+    --shadow-glow: 0 0 0 1px hsl(38 38% 48% / 0.18);
+    --shadow-aqua: 0 1px 0 hsl(0 0% 100%) inset, 0 1px 2px hsl(0 0% 0% / 0.04);
+    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.04), 0 12px 32px -16px hsl(0 0% 0% / 0.08);
 
-    --grid-line: hsl(220 12% 14%);
-    --grid-line-strong: hsl(220 12% 17%);
+    --grid-line: hsl(0 0% 95%);
+    --grid-line-strong: hsl(0 0% 90%);
 
-    --sidebar-background: 220 15% 7%;
-    --sidebar-foreground: 210 15% 88%;
-    --sidebar-primary: 40 35% 70%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 220 12% 14%;
-    --sidebar-accent-foreground: 210 15% 92%;
-    --sidebar-border: 220 12% 16%;
-    --sidebar-ring: 40 35% 70%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 12%;
+    --sidebar-primary: 38 38% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 12%;
+    --sidebar-border: 0 0% 92%;
+    --sidebar-ring: 38 38% 48%;
   }
 
   .dark {
