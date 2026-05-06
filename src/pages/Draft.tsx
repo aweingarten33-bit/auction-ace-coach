@@ -795,38 +795,46 @@ Keep it tight. No fluff, no closing line.`;
               <TabsTrigger value="vetri" className="text-[11px]">Analyst</TabsTrigger>
             </TabsList>
             <TabsContent value="targets" className="mt-3 space-y-4">
-              <UpNextQueue
-                targets={queue}
-                openMan={openMan}
-                loading={targetsMutation.isPending}
-                empty={!queue.length}
-                pulseMultiplier={pulse.multiplier}
-                pulseConfident={pulse.confident}
-                watchlist={watchlist}
-                onRefresh={refreshQueue}
-                onPick={handlePickFromQueue}
-                onPin={handlePin}
-                onUnpin={handleUnpin}
-                onDismiss={handleDismiss}
-                valueFor={valueFor}
-                whatIfFor={whatIfFor}
-              />
-              <Watchlist
-                watchlist={watchlist}
-                onUnpin={handleUnpin}
-                onLoad={handleLoadFromWatchlist}
-                valueFor={valueFor}
-                maxBid={budget.maxBid}
-              />
+              <div id="upnext" className="scroll-mt-28">
+                <UpNextQueue
+                  targets={queue}
+                  openMan={openMan}
+                  loading={targetsMutation.isPending}
+                  empty={!queue.length}
+                  pulseMultiplier={pulse.multiplier}
+                  pulseConfident={pulse.confident}
+                  watchlist={watchlist}
+                  onRefresh={refreshQueue}
+                  onPick={handlePickFromQueue}
+                  onPin={handlePin}
+                  onUnpin={handleUnpin}
+                  onDismiss={handleDismiss}
+                  valueFor={valueFor}
+                  whatIfFor={whatIfFor}
+                />
+              </div>
+              <div id="watchlist" className="scroll-mt-28">
+                <Watchlist
+                  watchlist={watchlist}
+                  onUnpin={handleUnpin}
+                  onLoad={handleLoadFromWatchlist}
+                  valueFor={valueFor}
+                  maxBid={budget.maxBid}
+                />
+              </div>
             </TabsContent>
             <TabsContent value="market" className="mt-3 space-y-4">
-              <MarketHeat
-                events={events} prices={prices}
-                gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
-                maxBid={budget.maxBid} remaining={budget.remaining}
-                pulseMultiplier={pulse.multiplier}
-              />
-              <OpponentHeatmap settings={settings} />
+              <div id="heat" className="scroll-mt-28">
+                <MarketHeat
+                  events={events} prices={prices}
+                  gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
+                  maxBid={budget.maxBid} remaining={budget.remaining}
+                  pulseMultiplier={pulse.multiplier}
+                />
+              </div>
+              <div id="opponents" className="scroll-mt-28">
+                <OpponentHeatmap settings={settings} />
+              </div>
             </TabsContent>
             <TabsContent value="vetri" className="mt-3 space-y-3 min-w-0 overflow-hidden">
               <Card className="min-w-0 overflow-hidden p-3">
