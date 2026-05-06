@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Calculator, Compass, Activity, Target, Bot, Plus, Mic, MessageSquare } from "lucide-react";
+import { Calculator, Search, Bot, Star } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -18,12 +18,12 @@ const CATEGORIES = [
   { label: "Settings", to: "/settings" },
 ];
 
-// Mobile bottom dock = quick ACTIONS, not category mirrors.
+// Bottom dock = research shortcuts. ESPN handles actual picks/nominations.
 const QUICK_ACTIONS = [
-  { label: "Plan", icon: Calculator, to: "/" },
-  { label: "Log Pick", icon: Plus, to: "/draft" },
-  { label: "Nominate", icon: Mic, to: "/coach?q=nominate" },
-  { label: "Ask Coach", icon: MessageSquare, to: "/coach" },
+  { label: "Planner", icon: Calculator, to: "/" },
+  { label: "Look Up", icon: Search, to: "/targets" },
+  { label: "Watchlist", icon: Star, to: "/targets" },
+  { label: "Ask Coach", icon: Bot, to: "/coach" },
 ];
 
 export default function EditorialShell({
