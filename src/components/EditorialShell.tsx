@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Calculator, Search, Bot, Star, Home, Settings as SettingsIcon, Target, TrendingUp, Compass, X } from "lucide-react";
 
@@ -9,39 +9,24 @@ interface Props {
 }
 
 const SECTIONS = [
-  { label: "Home",     to: "/",          Icon: Home },
-  { label: "Strategy", to: "/strategy",  Icon: Compass },
-  { label: "Market",   to: "/market",    Icon: TrendingUp },
-  { label: "Targets",  to: "/targets",   Icon: Target },
-  { label: "Coach",    to: "/coach",     Icon: Bot },
-  { label: "Settings", to: "/settings",  Icon: SettingsIcon },
-];
-
-const QUICK = [
-  { label: "Planner",  to: "/",                  Icon: Calculator },
-  { label: "Scout",    to: "/draft#upnext",      Icon: Search },
-  { label: "Watch",    to: "/draft#watchlist",   Icon: Star },
+  { label: "Home",     to: "/",          Icon: Home,         hue: "amber" },
+  { label: "Strategy", to: "/strategy",  Icon: Compass,      hue: "grass" },
+  { label: "Market",   to: "/market",    Icon: TrendingUp,   hue: "rose" },
+  { label: "Targets",  to: "/targets",   Icon: Target,       hue: "cyan" },
+  { label: "Coach",    to: "/coach",     Icon: Bot,          hue: "amber" },
+  { label: "Settings", to: "/settings",  Icon: SettingsIcon, hue: "grass" },
 ];
 
 export default function EditorialShell({
   children,
-  masthead = "The Daily Planet",
   activeCategory,
 }: Props) {
   const navigate = useNavigate();
   const loc = useLocation();
-  const [signalOpen, setSignalOpen] = useState(false);
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
 
-  // Issue date — Daily Planet front-page banner
-  const today = new Date();
-  const dateStr = today.toLocaleDateString("en-US", {
-    weekday: "long", month: "long", day: "numeric", year: "numeric",
-  }).toUpperCase();
-
-  // Close on escape
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSignalOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
@@ -52,91 +37,47 @@ export default function EditorialShell({
     return loc.pathname.startsWith(to);
   };
 
-  // Radial geometry — fan above the FAB
+  // radial geometry for the dream-orb menu
   const radius = 130;
-  const startAngle = -170; // degrees
+  const startAngle = -170;
   const endAngle = -10;
   const step = (endAngle - startAngle) / (SECTIONS.length - 1);
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground flex flex-col antialiased gotham-sky">
-      {/* ===================== MASTHEAD — Daily Planet front page ===================== */}
-      <header className="relative overflow-hidden border-b-[3px] border-foreground">
-        <div className="absolute inset-0 deco-rays opacity-30 pointer-events-none" />
-        <div className="absolute inset-0 grain pointer-events-none" />
+    <div className="relative min-h-screen text-foreground antialiased dream-sky overflow-x-hidden">
+      {/* Drifting paint blobs (the canvas breathes) */}
+      <div className="pointer-events-none fixed inset-0 -z-0">
+        <div className="blob drift" style={{ background: "hsl(138 70% 45%)", width: 380, height: 380, top: "10%", left: "-10%" }} />
+        <div className="blob drift-slow" style={{ background: "hsl(18 85% 55%)", width: 320, height: 320, top: "55%", right: "-12%" }} />
+        <div className="blob drift" style={{ background: "hsl(348 75% 55%)", width: 260, height: 260, bottom: "-8%", left: "20%", animationDelay: "3s" }} />
+        <div className="blob drift-slow" style={{ background: "hsl(188 80% 50%)", width: 200, height: 200, top: "30%", left: "55%", animationDelay: "5s" }} />
+      </div>
+      <div className="pointer-events-none fixed inset-0 grain -z-0" />
+      <div className="pointer-events-none fixed inset-0 vignette -z-0" />
 
-        {/* Daily Planet red banner */}
-        <div className="relative bg-destructive text-destructive-foreground">
-          <div className="absolute inset-0 halftone-red opacity-30 pointer-events-none" />
-          <div className="relative px-4 py-1 flex items-center justify-between text-stamp text-[9px] tracking-[0.3em]">
-            <span>VOL. CXII</span>
-            <span>FINAL EDITION</span>
-            <span>5¢</span>
-          </div>
-        </div>
-
-        {/* Newspaper title */}
-        <div className="relative px-4 pt-4 pb-3 text-center">
-          <p className="biz-card text-[9px] tracking-[0.5em] text-foreground/60 mb-1">
-            METROPOLIS · GOTHAM · CHICAGO
-          </p>
-          <h1
-            className="toon-display neon-yellow inline-block"
-            style={{ fontSize: "2.55rem" }}
-          >
-            {masthead}
-          </h1>
-          <div className="mt-2 flex items-center justify-center gap-3 text-stamp text-[9px] tracking-[0.32em] text-foreground/70">
-            <span className="h-px flex-1 bg-foreground/30 max-w-[70px]" />
-            <span>{dateStr}</span>
-            <span className="h-px flex-1 bg-foreground/30 max-w-[70px]" />
-          </div>
-        </div>
-
-        {/* Front-page sub-headline strip + skyline silhouette */}
-        <div className="relative h-14 border-t-2 border-foreground/80 overflow-hidden bg-background">
-          <div className="absolute inset-0 deco-rays-purple opacity-50" />
-          {/* Skyline silhouette — pure CSS rooftops */}
-          <div
-            className="absolute bottom-0 left-0 right-0 h-10"
-            style={{
-              background: "hsl(0 0% 0%)",
-              clipPath:
-                "polygon(0% 100%, 0% 60%, 5% 60%, 5% 40%, 10% 40%, 10% 55%, 14% 55%, 14% 30%, 18% 30%, 18% 50%, 22% 50%, 22% 20%, 26% 20%, 26% 45%, 32% 45%, 32% 35%, 36% 35%, 36% 60%, 42% 60%, 42% 25%, 46% 25%, 46% 50%, 52% 50%, 52% 15%, 56% 15%, 56% 45%, 62% 45%, 62% 30%, 68% 30%, 68% 55%, 74% 55%, 74% 35%, 80% 35%, 80% 60%, 86% 60%, 86% 40%, 92% 40%, 92% 55%, 100% 55%, 100% 100%)",
-            }}
-          />
-          {/* The signal — yellow moon over the skyline */}
-          <div
-            className="absolute right-6 top-1 w-9 h-9 rounded-full bat-glow"
-            style={{
-              background: "radial-gradient(circle at 35% 35%, hsl(48 100% 75%), hsl(48 100% 50%) 65%, hsl(38 100% 38%) 100%)",
-            }}
-          />
-        </div>
-      </header>
-
-      {/* ===================== MAIN ===================== */}
-      <main className="flex-1 pb-32 relative">{children}</main>
-
-      {/* ===================== BAT-SIGNAL RADIAL NAV ===================== */}
-      {/* Backdrop overlay when open */}
-      <div
-        ref={overlayRef}
-        onClick={() => setSignalOpen(false)}
-        className={`fixed inset-0 z-40 transition-opacity duration-300 ${
-          signalOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
-        style={{
-          background:
-            "radial-gradient(circle at 50% 100%, hsl(48 100% 55% / 0.18) 0%, hsl(252 60% 6% / 0.85) 55%, hsl(252 70% 4% / 0.95) 100%)",
-          backdropFilter: "blur(2px)",
-        }}
-      >
-        <div className="absolute inset-0 deco-rays opacity-60 pointer-events-none" />
-        <div className="absolute inset-0 grain pointer-events-none" />
+      {/* Quiet signature — no masthead */}
+      <div className="relative z-10 px-5 pt-5 flex items-center justify-between">
+        <span className="dream-hand text-[11px] tracking-[0.3em] text-foreground/55 wobble-slow">
+          {activeCategory || "the field"}
+        </span>
+        <span className="dream-hand text-[10px] tracking-[0.32em] text-foreground/40">
+          a dream of football · vol. {new Date().getFullYear()}
+        </span>
       </div>
 
-      {/* Radial section buttons */}
+      <main className="relative z-10 flex-1 pb-32">{children}</main>
+
+      {/* Dream-orb radial menu */}
+      <div
+        onClick={() => setOpen(false)}
+        className={`fixed inset-0 z-40 transition-opacity duration-500 ${open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        style={{
+          background: "radial-gradient(circle at 50% 100%, hsl(38 80% 55% / 0.20) 0%, hsl(232 60% 4% / 0.85) 60%)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+        }}
+      />
+
       <div className="fixed bottom-0 inset-x-0 z-50 pointer-events-none">
         <div className="relative max-w-md mx-auto h-0">
           {SECTIONS.map((s, i) => {
@@ -145,33 +86,33 @@ export default function EditorialShell({
             const y = Math.sin(angle) * radius;
             const active = isActive(s.to, s.label);
             const Icon = s.Icon;
+            const haloClass = `halo-${s.hue}`;
             return (
               <button
                 key={s.label}
-                onClick={() => { setSignalOpen(false); navigate(s.to); }}
-                tabIndex={signalOpen ? 0 : -1}
+                onClick={() => { setOpen(false); navigate(s.to); }}
+                tabIndex={open ? 0 : -1}
                 aria-label={s.label}
-                className={`absolute left-1/2 bottom-12 pointer-events-auto transition-all duration-300 ${
-                  signalOpen ? "opacity-100 scale-100" : "opacity-0 scale-50 pointer-events-none"
+                className={`absolute left-1/2 bottom-12 pointer-events-auto transition-all duration-500 ease-out ${
+                  open ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
                 style={{
-                  transform: signalOpen
+                  transform: open
                     ? `translate(calc(-50% + ${x}px), ${y}px)`
-                    : "translate(-50%, 0)",
-                  transitionDelay: signalOpen ? `${i * 35}ms` : "0ms",
+                    : "translate(-50%, 20px)",
+                  transitionDelay: open ? `${i * 50}ms` : "0ms",
                 }}
               >
-                <div className={`flex flex-col items-center gap-1 group`}>
+                <div className="flex flex-col items-center gap-2 wobble-slow">
                   <div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center border-[2.5px] border-foreground transition-all ${
-                      active
-                        ? "bg-primary text-primary-foreground bat-glow"
-                        : "bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:scale-110"
+                    className={`w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${haloClass} ${
+                      active ? "bg-foreground/15 scale-110" : "bg-foreground/8 hover:bg-foreground/15 hover:scale-110"
                     }`}
+                    style={{ background: "hsl(38 40% 94% / 0.10)" }}
                   >
-                    <Icon className="h-6 w-6" strokeWidth={2.25} />
+                    <Icon className="h-6 w-6 text-foreground" strokeWidth={1.5} />
                   </div>
-                  <span className={`text-stamp text-[9px] tracking-[0.25em] ${active ? "spot-yellow" : "text-foreground/85"}`}>
+                  <span className="dream-hand text-[10px] tracking-[0.25em] text-foreground/85 lowercase">
                     {s.label}
                   </span>
                 </div>
@@ -181,54 +122,43 @@ export default function EditorialShell({
         </div>
       </div>
 
-      {/* Bottom action bar — quick tools + signal trigger */}
-      <nav className="fixed bottom-0 inset-x-0 z-50 border-t-[3px] border-foreground bg-foreground text-background overflow-visible">
-        <div className="absolute inset-0 deco-rays-purple opacity-50 pointer-events-none" />
-        <div className="relative max-w-md mx-auto grid grid-cols-3 items-center">
-          {/* Quick action — left */}
-          <button
-            onClick={() => navigate(QUICK[0].to)}
-            className="flex flex-col items-center justify-center gap-1 py-3 text-[9px] uppercase tracking-[0.28em] text-background/85 hover:text-primary transition-colors text-stamp"
-          >
-            <Calculator className="h-5 w-5" strokeWidth={2.25} />
-            <span>{QUICK[0].label}</span>
-          </button>
+      {/* The summon — single floating dream-orb */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+        <button
+          onClick={() => setOpen(v => !v)}
+          aria-label={open ? "close" : "summon"}
+          aria-expanded={open}
+          className="relative w-16 h-16 rounded-full flex items-center justify-center transition-transform active:scale-95 hover:scale-105 wobble-slow"
+          style={{
+            background: "radial-gradient(circle at 35% 30%, hsl(38 95% 80%), hsl(18 85% 55%) 55%, hsl(348 60% 30%) 100%)",
+            boxShadow:
+              "0 0 0 1px hsl(38 40% 94% / 0.20), 0 0 40px hsl(18 90% 55% / 0.65), 0 0 90px hsl(348 70% 50% / 0.45), 0 18px 40px -10px hsl(232 60% 4% / 0.7)",
+          }}
+        >
+          {open
+            ? <X className="h-6 w-6 text-foreground/90" strokeWidth={1.5} />
+            : <span className="dream-hand text-[11px] tracking-[0.25em] text-foreground/80 lowercase">drift</span>}
+        </button>
+      </div>
 
-          {/* SIGNAL — center */}
-          <div className="flex justify-center">
-            <button
-              onClick={() => setSignalOpen((v) => !v)}
-              aria-label={signalOpen ? "Close signal" : "Open signal"}
-              aria-expanded={signalOpen}
-              className="relative -translate-y-5 w-16 h-16 rounded-full border-[3px] border-background flex items-center justify-center transition-transform active:scale-95 hover:scale-105"
-              style={{
-                background:
-                  "radial-gradient(circle at 35% 35%, hsl(48 100% 78%), hsl(48 100% 52%) 60%, hsl(38 100% 38%) 100%)",
-                boxShadow:
-                  "0 0 0 3px hsl(0 0% 0%), 0 0 28px hsl(48 100% 55% / 0.7), 0 0 64px hsl(48 100% 50% / 0.45)",
-              }}
-            >
-              {signalOpen ? (
-                <X className="h-7 w-7 text-foreground" strokeWidth={3} />
-              ) : (
-                /* Bat silhouette */
-                <svg viewBox="0 0 64 32" className="w-9 h-5" fill="hsl(0 0% 0%)" aria-hidden>
-                  <path d="M32 4 C30 10, 26 14, 20 14 C14 14, 8 10, 2 12 C6 16, 8 22, 12 24 C18 22, 24 24, 28 28 L32 22 L36 28 C40 24, 46 22, 52 24 C56 22, 58 16, 62 12 C56 10, 50 14, 44 14 C38 14, 34 10, 32 4 Z" />
-                </svg>
-              )}
-            </button>
-          </div>
-
-          {/* Quick action — right */}
+      {/* Faint quick-actions, top-right (planner / scout / watch / coach) */}
+      <div className="fixed top-4 right-4 z-40 flex items-center gap-1">
+        {[
+          { Icon: Calculator, to: "/", label: "math" },
+          { Icon: Search, to: "/draft#upnext", label: "scout" },
+          { Icon: Star, to: "/draft#watchlist", label: "watch" },
+          { Icon: Bot, to: "/draft?coach=open", label: "coach" },
+        ].map(a => (
           <button
-            onClick={() => navigate(QUICK[1].to)}
-            className="flex flex-col items-center justify-center gap-1 py-3 text-[9px] uppercase tracking-[0.28em] text-background/85 hover:text-primary transition-colors text-stamp"
+            key={a.label}
+            onClick={() => navigate(a.to)}
+            aria-label={a.label}
+            className="w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-md bg-foreground/5 hover:bg-foreground/12 transition-colors"
           >
-            <Search className="h-5 w-5" strokeWidth={2.25} />
-            <span>{QUICK[1].label}</span>
+            <a.Icon className="h-4 w-4 text-foreground/70" strokeWidth={1.5} />
           </button>
-        </div>
-      </nav>
+        ))}
+      </div>
     </div>
   );
 }

@@ -357,10 +357,9 @@
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
 
 /* ============================================================
-   TOON-NOIR — Dick Tracy × Roger Rabbit × '89 Batman ×
-   Clockwork Orange × American Psycho × Fight Club.
-   CG-cel: bold black outlines, flat fills, art-deco curves,
-   neon signs, dossier stamps, midnight-purple skies.
+   DREAMSCAPE FOOTBALL — Waking Life × What Dreams May Come ×
+   Eternal Sunshine. Every surface drifts, breathes, smudges.
+   Hand-painted, rotoscope wobble, memory-erase dissolve.
    ============================================================ */
 @layer utilities {
 
@@ -370,195 +369,138 @@
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
-  /* Dick Tracy / Batman '89 art-deco display */
-  .toon-display {
-    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.01em;
-    line-height: 0.86;
-    font-weight: 400;
-    -webkit-text-stroke: 2px hsl(0 0% 0%);
-    paint-order: stroke fill;
-  }
-  /* Roger Rabbit "WHO" cartoon — playful but inked */
-  .toon-cartoon {
-    font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    line-height: 0.9;
-    -webkit-text-stroke: 1.5px hsl(0 0% 0%);
-    paint-order: stroke fill;
-  }
-  /* American Psycho business card — Silian Rail */
-  .biz-card {
+  .dream-display {
     font-family: "Playfair Display", Georgia, serif;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 900;
+    letter-spacing: -0.025em;
+    line-height: 0.92;
   }
-
-  /* ---------- INK / OUTLINE ---------- */
-  /* The toon-noir signature: thick black outline + offset flat-color shadow */
-  .ink-edge {
-    border: 2.5px solid hsl(0 0% 0%);
-    box-shadow:
-      5px 5px 0 hsl(0 0% 0%),
-      0 0 0 1px hsl(0 0% 0%);
-    border-radius: 0.5rem;
+  .dream-hand {
+    font-family: "Special Elite", "Caveat", "Bradley Hand", cursive;
+    letter-spacing: 0.01em;
   }
-  .ink-edge-sm {
-    border: 2px solid hsl(0 0% 0%);
-    box-shadow: 3px 3px 0 hsl(0 0% 0%);
-    border-radius: 0.375rem;
-  }
-  .ink-edge-yellow {
-    border: 2.5px solid hsl(0 0% 0%);
-    box-shadow: 5px 5px 0 hsl(48 100% 52%), 6px 6px 0 hsl(0 0% 0%);
-    border-radius: 0.5rem;
-  }
-  .ink-edge-purple {
-    border: 2.5px solid hsl(0 0% 0%);
-    box-shadow: 5px 5px 0 hsl(285 75% 58%), 6px 6px 0 hsl(0 0% 0%);
-    border-radius: 0.5rem;
+  .dream-quiet {
+    font-family: "Inter", sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    color: hsl(38 30% 88% / 0.8);
   }
 
   /* ---------- BACKDROPS ---------- */
-  /* '89 Gotham — midnight indigo radial */
-  .gotham-sky {
+  /* Twilight oil — bruised dusk, the Vincent Ward painted world */
+  .dream-sky {
     background:
-      radial-gradient(ellipse at 30% 0%, hsl(285 60% 22%) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 20%, hsl(48 90% 45% / 0.18) 0%, transparent 45%),
-      linear-gradient(180deg, hsl(252 50% 12%), hsl(252 60% 6%));
+      radial-gradient(ellipse at 22% 18%, hsl(18 80% 55% / 0.30) 0%, transparent 45%),
+      radial-gradient(ellipse at 80% 12%, hsl(348 70% 55% / 0.22) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 95%, hsl(138 65% 35% / 0.30) 0%, transparent 55%),
+      radial-gradient(ellipse at 8% 80%, hsl(188 70% 45% / 0.20) 0%, transparent 50%),
+      linear-gradient(170deg, hsl(232 38% 12%) 0%, hsl(232 45% 7%) 100%);
   }
-  /* Dick Tracy yellow night sky */
-  .tracy-sky {
+  /* Stadium-grass field, soft-painted */
+  .field-paint {
     background:
-      radial-gradient(ellipse at 70% 10%, hsl(48 100% 60% / 0.35) 0%, transparent 50%),
-      linear-gradient(180deg, hsl(252 55% 12%), hsl(252 65% 6%));
+      radial-gradient(ellipse at 50% 40%, hsl(138 60% 42%) 0%, hsl(138 55% 28%) 50%, hsl(138 65% 16%) 100%);
   }
-  /* Roger Rabbit cel-toon backdrop */
-  .toon-sky {
+  /* Eternal Sunshine beach */
+  .beach-paint {
     background:
-      radial-gradient(circle at 20% 100%, hsl(192 90% 50% / 0.25), transparent 55%),
-      radial-gradient(circle at 80% 0%, hsl(48 100% 55% / 0.18), transparent 50%),
-      linear-gradient(180deg, hsl(252 35% 13%), hsl(252 40% 8%));
-  }
-  /* Clockwork Orange milkbar — soft glow with sickly tint */
-  .milkbar {
-    background:
-      radial-gradient(ellipse at center, hsl(48 70% 90% / 0.06) 0%, transparent 60%),
-      linear-gradient(180deg, hsl(252 30% 10%), hsl(252 40% 6%));
+      radial-gradient(ellipse at 50% 30%, hsl(38 75% 75%) 0%, hsl(18 70% 55%) 60%, hsl(348 55% 35%) 100%);
   }
 
-  /* ---------- HALFTONE / DOTS / BENDAY ---------- */
-  .halftone {
-    background-image: radial-gradient(hsl(48 100% 70% / 0.05) 1px, transparent 1.2px);
-    background-size: 5px 5px;
+  /* ---------- WET PAINT / OIL SMEAR ---------- */
+  .oil-smear {
+    background-image:
+      radial-gradient(ellipse 80% 40% at 30% 20%, hsl(138 70% 50% / 0.18), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 70% 70%, hsl(18 80% 55% / 0.16), transparent 65%),
+      radial-gradient(ellipse 50% 30% at 80% 25%, hsl(348 70% 60% / 0.14), transparent 60%);
+    filter: blur(0.4px);
   }
-  .halftone-yellow {
-    background-image: radial-gradient(hsl(48 100% 55% / 0.35) 1.2px, transparent 1.4px);
-    background-size: 6px 6px;
-  }
-  .halftone-purple {
-    background-image: radial-gradient(hsl(285 75% 60% / 0.32) 1.2px, transparent 1.4px);
-    background-size: 6px 6px;
-  }
-  .halftone-red {
-    background-image: radial-gradient(hsl(358 85% 55% / 0.32) 1.2px, transparent 1.4px);
-    background-size: 6px 6px;
-  }
-
-  /* ---------- NEON / BAT SIGNAL ---------- */
-  .neon-yellow {
-    color: hsl(48 100% 60%);
-    text-shadow:
-      0 0 4px hsl(48 100% 60% / 0.9),
-      0 0 14px hsl(48 100% 60% / 0.6),
-      0 0 28px hsl(48 100% 50% / 0.5);
-  }
-  .neon-purple {
-    color: hsl(285 90% 70%);
-    text-shadow:
-      0 0 4px hsl(285 90% 70% / 0.9),
-      0 0 14px hsl(285 80% 60% / 0.6),
-      0 0 28px hsl(285 80% 55% / 0.5);
-  }
-  .bat-glow {
+  .vellum {
+    background:
+      linear-gradient(180deg, hsl(38 35% 92% / 0.05), hsl(38 35% 92% / 0.02));
+    border: 1px solid hsl(38 40% 94% / 0.10);
+    backdrop-filter: blur(14px) saturate(120%);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    border-radius: 1.25rem;
     box-shadow:
-      0 0 0 2px hsl(0 0% 0%),
-      0 0 24px hsl(48 100% 55% / 0.55),
-      0 0 56px hsl(48 100% 50% / 0.35);
+      0 30px 60px -30px hsl(232 60% 4% / 0.6),
+      inset 0 1px 0 hsl(38 40% 94% / 0.08);
   }
 
-  /* ---------- SPOT COLORS ---------- */
-  .spot-yellow { color: hsl(48 100% 55%); }
-  .spot-purple { color: hsl(285 85% 68%); }
-  .spot-red    { color: hsl(358 85% 60%); }
-  .spot-cyan   { color: hsl(192 90% 55%); }
+  /* ---------- ROTOSCOPE WOBBLE (Waking Life) ---------- */
+  @keyframes wobble {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25%      { transform: translate(0.4px, -0.3px) rotate(0.18deg); }
+    50%      { transform: translate(-0.3px, 0.4px) rotate(-0.14deg); }
+    75%      { transform: translate(0.2px, 0.3px) rotate(0.10deg); }
+  }
+  .wobble       { animation: wobble 1.6s ease-in-out infinite; }
+  .wobble-slow  { animation: wobble 3.4s ease-in-out infinite; }
+  .wobble-fast  { animation: wobble 0.9s ease-in-out infinite; }
 
-  /* ---------- AMERICAN PSYCHO BUSINESS CARD ---------- */
-  .psycho-card {
-    background: hsl(48 30% 94%);
-    color: hsl(252 40% 12%);
-    border: 1px solid hsl(252 40% 12%);
-    box-shadow: 4px 4px 0 hsl(252 40% 12% / 0.25);
-    padding: 0.9rem 1.1rem;
-    letter-spacing: 0.04em;
+  @keyframes drift {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50%      { transform: translateY(-8px) translateX(3px); }
+  }
+  .drift      { animation: drift 8s ease-in-out infinite; }
+  .drift-slow { animation: drift 14s ease-in-out infinite; }
+
+  /* ---------- DISSOLVE / ERASE (Eternal Sunshine) ---------- */
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; filter: blur(0px); }
+    50%      { opacity: 1;   filter: blur(0.5px); }
+  }
+  .pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+
+  .erase-edge {
+    -webkit-mask-image:
+      radial-gradient(ellipse 90% 75% at 50% 50%, hsl(0 0% 0%) 55%, transparent 95%);
+            mask-image:
+      radial-gradient(ellipse 90% 75% at 50% 50%, hsl(0 0% 0%) 55%, transparent 95%);
+  }
+  .erase-edge-soft {
+    -webkit-mask-image:
+      radial-gradient(ellipse 100% 90% at 50% 50%, hsl(0 0% 0%) 70%, transparent 100%);
+            mask-image:
+      radial-gradient(ellipse 100% 90% at 50% 50%, hsl(0 0% 0%) 70%, transparent 100%);
   }
 
-  /* ---------- FIGHT CLUB DOSSIER STAMP ---------- */
-  .stamp-red {
-    display: inline-block;
-    color: hsl(358 85% 55%);
-    border: 2px solid hsl(358 85% 55%);
-    padding: 0.15rem 0.5rem;
-    font-family: "Special Elite", monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    transform: rotate(-4deg);
-    opacity: 0.92;
-    box-shadow: inset 0 0 0 1px hsl(358 85% 55% / 0.35);
-  }
-
-  /* ---------- ROGER RABBIT WIGGLE ---------- */
-  @keyframes toon-wiggle {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    25% { transform: rotate(-1.2deg) scale(1.01); }
-    75% { transform: rotate(1.2deg) scale(0.99); }
-  }
-  .toon-wiggle { animation: toon-wiggle 2.6s ease-in-out infinite; }
-
-  /* ---------- ART-DECO RAY BURST (Superman '78 / Batman '89) ---------- */
-  .deco-rays {
-    background-image:
-      repeating-conic-gradient(
-        from 0deg at 50% 100%,
-        hsl(48 100% 55% / 0.10) 0deg 6deg,
-        transparent 6deg 14deg
-      );
-  }
-  .deco-rays-purple {
-    background-image:
-      repeating-conic-gradient(
-        from 0deg at 50% 100%,
-        hsl(285 75% 60% / 0.12) 0deg 6deg,
-        transparent 6deg 14deg
-      );
-  }
-
-  /* ---------- FILM GRAIN ---------- */
+  /* ---------- MEMORY GRAIN ---------- */
   .grain::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.28;
+    opacity: 0.22;
     mix-blend-mode: overlay;
     background-image:
-      radial-gradient(hsl(48 100% 90% / 0.18) 0.5px, transparent 0.5px),
-      radial-gradient(hsl(252 60% 6% / 0.30) 0.5px, transparent 0.5px);
+      radial-gradient(hsl(38 80% 80% / 0.20) 0.5px, transparent 0.5px),
+      radial-gradient(hsl(232 60% 4% / 0.30) 0.5px, transparent 0.5px);
     background-size: 3px 3px, 5px 5px;
     background-position: 0 0, 1px 1px;
+  }
+
+  /* ---------- HALOS / MEMORY ORBS ---------- */
+  .halo-grass  { box-shadow: 0 0 0 1px hsl(138 60% 55% / 0.45), 0 0 32px hsl(138 70% 50% / 0.45), 0 0 80px hsl(138 65% 45% / 0.30); }
+  .halo-amber  { box-shadow: 0 0 0 1px hsl(18 90% 60% / 0.45),  0 0 28px hsl(18 90% 55% / 0.50),  0 0 70px hsl(18 85% 50% / 0.35); }
+  .halo-rose   { box-shadow: 0 0 0 1px hsl(348 75% 60% / 0.45), 0 0 28px hsl(348 80% 55% / 0.50), 0 0 70px hsl(348 75% 50% / 0.35); }
+  .halo-cyan   { box-shadow: 0 0 0 1px hsl(188 75% 55% / 0.45), 0 0 28px hsl(188 85% 55% / 0.45), 0 0 70px hsl(188 80% 50% / 0.30); }
+
+  .spot-grass { color: hsl(138 65% 60%); }
+  .spot-amber { color: hsl(18 90% 65%); }
+  .spot-rose  { color: hsl(348 80% 70%); }
+  .spot-cyan  { color: hsl(188 80% 65%); }
+
+  /* ---------- INK / EDGE ---------- */
+  .ink-edge {
+    border: 1px solid hsl(38 40% 94% / 0.14);
+    border-radius: 1.25rem;
+    box-shadow: 0 30px 60px -30px hsl(232 60% 4% / 0.7);
+  }
+  .ink-edge-sm {
+    border: 1px solid hsl(38 40% 94% / 0.12);
+    border-radius: 1rem;
+    box-shadow: 0 14px 30px -16px hsl(232 60% 4% / 0.55);
   }
 
   /* ---------- VIGNETTE ---------- */
@@ -567,60 +509,64 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 45%, hsl(252 60% 4% / 0.85) 100%);
+    background: radial-gradient(ellipse at center, transparent 50%, hsl(232 60% 4% / 0.75) 100%);
   }
 
-  /* ---------- SPLATTER ---------- */
-  .splatter {
+  /* ---------- PAINT BLOB ---------- */
+  .blob {
     position: absolute;
     border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%;
-    filter: blur(0.4px);
+    filter: blur(34px);
+    opacity: 0.55;
   }
 
-  /* ---------- BACK-COMPAT (legacy classnames used elsewhere) ---------- */
-  .headline-noir {
-    font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
-    letter-spacing: 0.015em;
-    line-height: 0.9;
+  /* ---------- BACKWARD-COMPAT (legacy classnames still in code) ---------- */
+  .toon-display, .title-slab, .headline-noir {
+    font-family: "Playfair Display", Georgia, serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    line-height: 0.95;
+    -webkit-text-stroke: 0;
+  }
+  .toon-cartoon { font-family: "Playfair Display", serif; font-weight: 700; text-transform: none; -webkit-text-stroke: 0; }
+  .biz-card     { font-family: "Inter", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; }
+  .neon-yellow  { color: hsl(38 95% 70%); text-shadow: 0 0 24px hsl(38 95% 60% / 0.6); }
+  .neon-purple  { color: hsl(285 80% 75%); text-shadow: 0 0 24px hsl(285 80% 65% / 0.6); }
+  .spot-yellow  { color: hsl(38 95% 70%); }
+  .spot-purple  { color: hsl(285 80% 75%); }
+  .spot-red     { color: hsl(348 80% 70%); }
+  .gotham-sky, .tracy-sky, .toon-sky, .milkbar { background: transparent; }
+  .halftone, .halftone-yellow, .halftone-purple, .halftone-red { background-image: none; }
+  .deco-rays, .deco-rays-purple { background-image: none; }
+  .silhouette { background: hsl(232 50% 8%); color: hsl(38 35% 92%); border-radius: 1rem; }
+  .ink-edge-yellow { border: 1px solid hsl(38 95% 60% / 0.30); border-radius: 1.25rem; box-shadow: 0 0 32px hsl(38 95% 55% / 0.20), 0 30px 60px -30px hsl(232 60% 4% / 0.7); }
+  .ink-edge-purple { border: 1px solid hsl(285 70% 60% / 0.30); border-radius: 1.25rem; box-shadow: 0 0 32px hsl(285 75% 55% / 0.20), 0 30px 60px -30px hsl(232 60% 4% / 0.7); }
+  .ink-edge-red    { border: 1px solid hsl(348 75% 60% / 0.30); border-radius: 1.25rem; box-shadow: 0 0 32px hsl(348 75% 55% / 0.20), 0 30px 60px -30px hsl(232 60% 4% / 0.7); }
+  .stamp-red {
+    display: inline-block;
+    color: hsl(348 80% 70%);
+    border: 1px solid hsl(348 75% 55% / 0.55);
+    padding: 0.2rem 0.55rem;
+    font-family: "Special Elite", monospace;
     text-transform: uppercase;
+    letter-spacing: 0.18em;
+    border-radius: 999px;
+    opacity: 0.9;
   }
-  .title-slab { /* legacy alias */
-    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.005em;
-    line-height: 0.84;
-    -webkit-text-stroke: 1.5px hsl(0 0% 0%);
-    paint-order: stroke fill;
+  .psycho-card {
+    background: hsl(38 35% 92%);
+    color: hsl(232 35% 12%);
+    border-radius: 1rem;
+    padding: 1rem 1.2rem;
+    box-shadow: 0 24px 50px -22px hsl(232 60% 4% / 0.7);
   }
-  .rgb-split, .rgb-split-strong { text-shadow: none; }
-  .silhouette {
-    background: hsl(0 0% 0%);
-    color: hsl(48 100% 96%);
-  }
+  .bat-glow { box-shadow: 0 0 0 1px hsl(38 95% 55% / 0.45), 0 0 32px hsl(38 95% 55% / 0.55), 0 0 80px hsl(38 95% 50% / 0.35); }
+  .toon-wiggle { animation: wobble 3s ease-in-out infinite; }
+  .speedlines, .speedlines-red { background-image: none; }
   .rain { background-image: none; }
-  .speedlines, .speedlines-red {
-    background-image: repeating-linear-gradient(
-      -22deg, transparent 0 9px, hsl(48 100% 55% / 0.10) 9px 10px, transparent 10px 24px
-    );
-  }
-  .red-slash {
-    position: absolute;
-    height: 3px;
-    background: hsl(48 100% 55%);
-    transform: rotate(-6deg);
-    box-shadow: 0 0 14px hsl(48 100% 55% / 0.7);
-  }
-  .ink-edge-red {
-    border: 2.5px solid hsl(0 0% 0%);
-    box-shadow: 5px 5px 0 hsl(358 85% 55%), 6px 6px 0 hsl(0 0% 0%);
-    border-radius: 0.5rem;
-  }
-  .burst-frame {
-    clip-path: polygon(
-      0% 8%, 8% 0%, 22% 6%, 36% 0%, 50% 5%, 64% 0%, 78% 6%, 92% 0%, 100% 10%,
-      96% 24%, 100% 38%, 94% 52%, 100% 66%, 96% 80%, 100% 92%,
-      88% 100%, 74% 96%, 60% 100%, 46% 95%, 32% 100%, 18% 96%, 6% 100%, 0% 90%,
-      4% 76%, 0% 62%, 6% 48%, 0% 34%, 4% 20%
-    );
-  }
+  .red-slash { position: absolute; height: 1px; background: hsl(38 95% 60%); transform: rotate(-6deg); box-shadow: 0 0 18px hsl(38 95% 60% / 0.7); }
+  .burst-frame { clip-path: none; border-radius: 1.5rem; }
+  .splatter { position: absolute; border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%; filter: blur(20px); }
 }
+
