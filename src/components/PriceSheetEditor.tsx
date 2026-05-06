@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2, Zap } from "lucide-react";
-import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import PlayerDecisionOverlay from "@/components/PlayerDecisionOverlay";
 import { parsePriceSheet } from "@/lib/draft-math";
 import { PriceEstimate, Position } from "@/lib/draft-types";
@@ -15,6 +14,38 @@ import { buildTierPrices, tierForPosRank, injuryMultiplier, type AuctionRow } fr
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
+const POSITION_ALIASES: Record<string, Position> = {
+  QB: "QB",
+  RB: "RB",
+  WR: "WR",
+  TE: "TE",
+  K: "K",
+  PK: "K",
+  DST: "DST",
+  DEF: "DST",
+  "D/ST": "DST",
+};
+
+const normName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+function normalizePosition(value: unknown): Position | undefined {
+  if (typeof value !== "string") return undefined;
+  const cleaned = value.trim().toUpperCase().replace(/[^A-Z/]/g, "");
+  return POSITION_ALIASES[cleaned];
+}
+
+function readPositionFromText(value: unknown): Position | undefined {
+  if (typeof value !== "string") return undefined;
+  const match = value.toUpperCase().match(/\b(QB|RB|WR|TE|PK|K|DST|DEF|D\/ST)\b/);
+  return normalizePosition(match?.[1]);
+}
+
+function priceText(players: PriceEstimate[]) {
+  return players
+    .map((p) => `${p.name}${p.position ? `, ${p.position}` : ""} - ${p.price}`)
+    .join("\n");
+}
+
 /**
  * Parse a 2D array (from CSV or XLSX) into player/price rows.
  * Auto-detects which columns hold the player name and the price.
@@ -22,7 +53,7 @@ const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price
  *  - Price column = column with the most positive integers in the range $1–$300
  * Skips header rows and blank rows.
  */
-function parseTabular(rows: any[][]): { name: string; price: number }[] {
+function parseTabular(rows: any[][]): PriceEstimate[] {
   if (!rows.length) return [];
   const width = Math.max(...rows.map((r) => r.length));
   const looksLikeName = (v: any) =>
@@ -42,10 +73,12 @@ function parseTabular(rows: any[][]): { name: string; price: number }[] {
   // Score each column
   const nameScores = new Array(width).fill(0);
   const priceScores = new Array(width).fill(0);
+  const positionScores = new Array(width).fill(0);
   for (const row of rows) {
     for (let c = 0; c < width; c++) {
       if (looksLikeName(row[c])) nameScores[c]++;
       if (toPrice(row[c]) != null) priceScores[c]++;
+      if (normalizePosition(row[c])) positionScores[c]++;
     }
   }
   const nameCol = nameScores.indexOf(Math.max(...nameScores));
@@ -57,19 +90,30 @@ function parseTabular(rows: any[][]): { name: string; price: number }[] {
   }
   if (nameCol < 0 || priceCol < 0 || nameScores[nameCol] === 0 || best === 0) return [];
 
-  const out: { name: string; price: number }[] = [];
+  let positionCol = -1;
+  let bestPositionScore = 0;
+  for (let c = 0; c < width; c++) {
+    if (c === nameCol || c === priceCol) continue;
+    if (positionScores[c] > bestPositionScore) {
+      bestPositionScore = positionScores[c];
+      positionCol = c;
+    }
+  }
+
+  const out: PriceEstimate[] = [];
   const seen = new Set<string>();
   for (const row of rows) {
     const name = typeof row[nameCol] === "string" ? row[nameCol].trim() : "";
     const price = toPrice(row[priceCol]);
     if (!name || !looksLikeName(name) || price == null) continue;
     // Strip trailing team/pos junk like "Jalen Hurts PHI QB"
+    const position = normalizePosition(positionCol >= 0 ? row[positionCol] : undefined) ?? readPositionFromText(name);
     const clean = name.replace(/\s+(QB|RB|WR|TE|K|DST|DEF|D\/ST)\b.*$/i, "")
                       .replace(/\s+[A-Z]{2,4}$/g, "").trim();
-    const key = clean.toLowerCase();
+    const key = normName(clean);
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ name: clean, price });
+    out.push({ name: clean, price, position });
   }
   return out;
 }
@@ -88,7 +132,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [filter, setFilter] = useState("");
   const [posFilter, setPosFilter] = useState<"ALL" | "QB" | "RB" | "WR" | "TE" | "K" | "DST">("ALL");
   const [sortBy, setSortBy] = useState<"default" | "price-desc" | "price-asc" | "name">("default");
-  const [posByName, setPosByName] = useState<Map<string, string>>(new Map());
+  const [posByName, setPosByName] = useState<Map<string, Position>>(new Map());
   const [uploading, setUploading] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
@@ -102,14 +146,32 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         .from("espn_player_ranks")
         .select("player_name, position");
       if (cancelled || !data) return;
-      const m = new Map<string, string>();
+      const m = new Map<string, Position>();
       for (const r of data) {
-        if (r.player_name && r.position) m.set(r.player_name.toLowerCase(), r.position);
+        const position = normalizePosition(r.position);
+        if (r.player_name && position) m.set(normName(r.player_name), position);
       }
       setPosByName(m);
     })();
     return () => { cancelled = true; };
   }, []);
+
+  // Backfill position onto already-loaded/persisted prices once ESPN/Vetri positions are available.
+  useEffect(() => {
+    if (!posByName.size || !prices.length) return;
+    let changed = false;
+    const enriched = prices.map((p) => {
+      if (p.position) return p;
+      const position = posByName.get(normName(p.name));
+      if (!position) return p;
+      changed = true;
+      return { ...p, position };
+    });
+    if (changed) {
+      setPrices(enriched);
+      setPricesText(priceText(enriched));
+    }
+  }, [posByName, prices, setPrices, setPricesText]);
 
   const autoFillFromEspn = async () => {
     setAutoBusy(true);
@@ -173,20 +235,21 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       // 4) For each ranked player → tier → league avg $
       // Blend ESPN preseason rank (70%) with last year's PPG rank (30%) so a
       // proven producer ESPN is sleeping on still gets bumped up a tier.
-      const built: { name: string; price: number }[] = [];
+      const built: PriceEstimate[] = [];
       for (const r of rRows) {
-        if (!r.position || !r.pos_rank) continue;
+        const position = normalizePosition(r.position);
+        if (!position || !r.pos_rank) continue;
         const ppgRank = ppgRankByName.get(r.player_name);
         const blendedRank = ppgRank
           ? Math.round(r.pos_rank * 0.7 + ppgRank * 0.3)
           : r.pos_rank;
-        const tier = tierForPosRank(r.position, blendedRank);
-        const tp = tierPrices.find((t) => t.position === r.position && t.tier === tier);
+        const tier = tierForPosRank(position, blendedRank);
+        const tp = tierPrices.find((t) => t.position === position && t.tier === tier);
         const basePrice = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
         // Auto-fade injured players (season-ending → ~$1, soft injuries scaled).
         const mult = injuryMultiplier((r as { injury_status?: string | null }).injury_status);
         const price = mult < 1 ? Math.max(1, Math.round(basePrice * mult)) : basePrice;
-        if (price > 0) built.push({ name: r.player_name, price });
+        if (price > 0) built.push({ name: r.player_name, price, position });
       }
       if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
       mergeImported(built, "ESPN auto-fill");
@@ -199,17 +262,23 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     }
   };
 
-  const mergeImported = (incoming: { name: string; price: number }[], filename: string) => {
+  const mergeImported = (incoming: PriceEstimate[], filename: string) => {
     if (!incoming.length) {
       toast.error("No players found in file");
       return;
     }
     const map = new Map<string, PriceEstimate>();
-    for (const p of prices) map.set(p.name.toLowerCase(), p);
-    for (const p of incoming) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
+    for (const p of prices) map.set(normName(p.name), p);
+    const nextPosByName = new Map(posByName);
+    for (const p of incoming) {
+      const position = p.position ?? nextPosByName.get(normName(p.name));
+      map.set(normName(p.name), { name: p.name, price: p.price, position });
+      if (position) nextPosByName.set(normName(p.name), position);
+    }
     const merged = Array.from(map.values());
+    setPosByName(nextPosByName);
     setPrices(merged);
-    setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    setPricesText(priceText(merged));
     toast.success(`Imported ${incoming.length} players from ${filename}`);
   };
 
@@ -264,7 +333,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         const t = await resp.json().catch(() => ({}));
         throw new Error(t.error || `Parse failed (${resp.status})`);
       }
-      const { players } = await resp.json() as { players: { name: string; price: number }[] };
+      const { players } = await resp.json() as { players: PriceEstimate[] };
       mergeImported(players || [], file.name);
     } catch (e: any) {
       console.error(e);
@@ -276,7 +345,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   };
 
   // Parse on every keystroke for the live preview
-  const parsed = useMemo(() => parsePriceSheet(pricesText), [pricesText]);
+  const parsed = useMemo(() => {
+    return parsePriceSheet(pricesText).map((p) => {
+      const position = p.position ?? posByName.get(normName(p.name));
+      return position ? { ...p, position } : p;
+    });
+  }, [pricesText, posByName]);
   const validCount = parsed.length;
   const totalLines = pricesText.split(/\r?\n/).filter((l) => l.trim()).length;
   const skipped = Math.max(0, totalLines - validCount);
@@ -284,6 +358,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   // Sync parsed → prices whenever it changes meaningfully
   const syncParsed = () => {
     setPrices(parsed);
+    setPricesText(priceText(parsed));
     toast.success(`Parsed ${parsed.length} players`);
   };
 
@@ -296,8 +371,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     }
     if (posFilter !== "ALL") {
       arr = arr.filter((p) => {
-        const pos = posByName.get(p.name.toLowerCase());
-        if (posFilter === "DST") return pos === "DST" || pos === "DEF" || pos === "D/ST";
+        const pos = p.position ?? posByName.get(normName(p.name));
         return pos === posFilter;
       });
     }
@@ -311,12 +385,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     const next = [...prices];
     next[idx] = { ...next[idx], price: value };
     setPrices(next);
-    setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    setPricesText(priceText(next));
   };
   const removeRow = (idx: number) => {
     const next = prices.filter((_, i) => i !== idx);
     setPrices(next);
-    setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    setPricesText(priceText(next));
   };
   const addQuick = () => {
     const name = quickName.trim();
@@ -328,7 +402,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     }
     const next = [...prices, { name, price }];
     setPrices(next);
-    setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    setPricesText(priceText(next));
     setQuickName(""); setQuickPrice("");
   };
 
@@ -447,8 +521,8 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             </div>
           )}
           <div
-            className="max-h-80 space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1"
-            style={{ WebkitOverflowScrolling: "touch" }}
+            className="min-h-[220px] space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1"
+            style={{ maxHeight: "min(52dvh, 26rem)", WebkitOverflowScrolling: "touch" }}
           >
             {filtered.map((p) => {
               const idx = prices.findIndex((x) => x.name === p.name);
@@ -457,7 +531,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
                   <button
                     type="button"
                     onClick={() => {
-                      const pos = posByName.get(p.name.toLowerCase()) as Position | undefined;
+                      const pos = p.position ?? posByName.get(normName(p.name));
                       setDetailFor({ name: p.name, position: pos, price: p.price });
                     }}
                     className="flex-1 truncate text-left font-medium hover:text-primary hover:underline"
@@ -489,6 +563,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         onOpenChange={(o) => !o && setDetailFor(null)}
         name={detailFor?.name ?? ""}
         position={detailFor?.position}
+        price={detailFor?.price}
       />
     </div>
   );
