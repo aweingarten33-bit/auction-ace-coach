@@ -317,6 +317,7 @@ export default function SetupWizard() {
           </div>
         </Card>
       </div>
-    </div>
+      </div>
+    </EditorialShell>
   );
 }
