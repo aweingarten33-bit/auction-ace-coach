@@ -465,44 +465,42 @@ export default function DraftV2() {
         )}
       </main>
 
-      {/* DESKTOP BOTTOM NAV — broadcast bottom bug */}
-      <nav className="hidden md:flex h-12 shrink-0 items-center border-t-4 border-primary bg-foreground text-background text-sm">
-        {[
-          { label: "TARGETS", Icon: Target, action: () => targetsMutation.mutate() },
-          { label: "NOMINATE", Icon: Layers, action: () => askCoach("Who should I nominate next?") },
-          { label: "PLAYERS", Icon: Users, action: () => navigate("/draft") },
-          { label: "HISTORY", Icon: History, action: () => navigate("/draft") },
-        ].map(({ label, Icon, action }) => (
-          <button
-            key={label}
-            onClick={action}
-            className="flex h-full items-center gap-2 px-5 border-r-2 border-background/20 hover:bg-primary hover:text-primary-foreground transition-colors font-black uppercase tracking-widest text-[11px]"
-          >
-            <Icon className="h-3.5 w-3.5" strokeWidth={2.5} /> {label}
-          </button>
-        ))}
-        <span className="ml-auto px-5 font-mono font-bold text-[11px] tabular-nums opacity-80">
-          RB ${spend.RB ?? 0} · WR ${spend.WR ?? 0} · QB ${spend.QB ?? 0} · TE ${spend.TE ?? 0}
+      {/* DESKTOP BOTTOM NAV */}
+      <nav className="hidden md:flex h-12 shrink-0 items-center gap-6 border-t border-border bg-card px-6 text-sm">
+        <button onClick={() => targetsMutation.mutate()} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <Target className="h-4 w-4" /> Targets
+        </button>
+        <button onClick={() => askCoach("Who should I nominate next?")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <Layers className="h-4 w-4" /> Nomination
+        </button>
+        <button onClick={() => navigate("/draft")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <Users className="h-4 w-4" /> Players
+        </button>
+        <button onClick={() => navigate("/draft")} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <History className="h-4 w-4" /> History
+        </button>
+        <span className="ml-auto font-mono text-xs text-muted-foreground tabular-nums">
+          RB ${spend.RB ?? 0} · WR ${spend.WR ?? 0} · QB ${spend.QB ?? 0}
         </span>
       </nav>
 
-      {/* MOBILE BOTTOM TAB BAR — scoreboard buttons */}
-      <nav className="flex md:hidden h-16 shrink-0 items-stretch border-t-4 border-primary bg-foreground text-background">
+      {/* MOBILE BOTTOM TAB BAR */}
+      <nav className="flex md:hidden h-16 shrink-0 items-center justify-around border-t border-border bg-card text-[11px]">
         {([
-          { id: "decision", label: "DECIDE",  Icon: Sparkles },
-          { id: "planner",  label: "PLAN",    Icon: Layers },
-          { id: "targets",  label: "TARGETS", Icon: Target },
-          { id: "market",   label: "MARKET",  Icon: Users },
-          { id: "log",      label: "LOG",     Icon: History },
+          { id: "decision", label: "Decide", Icon: Sparkles },
+          { id: "planner",  label: "Plan",   Icon: Layers },
+          { id: "targets",  label: "Targets",Icon: Target },
+          { id: "market",   label: "Market", Icon: Users },
+          { id: "log",      label: "Log",    Icon: History },
         ] as const).map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => setTab(id)}
-            className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 border-r-2 border-background/20 last:border-r-0 font-black uppercase tracking-widest text-[10px] ${
-              tab === id ? "bg-primary text-primary-foreground" : "text-background/70"
+            className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 ${
+              tab === id ? "text-primary" : "text-muted-foreground"
             }`}
           >
-            <Icon className="h-4 w-4" strokeWidth={2.5} />
+            <Icon className="h-4 w-4" />
             {label}
           </button>
         ))}
