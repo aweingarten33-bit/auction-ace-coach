@@ -12,66 +12,68 @@
 
 @layer base {
   :root {
-    /* VIP suite: paper-white, generous air, ink-black type, one gold accent. */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
+    /* KILLING JOKE: ink-black night, bone paper, blood red, sodium amber.
+       Pulpy, high-contrast, comic-noir. Halftone dots, hard shadows. */
+    --background: 0 0% 6%;
+    --foreground: 38 18% 88%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 9%;
+    --card-foreground: 38 18% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 38 18% 90%;
 
-    /* Single restrained champagne-gold accent — used sparingly. */
-    --primary: 38 38% 48%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 38 45% 60%;
+    /* Blood red — the Joker's grin. */
+    --primary: 358 78% 48%;
+    --primary-foreground: 38 18% 94%;
+    --primary-glow: 358 90% 58%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 12%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 38 18% 88%;
 
-    --muted: 0 0% 97%;
-    --muted-foreground: 0 0% 42%;
+    --muted: 0 0% 11%;
+    --muted-foreground: 38 8% 58%;
 
-    --accent: 0 0% 8%;
-    --accent-foreground: 0 0% 100%;
+    /* Sodium-lamp amber — Gotham streetlight. */
+    --accent: 38 85% 55%;
+    --accent-foreground: 0 0% 6%;
 
-    --destructive: 0 70% 45%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 358 78% 48%;
+    --destructive-foreground: 38 18% 94%;
 
-    --warning: 38 38% 48%;
-    --warning-foreground: 0 0% 100%;
+    --warning: 38 85% 55%;
+    --warning-foreground: 0 0% 6%;
 
-    --success: 150 30% 38%;
-    --success-foreground: 0 0% 100%;
+    --success: 150 35% 42%;
+    --success-foreground: 38 18% 94%;
 
-    --border: 0 0% 92%;
-    --input: 0 0% 96%;
-    --ring: 38 38% 48%;
+    --border: 0 0% 18%;
+    --input: 0 0% 12%;
+    --ring: 358 78% 48%;
 
-    --radius: 0.25rem;
+    --radius: 0.125rem;
 
-    --gradient-primary: linear-gradient(180deg, hsl(38 38% 52%), hsl(38 38% 44%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 99%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(0 0% 99%), hsl(0 0% 96%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
-    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 0% / 0.02) 0%, hsl(0 0% 0% / 0) 50%);
+    --gradient-primary: linear-gradient(180deg, hsl(358 80% 52%), hsl(358 78% 38%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 7%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(0 0% 12%), hsl(0 0% 8%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 11%), hsl(0 0% 6%));
+    --gradient-glossy: linear-gradient(180deg, hsl(38 18% 90% / 0.04) 0%, hsl(38 18% 90% / 0) 50%);
 
-    --shadow-glow: 0 0 0 1px hsl(38 38% 48% / 0.18);
-    --shadow-aqua: 0 1px 0 hsl(0 0% 100%) inset, 0 1px 2px hsl(0 0% 0% / 0.04);
-    --shadow-card: 0 1px 2px hsl(0 0% 0% / 0.04), 0 12px 32px -16px hsl(0 0% 0% / 0.08);
+    --shadow-glow: 0 0 0 1px hsl(358 78% 48% / 0.55), 0 0 24px -6px hsl(358 78% 48% / 0.5);
+    --shadow-aqua: 2px 2px 0 hsl(0 0% 0%);
+    --shadow-card: 4px 4px 0 hsl(0 0% 0%), 0 0 0 1px hsl(0 0% 18%);
 
-    --grid-line: hsl(0 0% 95%);
-    --grid-line-strong: hsl(0 0% 90%);
+    --grid-line: hsl(0 0% 14%);
+    --grid-line-strong: hsl(0 0% 20%);
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 12%;
-    --sidebar-primary: 38 38% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 96%;
-    --sidebar-accent-foreground: 0 0% 12%;
-    --sidebar-border: 0 0% 92%;
-    --sidebar-ring: 38 38% 48%;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 38 18% 86%;
+    --sidebar-primary: 358 78% 48%;
+    --sidebar-primary-foreground: 38 18% 94%;
+    --sidebar-accent: 0 0% 11%;
+    --sidebar-accent-foreground: 38 18% 88%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 358 78% 48%;
   }
 
   .dark {
