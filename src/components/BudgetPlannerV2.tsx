@@ -116,8 +116,20 @@ function suggestedAllocations(
 /* =========================
    🚀 ENTRY
 ========================= */
-export default function BudgetPlannerV2() {
-  const [open, setOpen] = useState(false);
+interface BudgetPlannerV2Props {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showFab?: boolean;
+}
+
+export default function BudgetPlannerV2({ open: openProp, onOpenChange, showFab = true }: BudgetPlannerV2Props = {}) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = openProp !== undefined;
+  const open = isControlled ? openProp : internalOpen;
+  const setOpen = (v: boolean) => {
+    if (!isControlled) setInternalOpen(v);
+    onOpenChange?.(v);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -166,24 +178,26 @@ export default function BudgetPlannerV2() {
         )}
       </AnimatePresence>
 
-      <motion.button
-        onClick={() => setOpen((o) => !o)}
-        whileHover={{ scale: 1.06 }}
-        whileTap={{ scale: 0.94 }}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={{ type: "spring", damping: 18, stiffness: 280 }}
-        aria-label={open ? "Close planner" : "Open planner"}
-        style={{
-          position: "fixed", bottom: 84, right: 16, zIndex: 50,
-          width: 56, height: 56, borderRadius: "50%",
-          background: C.ink, color: C.page, border: "none", cursor: "pointer",
-          boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
-          display: "grid", placeItems: "center",
-          fontFamily: SERIF, fontSize: 26, fontWeight: 400,
-        }}
-      >
-        $
-      </motion.button>
+      {showFab && (
+        <motion.button
+          onClick={() => setOpen(!open)}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+          animate={{ rotate: open ? 45 : 0 }}
+          transition={{ type: "spring", damping: 18, stiffness: 280 }}
+          aria-label={open ? "Close planner" : "Open planner"}
+          style={{
+            position: "fixed", bottom: 84, right: 16, zIndex: 50,
+            width: 56, height: 56, borderRadius: "50%",
+            background: C.ink, color: C.page, border: "none", cursor: "pointer",
+            boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
+            display: "grid", placeItems: "center",
+            fontFamily: SERIF, fontSize: 26, fontWeight: 400,
+          }}
+        >
+          $
+        </motion.button>
+      )}
     </>
   );
 }

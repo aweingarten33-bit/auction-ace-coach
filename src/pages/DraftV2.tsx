@@ -499,7 +499,7 @@ export default function DraftV2() {
       <nav className="flex md:hidden h-16 shrink-0 items-center justify-around border-t border-border bg-card text-[11px]">
         {([
           { id: "decision", label: "Decide",  Icon: Sparkles, action: () => setTab("decision") },
-          { id: "budget",   label: "Budget",  Icon: Trophy,   action: () => navigate("/planner") },
+          { id: "budget",   label: "Budget",  Icon: Trophy,   action: () => setBudgetOpen(true) },
           { id: "planner",  label: "Plan",    Icon: Layers,   action: () => setTab("planner") },
           { id: "targets",  label: "Targets", Icon: Target,   action: () => setTab("targets") },
           { id: "market",   label: "Market",  Icon: Users,    action: () => setTab("market") },
