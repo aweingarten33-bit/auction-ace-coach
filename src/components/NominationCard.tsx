@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Megaphone, Target, Check, X, Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 import type { DrainPlan, GetPlan } from "@/lib/nomination";
 
 export interface AiNomination {
