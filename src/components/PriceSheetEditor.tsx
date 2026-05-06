@@ -263,9 +263,33 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         const price = mult < 1 ? Math.max(1, Math.round(basePrice * mult)) : basePrice;
         if (price > 0) built.push({ name: r.player_name, price, position });
       }
+
+      // Layer in Sleeper-only players (rookies + anyone ESPN didn't rank).
+      // Map their pos_rank into your league's tier prices, just like ESPN players.
+      const haveNames = new Set(built.map((b) => normName(b.name)));
+      let rookieAdds = 0;
+      for (const r of (sRows ?? [])) {
+        if (!r.player_name || !r.pos_rank || !r.position) continue;
+        if (haveNames.has(normName(r.player_name))) continue;
+        const position = normalizePosition(r.position);
+        if (!position) continue;
+        const tier = tierForPosRank(position, r.pos_rank);
+        const tp = tierPrices.find((t) => t.position === position && t.tier === tier);
+        const basePrice = tp?.avg
+          ? Math.max(1, Math.round(tp.avg))
+          : Math.max(1, Math.round(Number(r.projected_auction_value) || 0));
+        if (basePrice <= 0) continue;
+        const mult = injuryMultiplier(r.injury_status);
+        const price = mult < 1 ? Math.max(1, Math.round(basePrice * mult)) : basePrice;
+        built.push({ name: r.player_name, price, position });
+        if (r.is_rookie) rookieAdds++;
+      }
+
       if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
-      mergeImported(built, "ESPN auto-fill");
-      toast.success(`Auto-filled ${built.length} players (ESPN ranks + last season's PPG)`);
+      mergeImported(built, "ESPN + Sleeper auto-fill");
+      toast.success(
+        `Auto-filled ${built.length} players (ESPN + Sleeper${rookieAdds ? `, +${rookieAdds} rookies` : ""})`,
+      );
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Auto-fill failed");
