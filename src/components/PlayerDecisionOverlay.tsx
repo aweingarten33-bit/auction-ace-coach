@@ -29,15 +29,20 @@ export default function PlayerDecisionOverlay({
 
   const decision = useMemo(() => {
     if (!name) return null;
-    return decide({
-      settings,
-      keepers,
-      events,
-      prices,
-      player: name,
-      position,
-      currentPrice: price ?? 0,
-    });
+    try {
+      return decide({
+        settings,
+        keepers,
+        events,
+        prices,
+        player: name,
+        position,
+        currentPrice: price ?? 0,
+      });
+    } catch (e) {
+      console.error("[PlayerDecisionOverlay] decide() threw:", e);
+      return null;
+    }
   }, [name, position, price, settings, keepers, events, prices]);
 
   return (
