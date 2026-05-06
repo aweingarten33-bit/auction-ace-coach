@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Sparkles, ChevronLeft, MessageSquare, Target, Layers, Users, History, ArrowUp, Sun, Moon } from "lucide-react";
+import { Sparkles, ChevronLeft, MessageSquare, Target, Layers, Users, History, ArrowUp, Sun, Moon, Trophy } from "lucide-react";
 import coachBotImg from "@/assets/coach-bot.png";
 
 import { useDraftStore } from "@/lib/draft-store";
