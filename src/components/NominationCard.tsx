@@ -28,103 +28,13 @@ const STRATEGY_STYLE: Record<AiNomination["strategy"], { label: string; cls: str
   enforcer: { label: "RAISE THE PRICE",   cls: "bg-warning/15 text-warning" },
 };
 
-export default function NominationCard({ drain, get, aiSuggestions, aiLoading, onAskAi, onPickAi }: Props) {
+export default function NominationCard({ drain: _drain, get: _get, aiSuggestions, aiLoading, onAskAi, onPickAi }: Props) {
   return (
     <Card className="bg-gradient-card p-3">
       <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">
-        Who to call out next
+        Who to nominate next
       </p>
 
-      {/* DRAIN */}
-      <div className="rounded-md border border-accent/40 bg-accent/5 p-2.5">
-        <div className="flex items-center gap-1.5">
-          <Megaphone className="h-3.5 w-3.5 text-accent" />
-          <p className="text-[9px] font-bold uppercase tracking-widest text-accent">
-            Call out — waste their money
-          </p>
-        </div>
-        {drain.primary ? (
-          <>
-            <div className="mt-1 flex items-baseline gap-2">
-              <p className="text-base font-bold leading-tight text-foreground">
-                {drain.primary.name}
-              </p>
-              {drain.primary.position && (
-                <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-                  {drain.primary.position}
-                </Badge>
-              )}
-              <span className="ml-auto font-mono text-xs tabular-nums text-muted-foreground">
-                ~${drain.primary.price}
-              </span>
-            </div>
-            <p className="mt-0.5 text-[11px] text-foreground">{drain.primary.reason}</p>
-            {drain.backups.length > 0 && (
-              <div className="mt-1.5 flex flex-wrap gap-1 text-[10px] text-muted-foreground">
-                <span className="font-bold uppercase tracking-wider">Backups:</span>
-                {drain.backups.map((b) => (
-                  <span key={b.name} className="text-foreground">
-                    {b.name}
-                    {b !== drain.backups[drain.backups.length - 1] && <span className="text-muted-foreground">,</span>}
-                  </span>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <p className="mt-1 text-[11px] text-muted-foreground">No good player to call out yet.</p>
-        )}
-      </div>
-
-      {/* GET */}
-      <div className="mt-2 rounded-md border border-primary/40 bg-primary/5 p-2.5">
-        <div className="flex items-center gap-1.5">
-          <Target className="h-3.5 w-3.5 text-primary" />
-          <p className="text-[9px] font-bold uppercase tracking-widest text-primary">
-            Player you want
-          </p>
-        </div>
-        {get.target ? (
-          <>
-            <div className="mt-1 flex items-baseline gap-2">
-              <p className="text-base font-bold leading-tight text-foreground">{get.target}</p>
-              {get.position && (
-                <Badge variant="outline" className="px-1.5 py-0 text-[10px]">{get.position}</Badge>
-              )}
-              <span className={`ml-auto rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                get.timing === "Nominate now"
-                  ? "bg-success/15 text-success"
-                  : "bg-muted text-muted-foreground"
-              }`}>
-                {get.timing}
-              </span>
-            </div>
-            <div className="mt-1.5 grid grid-cols-3 gap-1 text-center">
-              <div className="rounded border border-border/50 bg-secondary/30 px-1 py-1">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Start</p>
-                <p className="font-mono text-sm font-bold tabular-nums text-foreground">${get.startPrice}</p>
-              </div>
-              <div className="rounded border border-success/40 bg-success/10 px-1 py-1">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-success/80">Push to</p>
-                <p className="font-mono text-sm font-bold tabular-nums text-success">${get.pushTo}</p>
-              </div>
-              <div className="rounded border border-destructive/40 bg-destructive/10 px-1 py-1">
-                <p className="text-[9px] font-bold uppercase tracking-wider text-destructive/80">Stop at</p>
-                <p className="font-mono text-sm font-bold tabular-nums text-destructive">${get.stopAt}</p>
-              </div>
-            </div>
-            <div className="mt-1.5 flex items-center gap-2 text-[11px]">
-              <span className={`flex items-center gap-1 font-bold ${get.safeIfWin ? "text-success" : "text-warning"}`}>
-                {get.safeIfWin ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                {get.safeIfWin ? "Safe if you win" : "Risky if you win"}
-              </span>
-              <span className="text-muted-foreground">— {get.reason}</span>
-            </div>
-          </>
-        ) : (
-          <p className="mt-1 text-[11px] text-muted-foreground">{get.reason}</p>
-        )}
-      </div>
 
       {/* AI SUGGESTIONS */}
       {(onAskAi || aiSuggestions?.length) && (
