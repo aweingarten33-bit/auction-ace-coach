@@ -34,8 +34,8 @@ import Watchlist from "@/components/Watchlist";
 import MarketHeat from "@/components/MarketHeat";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import CoachMessage from "@/components/CoachMessage";
-import BudgetPlannerV2 from "@/components/BudgetPlannerV2";
 import BottomDock from "@/components/BottomDock";
+import PlannerDoorsDock from "@/components/PlannerDoorsDock";
 
 
 type MobileTab = "decision" | "planner" | "targets" | "market" | "log";
@@ -287,18 +287,6 @@ export default function DraftV2() {
             title={theme === "dark" ? "Switch to light" : "Switch to dark"}
           >
             {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-          </button>
-          <button
-            onClick={() => navigate("/draft-os")}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
-            OS
-          </button>
-          <button
-            onClick={() => navigate("/planner")}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
-            Strategy
           </button>
         </div>
       </header>
@@ -587,7 +575,7 @@ export default function DraftV2() {
           </div>
         </SheetContent>
       </Sheet>
-      <BudgetPlannerV2 open={budgetOpen} onOpenChange={setBudgetOpen} showFab={false} />
+      <PlannerDoorsDock open={budgetOpen} onOpenChange={setBudgetOpen} />
     </div>
   );
 }
