@@ -39,46 +39,40 @@ export default function EditorialShell({
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col antialiased">
-      {/* Masthead */}
-      <header className="pt-9 pb-5 bg-background">
-        <div className="flex items-center justify-center gap-3 px-6">
-          <span className="h-px w-8 bg-primary/70" />
-          <span className="text-[9px] uppercase tracking-[0.42em] text-primary/90">
-            Vol. I
-          </span>
-          <span className="h-px w-8 bg-primary/70" />
+    <div className="relative min-h-screen bg-background text-foreground flex flex-col antialiased halftone">
+      {/* Masthead — pulp comic cover */}
+      <header className="relative bg-background border-b-[3px] border-foreground">
+        <div className="px-4 pt-3 pb-2">
+          <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.3em] text-muted-foreground">
+            <span className="text-stamp">No. 01</span>
+            <span className="text-stamp text-primary">·  Auction Night  ·</span>
+            <span className="text-stamp">$2.99</span>
+          </div>
         </div>
-        <h1
-          className="mt-3 text-center text-foreground px-6"
-          style={{
-            fontFamily: '"Playfair Display", Georgia, serif',
-            fontSize: "1.55rem",
-            fontWeight: 400,
-            letterSpacing: "0.01em",
-            lineHeight: 1,
-          }}
-        >
-          {masthead}
-        </h1>
-        <p className="mt-2 text-center text-[9px] uppercase tracking-[0.32em] text-muted-foreground/80">
-          A private research suite
-        </p>
+        <div className="bg-foreground text-background py-3 px-4 border-y-2 border-foreground">
+          <h1
+            className="headline-noir text-center text-background"
+            style={{ fontSize: "2.4rem" }}
+          >
+            {masthead}
+          </h1>
+          <p className="mt-1 text-center text-[9px] uppercase tracking-[0.4em] text-background/70 text-stamp">
+            « A draft-room thriller in one panel »
+          </p>
+        </div>
 
-        {/* Hairline + nav */}
-        <div className="mt-6 border-t border-border" />
-        <nav className="overflow-x-auto no-scrollbar">
-          <ul className="flex items-center justify-center gap-7 px-5 pt-3 min-w-max">
+        <nav className="overflow-x-auto no-scrollbar bg-background">
+          <ul className="flex items-stretch justify-start gap-0 px-2 min-w-max">
             {CATEGORIES.map((c) => {
               const active = activeCategory ? activeCategory === c.label : isCatActive(c.to);
               return (
-                <li key={c.label}>
+                <li key={c.label} className="flex-1">
                   <button
                     onClick={() => navigate(c.to)}
-                    className={`pb-2 text-[10px] uppercase tracking-[0.26em] transition-colors ${
+                    className={`headline-noir w-full px-3 py-2.5 text-[13px] transition-colors border-r border-border last:border-r-0 ${
                       active
-                        ? "text-foreground border-b border-primary"
-                        : "text-muted-foreground hover:text-foreground border-b border-transparent"
+                        ? "bg-primary text-primary-foreground"
+                        : "text-foreground hover:bg-secondary"
                     }`}
                   >
                     {c.label}
@@ -88,13 +82,12 @@ export default function EditorialShell({
             })}
           </ul>
         </nav>
-        <div className="border-t border-border" />
       </header>
 
-      <main className="flex-1 pb-28 bg-background">{children}</main>
+      <main className="flex-1 pb-28 bg-background relative">{children}</main>
 
-      {/* Bottom dock */}
-      <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+      {/* Bottom dock — black ink slab */}
+      <nav className="fixed bottom-0 inset-x-0 z-40 border-t-[3px] border-foreground bg-foreground text-background">
         <ul className="grid grid-cols-4 max-w-md mx-auto">
           {QUICK_ACTIONS.map((a) => {
             const Icon = a.icon;
@@ -102,9 +95,9 @@ export default function EditorialShell({
               <li key={a.label}>
                 <button
                   onClick={() => navigate(a.to)}
-                  className="w-full flex flex-col items-center justify-center gap-1.5 py-3.5 text-[9px] uppercase tracking-[0.24em] text-muted-foreground hover:text-foreground transition-colors"
+                  className="w-full flex flex-col items-center justify-center gap-1 py-3 text-[9px] uppercase tracking-[0.24em] text-background/80 hover:text-primary transition-colors text-stamp"
                 >
-                  <Icon className="h-[17px] w-[17px]" strokeWidth={1.2} />
+                  <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
                   <span>{a.label}</span>
                 </button>
               </li>

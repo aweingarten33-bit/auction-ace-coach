@@ -1,5 +1,6 @@
 import EditorialShell from "@/components/EditorialShell";
 import { useNavigate } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 
 interface Tool {
   label: string;
@@ -18,75 +19,63 @@ export default function CategoryPage({ category, tagline, tools }: Props) {
   const navigate = useNavigate();
   return (
     <EditorialShell activeCategory={category}>
-      <div className="mx-auto max-w-md px-8 pt-16 pb-16 text-center">
-        {/* Eyebrow + gold rule */}
-        <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-6 bg-primary/70" />
-          <span className="text-[9px] uppercase tracking-[0.42em] text-primary/90">
+      <div className="mx-auto max-w-xl px-5 pt-6 pb-10">
+        {/* Chapter card — comic panel */}
+        <div className="relative ink-edge bg-background p-5 halftone-red">
+          <div className="flex items-center gap-2 text-stamp text-[10px] text-primary">
+            <span className="inline-block h-2 w-2 bg-primary" />
+            CHAPTER · {category.toUpperCase()}
+          </div>
+          <h2
+            className="headline-noir mt-3 text-foreground"
+            style={{ fontSize: "3rem" }}
+          >
             {category}
-          </span>
-          <span className="h-px w-6 bg-primary/70" />
+          </h2>
+          <p className="mt-2 text-[12px] leading-snug text-muted-foreground text-stamp">
+            « {tagline} »
+          </p>
         </div>
 
-        <h2
-          className="mt-6 text-foreground"
-          style={{
-            fontFamily: '"Playfair Display", Georgia, serif',
-            fontWeight: 400,
-            fontSize: "2.4rem",
-            lineHeight: 1.05,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          {tagline.split(" — ")[0]}
-        </h2>
-
-        {tagline.includes(" — ") && (
-          <p
-            className="mt-4 text-[12px] italic text-muted-foreground"
-            style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
-          >
-            {tagline.split(" — ")[1]}
-          </p>
-        )}
-
-        <div className="mt-12 flex flex-col items-stretch text-left">
+        {/* Tools — stacked comic panels */}
+        <div className="mt-5 space-y-3">
           {tools.map((t, i) => (
             <button
               key={t.label}
               onClick={() => t.to && navigate(t.to)}
               disabled={t.comingSoon}
-              className={`group w-full py-5 transition-colors disabled:opacity-40 ${
-                i !== 0 ? "border-t border-border" : ""
-              }`}
+              className="group relative w-full ink-edge-sm bg-card p-4 text-left transition-transform disabled:opacity-40 hover:-translate-y-0.5 hover:translate-x-0.5"
             >
-              <div className="flex items-baseline gap-4">
-                <span className="text-[10px] tabular-nums tracking-[0.2em] text-primary/80 w-6">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center justify-center bg-foreground text-background w-12 py-2 ink-edge-sm">
+                  <span className="text-stamp text-[8px] tracking-widest opacity-60">No.</span>
+                  <span className="headline-noir text-2xl leading-none">{String(i + 1).padStart(2, "0")}</span>
+                </div>
                 <div className="flex-1 min-w-0">
-                  <div
-                    className="text-[20px] tracking-tight text-foreground transition-colors group-hover:text-primary"
-                    style={{
-                      fontFamily: '"Playfair Display", Georgia, serif',
-                      fontWeight: 400,
-                    }}
-                  >
-                    {t.label}
+                  <div className="flex items-center gap-2">
+                    <h3 className="headline-noir text-[20px] text-foreground group-hover:text-primary transition-colors">
+                      {t.label}
+                    </h3>
                     {t.comingSoon && (
-                      <span className="ml-2 align-middle text-[8px] uppercase tracking-[0.28em] text-muted-foreground">
+                      <span className="text-stamp text-[8px] px-1.5 py-0.5 bg-accent text-accent-foreground">
                         Soon
                       </span>
                     )}
                   </div>
-                  <div className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                  <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
                     {t.description}
-                  </div>
+                  </p>
                 </div>
+                <ChevronRight className="h-5 w-5 text-foreground shrink-0 mt-1 transition-transform group-hover:translate-x-1 group-hover:text-primary" strokeWidth={2.5} />
               </div>
             </button>
           ))}
-          <div className="border-t border-border" />
+        </div>
+
+        {/* Footer stamp */}
+        <div className="mt-6 flex items-center justify-between text-stamp text-[9px] text-muted-foreground">
+          <span>« Continued inside »</span>
+          <span>{tools.length} panels</span>
         </div>
       </div>
     </EditorialShell>
