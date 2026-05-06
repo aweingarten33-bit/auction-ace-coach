@@ -349,3 +349,51 @@
 .coach-md strong { @apply text-foreground font-semibold; }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply font-semibold mt-3 mb-1 text-foreground; }
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
+
+/* ============================================================
+   KILLING JOKE — comic noir utilities
+   Halftone dots, hard shadows, ink-stamped headlines.
+   ============================================================ */
+@layer utilities {
+  .halftone {
+    background-image: radial-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+  .halftone-red {
+    background-image: radial-gradient(hsl(358 78% 48% / 0.18) 1px, transparent 1px);
+    background-size: 5px 5px;
+  }
+  .halftone-amber {
+    background-image: radial-gradient(hsl(38 85% 55% / 0.22) 1px, transparent 1px);
+    background-size: 5px 5px;
+  }
+  .ink-edge {
+    border: 1px solid hsl(0 0% 0%);
+    box-shadow: 4px 4px 0 hsl(0 0% 0%), 0 0 0 1px hsl(0 0% 18%);
+  }
+  .ink-edge-sm {
+    border: 1px solid hsl(0 0% 0%);
+    box-shadow: 2px 2px 0 hsl(0 0% 0%);
+  }
+  .text-stamp {
+    font-family: "Special Elite", "Courier New", monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .headline-noir {
+    font-family: "Bebas Neue", "Oswald", "Impact", sans-serif;
+    letter-spacing: 0.02em;
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    background-image: radial-gradient(hsl(0 0% 100% / 0.04) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+}
