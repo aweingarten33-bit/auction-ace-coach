@@ -16,13 +16,15 @@ import { LockProvider, useLock } from "@/hooks/useLock";
 
 const queryClient = new QueryClient();
 
-function Protected({ children, allowWhenLocked = false }: { children: JSX.Element; allowWhenLocked?: boolean }) {
+function Protected({ children, allowWhenLocked = false, adminOnly = false }: { children: JSX.Element; allowWhenLocked?: boolean; adminOnly?: boolean }) {
   const { user, loading } = useAuth();
   const { locked, isAdmin, loading: lockLoading } = useLock();
   if (loading || lockLoading) return null;
   if (!user) return <Navigate to="/auth" replace />;
   // Site-wide lock — show fake 404 to non-admins (admins always get through)
   if (locked && !isAdmin && !allowWhenLocked) return <NotFound />;
+  // Admin-only routes — show 404 to non-admins
+  if (adminOnly && !isAdmin) return <NotFound />;
   return children;
 }
 
