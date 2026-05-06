@@ -99,9 +99,10 @@ export default function SetupWizard() {
             <Button
               size="sm"
               onClick={() => navigate("/espn")}
-              className="bg-primary text-primary-foreground shadow-glow hover:bg-primary/90"
+              className="bg-[#D40026] text-white shadow-glow hover:bg-[#b8001f]"
             >
-              Connect ESPN
+              Connect
+              <span className="ml-1.5 font-extrabold italic tracking-tighter">ESPN</span>
             </Button>
             {setupComplete && (
               <Button size="sm" variant="outline" onClick={() => navigate("/draft")}>
