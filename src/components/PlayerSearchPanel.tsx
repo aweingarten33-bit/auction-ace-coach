@@ -7,7 +7,7 @@ import { Search, X, Pin, PinOff, Gavel } from "lucide-react";
 import { DraftEvent, PriceEstimate, Position } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { tierForPosRank } from "@/lib/league-tier-prices";
-import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
+import PlayerDecisionOverlay from "@/components/PlayerDecisionOverlay";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -67,7 +67,7 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
   }, [prices, q, pos, tier, tierByName]);
 
   return (
-    <Card className="min-w-0 overflow-hidden p-3">
+    <Card className="flex min-h-0 min-w-0 flex-col overflow-hidden p-3">
       <div className="mb-2 flex items-center gap-2">
         <Search className="h-3.5 w-3.5 text-muted-foreground" />
         <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -136,7 +136,10 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
       <p className="mb-1 text-[10px] text-muted-foreground">
         Showing {results.length}{results.length === 100 ? "+" : ""} of {prices.length}
       </p>
-      <div className="max-h-[60vh] space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1" style={{ WebkitOverflowScrolling: "touch" }}>
+      <div
+        className="min-h-[220px] flex-1 space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1 sm:max-h-[60vh]"
+        style={{ maxHeight: "min(52dvh, 26rem)", WebkitOverflowScrolling: "touch" }}
+      >
         {results.map((p) => {
           const isDrafted = draftedSet.has(norm(p.name));
           const isPinned = pinnedSet.has(norm(p.name));
@@ -193,11 +196,12 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
       <p className="mt-1.5 text-[10px] text-muted-foreground">
         Tap a name for the full pre-draft card. Gavel loads into the bid form. Pin saves to your watchlist.
       </p>
-      <PlayerDetailsOverlay
+      <PlayerDecisionOverlay
         open={!!detailFor}
         onOpenChange={(o) => !o && setDetailFor(null)}
         name={detailFor?.name ?? ""}
         position={detailFor?.position}
+        price={detailFor?.price}
       />
     </Card>
   );
