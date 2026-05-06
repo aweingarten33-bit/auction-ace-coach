@@ -766,8 +766,9 @@ Keep it tight. No fluff, no closing line.`;
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full min-w-0 overflow-hidden">
-            <TabsList className="grid h-9 w-full min-w-0 grid-cols-3">
+            <TabsList className="grid h-9 w-full min-w-0 grid-cols-4">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
+              <TabsTrigger value="players" className="text-[11px]">Players</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
               <TabsTrigger value="vetri" className="text-[11px]">Analyst</TabsTrigger>
             </TabsList>
