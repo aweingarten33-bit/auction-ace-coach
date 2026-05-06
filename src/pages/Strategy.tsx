@@ -4,7 +4,7 @@ export default function Strategy() {
   return (
     <CategoryPage
       category="Strategy"
-      tagline="How you'll attack the room — before the bidding heats up."
+      tagline="The blueprint — before the bidding heats up."
       tools={[
         { label: "Draft Plan", description: "Your written attack plan, generated from setup + price sheet.", to: "/draft#plan" },
         { label: "Team Build", description: "Live roster, slots filled, gaps remaining.", to: "/draft#roster" },
