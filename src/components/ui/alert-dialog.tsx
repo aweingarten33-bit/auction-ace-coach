@@ -34,9 +34,16 @@ const AlertDialogContent = React.forwardRef<
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        // Mobile-safe: anchor near the top with deterministic max-height + inner scroll,
+        // recenter on sm+. Avoids the "black overlay only" bug on short phone viewports
+        // where translate-y-[-50%] pushed the card off-screen.
+        "fixed inset-x-2 top-4 z-50 mx-auto grid w-auto max-w-lg gap-4 border bg-background p-6 shadow-lg duration-200",
+        "max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain",
+        "sm:inset-x-auto sm:left-[50%] sm:top-[50%] sm:w-full sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         className,
       )}
+      style={{ WebkitOverflowScrolling: "touch" }}
       {...props}
     />
   </AlertDialogPortal>
