@@ -521,27 +521,33 @@ export default function DraftV2() {
         </span>
       </nav>
 
-      {/* MOBILE BOTTOM TAB BAR */}
+      {/* MOBILE BOTTOM TAB BAR — every tab opens as a bottom-rising dock */}
       <nav className="flex md:hidden h-16 shrink-0 items-center justify-around border-t border-border bg-card text-[11px]">
         {([
-          { id: "decision", label: "Decide",  Icon: Sparkles, action: () => setTab("decision") },
-          { id: "budget",   label: "Budget",  Icon: Trophy,   action: () => setBudgetOpen(true) },
-          { id: "planner",  label: "Plan",    Icon: Layers,   action: () => setTab("planner") },
-          { id: "targets",  label: "Targets", Icon: Target,   action: () => setTab("targets") },
-          { id: "market",   label: "Market",  Icon: Users,    action: () => setTab("market") },
-          { id: "log",      label: "Log",     Icon: History,  action: () => setTab("log") },
-        ] as const).map(({ id, label, Icon, action }) => (
-          <button
-            key={id}
-            onClick={action}
-            className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 ${
-              tab === id ? "text-primary" : "text-muted-foreground"
-            }`}
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </button>
-        ))}
+          { id: "decision", label: "Decide",  Icon: Sparkles, action: () => { setDockTab(null); setBudgetOpen(false); setTab("decision"); } },
+          { id: "budget",   label: "Budget",  Icon: Trophy,   action: () => { setDockTab(null); setBudgetOpen(true); } },
+          { id: "planner",  label: "Plan",    Icon: Layers,   action: () => { setBudgetOpen(false); setDockTab("planner"); } },
+          { id: "targets",  label: "Targets", Icon: Target,   action: () => { setBudgetOpen(false); setDockTab("targets"); } },
+          { id: "market",   label: "Market",  Icon: Users,    action: () => { setBudgetOpen(false); setDockTab("market"); } },
+          { id: "log",      label: "Log",     Icon: History,  action: () => { setBudgetOpen(false); setDockTab("log"); } },
+        ] as const).map(({ id, label, Icon, action }) => {
+          const active =
+            (id === "budget" && budgetOpen) ||
+            (id === "decision" && tab === "decision" && !budgetOpen && !dockTab) ||
+            (dockTab === id);
+          return (
+            <button
+              key={id}
+              onClick={action}
+              className={`flex h-full flex-1 flex-col items-center justify-center gap-0.5 ${
+                active ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <Icon className="h-4 w-4" />
+              {label}
+            </button>
+          );
+        })}
       </nav>
 
       {/* COACH SHEET (mobile/desktop fallback for ad-hoc questions when not on Decide tab) */}
