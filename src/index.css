@@ -12,70 +12,75 @@
 
 @layer base {
   :root {
-    /* SIN CITY × STREET FIGHTER 6:
-       Pure ink black, bone white, single spot color — blood red.
-       Yellow reserved for "Yellow Bastard" highlights. Rain. Silhouettes.
-       Chromatic aberration / RGB split / hit-spark from SF6 cinematics. */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    /* DICK TRACY × ROGER RABBIT × '89 BATMAN × CLOCKWORK ORANGE:
+       Saturated cartoon primaries on a midnight-purple noir canvas.
+       Bold black ink outlines, flat cel-shaded fills, art-deco gold,
+       Tracy yellow, Joker purple, Superman red, Tyler Durden bruise.
+       Mild cartoon — not cheesy. Rendered like a CG cel.            */
 
-    --card: 0 0% 4%;
-    --card-foreground: 0 0% 100%;
+    /* Midnight indigo backdrop — '89 Gotham at 2am */
+    --background: 252 38% 9%;
+    --foreground: 48 100% 96%;
 
-    --popover: 0 0% 0%;
-    --popover-foreground: 0 0% 100%;
+    --card: 252 30% 13%;
+    --card-foreground: 48 100% 96%;
 
-    /* Spot red — the only true color in Basin City. */
-    --primary: 0 100% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 0 100% 60%;
+    --popover: 252 35% 11%;
+    --popover-foreground: 48 100% 96%;
 
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 0 0% 100%;
+    /* Tracy yellow — the trench coat */
+    --primary: 48 100% 52%;
+    --primary-foreground: 252 50% 10%;
+    --primary-glow: 48 100% 62%;
 
-    --muted: 0 0% 6%;
-    --muted-foreground: 0 0% 62%;
+    --secondary: 252 28% 18%;
+    --secondary-foreground: 48 100% 96%;
 
-    /* Yellow Bastard — second spot color, used sparingly. */
-    --accent: 52 100% 50%;
-    --accent-foreground: 0 0% 0%;
+    --muted: 252 22% 16%;
+    --muted-foreground: 48 30% 75%;
 
-    --destructive: 358 78% 48%;
-    --destructive-foreground: 38 18% 94%;
+    /* Joker purple / Clockwork bruise */
+    --accent: 285 75% 58%;
+    --accent-foreground: 48 100% 96%;
 
-    --warning: 38 85% 55%;
-    --warning-foreground: 0 0% 6%;
+    /* Superman red */
+    --destructive: 358 85% 55%;
+    --destructive-foreground: 48 100% 96%;
 
-    --success: 150 35% 42%;
-    --success-foreground: 38 18% 94%;
+    --warning: 28 95% 55%;
+    --warning-foreground: 252 50% 10%;
 
-    --border: 0 0% 100%;
-    --input: 0 0% 8%;
-    --ring: 0 100% 50%;
+    /* Roger Rabbit cyan / cel-toon sky */
+    --success: 192 90% 50%;
+    --success-foreground: 252 50% 10%;
 
-    --radius: 0rem;
+    --border: 252 30% 25%;
+    --input: 252 28% 16%;
+    --ring: 48 100% 52%;
 
-    --gradient-primary: linear-gradient(180deg, hsl(358 80% 52%), hsl(358 78% 38%));
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 7%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(0 0% 12%), hsl(0 0% 8%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(0 0% 11%), hsl(0 0% 6%));
-    --gradient-glossy: linear-gradient(180deg, hsl(38 18% 90% / 0.04) 0%, hsl(38 18% 90% / 0) 50%);
+    --radius: 0.375rem;
 
-    --shadow-glow: 0 0 0 1px hsl(358 78% 48% / 0.55), 0 0 24px -6px hsl(358 78% 48% / 0.5);
-    --shadow-aqua: 2px 2px 0 hsl(0 0% 0%);
-    --shadow-card: 4px 4px 0 hsl(0 0% 0%), 0 0 0 1px hsl(0 0% 18%);
+    --gradient-primary: linear-gradient(180deg, hsl(48 100% 60%), hsl(38 100% 48%));
+    --gradient-card: linear-gradient(180deg, hsl(252 30% 14%), hsl(252 35% 10%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(252 28% 18%), hsl(252 32% 12%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(285 60% 28%), hsl(252 50% 14%));
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.10) 0%, hsl(0 0% 100% / 0) 55%);
 
-    --grid-line: hsl(0 0% 14%);
-    --grid-line-strong: hsl(0 0% 20%);
+    --shadow-glow: 0 0 0 2px hsl(48 100% 52% / 0.6), 0 0 28px -4px hsl(48 100% 52% / 0.55);
+    --shadow-aqua: 3px 3px 0 hsl(0 0% 0%);
+    --shadow-card: 4px 4px 0 hsl(0 0% 0%), 0 0 0 1.5px hsl(0 0% 0%);
 
-    --sidebar-background: 0 0% 5%;
-    --sidebar-foreground: 38 18% 86%;
-    --sidebar-primary: 358 78% 48%;
-    --sidebar-primary-foreground: 38 18% 94%;
-    --sidebar-accent: 0 0% 11%;
-    --sidebar-accent-foreground: 38 18% 88%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 358 78% 48%;
+    --grid-line: hsl(252 30% 20%);
+    --grid-line-strong: hsl(252 30% 28%);
+
+    --sidebar-background: 252 40% 8%;
+    --sidebar-foreground: 48 100% 94%;
+    --sidebar-primary: 48 100% 52%;
+    --sidebar-primary-foreground: 252 50% 10%;
+    --sidebar-accent: 252 28% 16%;
+    --sidebar-accent-foreground: 48 100% 94%;
+    --sidebar-border: 252 30% 22%;
+    --sidebar-ring: 48 100% 52%;
   }
 
   .dark {
