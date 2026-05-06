@@ -426,6 +426,7 @@ export default function Planner() {
         </Card>
       </main>
     </div>
+    </EditorialShell>
   );
 }
 
