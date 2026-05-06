@@ -385,24 +385,27 @@
   }
 
   /* ---------- BACKDROPS ---------- */
-  /* Twilight oil — bruised dusk, the Vincent Ward painted world */
-  .dream-sky {
+  /* War room — midnight ink with brass-gold lamp glow + blood-orange contention */
+  .dream-sky, .room-bg {
     background:
-      radial-gradient(ellipse at 22% 18%, hsl(18 80% 55% / 0.30) 0%, transparent 45%),
-      radial-gradient(ellipse at 80% 12%, hsl(348 70% 55% / 0.22) 0%, transparent 50%),
-      radial-gradient(ellipse at 60% 95%, hsl(138 65% 35% / 0.30) 0%, transparent 55%),
-      radial-gradient(ellipse at 8% 80%, hsl(188 70% 45% / 0.20) 0%, transparent 50%),
-      linear-gradient(170deg, hsl(232 38% 12%) 0%, hsl(232 45% 7%) 100%);
+      radial-gradient(ellipse at 18% 12%, hsl(38 90% 55% / 0.16) 0%, transparent 40%),
+      radial-gradient(ellipse at 82% 18%, hsl(16 88% 50% / 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 60% 100%, hsl(0 75% 35% / 0.18) 0%, transparent 60%),
+      linear-gradient(170deg, hsl(222 38% 9%) 0%, hsl(222 50% 5%) 100%);
   }
-  /* Stadium-grass field, soft-painted */
+  /* Faint blueprint grid — the strategist's desk */
+  .room-grid {
+    background-image:
+      linear-gradient(hsl(38 30% 92% / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(38 30% 92% / 0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
   .field-paint {
     background:
-      radial-gradient(ellipse at 50% 40%, hsl(138 60% 42%) 0%, hsl(138 55% 28%) 50%, hsl(138 65% 16%) 100%);
+      radial-gradient(ellipse at 50% 40%, hsl(138 60% 30%) 0%, hsl(138 55% 18%) 60%, hsl(222 50% 8%) 100%);
   }
-  /* Eternal Sunshine beach */
   .beach-paint {
-    background:
-      radial-gradient(ellipse at 50% 30%, hsl(38 75% 75%) 0%, hsl(18 70% 55%) 60%, hsl(348 55% 35%) 100%);
+    background: radial-gradient(ellipse at 50% 30%, hsl(38 70% 55%), hsl(16 75% 45%) 70%, hsl(222 50% 10%) 100%);
   }
 
   /* ---------- WET PAINT / OIL SMEAR ---------- */
