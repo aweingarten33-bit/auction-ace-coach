@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Special+Elite&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -603,3 +605,207 @@ a:hover, button:hover { text-shadow: 0 0 8px hsl(var(--riddler-green) / 0.45); }
 @media (prefers-reduced-motion: reduce) {
   .comic-city * { animation: none !important; }
 }
+
+/* =====================================================================
+   GRAPHIC NOVEL MODE — app-wide visual takeover
+   Forces every card, panel, button, and header into Frank Miller comic
+   territory: thick ink outlines, halftone fills, hard shadows, slashed
+   asymmetry, cinematic accents. Pure presentation overrides.
+   ===================================================================== */
+
+:root {
+  --ink: 0 0% 4%;
+  --paper: 45 30% 92%;
+  --blood: 358 92% 48%;
+  --acid: 60 100% 55%;
+  --sky: 200 100% 55%;
+  --bruise: 285 60% 45%;
+}
+
+/* Repaint baseline so cards become "newsprint" panels over the noir city */
+body {
+  color: hsl(var(--paper));
+}
+
+/* Hard-edged comic panels — kill rounded SaaS look */
+.rounded-lg.border, .rounded-md.border, .rounded-xl.border,
+[class*="rounded"][class*="border"] {
+  border-radius: 2px !important;
+  border: 3px solid hsl(var(--ink)) !important;
+  background:
+    linear-gradient(180deg, hsl(var(--paper) / 0.96), hsl(45 25% 86% / 0.96)) !important;
+  color: hsl(var(--ink)) !important;
+  box-shadow:
+    6px 6px 0 0 hsl(var(--ink)),
+    0 0 0 1px hsl(var(--ink) / 0.6) inset !important;
+  position: relative;
+  overflow: hidden;
+}
+/* Halftone wash on every panel */
+.rounded-lg.border::before, .rounded-md.border::before, .rounded-xl.border::before,
+[class*="rounded"][class*="border"]::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(hsl(var(--ink) / 0.18) 1px, transparent 1.5px);
+  background-size: 5px 5px;
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+/* Diagonal ink slash in corner of every panel */
+.rounded-lg.border::after, .rounded-md.border::after, .rounded-xl.border::after,
+[class*="rounded"][class*="border"]::after {
+  content: ""; position: absolute; top: -8px; right: -30px;
+  width: 80px; height: 18px;
+  background: hsl(var(--blood));
+  border: 2px solid hsl(var(--ink));
+  transform: rotate(35deg);
+  pointer-events: none;
+}
+
+/* Force foreground text inside panels to ink so it reads on paper */
+.rounded-lg.border *, .rounded-md.border *, .rounded-xl.border *,
+[class*="rounded"][class*="border"] * {
+  color: hsl(var(--ink));
+  border-color: hsl(var(--ink) / 0.7);
+}
+.rounded-lg.border .text-muted-foreground,
+.rounded-md.border .text-muted-foreground,
+[class*="rounded"][class*="border"] .text-muted-foreground {
+  color: hsl(var(--ink) / 0.65) !important;
+}
+
+/* Headings inside panels = giant comic typography */
+.rounded-lg.border h1, .rounded-md.border h1, [class*="rounded"][class*="border"] h1,
+.rounded-lg.border h2, .rounded-md.border h2, [class*="rounded"][class*="border"] h2,
+.rounded-lg.border h3, .rounded-md.border h3, [class*="rounded"][class*="border"] h3 {
+  font-family: "Anton","Bebas Neue","Impact",sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: hsl(var(--ink));
+  text-shadow: 3px 3px 0 hsl(var(--blood));
+  line-height: 0.95;
+}
+
+/* Buttons → inked stamps */
+button, .btn, [role="button"] {
+  border-radius: 2px !important;
+  border: 2.5px solid hsl(var(--ink)) !important;
+  background: hsl(var(--acid)) !important;
+  color: hsl(var(--ink)) !important;
+  font-family: "Anton","Impact",sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  box-shadow: 4px 4px 0 0 hsl(var(--ink)) !important;
+  transition: transform .08s ease, box-shadow .08s ease, background .15s;
+}
+button:hover, [role="button"]:hover { transform: translate(-1px,-1px); box-shadow: 6px 6px 0 0 hsl(var(--ink)) !important; }
+button:active, [role="button"]:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 0 hsl(var(--ink)) !important; }
+button[data-variant="destructive"], button.destructive { background: hsl(var(--blood)) !important; color: hsl(var(--paper)) !important; }
+button[data-variant="ghost"], button.ghost { background: transparent !important; box-shadow: none !important; }
+
+/* Inputs — typewriter slips */
+input, textarea, select {
+  border-radius: 2px !important;
+  border: 2.5px solid hsl(var(--ink)) !important;
+  background: hsl(var(--paper)) !important;
+  color: hsl(var(--ink)) !important;
+  font-family: "Special Elite","Courier New",monospace !important;
+  box-shadow: 3px 3px 0 0 hsl(var(--ink)) !important;
+}
+input::placeholder, textarea::placeholder { color: hsl(var(--ink) / 0.5) !important; }
+
+/* Top-level page headings get a giant comic title treatment */
+h1 {
+  font-family: "Anton","Bebas Neue","Impact",sans-serif !important;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: hsl(var(--paper));
+  text-shadow:
+    3px 3px 0 hsl(var(--ink)),
+    6px 6px 0 hsl(var(--blood)),
+    0 0 24px hsl(var(--acid) / 0.4);
+  line-height: 0.92;
+}
+h2 {
+  font-family: "Anton","Impact",sans-serif !important;
+  text-transform: uppercase;
+  color: hsl(var(--paper));
+  text-shadow: 2px 2px 0 hsl(var(--ink));
+}
+
+/* Speed lines — radiating from top-left of every page main container */
+main, [role="main"], .min-h-screen {
+  position: relative;
+}
+main::before, [role="main"]::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    repeating-conic-gradient(from 0deg at 8% 12%,
+      transparent 0deg 6deg,
+      hsl(var(--paper) / 0.04) 6deg 7deg);
+  mix-blend-mode: screen;
+}
+
+/* INK SPLATTERS — fixed accents across the screen */
+body > #root::after {
+  content: "";
+  position: fixed; pointer-events: none; z-index: 1;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 92% 14%, hsl(var(--ink)) 0 6px, transparent 7px),
+    radial-gradient(circle at 95% 12%, hsl(var(--ink)) 0 3px, transparent 4px),
+    radial-gradient(circle at 90% 18%, hsl(var(--ink)) 0 2px, transparent 3px),
+    radial-gradient(circle at 4% 88%, hsl(var(--blood)) 0 8px, transparent 9px),
+    radial-gradient(circle at 8% 92%, hsl(var(--blood)) 0 3px, transparent 4px),
+    radial-gradient(circle at 12% 86%, hsl(var(--blood)) 0 4px, transparent 5px);
+  opacity: 0.75;
+}
+
+/* Comic "POW" flash — appears intermittently */
+@keyframes pow-flash {
+  0%,96%,100% { opacity: 0; transform: scale(0.6) rotate(-8deg); }
+  97%,99% { opacity: 1; transform: scale(1) rotate(-8deg); }
+}
+body::after {
+  /* override Riddler "?" with KAPOW burst star */
+  content: "POW!";
+  font-family: "Anton","Bangers","Impact",sans-serif !important;
+  font-size: clamp(80px, 18vw, 240px) !important;
+  color: hsl(var(--acid)) !important;
+  -webkit-text-stroke: 4px hsl(var(--ink));
+  text-shadow:
+    8px 8px 0 hsl(var(--blood)),
+    12px 12px 0 hsl(var(--ink)) !important;
+  display: flex; align-items: center; justify-content: center;
+  animation: pow-flash 11s ease-in-out infinite !important;
+  z-index: 3 !important;
+}
+
+/* Asymmetric tilt for first few panels on every screen — break the grid */
+main > * > .grid > :nth-child(3n+1),
+main > * > .grid > :nth-child(3n+2) {
+  transform: rotate(-0.6deg);
+}
+main > * > .grid > :nth-child(3n) {
+  transform: rotate(0.5deg);
+}
+
+/* Animated panel slam-in */
+@keyframes panel-slam {
+  0%   { transform: translateY(-30px) rotate(-3deg) scale(0.95); opacity: 0; }
+  60%  { transform: translateY(6px) rotate(0.6deg) scale(1.02); opacity: 1; }
+  100% { transform: translateY(0) rotate(-0.4deg) scale(1); opacity: 1; }
+}
+.rounded-lg.border, .rounded-md.border, .rounded-xl.border {
+  animation: panel-slam .55s cubic-bezier(.2,.9,.25,1.2) both;
+}
+
+/* WHIP-PAN page transition — applied on route container */
+@keyframes whip-pan {
+  0%   { transform: translateX(-12vw) skewX(8deg); filter: blur(6px); opacity: 0; }
+  40%  { transform: translateX(2vw) skewX(-2deg); filter: blur(2px); opacity: 1; }
+  100% { transform: translateX(0) skewX(0); filter: blur(0); opacity: 1; }
+}
+#root > * { animation: whip-pan .45s cubic-bezier(.2,.8,.2,1) both; }
+
+/* Fonts — load comic essentials */
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Special+Elite&display=swap');
