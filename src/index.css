@@ -491,6 +491,112 @@
   .spot-rose  { color: hsl(348 80% 70%); }
   .spot-cyan  { color: hsl(188 80% 65%); }
 
+  /* ============================================================
+     SUPERMAN 1978 — TRIPPY DONNER CREDITS
+     Cape red, krypton blue, sun yellow. Streaking blue starfield,
+     slow-spinning shield, kaleidoscopic crystal-fortress refractions.
+     ============================================================ */
+  .krypton-sky {
+    background:
+      radial-gradient(ellipse at 50% 30%, hsl(212 95% 32% / 0.95) 0%, hsl(232 80% 8%) 70%),
+      linear-gradient(180deg, hsl(232 80% 6%), hsl(220 85% 12%));
+  }
+  /* Donner opening-credits streak — blue beams of light flying forward */
+  .donner-streaks {
+    background-image:
+      repeating-linear-gradient(95deg,
+        transparent 0px, transparent 22px,
+        hsl(208 100% 70% / 0.10) 22px, hsl(208 100% 75% / 0.18) 23px,
+        transparent 24px, transparent 60px);
+    mix-blend-mode: screen;
+  }
+  @keyframes streak {
+    0%   { transform: translateX(-30%) skewX(-12deg); opacity: 0.55; }
+    100% { transform: translateX(30%)  skewX(-12deg); opacity: 0.55; }
+  }
+  .streak { animation: streak 6s linear infinite; }
+  .streak-slow { animation: streak 14s linear infinite; }
+
+  /* Crystal Fortress shards */
+  .fortress {
+    background:
+      conic-gradient(from 200deg at 50% 50%,
+        hsl(208 100% 80% / 0.18),
+        hsl(212 100% 60% / 0.04),
+        hsl(38 100% 70% / 0.10),
+        hsl(0 90% 55% / 0.08),
+        hsl(208 100% 80% / 0.18));
+    filter: blur(0.5px);
+  }
+
+  /* Solar yellow glow — Earth's yellow sun gives him his powers */
+  .sun-glow {
+    box-shadow:
+      0 0 0 1px hsl(48 100% 65% / 0.55),
+      0 0 32px hsl(48 100% 60% / 0.65),
+      0 0 90px hsl(38 100% 55% / 0.45),
+      0 0 160px hsl(0 85% 50% / 0.30);
+  }
+  .cape-red { color: hsl(0 85% 55%); }
+  .krypton-blue { color: hsl(208 100% 65%); }
+  .sun-yellow { color: hsl(48 100% 62%); }
+
+  /* The S-Shield — spinning slowly through space */
+  @keyframes shield-spin {
+    0%   { transform: rotateY(0deg) rotateZ(-2deg) scale(1); }
+    50%  { transform: rotateY(180deg) rotateZ(2deg) scale(1.04); }
+    100% { transform: rotateY(360deg) rotateZ(-2deg) scale(1); }
+  }
+  .shield-spin { animation: shield-spin 14s ease-in-out infinite; transform-style: preserve-3d; }
+
+  /* Title-card chromatic credit text — that blue beveled Donner type */
+  .donner-title {
+    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
+    letter-spacing: 0.06em;
+    color: hsl(208 100% 70%);
+    text-shadow:
+      0 0 1px hsl(208 100% 95%),
+      0 0 8px hsl(208 100% 60% / 0.95),
+      0 0 24px hsl(212 100% 50% / 0.85),
+      0 0 60px hsl(212 100% 40% / 0.55);
+  }
+  .donner-credit {
+    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
+    letter-spacing: 0.18em;
+    color: hsl(208 100% 78%);
+    text-shadow: 0 0 6px hsl(208 100% 60% / 0.85), 0 0 18px hsl(212 100% 45% / 0.7);
+  }
+
+  /* Trippy chromatic aberration wobble for headers */
+  @keyframes chroma {
+    0%, 100% { text-shadow:
+        -1px 0 hsl(0 90% 55% / 0.85),
+         1px 0 hsl(208 100% 60% / 0.85),
+         0 0 18px hsl(48 100% 60% / 0.6);
+    }
+    50% { text-shadow:
+         1px 0 hsl(0 90% 55% / 0.85),
+        -1px 0 hsl(208 100% 60% / 0.85),
+         0 0 24px hsl(48 100% 60% / 0.7);
+    }
+  }
+  .chroma-pulse { animation: chroma 2.4s ease-in-out infinite; }
+
+  /* Glass card lit from above by the yellow sun */
+  .krypton-card {
+    background:
+      linear-gradient(180deg, hsl(212 60% 18% / 0.55), hsl(232 60% 8% / 0.75));
+    border: 1px solid hsl(208 100% 70% / 0.25);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border-radius: 1.25rem;
+    box-shadow:
+      0 0 0 1px hsl(48 100% 60% / 0.10),
+      inset 0 1px 0 hsl(208 100% 80% / 0.18),
+      0 30px 60px -28px hsl(232 90% 4% / 0.85),
+      0 0 80px -20px hsl(208 100% 50% / 0.45);
+  }
+
   /* ---------- INK / EDGE ---------- */
   .ink-edge {
     border: 1px solid hsl(38 40% 94% / 0.14);
