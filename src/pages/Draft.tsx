@@ -541,28 +541,34 @@ Keep it tight. No fluff, no closing line.`;
             >
               <Calculator className="h-3.5 w-3.5" /> Planner
             </Button>
-            <AlertDialog>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="More">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
-                    <Download className="mr-2 h-4 w-4" /> Export CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
-                    <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
-                      <RotateCcw className="mr-2 h-4 w-4" /> Reset draft…
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="More">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
+                  <Download className="mr-2 h-4 w-4" /> Export CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
+                  <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    // Wait for dropdown to fully unmount before opening dialog
+                    // (avoids Radix pointer-events lock that "blacks out" the screen)
+                    setTimeout(() => setResetOpen(true), 0);
+                  }}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" /> Reset draft…
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Reset draft?</AlertDialogTitle>
@@ -572,7 +578,7 @@ Keep it tight. No fluff, no closing line.`;
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => { resetAll(); navigate("/"); }}>Reset</AlertDialogAction>
+                  <AlertDialogAction onClick={() => { resetAll(); setResetOpen(false); navigate("/"); }}>Reset</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
