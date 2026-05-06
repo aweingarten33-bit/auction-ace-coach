@@ -545,7 +545,7 @@ Keep it tight. No fluff, no closing line.`;
                   <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
                     <Download className="mr-2 h-4 w-4" /> Export CSV
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
+                  <DropdownMenuItem onClick={() => navigate("/setup?step=0")}>
                     <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

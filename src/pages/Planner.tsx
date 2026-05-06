@@ -645,7 +645,7 @@ function SetupChecklist() {
         <Step n="1c" label="Upload this year's cheat sheet (tiers)" done={hasPrices}>
           {hasPrices
             ? <span className="text-emerald-500">{prices.length} players priced. Re-import in setup wizard.</span>
-            : <button onClick={() => navigate("/?step=1&edit=1")} className="text-primary underline">Open setup wizard →</button>}
+            : <button onClick={() => navigate("/setup?step=1&edit=1")} className="text-primary underline">Open setup wizard →</button>}
         </Step>
       </div>
     </Card>
