@@ -183,6 +183,7 @@ export default function DraftV2() {
 
   // ---------- coach (chat) ----------
   const [coachOpen, setCoachOpen] = useState(false);
+  const [budgetOpen, setBudgetOpen] = useState(false);
   const [coachText, setCoachText] = useState("");
   const [coachHistory, setCoachHistory] = useState<{ role: "user"|"assistant"; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -555,7 +556,7 @@ export default function DraftV2() {
           </div>
         </SheetContent>
       </Sheet>
-      <BudgetPlannerV2 />
+      <BudgetPlannerV2 open={budgetOpen} onOpenChange={setBudgetOpen} showFab={false} />
     </div>
   );
 }
