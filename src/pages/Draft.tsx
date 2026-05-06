@@ -53,6 +53,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
+import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import MarketHeat from "@/components/MarketHeat";
 import Watchlist from "@/components/Watchlist";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
