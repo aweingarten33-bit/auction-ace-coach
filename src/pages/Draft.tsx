@@ -545,7 +545,7 @@ Keep it tight. No fluff, no closing line.`;
     : null;
 
   return (
-    <EditorialShell activeCategory="Home">
+    <EditorialShell activeCategory={activeCategory}>
     <div className="overflow-x-hidden bg-background pb-4">
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-1 px-3 pt-2">
             <Button
@@ -706,7 +706,7 @@ Keep it tight. No fluff, no closing line.`;
           {decision && <DecisionCard d={decision} />}
 
           {/* Draft Log */}
-          <Card className="bg-gradient-card p-3">
+          <Card id="log" className="scroll-mt-28 bg-gradient-card p-3">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                 Draft Log{" "}
@@ -754,32 +754,41 @@ Keep it tight. No fluff, no closing line.`;
 
         {/* RIGHT: State + targets */}
         <section className="min-w-0 space-y-4">
-          <RosterHero
-            remaining={budget.remaining}
-            slotsLeft={budget.slotsLeft}
-            slotsTotal={budget.slotsTotal}
-            maxBid={budget.maxBid}
-            rows={heroRows}
-            bestTarget={bestTarget}
-            onLoadTarget={(name, pos) => {
-              setPlayerName(name); setPosition(pos); setDrafter("me");
-              toast(`${name} loaded — best next target`);
-            }}
-          />
-          <NominationCard
-            drain={computeDrain({ settings, keepers, events, prices })}
-            get={computeGet({ settings, keepers, events, prices })}
-            aiSuggestions={aiNoms}
-            aiLoading={nominationsMutation.isPending}
-            onAskAi={fetchAiNominations}
-            onPickAi={(s) => {
-              setPlayerName(s.name); setPosition(s.position); setDrafter("other");
-              setPriceInput(String(s.price)); setManualOpen(true);
-              toast(`${s.name} loaded — ${s.strategy}`);
-            }}
-          />
-          <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
-          <Tabs defaultValue="targets" className="w-full min-w-0 overflow-hidden">
+          <div id="plan" className="scroll-mt-28">
+            <DraftPlanCard onGenerate={generateDraftPlan} generating={planGenerating} />
+          </div>
+          <div id="roster" className="scroll-mt-28">
+            <RosterHero
+              remaining={budget.remaining}
+              slotsLeft={budget.slotsLeft}
+              slotsTotal={budget.slotsTotal}
+              maxBid={budget.maxBid}
+              rows={heroRows}
+              bestTarget={bestTarget}
+              onLoadTarget={(name, pos) => {
+                setPlayerName(name); setPosition(pos); setDrafter("me");
+                toast(`${name} loaded — best next target`);
+              }}
+            />
+          </div>
+          <div id="nominate" className="scroll-mt-28">
+            <NominationCard
+              drain={computeDrain({ settings, keepers, events, prices })}
+              get={computeGet({ settings, keepers, events, prices })}
+              aiSuggestions={aiNoms}
+              aiLoading={nominationsMutation.isPending}
+              onAskAi={fetchAiNominations}
+              onPickAi={(s) => {
+                setPlayerName(s.name); setPosition(s.position); setDrafter("other");
+                setPriceInput(String(s.price)); setManualOpen(true);
+                toast(`${s.name} loaded — ${s.strategy}`);
+              }}
+            />
+          </div>
+          <div id="tiers" className="scroll-mt-28">
+            <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
+          </div>
+          <Tabs value={researchTab} onValueChange={setResearchTab} className="w-full min-w-0 overflow-hidden">
             <TabsList className="grid h-9 w-full min-w-0 grid-cols-3">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
