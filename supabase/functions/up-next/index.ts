@@ -204,6 +204,16 @@ Deno.serve(async (req: Request) => {
     if (Array.isArray(parsed?.targets)) {
       for (const t of parsed.targets) {
         const pos = t?.position as string | undefined;
+
+        // ---- Snap maxBid to deterministic going-price ----
+        // The model picks WHO to target; the $ comes from sheet × marketMult so
+        // the user sees the same number on every refresh. Falls back to AI value
+        // only when the player isn't on the sheet.
+        const sheetRef = sheetMap.get(norm(t?.name ?? ""));
+        if (sheetRef && sheetRef.price > 0) {
+          t.maxBid = Math.max(1, Math.round(sheetRef.price * marketMult));
+        }
+
         const maxBid = Number(t?.maxBid) || 0;
         const ceiling = maxBid * 0.6;
         const ceilingFloor = Math.max(0, Math.floor(ceiling));
