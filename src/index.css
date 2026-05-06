@@ -12,10 +12,11 @@
 
 @layer base {
   :root {
-    --background: 220 65% 16%;
-    --foreground: 210 15% 92%;
+    /* NYT-style editorial: matte near-black, monochrome, typography-first. */
+    --background: 0 0% 6%;
+    --foreground: 0 0% 96%;
 
-    --card: 220 14% 11%;
+    --card: 0 0% 8%;
     --card-foreground: 210 15% 92%;
 
     --popover: 220 14% 12%;
