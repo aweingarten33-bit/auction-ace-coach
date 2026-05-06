@@ -12,74 +12,72 @@
 
 @layer base {
   :root {
-    /* DREAMSCAPE FOOTBALL — Waking Life × What Dreams May Come ×
-       Eternal Sunshine. Wet oil paint, rotoscope wobble, paper memories
-       dissolving at the edges. Field-green stained-glass and twilight
-       petals. Soft, hand-painted, never sharp.                         */
+    /* WAR ROOM — midnight blue, graphite black, faded cream, warm gold,
+       blood orange. Neon green = value / win. Deep red = danger.
+       A football command room you'd find at 2am on draft night.       */
 
-    /* Twilight oil — bruised dusk over a stadium */
-    --background: 232 32% 11%;
-    --foreground: 38 40% 94%;
+    --background: 222 35% 7%;          /* midnight ink */
+    --foreground: 38 30% 92%;          /* faded cream */
 
-    --card: 232 28% 15%;
-    --card-foreground: 38 40% 94%;
+    --card: 222 30% 10%;
+    --card-foreground: 38 30% 92%;
+    --popover: 222 32% 9%;
+    --popover-foreground: 38 30% 92%;
 
-    --popover: 232 30% 13%;
-    --popover-foreground: 38 40% 94%;
+    /* warm gold — primary signal (the editorial brass) */
+    --primary: 38 78% 56%;
+    --primary-foreground: 222 35% 7%;
+    --primary-glow: 38 95% 65%;
 
-    /* Stadium-grass green — Vincent Ward "painted world" */
-    --primary: 138 55% 48%;
-    --primary-foreground: 232 35% 10%;
-    --primary-glow: 138 70% 60%;
+    --secondary: 222 22% 14%;
+    --secondary-foreground: 38 30% 92%;
 
-    --secondary: 232 24% 19%;
-    --secondary-foreground: 38 40% 94%;
+    --muted: 222 18% 13%;
+    --muted-foreground: 38 14% 64%;
 
-    --muted: 232 22% 17%;
-    --muted-foreground: 38 18% 72%;
+    /* blood orange — heat, contention, accent */
+    --accent: 16 88% 56%;
+    --accent-foreground: 222 35% 7%;
 
-    /* Eternal-Sunshine tangerine — that beach-house glow */
-    --accent: 18 88% 60%;
-    --accent-foreground: 232 35% 10%;
+    /* deep red — overpay / danger */
+    --destructive: 0 75% 52%;
+    --destructive-foreground: 38 30% 92%;
 
-    /* Memory rose — the petal that keeps falling */
-    --destructive: 348 75% 58%;
-    --destructive-foreground: 38 40% 94%;
-
+    /* warning amber */
     --warning: 38 92% 60%;
-    --warning-foreground: 232 35% 10%;
+    --warning-foreground: 222 35% 7%;
 
-    /* Waking-life sky-cyan — the rotoscope edge */
-    --success: 188 75% 55%;
-    --success-foreground: 232 35% 10%;
+    /* neon green — value captured / win */
+    --success: 138 75% 48%;
+    --success-foreground: 222 35% 7%;
 
-    --border: 232 22% 26%;
-    --input: 232 24% 17%;
-    --ring: 138 55% 48%;
+    --border: 222 18% 20%;
+    --input: 222 22% 13%;
+    --ring: 38 78% 56%;
 
-    --radius: 1rem;
+    --radius: 0.875rem;
 
-    --gradient-primary: linear-gradient(140deg, hsl(138 60% 55%), hsl(188 70% 50%));
-    --gradient-card: linear-gradient(160deg, hsl(232 28% 16%), hsl(232 35% 11%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(232 26% 19%), hsl(232 32% 13%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(18 70% 30%), hsl(232 35% 14%));
-    --gradient-glossy: linear-gradient(180deg, hsl(38 40% 94% / 0.10) 0%, hsl(38 40% 94% / 0) 55%);
+    --gradient-primary: linear-gradient(160deg, hsl(38 90% 60%), hsl(16 88% 56%));
+    --gradient-card:    linear-gradient(165deg, hsl(222 30% 11%), hsl(222 38% 7%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(222 22% 14%), hsl(222 30% 9%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(222 28% 13%), hsl(222 38% 7%));
+    --gradient-glossy:  linear-gradient(180deg, hsl(38 30% 92% / 0.07), transparent 55%);
 
-    --shadow-glow: 0 0 0 1px hsl(138 60% 55% / 0.4), 0 0 56px -8px hsl(138 60% 55% / 0.55);
-    --shadow-aqua: 0 14px 40px -16px hsl(232 60% 4% / 0.65);
-    --shadow-card: 0 24px 60px -22px hsl(232 60% 4% / 0.65), 0 0 0 1px hsl(38 40% 94% / 0.06);
+    --shadow-glow:  0 0 0 1px hsl(38 90% 60% / 0.30), 0 0 56px -8px hsl(38 95% 60% / 0.45);
+    --shadow-aqua:  0 14px 40px -16px hsl(222 80% 2% / 0.75);
+    --shadow-card:  0 28px 64px -28px hsl(222 80% 2% / 0.85), 0 0 0 1px hsl(38 30% 92% / 0.05);
 
-    --grid-line: hsl(232 22% 22%);
-    --grid-line-strong: hsl(232 22% 30%);
+    --grid-line:        hsl(222 18% 16%);
+    --grid-line-strong: hsl(222 18% 22%);
 
-    --sidebar-background: 232 38% 9%;
-    --sidebar-foreground: 38 35% 92%;
-    --sidebar-primary: 138 55% 48%;
-    --sidebar-primary-foreground: 232 35% 10%;
-    --sidebar-accent: 232 24% 17%;
-    --sidebar-accent-foreground: 38 35% 92%;
-    --sidebar-border: 232 22% 24%;
-    --sidebar-ring: 138 55% 48%;
+    --sidebar-background: 222 38% 6%;
+    --sidebar-foreground: 38 28% 90%;
+    --sidebar-primary: 38 78% 56%;
+    --sidebar-primary-foreground: 222 35% 7%;
+    --sidebar-accent: 222 22% 13%;
+    --sidebar-accent-foreground: 38 28% 90%;
+    --sidebar-border: 222 18% 18%;
+    --sidebar-ring: 38 78% 56%;
   }
 
   .dark {
