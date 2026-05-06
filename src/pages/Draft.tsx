@@ -798,6 +798,21 @@ Keep it tight. No fluff, no closing line.`;
                 maxBid={budget.maxBid}
               />
             </TabsContent>
+            <TabsContent value="players" className="mt-3 space-y-4">
+              <PlayerSearchPanel
+                prices={prices}
+                events={events}
+                watchlist={watchlist}
+                onPick={(name, pos, price) => {
+                  setPlayerName(name);
+                  if (pos) setPosition(pos);
+                  if (price != null) setPriceInput(String(price));
+                  setManualOpen(true);
+                }}
+                onPin={handlePin}
+                onUnpin={handleUnpin}
+              />
+            </TabsContent>
             <TabsContent value="market" className="mt-3 space-y-4">
               <MarketHeat
                 events={events} prices={prices}
