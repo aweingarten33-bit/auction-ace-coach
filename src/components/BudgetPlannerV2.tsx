@@ -30,16 +30,44 @@ const INITIAL: Row[] = [
 
 const STARTERS = new Set(["QB", "RB1", "RB2", "WR1", "WR2", "WR3", "TE", "FLEX", "K", "DST"]);
 
-export default function BudgetPlannerV2({ bank = 225 }: { bank?: number }) {
-  const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<"plan" | "audit" | "value">("plan");
-  const [rows, setRows] = useState<Row[]>(INITIAL);
-  const [picks, setPicks] = useState<string[]>(["", "", ""]);
-  const [look, setLook] = useState<{ amount: number; pos: string }>({ amount: 28, pos: "ANY" });
-
+/* =========================
+   🧠 CORE PLANNER LOGIC
+========================= */
+function usePlanner(initial: Row[], bank: number) {
+  const [rows, setRows] = useState<Row[]>(initial);
   const total = rows.reduce((s, r) => s + (Number(r[1]) || 0), 0);
   const remaining = bank - total;
   const balanced = total <= bank;
+
+  const update = (index: number, value: number) =>
+    setRows(prev => prev.map((r, i) => (i === index ? [r[0], value] as Row : r)));
+
+  const reset = () => setRows(initial);
+  const suggestPlan = () => setRows(suggest(bank));
+
+  return { rows, update, reset, suggestPlan, total, remaining, balanced, bank };
+}
+
+/* =========================
+   🚀 ENTRY
+========================= */
+export default function BudgetPlannerV2({ bank = 225 }: { bank?: number }) {
+  const planner = usePlanner(INITIAL, bank);
+  return <PlannerDock planner={planner} />;
+}
+
+/* =========================
+   💬 FLOATING DOCK (BOTTOM SHEET)
+========================= */
+function PlannerDock({ planner }: { planner: ReturnType<typeof usePlanner> }) {
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
     <>
@@ -52,14 +80,37 @@ export default function BudgetPlannerV2({ bank = 225 }: { bank?: number }) {
         .bp-input:focus { outline: none; }
       `}</style>
 
-      <Dock
-        open={open} setOpen={setOpen}
-        tab={tab} setTab={setTab}
-        rows={rows} setRows={setRows}
-        picks={picks} setPicks={setPicks}
-        look={look} setLook={setLook}
-        total={total} bank={bank} remaining={remaining} balanced={balanced}
-      />
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              style={{ position: "fixed", inset: 0, zIndex: 40, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }}
+            />
+            <motion.aside
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 260 }}
+              style={{
+                position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 45,
+                height: "85vh", background: C.page, color: C.ink,
+                borderTop: `1px solid ${C.hair}`,
+                borderTopLeftRadius: 24, borderTopRightRadius: 24,
+                display: "flex", flexDirection: "column",
+                fontFamily: SANS,
+                boxShadow: "0 -20px 60px rgba(0,0,0,0.5)",
+              }}
+            >
+              <SheetHandle />
+              <PanelHeader setOpen={setOpen} />
+              <div className="bp-scroll" style={{ flex: 1, overflowY: "auto" }}>
+                <PlannerView planner={planner} />
+              </div>
+              <PanelFooter remaining={planner.remaining} balanced={planner.balanced} />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       <motion.button
         onClick={() => setOpen(o => !o)}
@@ -83,150 +134,92 @@ export default function BudgetPlannerV2({ bank = 225 }: { bank?: number }) {
   );
 }
 
-function Dock({
-  open, setOpen, tab, setTab, rows, setRows, picks, setPicks, look, setLook,
-  total, bank, remaining, balanced,
-}: any) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, setOpen]);
-
+function SheetHandle() {
   return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
-            style={{ position: "fixed", inset: 0, zIndex: 40, background: "rgba(0,0,0,0.45)", backdropFilter: "blur(2px)" }}
-          />
-          <motion.aside
-            initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 28, stiffness: 240 }}
-            style={{
-              position: "fixed", top: 0, right: 0, bottom: 0, zIndex: 45,
-              width: "min(440px, 100vw)", background: C.page, color: C.ink,
-              borderLeft: `1px solid ${C.hair}`,
-              display: "flex", flexDirection: "column",
-              fontFamily: SANS,
-            }}
-          >
-            <PanelHeader tab={tab} setTab={setTab} setOpen={setOpen} />
-
-            <div className="bp-scroll" style={{ flex: 1, overflowY: "auto", padding: "0 28px 28px" }}>
-              {tab === "plan" && (
-                <PlanView rows={rows} setRows={setRows} bank={bank} total={total} remaining={remaining} balanced={balanced} />
-              )}
-              {tab === "audit" && <AuditView picks={picks} setPicks={setPicks} />}
-              {tab === "value" && <ValueView look={look} setLook={setLook} />}
-            </div>
-
-            <PanelFooter remaining={remaining} balanced={balanced} />
-          </motion.aside>
-        </>
-      )}
-    </AnimatePresence>
-  );
-}
-
-function PanelHeader({ tab, setTab, setOpen }: any) {
-  const tabs = [
-    { id: "plan", label: "Plan" },
-    { id: "audit", label: "Audit" },
-    { id: "value", label: "Valeur" },
-  ];
-  return (
-    <div style={{ padding: "28px 28px 0", borderBottom: `1px solid ${C.hairlite}` }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <div style={{ fontFamily: SERIF, fontSize: 32, fontStyle: "italic", lineHeight: 1, color: C.ink }}>
-            le planner
-          </div>
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint, marginTop: 8 }}>
-            BUDGET · AUCTION
-          </div>
-        </div>
-        <button onClick={() => setOpen(false)} aria-label="Close" style={{
-          width: 32, height: 32, borderRadius: "50%", background: "transparent",
-          border: `1px solid ${C.hair}`, color: C.ink, cursor: "pointer",
-          fontFamily: SERIF, fontSize: 18, display: "grid", placeItems: "center",
-        }}>×</button>
-      </div>
-
-      <div style={{ marginTop: 24, display: "flex" }}>
-        {tabs.map(t => {
-          const active = tab === t.id;
-          return (
-            <button key={t.id} onClick={() => setTab(t.id)} style={{
-              background: "transparent", border: "none", cursor: "pointer",
-              padding: "6px 0", marginRight: 24,
-              fontFamily: SANS, fontSize: 13, fontWeight: active ? 500 : 400,
-              color: active ? C.ink : C.muted, position: "relative",
-            }}>
-              {t.label}
-              {active && (
-                <motion.div layoutId="bp-tab-underline" style={{
-                  position: "absolute", left: 0, right: 0, bottom: -1, height: 1, background: C.ink,
-                }} />
-              )}
-            </button>
-          );
-        })}
-      </div>
+    <div style={{ display: "grid", placeItems: "center", padding: "10px 0 4px" }}>
+      <div style={{ width: 36, height: 4, borderRadius: 2, background: C.hair }} />
     </div>
   );
 }
 
-function PlanView({ rows, setRows, bank, total, remaining, balanced }: any) {
+function PanelHeader({ setOpen }: { setOpen: (b: boolean) => void }) {
   return (
-    <div style={{ paddingTop: 24 }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 24 }}>
-        <MiniStat label="Bank" value={`$${bank}`} />
-        <MiniStat label="Plan" value={`$${total}`} accent={balanced ? C.green : C.yellow} />
-        <MiniStat label="Reste" value={`$${remaining}`} accent={balanced ? C.ink : C.yellow} />
-      </div>
-
-      <div style={{
-        padding: "12px 14px", border: `1px solid ${C.hair}`, borderRadius: 10,
-        marginBottom: 24, display: "flex", justifyContent: "space-between", alignItems: "center",
-        background: C.surface,
-      }}>
-        <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.14em", color: C.muted }}>STRATEGY</span>
-        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: C.yellow }}>balanced — default</span>
-      </div>
-
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
-        <div>
-          <div style={{ fontFamily: SERIF, fontSize: 22, color: C.ink }}>Allocations</div>
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", color: C.faint, marginTop: 4 }}>
-            $ PER SLOT
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 16 }}>
-          <Linkish onClick={() => setRows(suggest(bank))}>Suggest</Linkish>
-          <Linkish onClick={() => setRows(INITIAL)}>Reset</Linkish>
-        </div>
-      </div>
-
+    <div style={{ padding: "12px 24px 16px", borderBottom: `1px solid ${C.hairlite}`, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
       <div>
-        {rows.map(([label, val]: Row, i: number) => (
-          <Row key={label} label={label} value={val} isStarter={STARTERS.has(label)}
-            onChange={(v: number) => setRows((prev: Row[]) => prev.map((r, idx) => idx === i ? [r[0], v] as Row : r))}
+        <div style={{ fontFamily: SERIF, fontSize: 30, fontStyle: "italic", lineHeight: 1, color: C.ink }}>
+          le planner
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint, marginTop: 6 }}>
+          BUDGET · AUCTION
+        </div>
+      </div>
+      <button onClick={() => setOpen(false)} aria-label="Close" style={{
+        width: 32, height: 32, borderRadius: "50%", background: "transparent",
+        border: `1px solid ${C.hair}`, color: C.ink, cursor: "pointer",
+        fontFamily: SERIF, fontSize: 18, display: "grid", placeItems: "center",
+      }}>×</button>
+    </div>
+  );
+}
+
+/* =========================
+   🎯 PLANNER VIEW (REUSABLE)
+========================= */
+function PlannerView({ planner }: { planner: ReturnType<typeof usePlanner> }) {
+  const { rows, update, reset, suggestPlan, total, remaining, bank, balanced } = planner;
+
+  return (
+    <div style={{ padding: "20px 24px 28px" }}>
+      {/* SNAPSHOT — Remaining is the hero */}
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint }}>
+          RESTE
+        </div>
+        <div style={{ fontFamily: SERIF, fontSize: 56, lineHeight: 1, color: balanced ? C.ink : C.yellow, marginTop: 6 }}>
+          ${remaining}
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: 11, color: balanced ? C.green : C.yellow, marginTop: 8, letterSpacing: "0.1em" }}>
+          ${total} / ${bank} {balanced ? "· EN ÉQUILIBRE" : "· OVER BUDGET"}
+        </div>
+      </div>
+
+      {/* ALLOCATIONS */}
+      <SectionHeader title="Allocations" caption="$ PER SLOT">
+        <Linkish onClick={suggestPlan}>Suggest</Linkish>
+        <Linkish onClick={reset}>Reset</Linkish>
+      </SectionHeader>
+
+      <div style={{ marginBottom: 32 }}>
+        {rows.map(([label, val], i) => (
+          <SlotRow key={label} label={label} value={val} isStarter={STARTERS.has(label)}
+            onChange={(v) => update(i, v)}
           />
         ))}
       </div>
+
+      {/* AUDIT */}
+      <SectionHeader title="Audit" caption="CAN I AFFORD X+Y+Z?" />
+      <AuditTool />
+
+      {/* VALEUR */}
+      <div style={{ marginTop: 32 }}>
+        <SectionHeader title="Valeur" caption="WHAT DOES $X BUY?" />
+        <ValueTool />
+      </div>
     </div>
   );
 }
 
-function MiniStat({ label, value, accent }: { label: string; value: string; accent?: string }) {
+function SectionHeader({ title, caption, children }: any) {
   return (
-    <div style={{ padding: "12px 0" }}>
-      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", color: C.faint }}>{label.toUpperCase()}</div>
-      <div style={{ fontFamily: SERIF, fontSize: 28, color: accent || C.ink, marginTop: 4 }}>{value}</div>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
+      <div>
+        <div style={{ fontFamily: SERIF, fontSize: 22, color: C.ink }}>{title}</div>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.14em", color: C.faint, marginTop: 4 }}>
+          {caption}
+        </div>
+      </div>
+      {children && <div style={{ display: "flex", gap: 16 }}>{children}</div>}
     </div>
   );
 }
@@ -241,7 +234,7 @@ function Linkish({ children, onClick }: any) {
   );
 }
 
-function Row({ label, value, isStarter, onChange }: any) {
+function SlotRow({ label, value, isStarter, onChange }: any) {
   const [focus, setFocus] = useState(false);
   return (
     <div style={{
@@ -271,90 +264,111 @@ function Row({ label, value, isStarter, onChange }: any) {
   );
 }
 
-function AuditView({ picks, setPicks }: any) {
-  return (
-    <div style={{ paddingTop: 24 }}>
-      <div style={{ fontFamily: SERIF, fontSize: 26, color: C.ink, marginBottom: 4 }}>Audit</div>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: C.muted, marginBottom: 6 }}>
-        Can I afford X + Y + Z?
-      </div>
-      <div style={{ fontFamily: SANS, fontSize: 12, color: C.faint, marginBottom: 24, lineHeight: 1.6 }}>
-        Add up to three names with their projected price. We'll tell you what's left for the rest of the room.
-      </div>
+/* =========================
+   🧮 AUDIT TOOL
+========================= */
+function AuditTool() {
+  const [picks, setPicks] = useState<{ name: string; price: number }[]>([
+    { name: "", price: 0 }, { name: "", price: 0 }, { name: "", price: 0 },
+  ]);
+  const sum = picks.reduce((s, p) => s + (Number(p.price) || 0), 0);
+  const named = picks.filter(p => p.name.trim()).length;
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-        {picks.map((p: string, i: number) => (
-          <PickRow key={i} index={i + 1} value={p}
-            onChange={(v: string) => setPicks((prev: string[]) => prev.map((x, idx) => idx === i ? v : x))}
+  return (
+    <div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 16 }}>
+        {picks.map((p, i) => (
+          <PickRow key={i} index={i + 1} pick={p}
+            onChange={(next) => setPicks(prev => prev.map((x, idx) => idx === i ? next : x))}
           />
         ))}
       </div>
 
       <div style={{
-        marginTop: 32, padding: "20px 18px",
-        border: `1px solid ${C.hair}`, borderRadius: 12, background: C.surface,
+        padding: "16px 18px", border: `1px solid ${C.hair}`, borderRadius: 12, background: C.surface,
       }}>
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint, marginBottom: 8 }}>
           VERDICT
         </div>
-        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: C.muted }}>
-          add a name to begin
-        </div>
+        {named === 0 ? (
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: C.muted }}>
+            add a name to begin
+          </div>
+        ) : (
+          <div style={{ fontFamily: SERIF, fontSize: 18, color: C.ink, lineHeight: 1.4 }}>
+            ${sum} <span style={{ fontStyle: "italic", color: C.muted, fontSize: 15 }}>across {named} pick{named > 1 ? "s" : ""}</span>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function PickRow({ index, value, onChange }: any) {
-  const [focus, setFocus] = useState(false);
+function PickRow({ index, pick, onChange }: any) {
+  const [focus, setFocus] = useState<"name" | "price" | null>(null);
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: C.faint, width: 18 }}>
         {index === 1 ? "i" : index === 2 ? "ii" : "iii"}
       </span>
-      <input className="bp-input" value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onFocus={() => setFocus(true)} onBlur={() => setFocus(false)}
+      <input className="bp-input" value={pick.name}
+        onChange={(e) => onChange({ ...pick, name: e.target.value })}
+        onFocus={() => setFocus("name")} onBlur={() => setFocus(null)}
         placeholder="player name"
         style={{
           flex: 1, background: "transparent", border: "none",
-          borderBottom: `1px solid ${focus ? C.ink : C.hair}`,
-          fontFamily: SERIF, fontSize: 20, color: C.ink, padding: "4px 0",
+          borderBottom: `1px solid ${focus === "name" ? C.ink : C.hair}`,
+          fontFamily: SERIF, fontSize: 18, color: C.ink, padding: "4px 0",
           transition: "border-color 0.2s ease",
         }}
       />
+      <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <span style={{ fontFamily: MONO, fontSize: 12, color: C.faint }}>$</span>
+        <input className="bp-input" type="number" value={pick.price || ""}
+          onChange={(e) => onChange({ ...pick, price: Math.max(0, Number(e.target.value) || 0) })}
+          onFocus={() => setFocus("price")} onBlur={() => setFocus(null)}
+          placeholder="0"
+          style={{
+            width: 48, textAlign: "right",
+            fontFamily: MONO, fontSize: 15,
+            background: "transparent", border: "none",
+            borderBottom: `1px solid ${focus === "price" ? C.yellow : C.hair}`,
+            color: C.ink, padding: "4px 0", transition: "border-color 0.2s ease",
+          }}
+        />
+      </div>
     </div>
   );
 }
 
-function ValueView({ look, setLook }: any) {
+/* =========================
+   💎 VALUE TOOL
+========================= */
+function ValueTool() {
+  const [look, setLook] = useState({ amount: 28, pos: "ANY" });
   const positions = ["ANY", "QB", "RB", "WR", "TE"];
-  return (
-    <div style={{ paddingTop: 24 }}>
-      <div style={{ fontFamily: SERIF, fontSize: 26, color: C.ink, marginBottom: 4 }}>Valeur</div>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: C.muted, marginBottom: 28 }}>
-        What does ${look.amount} buy?
-      </div>
 
-      <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 28 }}>
-        <span style={{ fontFamily: SERIF, fontSize: 36, color: C.muted }}>$</span>
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 18, marginTop: 4 }}>
+        <span style={{ fontFamily: SERIF, fontSize: 32, color: C.muted }}>$</span>
         <input className="bp-input" type="number" value={look.amount}
           onChange={(e) => setLook({ ...look, amount: Math.max(0, Number(e.target.value) || 0) })}
           style={{
-            width: 80, fontFamily: SERIF, fontSize: 36, color: C.ink,
+            width: 72, fontFamily: SERIF, fontSize: 32, color: C.ink,
             background: "transparent", border: "none",
             borderBottom: `1px solid ${C.ink}`, padding: "2px 4px",
           }}
         />
-        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: C.muted, marginLeft: 8 }}>at</span>
+        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: C.muted, marginLeft: 8 }}>at</span>
       </div>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 28 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
         {positions.map(p => {
           const active = look.pos === p;
           return (
             <button key={p} onClick={() => setLook({ ...look, pos: p })} style={{
-              padding: "8px 16px",
+              padding: "7px 14px",
               background: active ? C.chip : "transparent",
               color: active ? C.ink : C.muted,
               border: `1px solid ${active ? C.chip : C.hair}`,
@@ -367,13 +381,13 @@ function ValueView({ look, setLook }: any) {
       </div>
 
       <div style={{
-        padding: "20px 18px", border: `1px solid ${C.hair}`,
+        padding: "16px 18px", border: `1px solid ${C.hair}`,
         borderRadius: 12, background: C.surface,
       }}>
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint, marginBottom: 10 }}>
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.18em", color: C.faint, marginBottom: 8 }}>
           TIER — {look.pos}
         </div>
-        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: C.ink, lineHeight: 1.4 }}>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: C.ink, lineHeight: 1.4 }}>
           {tierForPrice(look.amount)}
         </div>
       </div>
@@ -381,16 +395,19 @@ function ValueView({ look, setLook }: any) {
   );
 }
 
-function PanelFooter({ remaining, balanced }: any) {
+/* =========================
+   📌 FOOTER (sticky reste)
+========================= */
+function PanelFooter({ remaining, balanced }: { remaining: number; balanced: boolean }) {
   return (
     <div style={{
-      borderTop: `1px solid ${C.hair}`, padding: "18px 28px",
+      borderTop: `1px solid ${C.hair}`, padding: "14px 24px",
       display: "flex", justifyContent: "space-between", alignItems: "center",
       background: C.surface,
     }}>
       <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: C.muted }}>Reste</span>
       <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-        <span style={{ fontFamily: SERIF, fontSize: 28, color: balanced ? C.ink : C.yellow }}>${remaining}</span>
+        <span style={{ fontFamily: SERIF, fontSize: 26, color: balanced ? C.ink : C.yellow }}>${remaining}</span>
         <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.16em", color: balanced ? C.green : C.yellow }}>
           {balanced ? "EN ÉQUILIBRE" : "OVER BUDGET"}
         </span>
@@ -399,6 +416,9 @@ function PanelFooter({ remaining, balanced }: any) {
   );
 }
 
+/* =========================
+   🛠 HELPERS
+========================= */
 function suggest(bank: number): Row[] {
   const pct: Record<string, number> = { QB: 0.10, RB1: 0.15, RB2: 0.10, WR1: 0.15, WR2: 0.10, WR3: 0.07, TE: 0.06, FLEX: 0.14 };
   const out: Row[] = INITIAL.map(([label]) => pct[label] ? [label, Math.round(bank * pct[label])] as Row : [label, 1] as Row);
