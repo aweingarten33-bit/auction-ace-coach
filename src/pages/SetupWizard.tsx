@@ -23,6 +23,7 @@ import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
 import EditorialShell from "@/components/EditorialShell";
+import SupermanShell from "@/components/SupermanShell";
 
 const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 
@@ -85,13 +86,14 @@ export default function SetupWizard() {
 
   return (
     <EditorialShell activeCategory="Settings">
-      <div className="px-4 md:px-8 pt-5">
+    <SupermanShell title="the auction room" credit={`step ${step + 1} of ${STEPS.length} · ${STEPS[step]}`}>
+      <div className="px-4 md:px-8">
       <div className="mx-auto max-w-2xl">
-        <header className="mb-5">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-            Draft Setup · Step {step + 1} of {STEPS.length}
+        <header className="mb-5 text-center">
+          <p className="donner-credit text-[10px] uppercase">
+            faster than a speeding bid
           </p>
-          <h2 className="mt-1 text-2xl font-bold tracking-tight" style={{ fontFamily: '"Playfair Display", Georgia, serif' }}>
+          <h2 className="mt-2 donner-title text-3xl md:text-4xl uppercase chroma-pulse">
             {STEPS[step]}
           </h2>
           {setupComplete && (
@@ -103,7 +105,8 @@ export default function SetupWizard() {
 
         <Progress value={progress} className="mb-6 h-1.5" />
 
-        <Card className="p-5 md:p-6">
+        <Card className="krypton-card p-5 md:p-6 border-0 bg-transparent shadow-none">
+
           {step === 0 && (
             <div className="space-y-6">
               <EspnImportButton />
@@ -318,6 +321,8 @@ export default function SetupWizard() {
         </Card>
       </div>
       </div>
+    </SupermanShell>
     </EditorialShell>
+
   );
 }
