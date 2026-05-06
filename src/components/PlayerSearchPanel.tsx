@@ -142,39 +142,48 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
           const isPinned = pinnedSet.has(norm(p.name));
           const cls = p.position && p.position in POS_COLORS ? POS_COLORS[p.position as Position] : "";
           return (
-            <button
+            <div
               key={p.name}
-              type="button"
-              disabled={isDrafted}
-              onClick={() => !isDrafted && onPick(p.name, p.position, p.price)}
-              className={`flex w-full items-center gap-2 rounded px-2 py-2 text-left transition ${
+              className={`flex items-center gap-2 rounded px-2 py-2 transition ${
                 isDrafted ? "opacity-40 line-through" : "hover:bg-secondary/60"
               }`}
             >
-              <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
-              {p.position && (
-                <Badge variant="outline" className={`${cls} text-[10px] px-1.5 py-0`}>
-                  {p.position}
-                </Badge>
-              )}
-              {tierByName.get(norm(p.name)) != null && (
-                <span className="rounded border border-border/60 px-1 text-[10px] font-mono text-muted-foreground">
-                  T{tierByName.get(norm(p.name))}
-                </span>
-              )}
-              <span className="w-12 text-right font-mono text-xs tabular-nums">${p.price}</span>
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  isPinned ? onUnpin(p.name) : onPin(p.name);
-                }}
+              <button
+                type="button"
+                disabled={isDrafted}
+                onClick={() => !isDrafted && setDetailFor({ name: p.name, position: p.position, price: p.price })}
+                className="flex flex-1 min-w-0 items-center gap-2 text-left"
+              >
+                <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
+                {p.position && (
+                  <Badge variant="outline" className={`${cls} text-[10px] px-1.5 py-0`}>
+                    {p.position}
+                  </Badge>
+                )}
+                {tierByName.get(norm(p.name)) != null && (
+                  <span className="rounded border border-border/60 px-1 text-[10px] font-mono text-muted-foreground">
+                    T{tierByName.get(norm(p.name))}
+                  </span>
+                )}
+                <span className="w-12 text-right font-mono text-xs tabular-nums">${p.price}</span>
+              </button>
+              <button
+                type="button"
+                disabled={isDrafted}
+                onClick={() => !isDrafted && onPick(p.name, p.position, p.price)}
+                title="Load into bid form"
+                className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-30"
+              >
+                <Gavel className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => (isPinned ? onUnpin(p.name) : onPin(p.name))}
                 className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
               >
                 {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
-              </span>
-            </button>
+              </button>
+            </div>
           );
         })}
         {!results.length && (
@@ -182,8 +191,14 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
         )}
       </div>
       <p className="mt-1.5 text-[10px] text-muted-foreground">
-        Tap a player to load them into the bid form. Pin to add to your watchlist.
+        Tap a name for the full pre-draft card. Gavel loads into the bid form. Pin saves to your watchlist.
       </p>
+      <PlayerDetailsOverlay
+        open={!!detailFor}
+        onOpenChange={(o) => !o && setDetailFor(null)}
+        name={detailFor?.name ?? ""}
+        position={detailFor?.position}
+      />
     </Card>
   );
 }
