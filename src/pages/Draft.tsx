@@ -53,6 +53,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import UpNextQueue, { QueueTarget } from "@/components/UpNextQueue";
+import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import MarketHeat from "@/components/MarketHeat";
 import Watchlist from "@/components/Watchlist";
 import EspnSyncStatus from "@/components/EspnSyncStatus";
@@ -766,8 +767,9 @@ Keep it tight. No fluff, no closing line.`;
           />
           <TierBreakAlerts prices={prices} events={events} keepers={keepers} />
           <Tabs defaultValue="targets" className="w-full min-w-0 overflow-hidden">
-            <TabsList className="grid h-9 w-full min-w-0 grid-cols-3">
+            <TabsList className="grid h-9 w-full min-w-0 grid-cols-4">
               <TabsTrigger value="targets" className="text-[11px]">Targets</TabsTrigger>
+              <TabsTrigger value="players" className="text-[11px]">Players</TabsTrigger>
               <TabsTrigger value="market" className="text-[11px]">Market</TabsTrigger>
               <TabsTrigger value="vetri" className="text-[11px]">Analyst</TabsTrigger>
             </TabsList>
@@ -794,6 +796,21 @@ Keep it tight. No fluff, no closing line.`;
                 onLoad={handleLoadFromWatchlist}
                 valueFor={valueFor}
                 maxBid={budget.maxBid}
+              />
+            </TabsContent>
+            <TabsContent value="players" className="mt-3 space-y-4">
+              <PlayerSearchPanel
+                prices={prices}
+                events={events}
+                watchlist={watchlist}
+                onPick={(name, pos, price) => {
+                  setPlayerName(name);
+                  if (pos) setPosition(pos);
+                  if (price != null) setPriceInput(String(price));
+                  setManualOpen(true);
+                }}
+                onPin={handlePin}
+                onUnpin={handleUnpin}
               />
             </TabsContent>
             <TabsContent value="market" className="mt-3 space-y-4">
