@@ -543,6 +543,15 @@ Keep it tight. No fluff, no closing line.`;
             </Button>
             <Button
               size="sm"
+              variant="outline"
+              onClick={() => navigate("/draft-os")}
+              className="h-8 px-2.5 text-[11px] font-semibold"
+              title="DraftOS shell"
+            >
+              OS
+            </Button>
+            <Button
+              size="sm"
               onClick={() => navigate("/planner")}
               className="h-8 gap-1.5 px-2.5 text-[11px] font-semibold"
               title="Budget Planner"
