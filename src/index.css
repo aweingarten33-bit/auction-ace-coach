@@ -12,72 +12,66 @@
 
 @layer base {
   :root {
-    /* WAR ROOM — midnight blue, graphite black, faded cream, warm gold,
-       blood orange. Neon green = value / win. Deep red = danger.
-       A football command room you'd find at 2am on draft night.       */
+    --background: 220 65% 16%;
+    --foreground: 210 15% 92%;
 
-    --background: 222 35% 7%;          /* midnight ink */
-    --foreground: 38 30% 92%;          /* faded cream */
+    --card: 220 14% 11%;
+    --card-foreground: 210 15% 92%;
 
-    --card: 222 30% 10%;
-    --card-foreground: 38 30% 92%;
-    --popover: 222 32% 9%;
-    --popover-foreground: 38 30% 92%;
+    --popover: 220 14% 12%;
+    --popover-foreground: 210 15% 94%;
 
-    /* warm gold — primary signal (the editorial brass) */
-    --primary: 38 78% 56%;
-    --primary-foreground: 222 35% 7%;
-    --primary-glow: 38 95% 65%;
+    /* Restrained, professional palette: a single muted gold accent. */
+    --primary: 40 35% 70%;
+    --primary-foreground: 220 20% 10%;
+    --primary-glow: 40 35% 75%;
 
-    --secondary: 222 22% 14%;
-    --secondary-foreground: 38 30% 92%;
+    --secondary: 220 12% 15%;
+    --secondary-foreground: 210 15% 92%;
 
-    --muted: 222 18% 13%;
-    --muted-foreground: 38 14% 64%;
+    --muted: 220 12% 14%;
+    --muted-foreground: 215 10% 65%;
 
-    /* blood orange — heat, contention, accent */
-    --accent: 16 88% 56%;
-    --accent-foreground: 222 35% 7%;
+    /* Accent intentionally matches foreground so stray accent uses stay neutral. */
+    --accent: 210 15% 92%;
+    --accent-foreground: 220 20% 10%;
 
-    /* deep red — overpay / danger */
-    --destructive: 0 75% 52%;
-    --destructive-foreground: 38 30% 92%;
+    --destructive: 0 90% 70%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* warning amber */
-    --warning: 38 92% 60%;
-    --warning-foreground: 222 35% 7%;
+    --warning: 40 35% 70%;
+    --warning-foreground: 220 20% 10%;
 
-    /* neon green — value captured / win */
-    --success: 138 75% 48%;
-    --success-foreground: 222 35% 7%;
+    --success: 150 25% 55%;
+    --success-foreground: 0 0% 100%;
 
-    --border: 222 18% 20%;
-    --input: 222 22% 13%;
-    --ring: 38 78% 56%;
+    --border: 220 12% 18%;
+    --input: 220 12% 14%;
+    --ring: 40 35% 70%;
 
-    --radius: 0.875rem;
+    --radius: 0.375rem;
 
-    --gradient-primary: linear-gradient(160deg, hsl(38 90% 60%), hsl(16 88% 56%));
-    --gradient-card:    linear-gradient(165deg, hsl(222 30% 11%), hsl(222 38% 7%));
-    --gradient-aluminum: linear-gradient(180deg, hsl(222 22% 14%), hsl(222 30% 9%));
-    --gradient-titlebar: linear-gradient(180deg, hsl(222 28% 13%), hsl(222 38% 7%));
-    --gradient-glossy:  linear-gradient(180deg, hsl(38 30% 92% / 0.07), transparent 55%);
+    --gradient-primary: linear-gradient(180deg, hsl(40 35% 70%), hsl(40 30% 62%));
+    --gradient-card: linear-gradient(180deg, hsl(220 14% 12%), hsl(220 14% 10%));
+    --gradient-aluminum: linear-gradient(180deg, hsl(220 12% 16%), hsl(220 14% 11%));
+    --gradient-titlebar: linear-gradient(180deg, hsl(220 14% 13%), hsl(220 15% 9%));
+    --gradient-glossy: linear-gradient(180deg, hsl(0 0% 100% / 0.03) 0%, hsl(0 0% 100% / 0) 50%);
 
-    --shadow-glow:  0 0 0 1px hsl(38 90% 60% / 0.30), 0 0 56px -8px hsl(38 95% 60% / 0.45);
-    --shadow-aqua:  0 14px 40px -16px hsl(222 80% 2% / 0.75);
-    --shadow-card:  0 28px 64px -28px hsl(222 80% 2% / 0.85), 0 0 0 1px hsl(38 30% 92% / 0.05);
+    --shadow-glow: 0 0 0 1px hsl(40 35% 70% / 0.25);
+    --shadow-aqua: 0 1px 0 hsl(0 0% 100% / 0.04) inset, 0 1px 2px hsl(0 0% 0% / 0.5);
+    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -12px hsl(0 0% 0% / 0.6);
 
-    --grid-line:        hsl(222 18% 16%);
-    --grid-line-strong: hsl(222 18% 22%);
+    --grid-line: hsl(220 12% 14%);
+    --grid-line-strong: hsl(220 12% 17%);
 
-    --sidebar-background: 222 38% 6%;
-    --sidebar-foreground: 38 28% 90%;
-    --sidebar-primary: 38 78% 56%;
-    --sidebar-primary-foreground: 222 35% 7%;
-    --sidebar-accent: 222 22% 13%;
-    --sidebar-accent-foreground: 38 28% 90%;
-    --sidebar-border: 222 18% 18%;
-    --sidebar-ring: 38 78% 56%;
+    --sidebar-background: 220 15% 7%;
+    --sidebar-foreground: 210 15% 88%;
+    --sidebar-primary: 40 35% 70%;
+    --sidebar-primary-foreground: 220 20% 10%;
+    --sidebar-accent: 220 12% 14%;
+    --sidebar-accent-foreground: 210 15% 92%;
+    --sidebar-border: 220 12% 16%;
+    --sidebar-ring: 40 35% 70%;
   }
 
   .dark {
@@ -186,7 +180,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
-    /* Editorial: clean matte canvas, no grid */
+    /* Blueprint grid — fine 8px lattice, slightly stronger every 64px */
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to right, var(--grid-line-strong) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line-strong) 1px, transparent 1px);
+    background-size: 8px 8px, 8px 8px, 64px 64px, 64px 64px;
+    background-attachment: fixed;
   }
 
   #root {
@@ -220,49 +221,6 @@
 }
 
 @layer utilities {
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-  /* ============================================================
-     NEUMORPHISM + GLASSMORPHISM SYSTEM
-     Applied globally to Cards, Buttons, Inputs via base overrides.
-     ============================================================ */
-
-  /* Subtle accents only — editorial first, glass/neu as quiet texture. */
-  .neu {
-    background: hsl(var(--card) / 0.6);
-    border-radius: 0.5rem;
-    box-shadow:
-      0 1px 0 hsl(0 0% 100% / 0.03) inset,
-      0 1px 2px hsl(0 0% 0% / 0.4);
-    border: 1px solid hsl(0 0% 100% / 0.06);
-  }
-  .neu-inset {
-    background: hsl(0 0% 0% / 0.35);
-    border-radius: 0.5rem;
-    box-shadow: inset 0 1px 2px hsl(0 0% 0% / 0.5);
-    border: 1px solid hsl(0 0% 100% / 0.04);
-  }
-  .neu-pressable {
-    transition: background-color 180ms ease, transform 120ms ease;
-  }
-  .neu-pressable:active { transform: translateY(0.5px); }
-
-  .glass {
-    background: hsl(0 0% 100% / 0.03);
-    backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    border: 1px solid hsl(0 0% 100% / 0.07);
-    border-radius: 0.5rem;
-  }
-  .glass-strong {
-    background: hsl(0 0% 100% / 0.06);
-    backdrop-filter: blur(18px) saturate(140%);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    border: 1px solid hsl(0 0% 100% / 0.10);
-    border-radius: 0.625rem;
-  }
-
   /* Aqua glossy button — like the iPhone 1 / Leopard buttons */
   .btn-aqua {
     background: var(--gradient-primary);
@@ -353,414 +311,3 @@
 .coach-md strong { @apply text-foreground font-semibold; }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply font-semibold mt-3 mb-1 text-foreground; }
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
-
-/* ============================================================
-   DREAMSCAPE FOOTBALL — Waking Life × What Dreams May Come ×
-   Eternal Sunshine. Every surface drifts, breathes, smudges.
-   Hand-painted, rotoscope wobble, memory-erase dissolve.
-   ============================================================ */
-@layer utilities {
-
-  /* ---------- TYPE ---------- */
-  .text-stamp {
-    font-family: "Special Elite", "Courier New", monospace;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .dream-display {
-    font-family: "Playfair Display", Georgia, serif;
-    font-weight: 900;
-    letter-spacing: -0.025em;
-    line-height: 0.92;
-  }
-  .dream-hand {
-    font-family: "Special Elite", "Caveat", "Bradley Hand", cursive;
-    letter-spacing: 0.01em;
-  }
-  .dream-quiet {
-    font-family: "Inter", sans-serif;
-    font-weight: 300;
-    letter-spacing: 0.01em;
-    color: hsl(38 30% 88% / 0.8);
-  }
-
-  /* ---------- BACKDROPS ---------- */
-  /* War room — midnight ink with brass-gold lamp glow + blood-orange contention */
-  .dream-sky, .room-bg {
-    background:
-      radial-gradient(ellipse at 18% 12%, hsl(38 90% 55% / 0.16) 0%, transparent 40%),
-      radial-gradient(ellipse at 82% 18%, hsl(16 88% 50% / 0.12) 0%, transparent 45%),
-      radial-gradient(ellipse at 60% 100%, hsl(0 75% 35% / 0.18) 0%, transparent 60%),
-      linear-gradient(170deg, hsl(222 38% 9%) 0%, hsl(222 50% 5%) 100%);
-  }
-  /* Faint blueprint grid — the strategist's desk */
-  .room-grid {
-    background-image:
-      linear-gradient(hsl(38 30% 92% / 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(38 30% 92% / 0.04) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-  .field-paint {
-    background:
-      radial-gradient(ellipse at 50% 40%, hsl(138 60% 30%) 0%, hsl(138 55% 18%) 60%, hsl(222 50% 8%) 100%);
-  }
-  .beach-paint {
-    background: radial-gradient(ellipse at 50% 30%, hsl(38 70% 55%), hsl(16 75% 45%) 70%, hsl(222 50% 10%) 100%);
-  }
-
-  /* ---------- WET PAINT / OIL SMEAR ---------- */
-  .oil-smear {
-    background-image:
-      radial-gradient(ellipse 80% 40% at 30% 20%, hsl(138 70% 50% / 0.18), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 70% 70%, hsl(18 80% 55% / 0.16), transparent 65%),
-      radial-gradient(ellipse 50% 30% at 80% 25%, hsl(348 70% 60% / 0.14), transparent 60%);
-    filter: blur(0.4px);
-  }
-  .vellum {
-    background:
-      linear-gradient(180deg, hsl(38 35% 92% / 0.05), hsl(38 35% 92% / 0.02));
-    border: 1px solid hsl(38 40% 94% / 0.10);
-    backdrop-filter: blur(14px) saturate(120%);
-    -webkit-backdrop-filter: blur(14px) saturate(120%);
-    border-radius: 1.25rem;
-    box-shadow:
-      0 30px 60px -30px hsl(232 60% 4% / 0.6),
-      inset 0 1px 0 hsl(38 40% 94% / 0.08);
-  }
-
-  /* ---------- ROTOSCOPE WOBBLE (Waking Life) ---------- */
-  @keyframes wobble {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25%      { transform: translate(0.4px, -0.3px) rotate(0.18deg); }
-    50%      { transform: translate(-0.3px, 0.4px) rotate(-0.14deg); }
-    75%      { transform: translate(0.2px, 0.3px) rotate(0.10deg); }
-  }
-  .wobble       { animation: wobble 1.6s ease-in-out infinite; }
-  .wobble-slow  { animation: wobble 3.4s ease-in-out infinite; }
-  .wobble-fast  { animation: wobble 0.9s ease-in-out infinite; }
-
-  @keyframes drift {
-    0%, 100% { transform: translateY(0) translateX(0); }
-    50%      { transform: translateY(-8px) translateX(3px); }
-  }
-  .drift      { animation: drift 8s ease-in-out infinite; }
-  .drift-slow { animation: drift 14s ease-in-out infinite; }
-
-  /* ---------- DISSOLVE / ERASE (Eternal Sunshine) ---------- */
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 0.6; filter: blur(0px); }
-    50%      { opacity: 1;   filter: blur(0.5px); }
-  }
-  .pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
-
-  .erase-edge {
-    -webkit-mask-image:
-      radial-gradient(ellipse 90% 75% at 50% 50%, hsl(0 0% 0%) 55%, transparent 95%);
-            mask-image:
-      radial-gradient(ellipse 90% 75% at 50% 50%, hsl(0 0% 0%) 55%, transparent 95%);
-  }
-  .erase-edge-soft {
-    -webkit-mask-image:
-      radial-gradient(ellipse 100% 90% at 50% 50%, hsl(0 0% 0%) 70%, transparent 100%);
-            mask-image:
-      radial-gradient(ellipse 100% 90% at 50% 50%, hsl(0 0% 0%) 70%, transparent 100%);
-  }
-
-  /* ---------- MEMORY GRAIN ---------- */
-  .grain::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.22;
-    mix-blend-mode: overlay;
-    background-image:
-      radial-gradient(hsl(38 80% 80% / 0.20) 0.5px, transparent 0.5px),
-      radial-gradient(hsl(232 60% 4% / 0.30) 0.5px, transparent 0.5px);
-    background-size: 3px 3px, 5px 5px;
-    background-position: 0 0, 1px 1px;
-  }
-
-  /* ---------- HALOS / MEMORY ORBS ---------- */
-  .halo-grass  { box-shadow: 0 0 0 1px hsl(138 60% 55% / 0.45), 0 0 32px hsl(138 70% 50% / 0.45), 0 0 80px hsl(138 65% 45% / 0.30); }
-  .halo-amber  { box-shadow: 0 0 0 1px hsl(18 90% 60% / 0.45),  0 0 28px hsl(18 90% 55% / 0.50),  0 0 70px hsl(18 85% 50% / 0.35); }
-  .halo-rose   { box-shadow: 0 0 0 1px hsl(348 75% 60% / 0.45), 0 0 28px hsl(348 80% 55% / 0.50), 0 0 70px hsl(348 75% 50% / 0.35); }
-  .halo-cyan   { box-shadow: 0 0 0 1px hsl(188 75% 55% / 0.45), 0 0 28px hsl(188 85% 55% / 0.45), 0 0 70px hsl(188 80% 50% / 0.30); }
-
-  .spot-grass { color: hsl(138 65% 60%); }
-  .spot-amber { color: hsl(18 90% 65%); }
-  .spot-rose  { color: hsl(348 80% 70%); }
-  .spot-cyan  { color: hsl(188 80% 65%); }
-
-  /* ============================================================
-     SUPERMAN 1978 — TRIPPY DONNER CREDITS
-     Cape red, krypton blue, sun yellow. Streaking blue starfield,
-     slow-spinning shield, kaleidoscopic crystal-fortress refractions.
-     ============================================================ */
-  .krypton-sky {
-    background:
-      radial-gradient(ellipse at 50% 30%, hsl(212 95% 32% / 0.95) 0%, hsl(232 80% 8%) 70%),
-      linear-gradient(180deg, hsl(232 80% 6%), hsl(220 85% 12%));
-  }
-  /* Donner opening-credits streak — blue beams of light flying forward */
-  .donner-streaks {
-    background-image:
-      repeating-linear-gradient(95deg,
-        transparent 0px, transparent 22px,
-        hsl(208 100% 70% / 0.10) 22px, hsl(208 100% 75% / 0.18) 23px,
-        transparent 24px, transparent 60px);
-    mix-blend-mode: screen;
-  }
-  @keyframes streak {
-    0%   { transform: translateX(-30%) skewX(-12deg); opacity: 0.55; }
-    100% { transform: translateX(30%)  skewX(-12deg); opacity: 0.55; }
-  }
-  .streak { animation: streak 6s linear infinite; }
-  .streak-slow { animation: streak 14s linear infinite; }
-
-  /* Crystal Fortress shards */
-  .fortress {
-    background:
-      conic-gradient(from 200deg at 50% 50%,
-        hsl(208 100% 80% / 0.18),
-        hsl(212 100% 60% / 0.04),
-        hsl(38 100% 70% / 0.10),
-        hsl(0 90% 55% / 0.08),
-        hsl(208 100% 80% / 0.18));
-    filter: blur(0.5px);
-  }
-
-  /* Solar yellow glow — Earth's yellow sun gives him his powers */
-  .sun-glow {
-    box-shadow:
-      0 0 0 1px hsl(48 100% 65% / 0.55),
-      0 0 32px hsl(48 100% 60% / 0.65),
-      0 0 90px hsl(38 100% 55% / 0.45),
-      0 0 160px hsl(0 85% 50% / 0.30);
-  }
-  .cape-red { color: hsl(0 85% 55%); }
-  .krypton-blue { color: hsl(208 100% 65%); }
-  .sun-yellow { color: hsl(48 100% 62%); }
-
-  /* The S-Shield — spinning slowly through space */
-  @keyframes shield-spin {
-    0%   { transform: rotateY(0deg) rotateZ(-2deg) scale(1); }
-    50%  { transform: rotateY(180deg) rotateZ(2deg) scale(1.04); }
-    100% { transform: rotateY(360deg) rotateZ(-2deg) scale(1); }
-  }
-  .shield-spin { animation: shield-spin 14s ease-in-out infinite; transform-style: preserve-3d; }
-
-  /* Title-card chromatic credit text — that blue beveled Donner type */
-  .donner-title {
-    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
-    letter-spacing: 0.06em;
-    color: hsl(208 100% 70%);
-    text-shadow:
-      0 0 1px hsl(208 100% 95%),
-      0 0 8px hsl(208 100% 60% / 0.95),
-      0 0 24px hsl(212 100% 50% / 0.85),
-      0 0 60px hsl(212 100% 40% / 0.55);
-  }
-  .donner-credit {
-    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
-    letter-spacing: 0.18em;
-    color: hsl(208 100% 78%);
-    text-shadow: 0 0 6px hsl(208 100% 60% / 0.85), 0 0 18px hsl(212 100% 45% / 0.7);
-  }
-
-  /* Trippy chromatic aberration wobble for headers */
-  @keyframes chroma {
-    0%, 100% { text-shadow:
-        -1px 0 hsl(0 90% 55% / 0.85),
-         1px 0 hsl(208 100% 60% / 0.85),
-         0 0 18px hsl(48 100% 60% / 0.6);
-    }
-    50% { text-shadow:
-         1px 0 hsl(0 90% 55% / 0.85),
-        -1px 0 hsl(208 100% 60% / 0.85),
-         0 0 24px hsl(48 100% 60% / 0.7);
-    }
-  }
-  .chroma-pulse { animation: chroma 2.4s ease-in-out infinite; }
-
-  /* Glass card lit from above by the yellow sun */
-  .krypton-card {
-    background:
-      linear-gradient(180deg, hsl(212 60% 18% / 0.55), hsl(232 60% 8% / 0.75));
-    border: 1px solid hsl(208 100% 70% / 0.25);
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-    border-radius: 1.25rem;
-    box-shadow:
-      0 0 0 1px hsl(48 100% 60% / 0.10),
-      inset 0 1px 0 hsl(208 100% 80% / 0.18),
-      0 30px 60px -28px hsl(232 90% 4% / 0.85),
-      0 0 80px -20px hsl(208 100% 50% / 0.45);
-  }
-
-  /* ---------- INK / EDGE ---------- */
-  .ink-edge {
-    border: 1px solid hsl(38 40% 94% / 0.14);
-    border-radius: 1.25rem;
-    box-shadow: 0 30px 60px -30px hsl(232 60% 4% / 0.7);
-  }
-  .ink-edge-sm {
-    border: 1px solid hsl(38 40% 94% / 0.12);
-    border-radius: 1rem;
-    box-shadow: 0 14px 30px -16px hsl(232 60% 4% / 0.55);
-  }
-
-  /* ---------- VIGNETTE ---------- */
-  .vignette::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, hsl(232 60% 4% / 0.75) 100%);
-  }
-
-  /* ---------- PAINT BLOB ---------- */
-  .blob {
-    position: absolute;
-    border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%;
-    filter: blur(34px);
-    opacity: 0.55;
-  }
-
-  /* ---------- BACKWARD-COMPAT (legacy classnames still in code) ---------- */
-  .toon-display, .title-slab, .headline-noir {
-    font-family: "Playfair Display", Georgia, serif;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    text-transform: none;
-    line-height: 0.95;
-    -webkit-text-stroke: 0;
-  }
-  .toon-cartoon { font-family: "Playfair Display", serif; font-weight: 700; text-transform: none; -webkit-text-stroke: 0; }
-  .biz-card     { font-family: "Inter", sans-serif; font-weight: 500; text-transform: uppercase; letter-spacing: 0.18em; }
-  .neon-yellow  { color: hsl(38 95% 70%); text-shadow: 0 0 24px hsl(38 95% 60% / 0.6); }
-  .neon-purple  { color: hsl(285 80% 75%); text-shadow: 0 0 24px hsl(285 80% 65% / 0.6); }
-  .spot-yellow  { color: hsl(38 95% 70%); }
-  .spot-purple  { color: hsl(285 80% 75%); }
-  .spot-red     { color: hsl(348 80% 70%); }
-  .gotham-sky, .tracy-sky, .toon-sky, .milkbar { background: transparent; }
-  .halftone, .halftone-yellow, .halftone-purple, .halftone-red { background-image: none; }
-  .deco-rays, .deco-rays-purple { background-image: none; }
-  .silhouette { background: hsl(232 50% 8%); color: hsl(38 35% 92%); border-radius: 1rem; }
-  .ink-edge-yellow { border: 1px solid hsl(38 95% 60% / 0.30); border-radius: 1.25rem; box-shadow: 0 0 32px hsl(38 95% 55% / 0.20), 0 30px 60px -30px hsl(232 60% 4% / 0.7); }
-  .ink-edge-purple { border: 1px solid hsl(285 70% 60% / 0.30); border-radius: 1.25rem; box-shadow: 0 0 32px hsl(285 75% 55% / 0.20), 0 30px 60px -30px hsl(232 60% 4% / 0.7); }
-  .ink-edge-red    { border: 1px solid hsl(348 75% 60% / 0.30); border-radius: 1.25rem; box-shadow: 0 0 32px hsl(348 75% 55% / 0.20), 0 30px 60px -30px hsl(232 60% 4% / 0.7); }
-  .stamp-red {
-    display: inline-block;
-    color: hsl(348 80% 70%);
-    border: 1px solid hsl(348 75% 55% / 0.55);
-    padding: 0.2rem 0.55rem;
-    font-family: "Special Elite", monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    border-radius: 999px;
-    opacity: 0.9;
-  }
-  .psycho-card {
-    background: hsl(38 35% 92%);
-    color: hsl(232 35% 12%);
-    border-radius: 1rem;
-    padding: 1rem 1.2rem;
-    box-shadow: 0 24px 50px -22px hsl(232 60% 4% / 0.7);
-  }
-  .bat-glow { box-shadow: 0 0 0 1px hsl(38 95% 55% / 0.45), 0 0 32px hsl(38 95% 55% / 0.55), 0 0 80px hsl(38 95% 50% / 0.35); }
-  .toon-wiggle { animation: wobble 3s ease-in-out infinite; }
-  .speedlines, .speedlines-red { background-image: none; }
-  .rain { background-image: none; }
-  .red-slash { position: absolute; height: 1px; background: hsl(38 95% 60%); transform: rotate(-6deg); box-shadow: 0 0 18px hsl(38 95% 60% / 0.7); }
-  .burst-frame { clip-path: none; border-radius: 1.5rem; }
-  .splatter { position: absolute; border-radius: 50% 40% 55% 45% / 45% 55% 40% 60%; filter: blur(20px); }
-}
-
-
-/* ============================================================
-   WAR ROOM — cinematic football auction OS
-   Two motion modes: idle (calm breathing) + urgent (bid pressure)
-   ============================================================ */
-@layer utilities {
-  /* TYPE */
-  .room-display { font-family: "Playfair Display", Georgia, serif; font-weight: 900; letter-spacing: -0.025em; line-height: 0.95; }
-  .room-eyebrow { font-family: "Inter", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.22em; font-size: 10px; color: hsl(var(--muted-foreground)); }
-  .room-mono    { font-family: "JetBrains Mono", ui-monospace, monospace; font-feature-settings: "tnum"; letter-spacing: -0.01em; }
-  .room-label   { font-family: "Inter", sans-serif; font-weight: 500; letter-spacing: 0.04em; }
-
-  /* SURFACES */
-  .room-card {
-    background:
-      linear-gradient(170deg, hsl(222 30% 11% / 0.92), hsl(222 38% 7% / 0.95));
-    border: 1px solid hsl(38 30% 92% / 0.08);
-    border-radius: 0.875rem;
-    backdrop-filter: blur(14px) saturate(135%);
-    -webkit-backdrop-filter: blur(14px) saturate(135%);
-    box-shadow:
-      0 1px 0 hsl(38 30% 92% / 0.04) inset,
-      0 22px 44px -22px hsl(222 90% 2% / 0.85),
-      0 0 0 1px hsl(0 0% 0% / 0.2);
-  }
-  .room-card-lift {
-    box-shadow:
-      0 1px 0 hsl(38 30% 92% / 0.05) inset,
-      0 30px 60px -24px hsl(222 90% 2% / 0.95),
-      0 0 0 1px hsl(38 80% 55% / 0.10),
-      0 0 60px -10px hsl(38 90% 55% / 0.18);
-  }
-  .room-divider { height: 1px; background: linear-gradient(90deg, transparent, hsl(38 30% 92% / 0.18), transparent); }
-
-  /* HEAT TONES */
-  .heat-good   { color: hsl(138 75% 55%); }
-  .heat-fair   { color: hsl(38 90% 60%); }
-  .heat-warn   { color: hsl(16 88% 58%); }
-  .heat-bad    { color: hsl(0 78% 58%); }
-  .bg-good     { background: hsl(138 75% 48% / 0.14); border: 1px solid hsl(138 75% 48% / 0.35); }
-  .bg-fair     { background: hsl(38 90% 60% / 0.14);  border: 1px solid hsl(38 90% 60% / 0.35); }
-  .bg-warn     { background: hsl(16 88% 58% / 0.14);  border: 1px solid hsl(16 88% 58% / 0.4); }
-  .bg-bad      { background: hsl(0 78% 58% / 0.14);   border: 1px solid hsl(0 78% 58% / 0.4); }
-
-  /* IDLE — calm breathing */
-  @keyframes room-breathe {
-    0%, 100% { transform: scale(1);   opacity: 1; }
-    50%      { transform: scale(1.008); opacity: 0.97; }
-  }
-  .room-breathe { animation: room-breathe 6s ease-in-out infinite; }
-
-  /* URGENT — bid pressure */
-  @keyframes pressure-flicker {
-    0%, 100% { box-shadow: 0 0 0 1px hsl(0 78% 58% / 0.5), 0 0 32px hsl(0 78% 58% / 0.45); }
-    47%      { box-shadow: 0 0 0 1px hsl(16 88% 58% / 0.6), 0 0 48px hsl(16 88% 58% / 0.55); }
-    52%      { box-shadow: 0 0 0 1px hsl(0 78% 58% / 0.4), 0 0 22px hsl(0 78% 58% / 0.35); }
-  }
-  .pressure { animation: pressure-flicker 1.4s ease-in-out infinite; }
-
-  @keyframes value-pulse {
-    0%, 100% { box-shadow: 0 0 0 1px hsl(138 75% 48% / 0.45), 0 0 24px hsl(138 75% 48% / 0.35); }
-    50%      { box-shadow: 0 0 0 1px hsl(138 75% 55% / 0.65), 0 0 56px hsl(138 75% 55% / 0.55); }
-  }
-  .value-glow { animation: value-pulse 3.4s ease-in-out infinite; }
-
-  @keyframes bid-tick {
-    0%   { transform: translateY(8px); opacity: 0; }
-    40%  { transform: translateY(-2px); opacity: 1; }
-    100% { transform: translateY(0);   opacity: 1; }
-  }
-  .bid-tick { animation: bid-tick 220ms cubic-bezier(.2,.7,.3,1.2); }
-
-  /* MEMORY FADE — missed targets */
-  @keyframes memory-fade { 0%,100% { opacity: 0.55; } 50% { opacity: 0.35; } }
-  .memory-fade { animation: memory-fade 4s ease-in-out infinite; filter: grayscale(0.4) blur(0.2px); }
-
-  /* TICKER — recent sales */
-  @keyframes room-ticker { from { transform: translateX(0);} to { transform: translateX(-50%);} }
-  .room-ticker { animation: room-ticker 38s linear infinite; }
-
-  /* BURNT EDGES — newspaper feel */
-  .editorial-rule { border-top: 1px solid hsl(38 30% 92% / 0.18); border-bottom: 3px double hsl(38 30% 92% / 0.18); padding: 8px 0; }
-  .editorial-kicker { font-family: "Playfair Display", Georgia, serif; font-style: italic; color: hsl(38 78% 56%); }
-
-  /* PRESSURE BAR */
-  .pressure-bar { background: linear-gradient(90deg, hsl(138 75% 48%), hsl(38 90% 58%) 50%, hsl(0 78% 58%)); }
-}

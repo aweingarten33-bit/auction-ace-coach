@@ -18,7 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
 import PricedPlayerAutocomplete from "@/components/PricedPlayerAutocomplete";
 import { STRATEGIES, getStrategy } from "@/lib/strategies";
-import EditorialShell from "@/components/EditorialShell";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -216,18 +215,21 @@ export default function Planner() {
   };
 
   return (
-    <EditorialShell activeCategory="Home">
-    <div className="bg-background text-foreground">
-      <div className="mx-auto max-w-3xl px-4 pt-5">
-        <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">Home</p>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight" style={{ fontFamily: '"Playfair Display", Georgia, serif' }}>
-          Budget Planner
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Allocate · Check · Find — your decision engine.</p>
-        <div className="mt-3">
-          <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-3 py-2 backdrop-blur">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/draft")} aria-label="Back to draft">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-base font-semibold leading-tight">Budget Planner</h1>
+            <p className="text-[11px] text-muted-foreground leading-tight">
+              Setup · Allocate · Check · Find
+            </p>
+          </div>
         </div>
-      </div>
+        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
+      </header>
 
       {/* Summary bar */}
       <div className="mx-auto max-w-3xl px-3 pt-3">
@@ -426,7 +428,6 @@ export default function Planner() {
         </Card>
       </main>
     </div>
-    </EditorialShell>
   );
 }
 
@@ -645,7 +646,7 @@ function SetupChecklist() {
         <Step n="1c" label="Upload this year's cheat sheet (tiers)" done={hasPrices}>
           {hasPrices
             ? <span className="text-emerald-500">{prices.length} players priced. Re-import in setup wizard.</span>
-            : <button onClick={() => navigate("/setup?step=1&edit=1")} className="text-primary underline">Open setup wizard →</button>}
+            : <button onClick={() => navigate("/?step=1&edit=1")} className="text-primary underline">Open setup wizard →</button>}
         </Step>
       </div>
     </Card>
