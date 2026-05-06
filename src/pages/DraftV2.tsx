@@ -288,18 +288,6 @@ export default function DraftV2() {
           >
             {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
-          <button
-            onClick={() => navigate("/draft-os")}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
-            OS
-          </button>
-          <button
-            onClick={() => navigate("/planner")}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
-            Strategy
-          </button>
         </div>
       </header>
 
