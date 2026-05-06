@@ -471,6 +471,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </>
       )}
 
+      <PlayerDetailsOverlay
+        open={!!detailFor}
+        onOpenChange={(o) => !o && setDetailFor(null)}
+        name={detailFor?.name ?? ""}
+        position={detailFor?.position}
+      />
     </div>
   );
 }
