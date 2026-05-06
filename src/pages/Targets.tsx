@@ -127,7 +127,7 @@ export default function Targets() {
                       t.affordability === "out-of-reach" ? "heat-bad" : "text-foreground"
                     }`}>${t.realistic || "—"}</div>
                   </div>
-                  <button onClick={() => removeFromWatchlist(t.name)} aria-label="Remove"
+                  <button onClick={() => unpinPlayer(t.name)} aria-label="Remove"
                     className="p-1.5 rounded hover:bg-foreground/10 text-muted-foreground hover:text-foreground">
                     <X className="h-4 w-4" />
                   </button>
