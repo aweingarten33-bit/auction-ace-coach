@@ -6,8 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronUp, Trash2, Plus, FileText, Sparkles, Upload, Loader2, Zap } from "lucide-react";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
+import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import { parsePriceSheet } from "@/lib/draft-math";
-import { PriceEstimate } from "@/lib/draft-types";
+import { PriceEstimate, Position } from "@/lib/draft-types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { buildTierPrices, tierForPosRank, injuryMultiplier, type AuctionRow } from "@/lib/league-tier-prices";
@@ -90,6 +91,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [posByName, setPosByName] = useState<Map<string, string>>(new Map());
   const [uploading, setUploading] = useState(false);
   const [autoBusy, setAutoBusy] = useState(false);
+  const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // Pull positions from cached ESPN ranks so we can filter the list by position
@@ -439,7 +441,16 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
               const idx = prices.findIndex((x) => x.name === p.name);
               return (
                 <div key={p.name} className="flex items-center gap-2 rounded px-2 py-1 text-sm hover:bg-secondary/60">
-                  <span className="flex-1 truncate font-medium">{p.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const pos = posByName.get(p.name.toLowerCase()) as Position | undefined;
+                      setDetailFor({ name: p.name, position: pos, price: p.price });
+                    }}
+                    className="flex-1 truncate text-left font-medium hover:text-primary hover:underline"
+                  >
+                    {p.name}
+                  </button>
                   <span className="text-xs text-muted-foreground">$</span>
                   <Input
                     type="number"
@@ -460,6 +471,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         </>
       )}
 
+      <PlayerDetailsOverlay
+        open={!!detailFor}
+        onOpenChange={(o) => !o && setDetailFor(null)}
+        name={detailFor?.name ?? ""}
+        position={detailFor?.position}
+      />
     </div>
   );
 }
