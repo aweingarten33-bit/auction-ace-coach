@@ -434,7 +434,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             Showing {filtered.length} of {prices.length}
             {posFilter !== "ALL" ? ` · ${posFilter} only` : ""}
           </p>
-          <div className="max-h-72 space-y-1 overflow-auto rounded-md border border-border/60 bg-secondary/20 p-1">
+          <div className="max-h-[70vh] space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1" style={{ WebkitOverflowScrolling: "touch" }}>
             {filtered.map((p) => {
               const idx = prices.findIndex((x) => x.name === p.name);
               return (
