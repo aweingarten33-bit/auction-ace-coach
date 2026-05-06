@@ -311,3 +311,106 @@
 .coach-md strong { @apply text-foreground font-semibold; }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply font-semibold mt-3 mb-1 text-foreground; }
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
+
+/* =====================================================================
+   RIDDLER PATCH — cinematic enigma overlay
+   Layered ON TOP of the tool palette. Pure presentation. No layout
+   breakage. Adds an acid-green/violet cipher mood, animated grid hum,
+   and "?" watermarks that pulse with the draft.
+   ===================================================================== */
+@layer base {
+  :root {
+    --riddler-green: 140 100% 55%;
+    --riddler-acid:  90 100% 60%;
+    --riddler-violet: 280 80% 60%;
+    --riddler-ink:   220 60% 6%;
+
+    /* Repaint core signal tokens with Riddler hues */
+    --background: var(--riddler-ink);
+    --primary: var(--riddler-green);
+    --primary-foreground: 220 60% 6%;
+    --primary-glow: var(--riddler-acid);
+    --ring: var(--riddler-green);
+    --warning: 50 100% 55%;
+    --success: var(--riddler-green);
+    --destructive: 320 90% 60%;
+    --sidebar-primary: var(--riddler-green);
+    --sidebar-ring: var(--riddler-green);
+
+    --grid-line: hsl(var(--riddler-green) / 0.06);
+    --grid-line-strong: hsl(var(--riddler-violet) / 0.10);
+
+    --shadow-glow: 0 0 0 1px hsl(var(--riddler-green) / 0.35),
+                   0 0 24px -4px hsl(var(--riddler-green) / 0.45);
+  }
+  .dark { --background: var(--riddler-ink); }
+}
+
+/* Cinematic body wash: vignette + animated cipher grid + "?" watermark */
+html, body, #root { background: hsl(var(--riddler-ink)); }
+body {
+  position: relative;
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(1200px 800px at 70% -10%, hsl(var(--riddler-violet) / 0.18), transparent 60%),
+    radial-gradient(900px 700px at -10% 110%, hsl(var(--riddler-green) / 0.14), transparent 60%),
+    linear-gradient(hsl(var(--riddler-ink)), hsl(220 60% 4%));
+}
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(hsl(var(--riddler-green) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--riddler-green) / 0.05) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 85%);
+  animation: riddler-grid-drift 22s linear infinite;
+}
+body::after {
+  content: "?";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  font-family: 'Courier New', ui-monospace, monospace;
+  font-weight: 900;
+  font-size: 62vh;
+  line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  color: hsl(var(--riddler-green) / 0.04);
+  text-shadow: 0 0 60px hsl(var(--riddler-green) / 0.15);
+  animation: riddler-pulse 6s ease-in-out infinite;
+}
+#root > * { position: relative; z-index: 1; }
+
+/* Make headings feel cipher-like */
+h1, h2 { letter-spacing: -0.01em; }
+h1 { text-shadow: 0 0 24px hsl(var(--riddler-green) / 0.20); }
+
+/* Buttons & accents pick up an acid-green glow */
+.bg-primary, [data-state="active"].bg-primary { box-shadow: var(--shadow-glow); }
+a:hover, button:hover { text-shadow: 0 0 8px hsl(var(--riddler-green) / 0.45); }
+
+/* Cards get a faint cipher border + scanline sheen */
+.rounded-lg.border, .rounded-md.border, .rounded-xl.border {
+  border-color: hsl(var(--riddler-green) / 0.18);
+  background-image: linear-gradient(180deg, hsl(var(--riddler-violet) / 0.04), transparent 40%);
+}
+
+/* Subtle CRT scanlines for that movie-screen feel */
+.riddler-scan, body > #root::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 2;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    hsl(var(--riddler-green) / 0.03) 2px 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+@keyframes riddler-grid-drift {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 32px 32px, 32px 32px; }
+}
+@keyframes riddler-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.6; transform: scale(1.02); }
+}
