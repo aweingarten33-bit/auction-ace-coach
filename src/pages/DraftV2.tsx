@@ -292,21 +292,14 @@ export default function DraftV2() {
         </div>
       </header>
 
-      {/* CHYRON RAIL — broadcast lower-third cards */}
-      <div className="flex shrink-0 gap-0 overflow-x-auto border-b-2 border-border bg-card">
+      {/* CARD RAIL */}
+      <div className="flex shrink-0 gap-3 overflow-x-auto border-b border-border bg-background px-3 md:px-6 py-3">
         {railCards.map((c, i) => (
-          <div
-            key={i}
-            className={`relative min-w-[240px] md:min-w-[280px] shrink-0 border-r-2 border-border px-4 py-2.5 ${c.tone}`}
-          >
-            {/* left accent bar */}
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
-            <div className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-              {c.kind}
-            </div>
-            <div className="mt-0.5 text-base font-black uppercase tracking-wide truncate">{c.title}</div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground truncate">{c.body}</div>
-          </div>
+          <Card key={i} className={`min-w-[220px] md:min-w-[260px] shrink-0 border p-3 ${c.tone}`}>
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{c.kind}</div>
+            <div className="mt-1 text-sm font-semibold truncate">{c.title}</div>
+            <div className="text-xs text-muted-foreground truncate">{c.body}</div>
+          </Card>
         ))}
       </div>
 
