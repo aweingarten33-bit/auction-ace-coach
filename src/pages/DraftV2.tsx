@@ -556,7 +556,7 @@ export default function DraftV2() {
           </div>
         </SheetContent>
       </Sheet>
-      <BudgetPlannerV2 />
+      <BudgetPlannerV2 open={budgetOpen} onOpenChange={setBudgetOpen} showFab={false} />
     </div>
   );
 }
