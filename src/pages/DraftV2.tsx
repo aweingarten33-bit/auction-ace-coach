@@ -34,8 +34,8 @@ import Watchlist from "@/components/Watchlist";
 import MarketHeat from "@/components/MarketHeat";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
 import CoachMessage from "@/components/CoachMessage";
-import BudgetPlannerV2 from "@/components/BudgetPlannerV2";
 import BottomDock from "@/components/BottomDock";
+import PlannerDoorsDock from "@/components/PlannerDoorsDock";
 
 
 type MobileTab = "decision" | "planner" | "targets" | "market" | "log";
