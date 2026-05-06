@@ -6,16 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
 import Planner from "./pages/Planner.tsx";
-import CommandCenter from "./pages/CommandCenter.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
-import Strategy from "./pages/Strategy.tsx";
-import Market from "./pages/Market.tsx";
-import Targets from "./pages/Targets.tsx";
-import Coach from "./pages/Coach.tsx";
-import SettingsPage from "./pages/Settings.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 
@@ -49,25 +43,17 @@ const App = () => (
         <AuthProvider>
           <LockProvider>
             <Routes>
-              {/* Home = the cinematic Command Center */}
-              <Route path="/" element={<PublicGate><Protected><CommandCenter /></Protected></PublicGate>} />
-              <Route path="/index" element={<Navigate to="/" replace />} />
+              <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
-              <Route path="/setup" element={<Protected><Index /></Protected>} />
               <Route path="/draft" element={<Protected><Draft /></Protected>} />
+              <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
+              <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
-              <Route path="/strategy" element={<Protected><Strategy /></Protected>} />
-              <Route path="/market" element={<Protected><Market /></Protected>} />
-              <Route path="/targets" element={<Protected><Targets /></Protected>} />
-              <Route path="/coach" element={<Protected><Coach /></Protected>} />
-              <Route path="/settings" element={<Protected><SettingsPage /></Protected>} />
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
               {/* Legacy redirects */}
-              <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
-              <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
-              <Route path="/dashboard" element={<Navigate to="/" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
               <Route path="/m" element={<Navigate to="/draft" replace />} />
               <Route path="/mobile" element={<Navigate to="/draft" replace />} />
               <Route path="*" element={<NotFound />} />

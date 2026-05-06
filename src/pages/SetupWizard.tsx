@@ -22,8 +22,6 @@ import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
-import EditorialShell from "@/components/EditorialShell";
-import SupermanShell from "@/components/SupermanShell";
 
 const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 
@@ -85,19 +83,20 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <SupermanShell title="the auction room" credit={`step ${step + 1} of ${STEPS.length} · ${STEPS[step]}`}>
-
-      <div className="px-4 md:px-8">
+    <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="mx-auto max-w-2xl">
-        <header className="mb-5 text-center">
-          <p className="donner-credit text-[10px] uppercase">
-            faster than a speeding bid
-          </p>
-          <h2 className="mt-2 donner-title text-3xl md:text-4xl uppercase chroma-pulse">
-            {STEPS[step]}
-          </h2>
+        <header className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
+              <Trophy className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-lg font-semibold">Draft Setup</h1>
+              <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
+            </div>
+          </div>
           {setupComplete && (
-            <Button size="sm" variant="outline" className="mt-3" onClick={() => navigate("/draft")}>
+            <Button size="sm" onClick={() => navigate("/draft")}>
               Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           )}
@@ -105,8 +104,7 @@ export default function SetupWizard() {
 
         <Progress value={progress} className="mb-6 h-1.5" />
 
-        <Card className="krypton-card p-5 md:p-6 border-0 bg-transparent shadow-none">
-
+        <Card className="p-5 md:p-6">
           {step === 0 && (
             <div className="space-y-6">
               <EspnImportButton />
@@ -320,8 +318,6 @@ export default function SetupWizard() {
           </div>
         </Card>
       </div>
-      </div>
-    </SupermanShell>
-
+    </div>
   );
 }
