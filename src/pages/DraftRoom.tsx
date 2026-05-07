@@ -244,8 +244,26 @@ export default function DraftRoom() {
     return m;
   }, [prices]);
   const suggestions = useMemo(() => {
-    if (query.trim().length < 2) return [];
-    const hits = searchPlayers(sleeper, query, 8).filter(
+    const trimmed = query.trim();
+    if (trimmed.length === 0) return [];
+    // $-amount mode: starts with $ or is pure digits → "what can I afford"
+    const dollarMatch = trimmed.match(/^\$?(\d{1,3})$/);
+    if (dollarMatch) {
+      const target = parseInt(dollarMatch[1], 10);
+      if (target <= 0) return [];
+      return prices
+        .filter((p) => !draftedSet.has(norm(p.name)) && p.price > 0 && p.price <= target)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 12)
+        .map((p) => ({
+          name: p.name,
+          position: (p as PriceEstimate & { position?: Position }).position,
+          team: null as string | null,
+          price: p.price,
+        }));
+    }
+    if (trimmed.length < 2) return [];
+    const hits = searchPlayers(sleeper, trimmed, 8).filter(
       (p) => !draftedSet.has(norm(p.full_name)),
     );
     return hits.map((p) => {
@@ -257,7 +275,7 @@ export default function DraftRoom() {
         price: price?.price ?? null,
       };
     });
-  }, [query, sleeper, draftedSet, priceByName]);
+  }, [query, sleeper, draftedSet, priceByName, prices]);
 
   // ── Decision card for active name ─────────────────────────────────────
   const activePrice = useMemo(
