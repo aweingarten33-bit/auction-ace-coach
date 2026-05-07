@@ -658,6 +658,8 @@ function DrawerContents({
   onSignOut,
   onGoToSetup,
   onGoToEspn,
+  onGoToClassicDraft,
+  onGoToPlanner,
   onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
