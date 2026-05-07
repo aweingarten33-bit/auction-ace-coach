@@ -487,7 +487,7 @@ export default function DraftRoom() {
 
         {/* DECISION CARD — when a player is locked in */}
         {decision && (
-          <section>
+          <section id="decision-card" className="scroll-mt-24">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Decision
