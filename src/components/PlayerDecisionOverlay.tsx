@@ -3,6 +3,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import DecisionCard from "@/components/DecisionCard";
 import { decide } from "@/lib/decision-engine";
+import { useAnchorMap } from "@/lib/use-anchor-map";
 import { useDraftStore } from "@/lib/draft-store";
 import { Position } from "@/lib/draft-types";
 import { cn } from "@/lib/utils";
