@@ -61,12 +61,6 @@ export default function MoneyHero({ remaining, total, showMax, maxBid, slotsLeft
               <span className="text-foreground tabular-nums">${maxBid}</span>
             </span>
           )}
-          {slotsLeft != null && (
-            <span className="flex items-baseline gap-1">
-              <span className="text-foreground tabular-nums">{slotsLeft}</span>
-              <span>slots</span>
-            </span>
-          )}
         </span>
       </div>
 
