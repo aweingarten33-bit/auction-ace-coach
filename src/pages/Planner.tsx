@@ -109,8 +109,32 @@ function suggestedAllocations(slots: Slot[], budget: number, strategyWeights?: P
 
 export default function Planner() {
   const navigate = useNavigate();
+  const setupComplete = useDraftStore((s) => s.setupComplete);
+  useEffect(() => { if (!setupComplete) navigate("/"); }, [setupComplete, navigate]);
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-3 py-2 backdrop-blur">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/draft")} aria-label="Back to draft">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-base font-semibold leading-tight">Budget Planner</h1>
+            <p className="text-[11px] text-muted-foreground leading-tight">
+              Setup · Allocate · Check · Find
+            </p>
+          </div>
+        </div>
+        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
+      </header>
+      <PlannerBody />
+    </div>
+  );
+}
+
+export function PlannerBody() {
   const {
-    settings, keepers, events, prices, setupComplete,
+    settings, keepers, events, prices,
     slotAllocations, setSlotAllocation, setSlotAllocations, clearSlotAllocations,
     strategyId, setStrategyId, setSettings,
   } = useDraftStore();
@@ -140,15 +164,9 @@ export default function Planner() {
     }
   };
 
-
-  useEffect(() => {
-    if (!setupComplete) navigate("/");
-  }, [setupComplete, navigate]);
-
   const slots = useMemo(() => buildSlots(settings.roster), [settings.roster]);
   const budget = useMemo(() => computeBudget(settings, keepers, events), [settings, keepers, events]);
 
-  // Initialize allocations the first time the page loads or roster changes shape
   useEffect(() => {
     const known = new Set(Object.keys(slotAllocations));
     const slotIds = new Set(slots.map((s) => s.id));
@@ -163,9 +181,8 @@ export default function Planner() {
     () => slots.reduce((s, sl) => s + (slotAllocations[sl.id] ?? 0), 0),
     [slots, slotAllocations]
   );
-  const diff = settings.totalBudget - totalAllocated; // positive = under, negative = over
+  const diff = settings.totalBudget - totalAllocated;
 
-  // ---------- Affordability checker ----------
   const [checkA, setCheckA] = useState("");
   const [checkB, setCheckB] = useState("");
   const [checkC, setCheckC] = useState("");
@@ -183,10 +200,9 @@ export default function Planner() {
   const checkSum = checkResults.reduce((s, r) => s + (r.info?.price ?? 0), 0);
   const remainingAfter = budget.remaining - checkSum;
   const slotsAfter = budget.slotsLeft - checkResults.filter((r) => r.info).length;
-  const minNeededForRest = Math.max(0, slotsAfter); // $1/slot floor
+  const minNeededForRest = Math.max(0, slotsAfter);
   const canAfford = checkSum > 0 && remainingAfter >= minNeededForRest && slotsAfter >= 0;
 
-  // ---------- "What can I get for $X at POS" ----------
   const [lookupBudget, setLookupBudget] = useState("");
   const [lookupPos, setLookupPos] = useState<"ANY" | Position>("ANY");
   const draftedKeys = useMemo(
@@ -196,7 +212,7 @@ export default function Planner() {
   const lookupResults = useMemo(() => {
     const target = parseInt(lookupBudget, 10);
     if (!Number.isFinite(target) || target <= 0) return [];
-    const tol = Math.max(2, Math.round(target * 0.15)); // ±15% tolerance
+    const tol = Math.max(2, Math.round(target * 0.15));
     return prices
       .filter((p) => !draftedKeys.has(norm(p.name)))
       .filter((p) => {
@@ -215,21 +231,7 @@ export default function Planner() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b bg-background/95 px-3 py-2 backdrop-blur">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/draft")} aria-label="Back to draft">
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-base font-semibold leading-tight">Budget Planner</h1>
-            <p className="text-[11px] text-muted-foreground leading-tight">
-              Setup · Allocate · Check · Find
-            </p>
-          </div>
-        </div>
-        <Link to="/draft" className="text-xs font-medium text-primary hover:underline">Live draft →</Link>
-      </header>
+    <>
 
       {/* Summary bar */}
       <div className="mx-auto max-w-3xl px-3 pt-3">
