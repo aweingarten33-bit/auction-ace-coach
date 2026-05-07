@@ -13,6 +13,8 @@ interface SlotRow {
   short: number;
   maxBid: number;
   severity: "critical" | "need" | "depth" | "done";
+  /** Optional sub-role label, e.g. "Backup QB", "Handcuff RB". Used for bench rows. */
+  label?: string;
 }
 
 interface BestTarget {
@@ -76,9 +78,9 @@ export default function RosterHero({
 
       {/* Per-slot grid */}
       <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-3 md:grid-cols-4">
-        {(openRows.length ? openRows : rows).map((r) => (
+        {(openRows.length ? openRows : rows).map((r, i) => (
           <div
-            key={r.pos}
+            key={`${r.pos}-${r.label ?? i}`}
             className={`flex flex-col rounded-md border px-2 py-1.5 ${sevTone[r.severity]}`}
           >
             <div className="flex items-center justify-between">
@@ -96,6 +98,9 @@ export default function RosterHero({
                 {r.have}/{r.need}
               </span>
             </div>
+            {r.label && (
+              <p className="mt-0.5 truncate text-[9px] leading-tight opacity-80">{r.label}</p>
+            )}
             {r.severity !== "done" && (
               <div className="mt-0.5 flex items-center justify-between text-[10px] tabular-nums">
                 <span className="text-[9px] uppercase tracking-wider opacity-70">max</span>
