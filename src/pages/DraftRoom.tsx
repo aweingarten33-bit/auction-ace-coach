@@ -69,6 +69,7 @@ import MarketHeat from "@/components/MarketHeat";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import MoneyHero from "@/components/MoneyHero";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
