@@ -371,8 +371,9 @@ export default function DraftRoom() {
             <MoneyHero
               remaining={budget.remaining}
               total={settings.totalBudget}
-              showMax={events.filter((e) => e.drafter === "me").length >= 3}
+              showMax={budget.maxBid > 0}
               maxBid={budget.maxBid}
+              slotsLeft={budget.slotsLeft}
             />
           </div>
 
