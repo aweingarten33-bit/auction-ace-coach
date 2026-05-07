@@ -7,6 +7,7 @@ interface Props {
   total: number;
   showMax: boolean;
   maxBid: number;
+  slotsLeft?: number;
 }
 
 export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) {
