@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { EspnSyncStatus as Status } from "@/hooks/useEspnLiveSync";
 import { Activity, AlertTriangle, WifiOff, KeyboardIcon } from "lucide-react";
 
@@ -12,6 +13,7 @@ interface Props {
  * manual entry is the active fallback so the AI keeps working.
  */
 export default function EspnSyncStatusPill({ status, lastEventAt }: Props) {
+  const navigate = useNavigate();
   const ago = lastEventAt
     ? `${Math.max(1, Math.round((Date.now() - lastEventAt) / 1000))}s ago`
     : "—";
@@ -55,12 +57,14 @@ export default function EspnSyncStatusPill({ status, lastEventAt }: Props) {
   const m = map[status];
   const Icon = m.icon;
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${m.cls}`}
+    <button
+      type="button"
+      onClick={() => navigate("/espn")}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[10px] font-semibold transition hover:opacity-80 ${m.cls}`}
       title={m.hint || "ESPN sync status"}
     >
       <Icon className="h-3 w-3" />
       <span>{m.label}</span>
-    </span>
+    </button>
   );
 }

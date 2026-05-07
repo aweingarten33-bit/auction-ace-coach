@@ -37,11 +37,6 @@ Deno.serve(async (req) => {
       return j({ error: "No ESPN league selected yet. Go to the ESPN connection step and pick your league + team, then come back." }, 400);
     }
 
-    // Your ESPN owner ID is your SWID. ESPN stores team→owner as the
-    // {GUID-WITH-BRACES} form on each team object, so we normalize ours
-    // to match before comparing.
-    const myOwnerId = String(creds.swid || "").toUpperCase();
-
     const cookie = `SWID=${creds.swid}; espn_s2=${creds.espn_s2}`;
     const currentSeason: number = creds.season_id;
     const seasons = Array.from({ length: seasonsBack }, (_, i) => currentSeason - 1 - i);
@@ -102,37 +97,14 @@ Deno.serve(async (req) => {
 
         // Build playerId -> {name, pos} from teams' rosters where present.
         const playerMap = new Map<number, { name: string; pos: string | null }>();
-        // Also build teamId -> primary owner ID so we can flag which picks were YOURS.
-        // Each team has `owners: ["{GUID}", ...]` and `primaryOwner: "{GUID}"`.
-        // We treat the primaryOwner as the single source of truth.
-        const teamOwnerMap = new Map<number, string>();
         for (const t of data.teams ?? []) {
-          // Player roster
           for (const e of t.roster?.entries ?? []) {
             const p = e.playerPoolEntry?.player;
             if (p?.id) {
               playerMap.set(p.id, { name: p.fullName ?? `Player ${p.id}`, pos: posCode(p.defaultPositionId) });
             }
           }
-          // Owner mapping for "was this MY pick?" tagging
-          const tid = typeof t.id === "number" ? t.id : null;
-          const primary = typeof t.primaryOwner === "string" ? t.primaryOwner : null;
-          const firstOwner = Array.isArray(t.owners) && t.owners.length > 0 ? String(t.owners[0]) : null;
-          const owner = (primary ?? firstOwner ?? "").toUpperCase();
-          if (tid != null && owner) teamOwnerMap.set(tid, owner);
         }
-        // Which team_id was YOU this season? (Your team name probably changes
-        // year to year, but your SWID/owner ID does not.) If we can't find
-        // ourselves on the roster (e.g. you joined this league after this
-        // season), all picks below will simply be flagged was_my_pick=false.
-        let myTeamIdThisSeason: number | null = null;
-        for (const [tid, ownerId] of teamOwnerMap) {
-          if (ownerId === myOwnerId) {
-            myTeamIdThisSeason = tid;
-            break;
-          }
-        }
-        console.log(`[espn-historical-draft] season=${season} my owner=${myOwnerId} → my team_id=${myTeamIdThisSeason}`);
 
         // Include keepers (bidAmount may be 0) AND real auction picks (bidAmount > 0).
         const auctionPicks = picks.filter((p: any) =>
@@ -188,9 +160,6 @@ Deno.serve(async (req) => {
         const rows = auctionPicks
           .map((p: any) => {
             const meta = playerMap.get(p.playerId) ?? { name: `Player ${p.playerId}`, pos: null };
-            const teamId = p.teamId ?? null;
-            // Owner-based ownership check — survives team-name changes year to year.
-            const wasMine = myTeamIdThisSeason != null && teamId === myTeamIdThisSeason;
             return {
               user_id: u.user.id,
               league_id: creds.league_id,
@@ -199,9 +168,8 @@ Deno.serve(async (req) => {
               player_name: meta.name,
               position: meta.pos,
               bid_amount: p.bidAmount,
-              team_id: teamId,
+              team_id: p.teamId ?? null,
               pick_overall: p.overallPickNumber ?? null,
-              was_my_pick: wasMine,
               raw: p,
             };
           });

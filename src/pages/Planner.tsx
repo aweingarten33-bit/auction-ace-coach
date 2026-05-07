@@ -451,7 +451,9 @@ function SyncHistoryButton() {
       const combined = `${dErr ?? ""} ${rErr ?? ""}`.toLowerCase();
       if (combined.includes("connect espn")) {
         setNeedsEspn(true);
-        toast.error("Connect ESPN first to sync history.");
+        toast.error("Connect ESPN first to sync history.", {
+          action: { label: "Open ESPN settings", onClick: () => navigate("/espn") },
+        });
       } else if (dErr || rErr) {
         toast.error(`Sync issue: ${dErr || rErr}`);
       } else {
@@ -471,9 +473,12 @@ function SyncHistoryButton() {
 
   if (needsEspn) {
     return (
-      <span className="rounded border border-amber-500/50 bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-600">
-        Connect ESPN on the sign-in page to sync history
-      </span>
+      <button
+        onClick={() => navigate("/espn")}
+        className="rounded border border-amber-500/50 bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-600 hover:bg-amber-500/20"
+      >
+        Connect ESPN to sync history →
+      </button>
     );
   }
 
@@ -622,7 +627,9 @@ function SetupChecklist() {
           {espnConnected ? (
             <span className="text-emerald-500">Connected.</span>
           ) : (
-            <span className="text-muted-foreground">Use "Connect ESPN" on the sign-in page.</span>
+            <button onClick={() => navigate("/espn")} className="text-primary underline">
+              Paste SWID + espn_s2 + league ID →
+            </button>
           )}
         </Step>
         <Step n="1b" label="Sync last 3 yrs of auction history" done={historySeasons.length > 0 && rankSeasons.length > 0}>
