@@ -36,6 +36,8 @@ import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 import { useAuth } from "@/hooks/useAuth";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
+import { STRATEGIES, getStrategy } from "@/lib/strategies";
+import { supabase } from "@/integrations/supabase/client";
 import {
   computeBudget,
   countByPosition,
@@ -302,6 +304,7 @@ export default function DraftRoom() {
               onSignOut={async () => { await signOut(); navigate("/auth"); }}
               onGoToSetup={() => navigate("/setup")}
               onGoToEspn={() => navigate("/espn")}
+              onLockPlayer={lockToPlayer}
             />
           </Sheet>
 
@@ -581,6 +584,7 @@ interface DrawerProps {
   onSignOut: () => void;
   onGoToSetup: () => void;
   onGoToEspn: () => void;
+  onLockPlayer: (name: string) => void;
 }
 
 function DrawerContents({
@@ -595,12 +599,15 @@ function DrawerContents({
   onSignOut,
   onGoToSetup,
   onGoToEspn,
+  onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "market" | "opponents" | "vetri" | "recent"
+    "menu" | "plan" | "lookup" | "market" | "opponents" | "vetri" | "recent"
   >("menu");
 
   const sections = [
+    { id: "plan" as const, label: "Plan", icon: Settings, hint: "Strategy & slot allocations" },
+    { id: "lookup" as const, label: "Lookup", icon: Search, hint: "Affordability · what can I get for $X" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
     { id: "vetri" as const, label: "Analyst", icon: MessageSquare, hint: "Vetri's takes" },
@@ -674,6 +681,7 @@ function DrawerContents({
               <Wifi className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">ESPN connection</span>
             </button>
+            <RefreshLeagueButton onDone={onClose} />
             <button
               type="button"
               onClick={onSignOut}
@@ -683,6 +691,26 @@ function DrawerContents({
               <span className="text-sm">Sign out</span>
             </button>
           </div>
+        </div>
+      )}
+
+      {section === "plan" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <PlanSection budget={budget} />
+        </div>
+      )}
+
+      {section === "lookup" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <LookupSection
+            prices={prices}
+            events={events}
+            maxBid={budget.maxBid}
+            onPick={(name) => {
+              onLockPlayer(name);
+              onClose();
+            }}
+          />
         </div>
       )}
 
