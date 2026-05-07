@@ -53,10 +53,12 @@ export default function AuctionPlayerCard({ d }: Props) {
   const keepers = useDraftStore((s) => s.keepers);
 
   const [meta, setMeta] = useState<SleeperMeta>({ team: null, bye: null });
+  const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null }>({ stats: null, points: null });
 
   useEffect(() => {
     let live = true;
     setMeta({ team: null, bye: null });
+    setProj({ stats: null, points: null });
     if (!d.player) return;
     loadSleeperPlayers().then((players) => {
       if (!live) return;
@@ -65,6 +67,26 @@ export default function AuctionPlayerCard({ d }: Props) {
       const team = p.team ?? null;
       setMeta({ team, bye: byeWeekForTeam(team) ?? null });
     }).catch(() => {});
+
+    // Fetch ESPN projected stat line for this player.
+    const norm = d.player.toLowerCase().normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "")
+      .replace(/\s+/g, " ").trim();
+    supabase
+      .from("espn_player_ranks")
+      .select("projected_stats, projected_points, season")
+      .eq("player_name_norm", norm)
+      .order("season", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!live || !data) return;
+        setProj({
+          stats: (data.projected_stats as ProjStats) ?? null,
+          points: data.projected_points ?? null,
+        });
+      });
+
     return () => { live = false; };
   }, [d.player]);
 
