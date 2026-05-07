@@ -31,7 +31,7 @@ Your ONLY job is to call the emit_queue tool with the THREE best players the use
 Rules:
 - Pick from the user's price sheet when possible. Otherwise use widely known players appropriate for the format.
 - NEVER list a player who is already drafted (in the draft log) or already on the user's roster/keepers.
-- Each suggested maxBid MUST be <= the user's current max bid AND must leave $1 per remaining slot.
+- "maxBid" = the REALISTIC AUCTION PRICE this specific player goes for in a $${"{BUDGET}"} ${"{LEAGUE_TYPE}"} league. NOT the user's affordability ceiling. Each player should have a DIFFERENT, player-specific price reflecting their actual market value (e.g. Mahomes $55, McCaffrey $65, Jefferson $60 — NOT all the same number). Must be <= user's affordability max and leave $1 per remaining slot, but otherwise reflect true market.
 - "matchPct" (0-100) reflects how well the player fits the user's needs RIGHT NOW (positional gap urgency + value vs price sheet + market timing). Higher = better fit.
 - "reason" is ONE short punchy line (max ~70 chars). Concrete: positional fit + value angle. No fluff.
 - Order the 3 by matchPct descending.
@@ -218,38 +218,42 @@ Deno.serve(async (req: Request) => {
     }
 
     if (Array.isArray(parsed?.targets)) {
+      // Detect duplicate AI prices (model lazily returned ceiling for all) so
+      // we can spread them out using the position fallback board.
+      const aiPrices = parsed.targets.map((t: any) => Number(t?.maxBid) || 0);
+      const allSame = aiPrices.length > 1 && aiPrices.every((v: number) => v === aiPrices[0]);
+
       for (const t of parsed.targets) {
         const pos = t?.position as string | undefined;
 
-        // 1. Market price (sheet × marketMult) — anchor when available
+        // 1. Anchor: sheet first, else top-of-board going price for that pos,
+        //    else AI's own number (already player-specific per the prompt).
         const sheetRef = sheetMap.get(norm(t?.name ?? ""));
-        const marketPrice = sheetRef && sheetRef.price > 0
-          ? Math.max(1, Math.round(sheetRef.price * marketMult))
-          : (pos && replacementByPos[pos]) || 0;
+        const board = (pos && fallbackByPos[pos]) ? fallbackByPos[pos] : [];
+        const topGoing = board[0]?.going || 0;
 
-        // 2. AI price (model's own maxBid guess) — clamp to a sane band so a
-        //    runaway $213 doesn't poison the blend
-        const aiRaw = Number(t?.maxBid) || 0;
-        const aiPrice = marketPrice > 0
-          ? Math.max(1, Math.min(aiRaw, Math.round(marketPrice * 1.5)))
-          : Math.max(1, Math.min(aiRaw, Math.round(affordabilityCeiling * 0.5)));
+        let basePrice: number;
+        if (sheetRef && sheetRef.price > 0) {
+          basePrice = Math.round(sheetRef.price * marketMult);
+        } else if (allSame && topGoing > 0) {
+          // AI gave the same number for everyone — replace with the position's
+          // top going rate so QB/RB/WR don't all read $134.
+          basePrice = topGoing;
+        } else {
+          basePrice = Number(t?.maxBid) || (topGoing || Math.round(affordabilityCeiling * 0.3));
+        }
 
-        // 3. Blend
-        let blend = marketPrice > 0
-          ? 0.6 * marketPrice + 0.4 * aiPrice
-          : aiPrice;
-
-        // 4. Scarcity nudge
+        // 2. Scarcity nudge
         const sev = pos ? gapByPos.get(pos) : undefined;
-        const scarcityMult = sev === "critical" ? 1.25 : sev === "need" ? 1.10 : 1.0;
+        const scarcityMult = sev === "critical" ? 1.15 : sev === "need" ? 1.05 : 1.0;
 
-        // 5. Run nudge (mid-run = pay up a bit)
+        // 3. Run nudge
         const runN = pos ? Number(runCounts[pos] || 0) : 0;
-        const runMult = 1 + Math.min(0.20, runN * 0.05);
+        const runMult = 1 + Math.min(0.15, runN * 0.05);
 
         const suggested = Math.max(
           1,
-          Math.min(affordabilityCeiling, Math.round(blend * scarcityMult * runMult)),
+          Math.min(affordabilityCeiling, Math.round(basePrice * scarcityMult * runMult)),
         );
         t.maxBid = suggested;
 
