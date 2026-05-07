@@ -40,6 +40,10 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
   const [lastEventAt, setLastEventAt] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [liveBid, setLiveBid] = useState<LiveBid | null>(null);
+  // Your ESPN team_id for the current season. Used to auto-tag incoming
+  // "won" events as YOUR picks (drafter: "me") so the budget math, targets,
+  // and decision engine all work without you logging anything by hand.
+  const [myTeamId, setMyTeamId] = useState<number | null>(null);
 
   const seenIds = useRef<Set<string>>(new Set());
   const addEvent = useDraftStore((s) => s.addEvent);
@@ -71,6 +75,25 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
     };
   }, []);
 
+  // Pull our ESPN team_id once we know the user. This is what we compare
+  // against incoming `drafter_team_id` to decide if a pick was ours.
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    supabase
+      .from("espn_credentials")
+      .select("team_id")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setMyTeamId(typeof data?.team_id === "number" ? data.team_id : null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
   // Apply a single event row to local state (used for both backfill and realtime)
   const applyEvent = (row: any, fromBackfill = false) => {
     if (!row || seenIds.current.has(row.id)) return;
@@ -83,16 +106,28 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
     if (row.event_type === "won" && row.player_name && row.price != null) {
       const sig = `${String(row.player_name).toLowerCase()}|${row.price}`;
       if (!eventSig.current.has(sig)) {
+        // Auto-tag YOUR picks based on team_id matching your ESPN team.
+        // Without this, the app thinks every pick was "other" and your
+        // remaining budget never moves.
+        const isMine =
+          myTeamId != null &&
+          typeof row.drafter_team_id === "number" &&
+          row.drafter_team_id === myTeamId;
         addEvent({
           id: row.id,
           player: row.player_name,
           position: (row.player_position as Position) || undefined,
           price: Number(row.price) || 0,
-          drafter: "other",
+          drafter: isMine ? "me" : "other",
           ts: new Date(row.occurred_at || row.created_at || Date.now()).getTime(),
         });
         if (!fromBackfill) {
-          toast.success(`ESPN: ${row.player_name} → $${row.price}`, { duration: 2500 });
+          toast.success(
+            isMine
+              ? `You won ${row.player_name} for $${row.price}`
+              : `ESPN: ${row.player_name} → $${row.price}`,
+            { duration: 2500 },
+          );
         }
       }
       // Won → bidding war is over for that player
@@ -156,7 +191,7 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
       const since = new Date(Date.now() - 60 * 60_000).toISOString();
       const { data } = await supabase
         .from("live_draft_events")
-        .select("id, event_type, player_name, player_position, player_team, price, drafter_team_name, occurred_at, created_at")
+        .select("id, event_type, player_name, player_position, player_team, price, drafter_team_name, drafter_team_id, occurred_at, created_at")
         .eq("user_id", userId)
         .gte("created_at", since)
         .order("created_at", { ascending: true })
