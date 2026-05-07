@@ -418,6 +418,10 @@ export default function DraftRoom() {
               onGoToClassicDraft={() => navigate("/draft")}
               onGoToPlanner={() => navigate("/planner")}
               onLockPlayer={lockToPlayer}
+              watchlist={watchlist}
+              keepers={keepers}
+              onPin={pinPlayer}
+              onUnpin={unpinPlayer}
             />
           </Sheet>
 
