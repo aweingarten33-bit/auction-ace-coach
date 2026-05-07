@@ -207,6 +207,41 @@ export default function AuctionPlayerCard({ d }: Props) {
           ))}
         </div>
 
+        {/* PROJECTED STAT LINE — like a real Topps card back */}
+        {proj.stats && Object.keys(proj.stats).length > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <SectionRule>PROJECTED STAT LINE</SectionRule>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(5, projStatCells(d.position, proj.stats).length) || 1}, 1fr)`,
+              gap: 2, marginTop: 4,
+              fontFamily: "Georgia, serif",
+            }}>
+              {projStatCells(d.position, proj.stats).slice(0,5).map((c) => (
+                <div key={c.label} style={{
+                  textAlign: "center", borderRight: `1px solid ${C.rule}`, padding: "0 2px",
+                }}>
+                  <div style={{ fontSize: 7, letterSpacing: 1.2, color: C.muted, textTransform: "uppercase" }}>
+                    {c.label}
+                  </div>
+                  <div style={{
+                    fontSize: 13, fontWeight: 700, color: C.ink, lineHeight: 1.1,
+                    fontFamily: "'Courier New', monospace",
+                  }}>{c.value}</div>
+                </div>
+              ))}
+            </div>
+            {proj.points != null && (
+              <div style={{
+                fontSize: 8, color: C.muted, letterSpacing: 1.2, fontFamily: "Georgia,serif",
+                textAlign: "right", marginTop: 2,
+              }}>
+                PROJ. FANTASY PTS: <span style={{ color: C.ink, fontWeight: 700 }}>{proj.points}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* STAT TABLE — auction price ladder, like a stat line on card back */}
         <div style={{ marginTop: 10 }}>
           <SectionRule>AUCTION PRICE LINE</SectionRule>
