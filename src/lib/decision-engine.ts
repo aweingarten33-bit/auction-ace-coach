@@ -62,8 +62,11 @@ export interface DecisionResult {
 }
 
 export interface AnchorEntry {
-  price: number;
+  price: number;                  // final blended anchor we use
   source: "league" | "espn";
+  leaguePrice?: number;           // raw weighted league history (if any)
+  marketPrice?: number;           // raw market consensus (Sleeper/ESPN blend)
+  marketSources?: { espn?: number; sleeper?: number };
 }
 
 interface EngineInput {
