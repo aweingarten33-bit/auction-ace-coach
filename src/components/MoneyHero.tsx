@@ -1,5 +1,5 @@
-// MoneyHero — Stark HUD readout. Big mono number, no denominator,
-// thin scan line, corner ticks. Color shifts amber → red as bank drains.
+// MoneyHero — instrument readout. Big mono $-remaining + a thin oscilloscope
+// bar that drains as you spend. Restrained palette, real signal.
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
@@ -12,15 +12,18 @@ interface Props {
 export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) {
   const prev = useRef(remaining);
   const [delta, setDelta] = useState<number | null>(null);
+  const [bump, setBump] = useState(false);
 
   useEffect(() => {
     if (prev.current !== remaining) {
       const d = remaining - prev.current;
       if (d < 0) {
         setDelta(d);
-        const t = setTimeout(() => setDelta(null), 1600);
+        setBump(true);
+        const t1 = setTimeout(() => setDelta(null), 1600);
+        const t2 = setTimeout(() => setBump(false), 280);
         prev.current = remaining;
-        return () => clearTimeout(t);
+        return () => { clearTimeout(t1); clearTimeout(t2); };
       }
       prev.current = remaining;
     }
@@ -28,37 +31,23 @@ export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) 
 
   const pct = total > 0 ? Math.max(0, Math.min(1, remaining / total)) : 1;
   const tone =
-    pct < 0.2
-      ? "text-destructive"
-      : pct < 0.45
-        ? "text-warning"
-        : "text-primary";
-  const dotTone =
+    pct < 0.2 ? "text-destructive" : pct < 0.45 ? "text-warning" : "text-foreground";
+  const barTone =
     pct < 0.2 ? "bg-destructive" : pct < 0.45 ? "bg-warning" : "bg-primary";
 
   return (
-    <div className="relative flex min-w-0 flex-1 items-center">
-      {/* Corner ticks — HUD frame */}
-      <span className="absolute left-0 top-0 h-1.5 w-1.5 border-l border-t border-primary/40" aria-hidden />
-      <span className="absolute right-0 top-0 h-1.5 w-1.5 border-r border-t border-primary/40" aria-hidden />
-      <span className="absolute left-0 bottom-0 h-1.5 w-1.5 border-l border-b border-primary/40" aria-hidden />
-      <span className="absolute right-0 bottom-0 h-1.5 w-1.5 border-r border-b border-primary/40" aria-hidden />
-
-      <div className="flex w-full items-center gap-2.5 px-2 py-1">
-        {/* Live dot */}
-        <span className="relative flex h-1.5 w-1.5 items-center justify-center" aria-hidden>
-          <span className={`absolute inset-0 rounded-full ${dotTone} opacity-70 animate-ping`} />
-          <span className={`relative h-1.5 w-1.5 rounded-full ${dotTone}`} />
-        </span>
-
-        {/* Hero number */}
+    <div className="flex min-w-0 flex-1 flex-col gap-1">
+      {/* Top row: hero number + max */}
+      <div className="flex min-w-0 items-baseline gap-2">
         <span
-          className={`font-mono text-[28px] font-bold leading-none tracking-tight tabular-nums ${tone} drop-shadow-[0_0_6px_currentColor]`}
+          className={`font-mono text-[26px] font-bold leading-none tracking-tight tabular-nums transition-transform ${tone} ${bump ? "scale-[1.04]" : "scale-100"}`}
+          style={{ fontVariantNumeric: "tabular-nums" }}
         >
           ${remaining}
         </span>
-
-        {/* Spend tick */}
+        <span className="font-mono text-[10px] leading-none text-muted-foreground/60 tabular-nums">
+          /{total}
+        </span>
         {delta !== null && (
           <span
             key={delta}
@@ -67,16 +56,33 @@ export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) 
             {delta}
           </span>
         )}
-
-        {/* Right-side meta */}
-        <span className="ml-auto flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.22em] text-muted-foreground">
-          {showMax && (
+        <span className="ml-auto flex items-baseline gap-1 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          {showMax ? (
             <>
               <span>max</span>
               <span className="text-foreground tabular-nums">${maxBid}</span>
             </>
+          ) : (
+            <span>bank</span>
           )}
         </span>
+      </div>
+
+      {/* Drain meter — thin oscilloscope rail */}
+      <div className="relative h-[3px] w-full overflow-hidden rounded-full bg-border/60">
+        <div
+          className={`h-full ${barTone} transition-[width] duration-500 ease-out`}
+          style={{ width: `${pct * 100}%` }}
+        />
+        {/* Tick marks at 25 / 50 / 75 */}
+        {[0.25, 0.5, 0.75].map((p) => (
+          <span
+            key={p}
+            className="absolute top-0 h-full w-px bg-background/70"
+            style={{ left: `${p * 100}%` }}
+            aria-hidden
+          />
+        ))}
       </div>
     </div>
   );
