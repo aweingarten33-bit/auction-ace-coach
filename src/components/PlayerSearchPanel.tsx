@@ -199,15 +199,19 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
         style={{ WebkitOverflowScrolling: "touch", maxHeight: "max(16rem, 55dvh)" }}
       >
         {results.map((p) => {
-          const isDrafted = draftedSet.has(norm(p.name));
-          const isPinned = pinnedSet.has(norm(p.name));
+          const nm = norm(p.name);
+          const isPicked = draftedSet.has(nm);
+          const isKeeper = keeperPriceByName.has(nm);
+          const keeperCost = keeperPriceByName.get(nm);
+          const isDrafted = isPicked || isKeeper;
+          const isPinned = pinnedSet.has(nm);
           const position = resolvePos(p);
           const cls = position && position in POS_COLORS ? POS_COLORS[position] : "";
           return (
             <div
               key={p.name}
               className={`flex items-center gap-2 rounded px-2 py-2 transition ${
-                isDrafted ? "opacity-40 line-through" : "hover:bg-secondary/60"
+                isDrafted ? "opacity-50" : "hover:bg-secondary/60"
               }`}
             >
               <button
@@ -218,18 +222,27 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
                 }
                 className="flex flex-1 min-w-0 items-center gap-2 text-left"
               >
-                <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
+                <span className={`flex-1 truncate text-sm font-medium ${isPicked ? "line-through" : ""}`}>
+                  {p.name}
+                </span>
+                {isKeeper && (
+                  <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-500/60 text-amber-600 dark:text-amber-400">
+                    KEPT
+                  </Badge>
+                )}
                 {position && (
                   <Badge variant="outline" className={`${cls} text-[10px] px-1.5 py-0`}>
                     {position}
                   </Badge>
                 )}
-                {tierByName.get(norm(p.name)) != null && (
+                {tierByName.get(nm) != null && (
                   <span className="rounded border border-border/60 px-1 text-[10px] font-mono text-muted-foreground">
-                    T{tierByName.get(norm(p.name))}
+                    T{tierByName.get(nm)}
                   </span>
                 )}
-                <span className="w-12 text-right font-mono text-xs tabular-nums">${p.price}</span>
+                <span className="w-12 text-right font-mono text-xs tabular-nums">
+                  ${isKeeper && keeperCost != null ? keeperCost : p.price}
+                </span>
               </button>
               <button
                 type="button"
