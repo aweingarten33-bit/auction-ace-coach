@@ -84,7 +84,6 @@ interface DraftState {
   setSlotAllocations: (a: Record<string, number>) => void;
   clearSlotAllocations: () => void;
   setStrategyId: (id: string) => void;
-  setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
 
