@@ -30,6 +30,7 @@ import {
   Sparkles,
   ChevronRight,
   ListOrdered,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 import { useAuth } from "@/hooks/useAuth";
