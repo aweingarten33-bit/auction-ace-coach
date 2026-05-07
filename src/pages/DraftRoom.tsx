@@ -324,11 +324,11 @@ export default function DraftRoom() {
 
   void activePrice;
 
-  const decision = useMemo(() => {
-    if (!activeName) return null;
+  const decisionResult = useMemo(() => {
+    if (!activeName) return { decision: null, error: "" };
 
     try {
-      return decide({
+      const d = decide({
         settings,
         keepers,
         events,
@@ -338,10 +338,15 @@ export default function DraftRoom() {
         currentPrice: 0,
         anchorMap,
       });
-    } catch {
-      return null;
+      return { decision: d, error: "" };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[decide] threw for", activeName, e);
+      return { decision: null, error: msg };
     }
   }, [activeName, activePosition, settings, keepers, events, prices, anchorMap]);
+  const decision = decisionResult.decision;
+  const decisionError = decisionResult.error;
 
   // ── Helpers ───────────────────────────────────────────────────────────
   const lockToPlayer = (name: string) => {
@@ -562,6 +567,11 @@ export default function DraftRoom() {
                   <p className="text-xs text-muted-foreground">
                     No decision available. Make sure setup is complete (budget, roster, prices) and try again.
                   </p>
+                  {decisionError && (
+                    <p className="rounded bg-destructive/10 p-2 text-left font-mono text-[10px] text-destructive">
+                      {decisionError}
+                    </p>
+                  )}
                 </div>
               )}
 
