@@ -236,7 +236,7 @@ export function PlannerBody() {
       {/* Summary bar */}
       <div className="mx-auto max-w-3xl px-3 pt-3">
         <Card className="flex flex-wrap items-center gap-3 px-3 py-2 text-sm">
-          <div><span className="text-muted-foreground">Bank</span> <span className="font-bold">${budget.remaining}</span></div>
+          <div><span className="font-bold">${budget.remaining}</span> <span className="text-muted-foreground">left</span></div>
           <span className="text-muted-foreground/50">·</span>
           <div><span className="text-muted-foreground">Max bid</span> <span className="font-bold">${budget.maxBid}</span></div>
           <span className="text-muted-foreground/50">·</span>
@@ -244,7 +244,7 @@ export function PlannerBody() {
           <span className="text-muted-foreground/50">·</span>
           <div><span className="text-muted-foreground">Plan total</span>{" "}
             <span className={`font-bold ${diff === 0 ? "text-emerald-500" : diff < 0 ? "text-red-500" : "text-amber-500"}`}>
-              ${totalAllocated} / ${settings.totalBudget}
+              ${totalAllocated}
             </span>
             {diff !== 0 && (
               <span className={`ml-1 text-[11px] ${diff < 0 ? "text-red-500" : "text-amber-500"}`}>
@@ -365,16 +365,16 @@ export function PlannerBody() {
               {/* Exact math */}
               <div className="rounded-md border border-border/60 bg-background/60 p-2 font-mono text-[11px] tabular-nums leading-relaxed">
                 <div className="mb-1 font-sans text-[10px] uppercase tracking-wide text-muted-foreground">The math</div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Bank now</span><span>${budget.remaining}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Money now</span><span>${budget.remaining}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">− Cost of these {checkResults.filter(r=>r.info).length} player{checkResults.filter(r=>r.info).length===1?"":"s"}</span><span>−${checkSum}</span></div>
                 <div className="my-1 border-t border-border/60" />
-                <div className="flex justify-between"><span className="text-muted-foreground">= Bank after</span><span className="font-semibold text-foreground">${remainingAfter}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">= Money after</span><span className="font-semibold text-foreground">${remainingAfter}</span></div>
                 <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Slots open now</span><span>{budget.slotsLeft}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">− Slots used</span><span>−{checkResults.filter(r=>r.info).length}</span></div>
                 <div className="my-1 border-t border-border/60" />
                 <div className="flex justify-between"><span className="text-muted-foreground">= Slots left after</span><span className="font-semibold text-foreground">{slotsAfter}</span></div>
                 <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Min $ needed (1/slot)</span><span>${minNeededForRest}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Cushion (Bank after − min)</span><span className={remainingAfter - minNeededForRest >= 0 ? "text-emerald-400" : "text-red-400"}>${remainingAfter - minNeededForRest}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Cushion (left − min)</span><span className={remainingAfter - minNeededForRest >= 0 ? "text-emerald-400" : "text-red-400"}>${remainingAfter - minNeededForRest}</span></div>
               </div>
             </div>
           )}
