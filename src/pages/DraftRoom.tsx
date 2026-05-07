@@ -319,11 +319,12 @@ export default function DraftRoom() {
         player: activeName,
         position: activePosition,
         currentPrice: 0, // pre-bid lookup — show me the ceiling, not "what should I bid against $X"
+        anchorMap,
       });
     } catch {
       return null;
     }
-  }, [activeName, activePosition, settings, keepers, events, prices]);
+  }, [activeName, activePosition, settings, keepers, events, prices, anchorMap]);
 
   // ── Helpers ───────────────────────────────────────────────────────────
   const lockToPlayer = (name: string) => {
