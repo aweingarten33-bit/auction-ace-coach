@@ -785,12 +785,7 @@ function DrawerContents({
 
       {section === "vetri" && (
         <div className="flex-1 overflow-y-auto p-3">
-          <Card className="p-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Recent analyst takes
-            </p>
-            <VetriPlayerSummary />
-          </Card>
+          <SocialTakes />
         </div>
       )}
 
