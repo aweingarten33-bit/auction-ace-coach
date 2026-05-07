@@ -50,6 +50,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import DecisionCard from "@/components/DecisionCard";
 import MarketHeat from "@/components/MarketHeat";
@@ -485,58 +486,48 @@ export default function DraftRoom() {
           )}
         </section>
 
-        {/* DECISION CARD — when a player is locked in */}
-        {decision && (
-          <section id="decision-card" className="scroll-mt-24">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Decision
-              </p>
-              <div className="flex gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 px-2 text-[11px]"
-                  onClick={() =>
-                    isPinned(activeName) ? unpinPlayer(activeName) : pinPlayer(activeName)
-                  }
-                >
-                  {isPinned(activeName) ? (
-                    <>
-                      <PinOff className="mr-1 h-3 w-3" />
-                      Unpin
-                    </>
-                  ) : (
-                    <>
-                      <Pin className="mr-1 h-3 w-3" />
-                      Pin
-                    </>
-                  )}
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-7 px-2 text-[11px]"
-                  onClick={() => setActiveName("")}
-                >
-                  Clear
-                </Button>
-              </div>
-            </div>
-            <DecisionCard d={decision} />
-            <div className="mt-3">
-              <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Analyst take
-              </p>
-              <Card className="p-3 text-[12px]">
-                <VetriTakesForPlayer
-                  player={activeName}
-                  emptyText="No analyst take on this player yet."
-                />
-              </Card>
-            </div>
-          </section>
-        )}
+        {/* DECISION CARD — popup bubble when a player is locked in */}
+        <Dialog open={!!decision} onOpenChange={(o) => { if (!o) setActiveName(""); }}>
+          <DialogContent className="max-h-[90vh] w-[94vw] max-w-md overflow-y-auto p-4">
+            {decision && (
+              <>
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Decision
+                  </p>
+                  <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2 text-[11px]"
+                      onClick={() =>
+                        isPinned(activeName) ? unpinPlayer(activeName) : pinPlayer(activeName)
+                      }
+                    >
+                      {isPinned(activeName) ? (
+                        <><PinOff className="mr-1 h-3 w-3" />Unpin</>
+                      ) : (
+                        <><Pin className="mr-1 h-3 w-3" />Pin</>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                <DecisionCard d={decision} />
+                <div className="mt-3">
+                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Analyst take
+                  </p>
+                  <Card className="p-3 text-[12px]">
+                    <VetriTakesForPlayer
+                      player={activeName}
+                      emptyText="No analyst take on this player yet."
+                    />
+                  </Card>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
 
         {/* BUDGET PLANNER — strategy, slots, affordability, lookup */}
         <PlannerBody />
@@ -592,12 +583,8 @@ export default function DraftRoom() {
             targetsLoading={targetsMutation.isPending}
             onRefreshTargets={() => targetsMutation.mutate()}
             onPickTarget={(name) => {
-              lockToPlayer(name);
               setAiOpen(false);
-              // After sheet closes, scroll the decision card into view.
-              setTimeout(() => {
-                document.getElementById("decision-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }, 250);
+              lockToPlayer(name);
             }}
             coachContext={() => ({
               settings: {
