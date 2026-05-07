@@ -799,12 +799,6 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "plan" && (
-        <div className="flex-1 overflow-y-auto p-3">
-          <PlanSection budget={budget} />
-        </div>
-      )}
-
       {section === "lookup" && (
         <div className="flex-1 overflow-y-auto p-3">
           <LookupSection
@@ -837,11 +831,6 @@ function DrawerContents({
             remaining={budget.remaining}
             pulseMultiplier={pulseMultiplier}
           />
-        </div>
-      )}
-
-      {section === "opponents" && (
-        <div className="flex-1 overflow-y-auto p-3">
           <OpponentHeatmap settings={settings} />
         </div>
       )}
