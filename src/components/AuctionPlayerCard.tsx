@@ -53,14 +53,14 @@ export default function AuctionPlayerCard({ d }: Props) {
   const keepers = useDraftStore((s) => s.keepers);
 
   const [meta, setMeta] = useState<SleeperMeta>({ team: null, bye: null });
-  const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null }>({ stats: null, points: null });
+  const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null; posRank: number | null; overallRank: number | null }>({ stats: null, points: null, posRank: null, overallRank: null });
   const [espnId, setEspnId] = useState<number | null>(null);
   const [headshotOk, setHeadshotOk] = useState(true);
 
   useEffect(() => {
     let live = true;
     setMeta({ team: null, bye: null });
-    setProj({ stats: null, points: null });
+    setProj({ stats: null, points: null, posRank: null, overallRank: null });
     setEspnId(null);
     setHeadshotOk(true);
     if (!d.player) return;
@@ -72,13 +72,12 @@ export default function AuctionPlayerCard({ d }: Props) {
       setMeta({ team, bye: byeWeekForTeam(team) ?? null });
     }).catch(() => {});
 
-    // Fetch ESPN projected stat line for this player.
     const norm = d.player.toLowerCase().normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "")
       .replace(/\s+/g, " ").trim();
     supabase
       .from("espn_player_ranks")
-      .select("projected_stats, projected_points, season, espn_player_id")
+      .select("projected_stats, projected_points, season, espn_player_id, pos_rank, overall_rank")
       .eq("player_name_norm", norm)
       .order("season", { ascending: false })
       .limit(1)
@@ -88,6 +87,8 @@ export default function AuctionPlayerCard({ d }: Props) {
         setProj({
           stats: (data.projected_stats as ProjStats) ?? null,
           points: data.projected_points ?? null,
+          posRank: data.pos_rank ?? null,
+          overallRank: data.overall_rank ?? null,
         });
         if (data.espn_player_id) setEspnId(Number(data.espn_player_id));
       });
@@ -269,29 +270,52 @@ export default function AuctionPlayerCard({ d }: Props) {
         </div>
 
         {/* PROJECTED STAT LINE — like a real Topps card back */}
-        {proj.stats && Object.keys(proj.stats).length > 0 && (
+        {(proj.stats && Object.keys(proj.stats).length > 0) || proj.posRank || proj.points != null ? (
           <div style={{ marginTop: 10 }}>
             <SectionRule>PROJECTED STAT LINE</SectionRule>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: `repeat(${Math.min(5, projStatCells(d.position, proj.stats).length) || 1}, 1fr)`,
-              gap: 2, marginTop: 4,
-              fontFamily: "Georgia, serif",
-            }}>
-              {projStatCells(d.position, proj.stats).slice(0,5).map((c) => (
-                <div key={c.label} style={{
-                  textAlign: "center", borderRight: `1px solid ${C.rule}`, padding: "0 2px",
-                }}>
-                  <div style={{ fontSize: 7, letterSpacing: 1.2, color: C.muted, textTransform: "uppercase" }}>
-                    {c.label}
+            {(proj.posRank || proj.overallRank) && (
+              <div style={{
+                marginTop: 4, display: "flex", justifyContent: "space-between",
+                alignItems: "baseline", padding: "3px 6px",
+                background: C.navy, color: "#fbbf24",
+                fontFamily: "Impact, sans-serif", letterSpacing: 1.5, fontSize: 11,
+                border: `1px solid ${C.orange}`,
+              }}>
+                <span>
+                  PROJ. FINISH:{" "}
+                  <span style={{ color: "#fff", fontSize: 14 }}>
+                    {proj.posRank ? `${d.position ?? "POS"}${proj.posRank}` : "—"}
+                  </span>
+                </span>
+                {proj.overallRank && (
+                  <span style={{ fontSize: 9, color: "#fff" }}>
+                    OVERALL #{proj.overallRank}
+                  </span>
+                )}
+              </div>
+            )}
+            {proj.stats && Object.keys(proj.stats).length > 0 && (
+              <div style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${Math.min(5, projStatCells(d.position, proj.stats).length) || 1}, 1fr)`,
+                gap: 2, marginTop: 4,
+                fontFamily: "Georgia, serif",
+              }}>
+                {projStatCells(d.position, proj.stats).slice(0,5).map((c) => (
+                  <div key={c.label} style={{
+                    textAlign: "center", borderRight: `1px solid ${C.rule}`, padding: "0 2px",
+                  }}>
+                    <div style={{ fontSize: 7, letterSpacing: 1.2, color: C.muted, textTransform: "uppercase" }}>
+                      {c.label}
+                    </div>
+                    <div style={{
+                      fontSize: 13, fontWeight: 700, color: C.ink, lineHeight: 1.1,
+                      fontFamily: "'Courier New', monospace",
+                    }}>{c.value}</div>
                   </div>
-                  <div style={{
-                    fontSize: 13, fontWeight: 700, color: C.ink, lineHeight: 1.1,
-                    fontFamily: "'Courier New', monospace",
-                  }}>{c.value}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
             {proj.points != null && (
               <div style={{
                 fontSize: 8, color: C.muted, letterSpacing: 1.2, fontFamily: "Georgia,serif",
@@ -301,7 +325,8 @@ export default function AuctionPlayerCard({ d }: Props) {
               </div>
             )}
           </div>
-        )}
+        ) : null}
+
 
         {/* STAT TABLE — auction price ladder, like a stat line on card back */}
         <div style={{ marginTop: 10 }}>
