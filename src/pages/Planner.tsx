@@ -236,7 +236,7 @@ export function PlannerBody() {
       {/* Summary bar */}
       <div className="mx-auto max-w-3xl px-3 pt-3">
         <Card className="flex flex-wrap items-center gap-3 px-3 py-2 text-sm">
-          <div><span className="text-muted-foreground">Bank</span> <span className="font-bold">${budget.remaining}</span></div>
+          <div><span className="font-bold">${budget.remaining}</span> <span className="text-muted-foreground">left</span></div>
           <span className="text-muted-foreground/50">·</span>
           <div><span className="text-muted-foreground">Max bid</span> <span className="font-bold">${budget.maxBid}</span></div>
           <span className="text-muted-foreground/50">·</span>
@@ -244,7 +244,7 @@ export function PlannerBody() {
           <span className="text-muted-foreground/50">·</span>
           <div><span className="text-muted-foreground">Plan total</span>{" "}
             <span className={`font-bold ${diff === 0 ? "text-emerald-500" : diff < 0 ? "text-red-500" : "text-amber-500"}`}>
-              ${totalAllocated} / ${settings.totalBudget}
+              ${totalAllocated}
             </span>
             {diff !== 0 && (
               <span className={`ml-1 text-[11px] ${diff < 0 ? "text-red-500" : "text-amber-500"}`}>
