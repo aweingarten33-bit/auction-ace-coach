@@ -104,7 +104,7 @@ export default function PlayerDecisionOverlay({
           </DialogPrimitive.Title>
 
           {decision ? (
-            <DecisionCard d={decision} />
+            <AuctionPlayerCard d={decision} />
           ) : (
             <div className="space-y-3 rounded-md border border-border bg-secondary/30 p-4">
               <div className="text-center">
