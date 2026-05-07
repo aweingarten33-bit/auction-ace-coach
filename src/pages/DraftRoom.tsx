@@ -66,6 +66,7 @@ import {
 
 import DecisionCard from "@/components/DecisionCard";
 import MarketHeat from "@/components/MarketHeat";
+import StealReachCounter from "@/components/StealReachCounter";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
@@ -834,7 +835,8 @@ function DrawerContents({
       )}
 
       {section === "market" && (
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 space-y-3 overflow-y-auto p-3">
+          <StealReachCounter events={events} />
           <MarketHeat
             events={events}
             prices={prices}
