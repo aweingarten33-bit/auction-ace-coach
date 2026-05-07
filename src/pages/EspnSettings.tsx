@@ -185,7 +185,6 @@ export default function EspnSettings() {
         </Button>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {user?.email}
-          <Button size="sm" variant="ghost" onClick={() => { signOut(); nav("/auth"); }}>Sign out</Button>
         </div>
       </div>
 
