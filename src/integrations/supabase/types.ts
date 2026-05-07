@@ -208,6 +208,7 @@ export type Database = {
           season: number
           team_id: number | null
           user_id: string
+          was_my_pick: boolean
         }
         Insert: {
           bid_amount: number
@@ -222,6 +223,7 @@ export type Database = {
           season: number
           team_id?: number | null
           user_id: string
+          was_my_pick?: boolean
         }
         Update: {
           bid_amount?: number
@@ -236,6 +238,7 @@ export type Database = {
           season?: number
           team_id?: number | null
           user_id?: string
+          was_my_pick?: boolean
         }
         Relationships: []
       }
