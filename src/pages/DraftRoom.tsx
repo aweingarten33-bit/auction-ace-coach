@@ -106,7 +106,7 @@ export default function DraftRoom() {
 
   // Anchor price map: league 3yr avg + ESPN 2026 auction value, used by
   // decide() so off-sheet players show real numbers instead of the wallet cap.
-  const anchorMap = useAnchorMap();
+  const { map: anchorMap } = useAnchorMap();
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!searchWrapRef.current?.contains(e.target as Node)) setSearchOpen(false);
