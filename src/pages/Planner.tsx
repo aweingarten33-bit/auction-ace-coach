@@ -251,22 +251,7 @@ export function PlannerBody() {
   return (
     <>
 
-      {/* Refresh league action — budget/slots already shown in the top header */}
-      <div className="mx-auto max-w-3xl px-3 pt-3">
-        <div className="flex justify-end">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={refreshFromEspn}
-            disabled={refreshing}
-            className="h-7 gap-1 text-[11px]"
-            title="Re-pull league settings from ESPN"
-          >
-            <RotateCcw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
-            {refreshing ? "Syncing…" : "Refresh league"}
-          </Button>
-        </div>
-      </div>
+      {/* Refresh league moved to the hamburger menu (Settings → Refresh league from ESPN). */}
 
       <main className="mx-auto max-w-3xl space-y-4 p-3">
         {/* ---------- Strategy picker ---------- */}
