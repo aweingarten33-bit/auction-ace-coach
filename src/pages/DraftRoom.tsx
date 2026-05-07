@@ -63,6 +63,7 @@ import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
 import SocialTakes from "@/components/SocialTakes";
+import RedditBuzz from "@/components/RedditBuzz";
 import AffordabilityChecker from "@/components/AffordabilityChecker";
 import { PlannerBody } from "@/pages/Planner";
 
@@ -370,6 +371,7 @@ export default function DraftRoom() {
               onGoToClassicDraft={() => navigate("/draft")}
               onGoToPlanner={() => navigate("/planner")}
               onLockPlayer={lockToPlayer}
+              livePlayer={espnSync.liveBid?.player}
             />
           </Sheet>
 
@@ -569,6 +571,7 @@ interface DrawerProps {
   onGoToClassicDraft: () => void;
   onGoToPlanner: () => void;
   onLockPlayer: (name: string) => void;
+  livePlayer?: string;
 }
 
 function DrawerContents({
@@ -586,9 +589,10 @@ function DrawerContents({
   onGoToClassicDraft,
   onGoToPlanner,
   onLockPlayer,
+  livePlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "plan" | "lookup" | "afford" | "market" | "opponents" | "vetri" | "recent"
+    "menu" | "plan" | "lookup" | "afford" | "market" | "opponents" | "vetri" | "reddit" | "recent"
   >("menu");
 
   const sections = [
@@ -596,6 +600,7 @@ function DrawerContents({
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pick up to 3 players you're dreaming about. I'll add up their prices, take it out of your money, and tell you straight up: yes you can pull it off, or no here's why it breaks your team." },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "See what the room is doing right now — who's getting overpaid, who's a steal, and whether a position run is happening so you don't get caught flat-footed." },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "A quick scoreboard of every other team — how much money they've burned, how many roster spots they have left, and who they already own. Spot the desperate teams." },
+    { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live threads from r/fantasyfootball — auto-filters to the player on the block when someone gets nominated. Crowd takes, hot threads, injury chatter." },
     { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "The latest takes from Matthew Berry, ESPN, FantasyPros and CBS — sleepers, busts, who's hot, who's hurt — pulled fresh so you don't have to open 5 tabs." },
   ];
 
@@ -615,7 +620,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Find (player or $)" : section}
+            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section === "reddit" ? "Reddit buzz" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Find (player or $)" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
@@ -731,6 +736,12 @@ function DrawerContents({
       {section === "vetri" && (
         <div className="flex-1 overflow-y-auto p-3">
           <SocialTakes />
+        </div>
+      )}
+
+      {section === "reddit" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <RedditBuzz defaultPlayer={livePlayer} />
         </div>
       )}
 
