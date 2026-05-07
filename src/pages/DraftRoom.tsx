@@ -66,7 +66,11 @@ import {
 
 import DecisionCard from "@/components/DecisionCard";
 import MarketHeat from "@/components/MarketHeat";
+import CounterAnchorDetector from "@/components/CounterAnchorDetector";
 import StealReachCounter from "@/components/StealReachCounter";
+import WalletRace from "@/components/WalletRace";
+import TierCliffHeatmap from "@/components/TierCliffHeatmap";
+import OpponentBidProfiler from "@/components/OpponentBidProfiler";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
@@ -366,24 +370,30 @@ export default function DraftRoom() {
         {/* Live nomination strip — only when something's actively up for bid */}
         {espnSync.liveBid && (
           <div className="border-t border-border/40 bg-secondary/40 px-4 py-1.5">
-            <p className="mx-auto flex max-w-3xl items-center gap-2 text-[11px]">
-              <span className="font-semibold uppercase tracking-wider text-muted-foreground">
-                On the block:
-              </span>
-              <button
-                type="button"
-                onClick={() => lockToPlayer(espnSync.liveBid!.player)}
-                className="truncate font-medium text-foreground hover:text-primary"
-              >
-                {espnSync.liveBid.player}
-              </button>
-              <span className="ml-auto font-mono tabular-nums text-foreground">
-                ${espnSync.liveBid.price}
-              </span>
-              {espnSync.liveBid.bidder && (
-                <span className="text-muted-foreground">· {espnSync.liveBid.bidder}</span>
-              )}
-            </p>
+            <div className="mx-auto flex max-w-3xl flex-col gap-1">
+              <p className="flex items-center gap-2 text-[11px]">
+                <span className="font-semibold uppercase tracking-wider text-muted-foreground">
+                  On the block:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => lockToPlayer(espnSync.liveBid!.player)}
+                  className="truncate font-medium text-foreground hover:text-primary"
+                >
+                  {espnSync.liveBid.player}
+                </button>
+                <span className="ml-auto font-mono tabular-nums text-foreground">
+                  ${espnSync.liveBid.price}
+                </span>
+                {espnSync.liveBid.bidder && (
+                  <span className="text-muted-foreground">· {espnSync.liveBid.bidder}</span>
+                )}
+              </p>
+              <CounterAnchorDetector
+                player={espnSync.liveBid.player}
+                livePrice={espnSync.liveBid.price}
+              />
+            </div>
           </div>
         )}
       </header>
@@ -837,6 +847,9 @@ function DrawerContents({
       {section === "market" && (
         <div className="flex-1 space-y-3 overflow-y-auto p-3">
           <StealReachCounter events={events} />
+          <TierCliffHeatmap events={events} />
+          <WalletRace totalBudget={settings.totalBudget} numTeams={settings.numTeams} />
+          <OpponentBidProfiler />
           <MarketHeat
             events={events}
             prices={prices}
