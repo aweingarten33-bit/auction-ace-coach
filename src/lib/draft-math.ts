@@ -18,7 +18,24 @@ import {
  *   QB1  Jalen Hurts  PHI  65
  * Returns null when no number found.
  */
-export function parsePlayerLine(input: string): { name: string; price: number } | null {
+const POSITION_ALIASES: Record<string, Position> = {
+  QB: "QB",
+  RB: "RB",
+  WR: "WR",
+  TE: "TE",
+  K: "K",
+  PK: "K",
+  DST: "DST",
+  DEF: "DST",
+  "D/ST": "DST",
+};
+
+function normalizePosition(value: string | undefined): Position | undefined {
+  if (!value) return undefined;
+  return POSITION_ALIASES[value.trim().toUpperCase().replace(/[^A-Z/]/g, "")];
+}
+
+export function parsePlayerLine(input: string): { name: string; price: number; position?: Position } | null {
   let line = input.trim();
   if (!line) return null;
 
@@ -34,22 +51,25 @@ export function parsePlayerLine(input: string): { name: string; price: number } 
 
   // Everything before the price = name segment (may include team/pos junk)
   let nameSegment = line.slice(0, last.index).trim();
+  const position = normalizePosition(
+    nameSegment.toUpperCase().match(/\b(QB|RB|WR|TE|PK|K|DST|DEF|D\/ST)\b/)?.[1]
+  );
   // Drop common trailing separators
   nameSegment = nameSegment.replace(/[\s,|\t\-–—:]+$/g, "").trim();
   // Drop parenthetical team/pos like "(PHI - QB)"
   nameSegment = nameSegment.replace(/\s*\([^)]*\)\s*/g, " ").trim();
   // Drop leading position tag like "QB1 " or "RB - "
-  nameSegment = nameSegment.replace(/^(QB|RB|WR|TE|K|DST|DEF)\d*\s*[-,|:]?\s*/i, "").trim();
+  nameSegment = nameSegment.replace(/^(QB|RB|WR|TE|PK|K|DST|DEF|D\/ST)\d*\s*[-,|:]?\s*/i, "").trim();
   // If comma-or-pipe separated, take the first chunk that looks like a name
   const chunks = nameSegment.split(/\s*[,|\t]\s*/).filter(Boolean);
   let name = chunks[0] || nameSegment;
   // Strip any trailing team abbreviation like "Jalen Hurts PHI"
   name = name.replace(/\s+(?:[A-Z]{2,4})$/, "").trim();
   // Strip a trailing position
-  name = name.replace(/\s+(QB|RB|WR|TE|K|DST|DEF)$/i, "").trim();
+  name = name.replace(/\s+(QB|RB|WR|TE|PK|K|DST|DEF|D\/ST)$/i, "").trim();
 
   if (!name || name.length < 2) return null;
-  return { name, price };
+  return { name, price, position };
 }
 
 export function parsePriceSheet(text: string): PriceEstimate[] {
@@ -61,7 +81,7 @@ export function parsePriceSheet(text: string): PriceEstimate[] {
     const key = p.name.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ name: p.name, price: p.price });
+    out.push({ name: p.name, price: p.price, position: p.position });
   }
   return out;
 }
