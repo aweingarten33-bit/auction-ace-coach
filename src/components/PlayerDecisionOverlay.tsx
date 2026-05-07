@@ -41,7 +41,7 @@ export default function PlayerDecisionOverlay({
   const keepers = useDraftStore((s) => s.keepers);
   const events = useDraftStore((s) => s.events);
   const prices = useDraftStore((s) => s.prices);
-  const anchorMap = useAnchorMap();
+  const { map: anchorMap } = useAnchorMap();
 
   // Run the engine. Capture errors so the popup never silently blanks.
   const { decision, error } = useMemo(() => {
