@@ -105,7 +105,7 @@ export default function SetupWizard() {
               <span className="ml-1.5 font-extrabold italic tracking-tighter">ESPN</span>
             </Button>
             {setupComplete && (
-              <Button size="sm" variant="outline" onClick={() => navigate("/draft")}>
+              <Button size="sm" variant="outline" onClick={() => navigate("/draft-room")}>
                 Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             )}
