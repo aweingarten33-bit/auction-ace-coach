@@ -344,7 +344,7 @@ function noteItem(): CSSProperties {
     fontFamily: "Georgia, serif", fontSize: 10, color: C.body, lineHeight: 1.3,
   };
 }
-function toneColor(t: "good" | "ok" | "warn" | "bad") {
+function toneColor(t: string) {
   return t === "good" ? C.green : t === "ok" ? C.amber : t === "warn" ? C.orange : C.red;
 }
 function firstName(full: string): string {
