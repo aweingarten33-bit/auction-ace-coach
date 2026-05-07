@@ -73,6 +73,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
+import { PlannerBody } from "@/pages/Planner";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -398,13 +399,8 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-5 pb-24">
-        {/* PLANNER — strategy & slot allocations */}
-        <section>
-          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Planner
-          </p>
-          <PlanSection budget={budget} />
-        </section>
+        {/* BUDGET PLANNER — strategy, slots, affordability, lookup */}
+        <PlannerBody />
 
         {/* DECISION CARD — when a player is locked in */}
         {decision && (
