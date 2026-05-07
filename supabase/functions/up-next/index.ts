@@ -287,23 +287,30 @@ Deno.serve(async (req: Request) => {
 
       for (const t of parsed.targets) {
         const pos = t?.position as string | undefined;
+        const nameKey = norm(t?.name ?? "");
 
-        // 1. Anchor: sheet first, else top-of-board going price for that pos,
-        //    else AI's own number (already player-specific per the prompt).
-        const sheetRef = sheetMap.get(norm(t?.name ?? ""));
+        // 1. Anchor priority: user sheet → league 3yr avg → ESPN 2026 → AI guess
+        const sheetRef = sheetMap.get(nameKey);
+        const anchorRef = anchorByName.get(nameKey);
         const board = (pos && fallbackByPos[pos]) ? fallbackByPos[pos] : [];
         const topGoing = board[0]?.going || 0;
 
         let basePrice: number;
+        let priceSrc: string;
         if (sheetRef && sheetRef.price > 0) {
           basePrice = Math.round(sheetRef.price * marketMult);
+          priceSrc = "sheet";
+        } else if (anchorRef && anchorRef.price > 0) {
+          basePrice = Math.round(anchorRef.price * marketMult);
+          priceSrc = anchorRef.src;
         } else if (allSame && topGoing > 0) {
-          // AI gave the same number for everyone — replace with the position's
-          // top going rate so QB/RB/WR don't all read $134.
           basePrice = topGoing;
+          priceSrc = "board";
         } else {
           basePrice = Number(t?.maxBid) || (topGoing || Math.round(affordabilityCeiling * 0.3));
+          priceSrc = "ai";
         }
+        (t as any).priceSource = priceSrc;
 
         // 2. Scarcity nudge
         const sev = pos ? gapByPos.get(pos) : undefined;
