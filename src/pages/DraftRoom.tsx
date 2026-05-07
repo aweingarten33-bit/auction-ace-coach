@@ -646,11 +646,9 @@ function DrawerContents({
   >("menu");
 
   const sections = [
-    { id: "lookup" as const, label: "Lookup", icon: Search, hint: "Affordability · what can I get for $X" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
     { id: "vetri" as const, label: "Analyst", icon: MessageSquare, hint: "Vetri's takes" },
-    { id: "recent" as const, label: "Recent picks", icon: History, hint: `Last ${Math.min(events.length, 10)} picks` },
   ];
 
   return (
