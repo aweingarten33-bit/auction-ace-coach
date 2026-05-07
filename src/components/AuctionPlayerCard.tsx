@@ -1,20 +1,27 @@
+// Fantasy Focus magazine cheat-sheet card.
+// Cream bg, navy + orange palette, collectible energy, mobile-first 402px.
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertTriangle,
   ArrowUpRight,
-  BadgeDollarSign,
   BarChart3,
-  Flame,
-  Gauge,
-  MessageSquareQuote,
-  ShieldAlert,
-  Sparkles,
+  CheckCircle2,
+  DollarSign,
+  Footprints,
+  Gavel,
+  HeartPulse,
+  Megaphone,
+  Quote,
+  ShieldCheck,
+  Smile,
+  Sofa,
   Star,
   Target,
+  TrendingUp,
   Trophy,
   Users,
+  Zap,
 } from "lucide-react";
-
 import type { DecisionResult } from "@/lib/decision-engine";
 import { computeCardInsights, type OutcomeRow } from "@/lib/card-insights";
 import { useDraftStore } from "@/lib/draft-store";
@@ -26,560 +33,455 @@ import {
 
 const LEAGUE_NAME = "BRO WE'RE SENIOR CITIZENS";
 
-interface AuctionPlayerCardProps {
+interface Props {
   d: DecisionResult;
 }
 
 type SleeperMeta = {
   playerId: string | null;
   team: string | null;
+  teamFull: string | null;
   bye: number | null;
 };
 
-const tonePill: Record<OutcomeRow["tone"], string> = {
-  good: "bg-emerald-700 text-white",
-  ok: "bg-slate-900 text-white",
-  warn: "bg-orange-600 text-white",
-  bad: "bg-red-700 text-white",
+const TEAM_FULL: Record<string, string> = {
+  ARI: "Arizona Cardinals", ATL: "Atlanta Falcons", BAL: "Baltimore Ravens",
+  BUF: "Buffalo Bills", CAR: "Carolina Panthers", CHI: "Chicago Bears",
+  CIN: "Cincinnati Bengals", CLE: "Cleveland Browns", DAL: "Dallas Cowboys",
+  DEN: "Denver Broncos", DET: "Detroit Lions", GB: "Green Bay Packers",
+  HOU: "Houston Texans", IND: "Indianapolis Colts", JAX: "Jacksonville Jaguars",
+  KC: "Kansas City Chiefs", LAC: "Los Angeles Chargers", LAR: "Los Angeles Rams",
+  LV: "Las Vegas Raiders", MIA: "Miami Dolphins", MIN: "Minnesota Vikings",
+  NE: "New England Patriots", NO: "New Orleans Saints", NYG: "New York Giants",
+  NYJ: "New York Jets", PHI: "Philadelphia Eagles", PIT: "Pittsburgh Steelers",
+  SEA: "Seattle Seahawks", SF: "San Francisco 49ers", TB: "Tampa Bay Buccaneers",
+  TEN: "Tennessee Titans", WAS: "Washington Commanders",
 };
 
-const toneText: Record<OutcomeRow["tone"], string> = {
+const LADDER_COLORS: Record<OutcomeRow["tone"] | "stop", string> = {
+  good: "bg-gradient-to-r from-emerald-700 to-emerald-600 text-white",
+  ok:   "bg-gradient-to-r from-amber-500 to-amber-400 text-slate-900",
+  warn: "bg-gradient-to-r from-orange-600 to-orange-500 text-white",
+  bad:  "bg-gradient-to-r from-red-700 to-red-600 text-white",
+  stop: "bg-gradient-to-r from-red-900 to-red-800 text-white",
+};
+
+const TONE_TEXT: Record<OutcomeRow["tone"], string> = {
   good: "text-emerald-700",
-  ok: "text-sky-700",
-  warn: "text-orange-700",
-  bad: "text-red-700",
+  ok:   "text-sky-700",
+  warn: "text-orange-600",
+  bad:  "text-red-600",
 };
 
-export default function AuctionPlayerCard({ d }: AuctionPlayerCardProps) {
+export default function AuctionPlayerCard({ d }: Props) {
   const settings = useDraftStore((s) => s.settings);
   const events = useDraftStore((s) => s.events);
   const keepers = useDraftStore((s) => s.keepers);
 
   const [meta, setMeta] = useState<SleeperMeta>({
-    playerId: null,
-    team: null,
-    bye: null,
+    playerId: null, team: null, teamFull: null, bye: null,
   });
 
   useEffect(() => {
     let live = true;
-
-    setMeta({
-      playerId: null,
-      team: null,
-      bye: null,
-    });
-
+    setMeta({ playerId: null, team: null, teamFull: null, bye: null });
     if (!d.player) return;
-
-    loadSleeperPlayers()
-      .then((players) => {
-        if (!live) return;
-
-        const p = findPlayerByName(players, d.player);
-
-        if (!p) return;
-
-        setMeta({
-          playerId: p.player_id,
-          team: p.team ?? null,
-          bye: byeWeekForTeam(p.team) ?? null,
-        });
-      })
-      .catch(() => {
-        if (!live) return;
-
-        setMeta({
-          playerId: null,
-          team: null,
-          bye: null,
-        });
+    loadSleeperPlayers().then((players) => {
+      if (!live) return;
+      const p = findPlayerByName(players, d.player);
+      if (!p) return;
+      const team = p.team ?? null;
+      setMeta({
+        playerId: p.player_id,
+        team,
+        teamFull: team ? (TEAM_FULL[team] ?? team) : null,
+        bye: byeWeekForTeam(team) ?? null,
       });
-
-    return () => {
-      live = false;
-    };
+    }).catch(() => {});
+    return () => { live = false; };
   }, [d.player]);
 
   const insights = computeCardInsights(d, settings, events, keepers);
-
-  const derived = useMemo(() => {
-    return buildDerivedCopy(d, meta.team, insights.take);
-  }, [d, meta.team, insights.take]);
+  const copy = useMemo(() => buildCopy(d, insights), [d, insights]);
 
   const headshotUrl = meta.playerId
     ? `https://sleepercdn.com/content/nfl/players/${meta.playerId}.jpg`
     : null;
-
   const teamLogoUrl = meta.team
     ? `https://sleepercdn.com/images/team_logos/nfl/${meta.team.toLowerCase()}.png`
     : null;
 
+  const ladderRows = insights.ladder.slice(0, 5);
+
   return (
-    <article className="mx-auto w-full max-w-[402px] overflow-hidden rounded-[1.35rem] bg-[#f5efe4] text-slate-950 shadow-2xl ring-1 ring-slate-900/15">
-      <div className="bg-slate-950 px-3 py-1.5 text-center text-[10px] font-black tracking-[0.16em] text-orange-300">
-        ★ LEAGUE: {LEAGUE_NAME} ★
+    <article className="mx-auto w-full max-w-[402px] overflow-hidden rounded-2xl bg-[#f5efe4] text-slate-900 shadow-2xl ring-1 ring-slate-900/15">
+      {/* LEAGUE BANNER */}
+      <div className="flex items-center justify-center gap-1.5 px-3 pt-3">
+        <div className="flex items-center gap-1.5 rounded-full bg-slate-950 px-3 py-1">
+          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+          <span className="text-[9px] font-black tracking-[0.18em] text-white">LEAGUE:</span>
+          <span className="text-[10px] font-black tracking-wider text-orange-400">{LEAGUE_NAME}</span>
+          <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+        </div>
       </div>
 
-      <header className="relative border-b-4 border-slate-950 bg-orange-500 px-3 py-3">
-        <div className="absolute inset-x-0 bottom-0 h-1 bg-white/40" />
-
-        <div className="grid grid-cols-[48px_1fr_48px] items-center gap-2">
-          <div className="rounded-xl border-2 border-slate-950 bg-white px-1.5 py-1 text-center shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]">
-            <div className="text-[8px] font-black tracking-widest text-slate-500">
-              BYE
-            </div>
-
-            <div className="font-mono text-xl font-black leading-none text-slate-950">
-              {meta.bye ?? "—"}
-            </div>
-          </div>
-
-          <div className="min-w-0 text-center">
-            <h2 className="truncate text-[1.65rem] font-black uppercase leading-none tracking-[-0.06em] text-white drop-shadow">
-              {d.player || "PLAYER"}
-            </h2>
-
-            <div className="mt-1 inline-flex items-center rounded-full border border-slate-950 bg-white px-2 py-0.5 text-[10px] font-black tracking-widest text-slate-950">
-              {d.position ?? "—"}
-              <span className="mx-1.5 text-orange-600">•</span>
-              {meta.team ?? "TEAM"}
-            </div>
-          </div>
-
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border-2 border-slate-950 bg-white shadow-[3px_3px_0px_0px_rgba(15,23,42,1)]">
-            {teamLogoUrl ? (
-              <img
-                src={teamLogoUrl}
-                alt={meta.team ?? "team"}
-                className="h-9 w-9 object-contain"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            ) : (
-              <Trophy className="h-6 w-6 text-slate-400" />
-            )}
-          </div>
+      {/* HEADER */}
+      <header className="flex items-center gap-2 px-3 pt-2">
+        <div className="flex shrink-0 flex-col items-center justify-center rounded-lg bg-slate-950 px-2 py-1.5">
+          <span className="text-[8px] font-black tracking-widest text-white">BYE</span>
+          <span className="text-xl font-black leading-none text-orange-500">{meta.bye ?? "—"}</span>
+        </div>
+        <div className="min-w-0 flex-1 text-center">
+          <h2 className="truncate text-[1.5rem] font-black uppercase leading-none tracking-tight text-slate-950">
+            {d.player || "PLAYER"}
+          </h2>
+          <p className="mt-1 text-[10px] font-black tracking-widest">
+            <span className="text-orange-600">{d.position ?? "—"}</span>
+            <span className="mx-1.5 text-slate-400">•</span>
+            <span className="text-slate-800">{(meta.teamFull ?? meta.team ?? "TEAM").toUpperCase()}</span>
+          </p>
+        </div>
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center">
+          {teamLogoUrl ? (
+            <img src={teamLogoUrl} alt={meta.team ?? ""} className="h-9 w-9 object-contain"
+              onError={(e) => ((e.currentTarget.style.display = "none"))} />
+          ) : (
+            <Trophy className="h-6 w-6 text-slate-300" />
+          )}
         </div>
       </header>
 
-      <section className="border-b border-slate-300 p-3">
-        <div className="grid grid-cols-[126px_1fr] gap-2">
-          <div className="relative min-h-[172px] overflow-hidden rounded-2xl border-2 border-slate-950 bg-gradient-to-b from-orange-200 to-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-            <div className="absolute inset-x-0 top-0 bg-slate-950 py-1 text-center text-[9px] font-black tracking-widest text-orange-300">
-              PLAYER FILE
+      {/* WHY + PHOTO + PATH */}
+      <section className="grid grid-cols-[1fr_96px_1fr] items-stretch gap-2 px-3 pt-3">
+        <Panel>
+          <PanelTitle icon={<Trophy className="h-3.5 w-3.5 text-white" />} iconBg="bg-orange-500">
+            WHY YOU DRAFT HIM
+          </PanelTitle>
+          <p className="mt-1.5 text-[10px] font-semibold leading-snug text-slate-800">
+            {copy.whyDraftHim}
+          </p>
+        </Panel>
+
+        <div className="relative flex items-end justify-center">
+          {headshotUrl ? (
+            <img
+              src={headshotUrl}
+              alt={d.player}
+              className="h-[120px] w-auto object-contain drop-shadow-[0_4px_8px_rgba(234,88,12,0.4)]"
+              onError={(e) => ((e.currentTarget.style.display = "none"))}
+            />
+          ) : (
+            <div className="flex h-[120px] w-full items-end justify-center text-[10px] text-slate-400">
+              no photo
             </div>
-
-            <div className="absolute inset-x-2 bottom-0 flex justify-center">
-              {headshotUrl ? (
-                <img
-                  src={headshotUrl}
-                  alt={d.player}
-                  className="h-40 w-auto object-contain drop-shadow-xl"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              ) : (
-                <div className="mb-10 flex h-24 w-24 items-center justify-center rounded-full border border-slate-300 bg-white text-[10px] font-bold text-slate-400">
-                  PHOTO
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="flex min-w-0 flex-col gap-2">
-            <CardPlate title="BIG DECISION" icon={<Gauge className="h-3.5 w-3.5" />}>
-              <div className="text-[1.05rem] font-black uppercase leading-none tracking-tight text-orange-600">
-                {insights.bigDecision}
-              </div>
-
-              <div className="mt-1 line-clamp-2 text-[10px] font-bold leading-snug text-slate-700">
-                {insights.bigDecisionReason}
-              </div>
-            </CardPlate>
-
-            <CardPlate title="WHY DRAFT HIM" icon={<Sparkles className="h-3.5 w-3.5" />}>
-              <div className="line-clamp-3 text-[11px] font-black leading-snug text-slate-900">
-                {derived.whyDraftHim}
-              </div>
-            </CardPlate>
-
-            <CardPlate title="PATH TO SMASH" icon={<ArrowUpRight className="h-3.5 w-3.5" />}>
-              <div className="grid gap-1">
-                {derived.pathToSmash.slice(0, 2).map((item) => (
-                  <MiniBullet key={item}>{item}</MiniBullet>
-                ))}
-              </div>
-            </CardPlate>
-          </div>
+          )}
         </div>
-      </section>
 
-      <section className="grid grid-cols-[1fr_112px] gap-2 border-b border-slate-300 p-3">
-        <div className="rounded-2xl border-2 border-slate-950 bg-white p-2 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-          <SectionTitle icon={<BadgeDollarSign className="h-3.5 w-3.5" />} title="PRICE LADDER" />
-
-          <div className="mt-2 grid gap-1">
-            {insights.ladder.slice(0, 5).map((row) => (
-              <div
-                key={row.label}
-                className="grid grid-cols-[58px_1fr] overflow-hidden rounded-lg border border-slate-950"
-              >
-                <div className={`px-2 py-1 text-center font-mono text-[13px] font-black tabular-nums ${tonePill[row.tone]}`}>
-                  {formatMoney(row.price)}
-                </div>
-
-                <div className="bg-slate-100 px-2 py-1 text-[11px] font-black tracking-tight text-slate-950">
-                  {row.label}
-                </div>
-              </div>
+        <Panel>
+          <PanelTitle icon={<TrendingUp className="h-3.5 w-3.5 text-navy" />} iconBg="bg-slate-950">
+            PATH TO SMASH
+          </PanelTitle>
+          <ul className="mt-1.5 space-y-1">
+            {copy.pathToSmash.map((item) => (
+              <li key={item} className="flex items-start gap-1">
+                <CheckCircle2 className="mt-0.5 h-3 w-3 shrink-0 text-emerald-600" />
+                <span className="text-[10px] font-semibold leading-tight text-slate-800">{item}</span>
+              </li>
             ))}
-          </div>
-        </div>
-
-        <div className="grid gap-2">
-          <PriceBox label="WALK-AWAY" value={formatMoney(insights.walkAway)} danger />
-          <PriceBox label="EXPECTED FINAL" value={formatExpectedFinal(insights.expectedFinal)} />
-        </div>
+          </ul>
+        </Panel>
       </section>
 
-      <section className="border-b border-slate-300 p-3">
-        <div className="rounded-2xl border-2 border-slate-950 bg-white p-2 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              <SectionTitle icon={<Target className="h-3.5 w-3.5" />} title={`IF YOU BUY ${firstName(d.player)}`} />
-              <div className="text-[10px] font-black italic tracking-tight text-orange-600">
-                What happens to the rest of your draft?
-              </div>
+      {/* PRICE LADDER + IF YOU BUY */}
+      <section className="grid grid-cols-[160px_1fr] gap-2 px-3 pt-3">
+        <div className="space-y-2">
+          <Panel>
+            <PanelTitle icon={<DollarSign className="h-3.5 w-3.5 text-amber-400" />} iconBg="bg-slate-950">
+              PRICE LADDER
+            </PanelTitle>
+            <div className="mt-1 grid grid-cols-2 gap-x-1 px-0.5 text-[7px] font-black tracking-widest text-slate-500">
+              <span>PRICE</span>
+              <span className="text-right">REACTION</span>
             </div>
-
-            <div className="rounded-full bg-slate-950 px-2 py-0.5 text-[9px] font-black text-orange-300">
-              20 SEC READ
+            <div className="mt-1 space-y-1">
+              {ladderRows.map((row) => (
+                <div key={row.label} className={`grid grid-cols-2 overflow-hidden rounded ${LADDER_COLORS[row.tone]}`}>
+                  <div className="px-1.5 py-1 font-mono text-[11px] font-black tabular-nums">{row.price}</div>
+                  <div className="px-1.5 py-1 text-right text-[10px] font-black tracking-wider">{row.label}</div>
+                </div>
+              ))}
             </div>
-          </div>
+          </Panel>
 
-          <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1">
-            {insights.outcomes.slice(0, 6).map((row) => (
-              <div
-                key={row.label}
-                className="flex items-center justify-between gap-1 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1"
-              >
-                <div className="flex min-w-0 items-center gap-1.5">
+          <Panel className="text-center">
+            <div className="flex items-center justify-center gap-1 text-[8px] font-black tracking-widest text-slate-700">
+              <AlertTriangle className="h-2.5 w-2.5 text-red-600" />
+              WALK-AWAY PRICE
+              <AlertTriangle className="h-2.5 w-2.5 text-red-600" />
+            </div>
+            <p className="font-mono text-lg font-black tabular-nums text-red-600">${insights.walkAway}</p>
+          </Panel>
+
+          <Panel className="text-center">
+            <div className="text-[8px] font-black tracking-widest text-slate-700">EXPECTED FINAL BID</div>
+            <p className="flex items-center justify-center gap-1 font-mono text-base font-black tabular-nums text-slate-950">
+              ${Math.max(1, insights.expectedFinal - 2)}–${insights.expectedFinal + 2}
+              <Gavel className="h-3 w-3 text-slate-700" />
+            </p>
+          </Panel>
+        </div>
+
+        <Panel>
+          <h3 className="text-[14px] font-black uppercase tracking-tight text-slate-950">
+            IF YOU BUY {firstName(d.player).toUpperCase()}:
+          </h3>
+          <p className="text-[9px] font-black italic tracking-wider text-orange-600">
+            WHAT HAPPENS TO THE REST OF YOUR DRAFT?
+          </p>
+          <div className="mt-2 grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 text-[10px]">
+            <div className="text-[7px] font-black tracking-widest text-slate-500">OUTCOME</div>
+            <div className="text-right text-[7px] font-black tracking-widest text-slate-500">EFFECT</div>
+            {insights.outcomes.map((row) => (
+              <div key={row.label} className="contents">
+                <div className="flex items-center gap-1.5 border-t border-slate-200 py-1">
                   <OutcomeIcon label={row.label} />
-                  <span className="truncate text-[9px] font-black text-slate-600">
-                    {row.label}
-                  </span>
+                  <span className="text-[10px] font-bold text-slate-800">{row.label}</span>
                 </div>
-
-                <span className={`shrink-0 text-[10px] font-black ${toneText[row.tone]}`}>
+                <div className={`border-t border-slate-200 py-1 text-right text-[10px] font-black italic ${TONE_TEXT[row.tone]}`}>
                   {row.value}
-                </span>
+                </div>
               </div>
             ))}
           </div>
-        </div>
+        </Panel>
       </section>
 
-      <section className="border-b border-slate-300 p-3">
-        <div className="rounded-2xl border-2 border-slate-950 bg-orange-500 p-2 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-          <div className="text-[9px] font-black tracking-[0.18em] text-white/80">
-            PROJECTED TEAM IDENTITY
-          </div>
+      {/* RISKS / UPSIDE / STACKS */}
+      <section className="grid grid-cols-3 gap-2 px-3 pt-3">
+        <Panel>
+          <PanelTitle icon={<AlertTriangle className="h-3 w-3 text-red-600" />} iconBg="bg-transparent">
+            <span className="text-red-700">WHAT CAN GO WRONG?</span>
+          </PanelTitle>
+          <ul className="mt-1.5 space-y-1">
+            {copy.risks.map((r) => (
+              <li key={r} className="flex items-start gap-1">
+                <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-red-600" />
+                <span className="text-[9px] font-semibold leading-tight text-slate-800">{r}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
 
-          <div className="mt-1 text-[16px] font-black uppercase leading-none tracking-tight text-white">
-            {insights.identity}
+        <Panel>
+          <PanelTitle icon={<Trophy className="h-3 w-3 text-amber-500" />} iconBg="bg-transparent">
+            <span className="text-slate-950">LEAGUE-WINNING UPSIDE</span>
+          </PanelTitle>
+          <div className="mt-1.5 space-y-1 text-[9px]">
+            {copy.upside.map((u) => (
+              <div key={u.label} className="flex items-center justify-between gap-1">
+                <span className="flex items-center gap-1 font-semibold text-slate-800">
+                  <u.Icon className="h-3 w-3 text-orange-500" />
+                  {u.label}
+                </span>
+                <span className={`font-black ${u.color}`}>{u.value}</span>
+              </div>
+            ))}
           </div>
-        </div>
+        </Panel>
+
+        <Panel>
+          <PanelTitle icon={<Users className="h-3 w-3 text-slate-950" />} iconBg="bg-transparent">
+            <span className="text-slate-950">IDEAL STACKS</span>
+          </PanelTitle>
+          <ul className="mt-1.5 space-y-1">
+            {copy.stacks.map((s) => (
+              <li key={s} className="flex items-start gap-1">
+                <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-orange-500" />
+                <span className="text-[9px] font-semibold leading-tight text-slate-800">{s}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       </section>
 
-      <section className="grid grid-cols-3 gap-2 border-b border-slate-300 p-3">
-        <SmallPanel title="WHAT CAN GO WRONG" icon={<ShieldAlert className="h-3.5 w-3.5" />}>
-          {derived.risks.slice(0, 2).map((item) => (
-            <MiniBullet key={item}>{item}</MiniBullet>
-          ))}
-        </SmallPanel>
+      {/* DRAFT ROOM VIBE / TIER / DRAFT IF */}
+      <section className="grid grid-cols-3 gap-2 px-3 pt-3">
+        <Panel>
+          <PanelTitle icon={<Megaphone className="h-3 w-3 text-sky-700" />} iconBg="bg-transparent">
+            <span className="text-slate-950">DRAFT ROOM VIBE</span>
+          </PanelTitle>
+          <p className="mt-1.5 text-[9px] font-semibold leading-tight text-slate-800">
+            {copy.vibe}
+          </p>
+        </Panel>
 
-        <SmallPanel title="LEAGUE-WINNING UPSIDE" icon={<Flame className="h-3.5 w-3.5" />}>
-          <div className="text-[1.35rem] font-black leading-none text-orange-600">
-            {derived.upside.grade}
+        <Panel className="text-center">
+          <PanelTitle icon={<Star className="h-3 w-3 fill-amber-400 text-amber-400" />} iconBg="bg-transparent">
+            <span className="text-slate-950">TIER</span>
+          </PanelTitle>
+          <div className="mt-1.5 rounded-md border-2 border-orange-500 bg-slate-950 px-2 py-1.5">
+            <span className="font-mono text-base font-black italic tracking-wider text-orange-500">
+              {copy.tier.label}
+            </span>
           </div>
+          <p className="mt-1 text-[8px] font-black uppercase tracking-wider text-slate-700">
+            {copy.tier.sub}
+          </p>
+        </Panel>
 
-          <div className="mt-1 text-[9px] font-black leading-tight text-slate-700">
-            {derived.upside.label}
-          </div>
-        </SmallPanel>
-
-        <SmallPanel title="IDEAL STACKS" icon={<Users className="h-3.5 w-3.5" />}>
-          {derived.idealStacks.slice(0, 2).map((item) => (
-            <MiniBullet key={item}>{item}</MiniBullet>
-          ))}
-        </SmallPanel>
+        <Panel>
+          <PanelTitle icon={<Target className="h-3 w-3 text-slate-950" />} iconBg="bg-transparent">
+            <span className="text-slate-950">DRAFT IF...</span>
+          </PanelTitle>
+          <ul className="mt-1.5 space-y-1">
+            {copy.draftIf.map((s) => (
+              <li key={s} className="flex items-start gap-1">
+                <CheckCircle2 className="mt-0.5 h-2.5 w-2.5 shrink-0 text-emerald-600" />
+                <span className="text-[9px] font-semibold leading-tight text-slate-800">{s}</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       </section>
 
-      <section className="p-3">
-        <div className="rounded-2xl border-2 border-slate-950 bg-white p-3 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-          <div className="mb-2 flex items-center gap-1.5 text-[11px] font-black tracking-tight text-slate-950">
-            <MessageSquareQuote className="h-4 w-4 text-orange-600" />
-            <span>ANALYST TAKE</span>
-          </div>
+      {/* ARCHETYPE + BOTTOM LINE */}
+      <section className="grid grid-cols-[1fr_1.4fr] gap-2 px-3 pb-3 pt-3">
+        <Panel>
+          <PanelTitle icon={<Zap className="h-3 w-3 text-sky-700" />} iconBg="bg-transparent">
+            <span className="text-slate-950">PLAYER ARCHETYPE</span>
+          </PanelTitle>
+          <p className="mt-1.5 text-[9px] font-semibold leading-tight text-slate-800">
+            {copy.archetype}
+          </p>
+        </Panel>
 
-          <div className="line-clamp-2 text-[12px] font-black italic leading-snug text-slate-900">
-            {insights.take || derived.analystTake}
+        <Panel>
+          <div className="flex items-start gap-1.5">
+            <Quote className="h-4 w-4 shrink-0 text-orange-500" />
+            <div className="min-w-0">
+              <div className="text-[9px] font-black tracking-widest text-orange-600">ANALYST BOTTOM LINE</div>
+              <p className="mt-0.5 text-[10px] font-semibold italic leading-snug text-slate-800">
+                {insights.take}
+              </p>
+            </div>
           </div>
-        </div>
+        </Panel>
       </section>
     </article>
   );
 }
 
-function CardPlate({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <div className="rounded-xl border border-slate-300 bg-white p-2 shadow-sm">
-      <div className="mb-1 flex items-center gap-1.5 text-[9px] font-black tracking-wider text-slate-500">
-        <span className="text-orange-600">{icon}</span>
-        {title}
-      </div>
+// ────────────────────────────── primitives ──────────────────────────────
 
+function Panel({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`rounded-lg border border-slate-300 bg-white p-2 shadow-sm ${className}`}>
       {children}
     </div>
   );
 }
 
-function SmallPanel({
-  title,
-  icon,
-  children,
-}: {
-  title: string;
-  icon: ReactNode;
-  children: ReactNode;
-}) {
+function PanelTitle({
+  icon, iconBg, children,
+}: { icon: ReactNode; iconBg: string; children: ReactNode }) {
   return (
-    <div className="min-h-[84px] rounded-xl border border-slate-300 bg-white p-2 shadow-sm">
-      <div className="mb-1 flex items-center gap-1 text-[8px] font-black leading-tight tracking-wider text-orange-600">
+    <div className="flex items-center gap-1.5">
+      <div className={`flex h-4 w-4 items-center justify-center rounded-full ${iconBg}`}>
         {icon}
-        <span>{title}</span>
       </div>
-
-      <div className="grid gap-1">{children}</div>
-    </div>
-  );
-}
-
-function SectionTitle({
-  icon,
-  title,
-}: {
-  icon: ReactNode;
-  title: string;
-}) {
-  return (
-    <div className="flex items-center gap-1.5 text-[12px] font-black tracking-tight text-slate-950">
-      <span className="text-orange-600">{icon}</span>
-      <span>{title}</span>
-    </div>
-  );
-}
-
-function PriceBox({
-  label,
-  value,
-  danger = false,
-}: {
-  label: string;
-  value: string;
-  danger?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-2xl border-2 border-slate-950 p-2 text-center shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] ${
-        danger ? "bg-red-700 text-white" : "bg-slate-950 text-white"
-      }`}
-    >
-      <div className={`text-[8px] font-black tracking-widest ${danger ? "text-red-100" : "text-orange-300"}`}>
-        {label}
-      </div>
-
-      <div className="mt-1 font-mono text-[1.05rem] font-black leading-none tabular-nums">
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function MiniBullet({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex items-start gap-1 text-[9px] font-bold leading-tight text-slate-800">
-      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500" />
-      <span className="line-clamp-2">{children}</span>
+      <span className="text-[10px] font-black tracking-wider text-slate-950">{children}</span>
     </div>
   );
 }
 
 function OutcomeIcon({ label }: { label: string }) {
-  const cls = "h-3.5 w-3.5 shrink-0";
-  const upper = label.toUpperCase();
-
-  if (upper.includes("RB")) return <Target className={`${cls} text-orange-600`} />;
-  if (upper.includes("QB")) return <ArrowUpRight className={`${cls} text-sky-700`} />;
-  if (upper.includes("FLEX")) return <Sparkles className={`${cls} text-amber-600`} />;
-  if (upper.includes("BENCH")) return <Users className={`${cls} text-violet-700`} />;
-  if (upper.includes("RISK")) return <AlertTriangle className={`${cls} text-red-700`} />;
-  if (upper.includes("CEILING")) return <BarChart3 className={`${cls} text-emerald-700`} />;
-
-  return <Star className={`${cls} text-orange-600`} />;
+  const cls = "h-3 w-3 shrink-0";
+  const u = label.toUpperCase();
+  if (u.includes("RB")) return <Footprints className={`${cls} text-orange-600`} />;
+  if (u.includes("QB")) return <ArrowUpRight className={`${cls} text-sky-700`} />;
+  if (u.includes("FLEX")) return <Star className={`${cls} text-amber-500`} />;
+  if (u.includes("BENCH")) return <Sofa className={`${cls} text-violet-600`} />;
+  if (u.includes("RISK")) return <AlertTriangle className={`${cls} text-red-600`} />;
+  if (u.includes("CEILING")) return <BarChart3 className={`${cls} text-emerald-600`} />;
+  return <Star className={`${cls} text-orange-500`} />;
 }
 
-function firstName(full?: string): string {
-  if (!full) return "PLAYER";
-
-  return full.split(" ")[0]?.toUpperCase() ?? "PLAYER";
+function firstName(full: string): string {
+  if (!full) return "this player";
+  return full.split(" ")[0] || full;
 }
 
-function formatMoney(value: string | number): string {
-  if (typeof value === "string") {
-    return value.startsWith("$") ? value : `$${value}`;
-  }
+// ────────────────────────────── derived copy ──────────────────────────────
 
-  return `$${value}`;
-}
-
-function formatExpectedFinal(value: string | number): string {
-  if (typeof value === "string") {
-    return value.includes("$") ? value : `$${value}`;
-  }
-
-  const low = Math.max(1, value - 2);
-  const high = value + 2;
-
-  return `$${low}–$${high}`;
-}
-
-function buildDerivedCopy(
-  d: DecisionResult,
-  team: string | null,
-  take: string,
-) {
-  const position = d.position ?? "player";
+function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardInsights>) {
+  const pos = d.position ?? "player";
   const anchor = d.anchorPrice || d.goUpTo || d.currentPrice || 1;
-  const isElite = anchor >= 45;
-  const isPremium = anchor >= 25;
-  const teamLabel = team ?? "team";
+  const tier = anchor >= 45 ? 1 : anchor >= 28 ? 2 : anchor >= 15 ? 3 : 4;
 
-  const whyDraftHim = (() => {
-    if (isElite) {
-      return "Ceiling swing piece who can change the whole week with one monster game.";
-    }
+  const whyDraftHim =
+    anchor >= 45
+      ? `Can single-handedly win weeks. One of the few ${pos}s capable of league-tilting performances multiple times per season.`
+      : anchor >= 25
+      ? `Strong weekly starter with the upside to swing close matchups. The kind of name that anchors a real build.`
+      : d.verdict === "BID"
+      ? `Quiet value pocket. Keeps the build alive without wrecking budget — exactly the role-player edge winning teams find.`
+      : `Only worth it if the room lets the price fall. Discipline over impulse here.`;
 
-    if (isPremium) {
-      return "Strong starter price with enough weekly juice to tilt close matchups.";
-    }
-
-    if (d.verdict === "BID") {
-      return "Value pocket target who keeps the build alive without wrecking budget.";
-    }
-
-    return "Only worth it if the room lets the price fall under market.";
+  const pathToSmash: string[] = (() => {
+    if (pos === "QB") return ["Rushing floor holds", "Stays healthy 17 weeks", "Pass volume stays elite", "Stack partner produces", "Game scripts cooperate"];
+    if (pos === "RB") return ["Goal-line role sticks", "Passing-down work climbs", "Offensive line holds up", "Backup stays inactive", "Avoids soft-tissue dings"];
+    if (pos === "WR") return ["Target share stays alpha", "QB plays the full season", "Offense plays fast", "Red-zone looks spike", "Massive spike-week profile"];
+    if (pos === "TE") return ["Routes stay elite", "Red-zone looks spike", "Offense throws to TE", "Stays healthy", "Beats coverage matchups"];
+    return ["Price stays cheap", "Role beats projection", "Volume materializes", "Health holds", "Game flow cooperates"];
   })();
 
-  const pathToSmash = (() => {
-    if (position === "QB") {
-      return ["Rushing/volume edge holds", "Stack partner stays healthy"];
-    }
-
-    if (position === "RB") {
-      return ["Goal-line role sticks", "Passing-down work climbs"];
-    }
-
-    if (position === "WR") {
-      return ["Target share stays alpha", "Offense plays fast"];
-    }
-
-    if (position === "TE") {
-      return ["Routes stay elite", "Red-zone looks spike"];
-    }
-
-    return ["Price stays cheap", "Role beats projection"];
+  const risks: string[] = (() => {
+    const base: string[] = [];
+    if (anchor >= 35) base.push("Premium auction cost limits depth");
+    if (pos === "RB") base.push("Soft-tissue injury risk", "Workload concerns", "Game-script dependent");
+    else if (pos === "WR") base.push("QB injury would crater value", "Target share volatility", "Boom/bust week-to-week");
+    else if (pos === "QB") base.push("Defense scoring dependency", "Rushing volume could dip");
+    else base.push("Tight roster window", "Volume not guaranteed");
+    return base.slice(0, 4);
   })();
 
-  const risks = (() => {
-    if (d.plan.status === "broken") {
-      return ["Budget damage", "Depth gets squeezed"];
-    }
+  const upside = [
+    { label: "Weekly Ceiling",       value: anchor >= 45 ? "A+" : anchor >= 25 ? "A" : "B",    color: "text-emerald-600", Icon: BarChart3 },
+    { label: "League-Winning Upside", value: anchor >= 45 ? "ELITE" : anchor >= 25 ? "HIGH" : "MID", color: anchor >= 45 ? "text-emerald-600" : "text-amber-600", Icon: Trophy },
+    { label: "Bust Risk",            value: anchor >= 45 ? "LOW" : "MEDIUM",                    color: anchor >= 45 ? "text-emerald-600" : "text-amber-600", Icon: HeartPulse },
+    { label: "Safety",               value: anchor >= 45 ? "A" : anchor >= 25 ? "B" : "C",     color: "text-sky-700", Icon: ShieldCheck },
+    { label: "Fun Factor",           value: anchor >= 35 ? "MAX" : "HIGH",                     color: "text-orange-600", Icon: Smile },
+  ];
 
-    if (d.plan.status === "tight") {
-      return ["Thin bench", "Must hit cheap values"];
-    }
+  const stacks: string[] = ["Same-team QB stack", "Same-team WR2 cheap", "Defense late round"];
 
-    if (isElite) {
-      return ["Premium cost", "One injury hurts build"];
-    }
+  const vibe = anchor >= 45
+    ? "Room turns aggressive once elite tiers thin. Expect bid wars and overpays nearby."
+    : anchor >= 25
+    ? "Mid-tier nominations spike when premium names leave the board. Anticipate the run."
+    : "Often goes for cheap when the room is chasing names. Pounce when attention is elsewhere.";
 
-    return ["Role volatility", "Easy to replace"];
-  })();
-
-  const upside = (() => {
-    if (isElite) {
-      return {
-        grade: "A+",
-        label: "Week-winner profile",
-      };
-    }
-
-    if (isPremium) {
-      return {
-        grade: "A",
-        label: "Real ceiling",
-      };
-    }
-
-    if (anchor >= 12) {
-      return {
-        grade: "B",
-        label: "Useful spike weeks",
-      };
-    }
-
-    return {
-      grade: "C+",
-      label: "Value dart",
-    };
-  })();
-
-  const idealStacks = (() => {
-    if (position === "QB") {
-      return ["Top pass-catcher", "Late upside WR"];
-    }
-
-    if (position === "WR" || position === "TE") {
-      return [`${teamLabel} QB`, "Cheap RB value"];
-    }
-
-    if (position === "RB") {
-      return ["Value WRs", "Mobile QB"];
-    }
-
-    return ["Bench upside", "Low-cost depth"];
-  })();
-
-  const analystTake = take || "Do not overthink it: follow the price, protect the build, and keep your walk-away number clean.";
-
-  return {
-    whyDraftHim,
-    pathToSmash,
-    risks,
-    upside,
-    idealStacks,
-    analystTake,
+  const tierData = {
+    label: `TIER ${tier}`,
+    sub: tier === 1 ? "LEAGUE-TILTING ALPHAS" : tier === 2 ? "WEEKLY STARTERS" : tier === 3 ? "VALUE STARTERS" : "DEPTH / DART THROW",
   };
+
+  const draftIf: string[] = (() => {
+    if (insights.bigDecision === "AGGRESSIVE BUY") return ["You want a tier-1 anchor", "Comfortable with aggressive spending", "Trust the QB/team context"];
+    if (insights.bigDecision === "VALUE ONLY") return ["Price falls into your zone", "You need this position", "Bench depth is healthy"];
+    if (insights.bigDecision === "BAIT NOMINATION") return ["You want to drain wallets", "Have alternative targets queued", "Comfortable letting it walk"];
+    return ["Room is undervaluing", "You can absorb the cost", "Build still has flexibility"];
+  })();
+
+  const archetype = pos === "WR"
+    ? "Modern alpha receiver. Spike-week ceiling that breaks matchup models when healthy."
+    : pos === "RB"
+    ? "Workhorse role with multi-category usage. The kind of back that wins weeks outright."
+    : pos === "QB"
+    ? "Dual-threat profile. Rushing floor changes the math on every weekly decision."
+    : pos === "TE"
+    ? "Mismatch piece. Solves the position weekly when most rosters can't."
+    : "Role player with situational upside.";
+
+  return { whyDraftHim, pathToSmash, risks, upside, stacks, vibe, tier: tierData, draftIf, archetype };
 }
