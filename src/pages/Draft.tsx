@@ -210,16 +210,41 @@ export default function Draft() {
       });
     }
     if (requiredCount.BENCH > 0) {
-      const sev: SlotRow["severity"] = benchFilled >= requiredCount.BENCH ? "done" : "depth";
-      rows.push({
-        pos: "BENCH", have: benchFilled, need: requiredCount.BENCH,
-        short: Math.max(0, requiredCount.BENCH - benchFilled),
-        maxBid: Math.max(1, Math.min(cap, Math.round(avg * sevWeight[sev]))),
-        severity: sev,
-      });
+      const benchShortTotal = Math.max(0, requiredCount.BENCH - benchFilled);
+      // Use league history medians for realistic bench role caps.
+      // Fall back to the old 0.4× avg formula if we have no history yet.
+      if (benchPrices.length && benchShortTotal > 0) {
+        for (const bp of benchPrices) {
+          // Skip $1 dart row if every other bench role already covers spend
+          if (bp.role === "DART" && benchPrices.length > 1 && bp.median <= 1) continue;
+          rows.push({
+            pos: "BENCH", have: benchFilled, need: requiredCount.BENCH,
+            short: benchShortTotal,
+            maxBid: Math.max(1, Math.min(cap, bp.median)),
+            severity: "depth",
+            label: bp.label,
+          });
+        }
+        // Always show one $1 dart slot at the end
+        if (!benchPrices.find((b) => b.role === "DART")) {
+          rows.push({
+            pos: "BENCH", have: benchFilled, need: requiredCount.BENCH,
+            short: benchShortTotal,
+            maxBid: 1, severity: "depth", label: "Dart bench",
+          });
+        }
+      } else {
+        const sev: SlotRow["severity"] = benchFilled >= requiredCount.BENCH ? "done" : "depth";
+        rows.push({
+          pos: "BENCH", have: benchFilled, need: requiredCount.BENCH,
+          short: benchShortTotal,
+          maxBid: Math.max(1, Math.min(cap, Math.round(avg * sevWeight[sev]))),
+          severity: sev,
+        });
+      }
     }
     return rows;
-  }, [gaps, flexNeed, flexShort, flexHave, requiredCount.BENCH, benchFilled, budget.maxBid, budget.avgPerSlot]);
+  }, [gaps, flexNeed, flexShort, flexHave, requiredCount.BENCH, benchFilled, budget.maxBid, budget.avgPerSlot, benchPrices]);
 
   const bestTarget: BestTarget | null = useMemo(() => {
     if (budget.slotsLeft <= 0 || budget.maxBid <= 0) return null;
