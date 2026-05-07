@@ -241,17 +241,14 @@ export function PlannerBody() {
           <div><span className="text-muted-foreground">Max bid</span> <span className="font-bold">${budget.maxBid}</span></div>
           <span className="text-muted-foreground/50">·</span>
           <div><span className="font-bold">{budget.slotsLeft}</span> <span className="text-muted-foreground">slots left</span></div>
-          <span className="text-muted-foreground/50">·</span>
-          <div><span className="text-muted-foreground">Plan total</span>{" "}
-            <span className={`font-bold ${diff === 0 ? "text-emerald-500" : diff < 0 ? "text-red-500" : "text-amber-500"}`}>
-              ${totalAllocated}
-            </span>
-            {diff !== 0 && (
-              <span className={`ml-1 text-[11px] ${diff < 0 ? "text-red-500" : "text-amber-500"}`}>
-                ({diff > 0 ? `+${diff} unspent` : `${diff} over`})
+          {diff !== 0 && (
+            <>
+              <span className="text-muted-foreground/50">·</span>
+              <span className={`text-[11px] font-semibold ${diff < 0 ? "text-red-500" : "text-amber-500"}`}>
+                {diff > 0 ? `+$${diff} unspent` : `$${Math.abs(diff)} over`}
               </span>
-            )}
-          </div>
+            </>
+          )}
           <Button
             size="sm"
             variant="outline"

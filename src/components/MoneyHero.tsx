@@ -45,9 +45,6 @@ export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) 
         >
           ${remaining}
         </span>
-        <span className="font-mono text-[10px] leading-none text-muted-foreground/60 tabular-nums">
-          /{total}
-        </span>
         {delta !== null && (
           <span
             key={delta}
@@ -56,16 +53,12 @@ export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) 
             {delta}
           </span>
         )}
-        <span className="ml-auto flex items-baseline gap-1 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
-          {showMax ? (
-            <>
-              <span>max</span>
-              <span className="text-foreground tabular-nums">${maxBid}</span>
-            </>
-          ) : (
-            <span>bank</span>
-          )}
-        </span>
+        {showMax && (
+          <span className="ml-auto flex items-baseline gap-1 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+            <span>max</span>
+            <span className="text-foreground tabular-nums">${maxBid}</span>
+          </span>
+        )}
       </div>
 
       {/* Drain meter — thin oscilloscope rail */}
