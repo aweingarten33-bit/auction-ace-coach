@@ -651,7 +651,7 @@ function DrawerContents({
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Check 1–3 players against your bank" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
-    { id: "vetri" as const, label: "Analyst", icon: MessageSquare, hint: "Vetri's takes" },
+    { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "Footballers · Berry · Fantasy Focus · ETR" },
   ];
 
   return (
