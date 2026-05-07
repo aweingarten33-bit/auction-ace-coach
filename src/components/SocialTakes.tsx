@@ -1,18 +1,22 @@
-// "What's social saying" — accordion of latest player takes from
-// fantasy football podcasts (RSS → AI bullets, no prices, no fluff).
+// "What's social saying" — accordion of latest podcast episodes (raw RSS notes,
+// no AI summarization) plus Matthew Berry's full Love/Hate column scraped from NBC.
 import { useQuery } from "@tanstack/react-query";
-import { ChevronDown, RefreshCw } from "lucide-react";
+import { ChevronDown, ExternalLink, RefreshCw } from "lucide-react";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
+type LoveHate = { title: string; url: string; markdown: string };
 type ShowResult = {
   id: string;
   name: string;
-  bullets: string[];
-  loveHate?: string[];
+  episodeTitle?: string | null;
+  description?: string | null;
+  sourceUrl?: string | null;
   updatedAt?: string | null;
-  episodeTitle?: string;
+  loveHate?: LoveHate;
 };
 
 function timeAgo(iso?: string | null) {
@@ -25,22 +29,6 @@ function timeAgo(iso?: string | null) {
   if (h < 24) return `${h}h ago`;
   const d = Math.floor(h / 24);
   return `${d}d ago`;
-}
-
-function Bullet({ text }: { text: string }) {
-  // Pull "[LABEL]" prefix if present
-  const m = text.match(/^\[([^\]]+)\]\s*(.*)$/);
-  if (m) {
-    return (
-      <li className="flex gap-1.5 text-[12px] leading-snug">
-        <span className="shrink-0 rounded bg-primary/15 px-1 text-[9px] font-bold uppercase tracking-wider text-primary">
-          {m[1]}
-        </span>
-        <span>{m[2]}</span>
-      </li>
-    );
-  }
-  return <li className="text-[12px] leading-snug">{text}</li>;
 }
 
 export default function SocialTakes() {
@@ -56,7 +44,7 @@ export default function SocialTakes() {
   });
 
   if (isLoading) {
-    return <p className="px-2 py-6 text-center text-xs text-muted-foreground">Pulling takes…</p>;
+    return <p className="px-2 py-6 text-center text-xs text-muted-foreground">Pulling latest…</p>;
   }
   const shows = data?.shows ?? [];
 
@@ -79,7 +67,6 @@ export default function SocialTakes() {
 
       {shows.map((s) => {
         const isOpen = open === s.id;
-        const total = (s.bullets?.length ?? 0) + (s.loveHate?.length ?? 0);
         return (
           <div
             key={s.id}
@@ -92,8 +79,8 @@ export default function SocialTakes() {
             >
               <div className="min-w-0">
                 <p className="truncate text-[13px] font-semibold">{s.name}</p>
-                <p className="text-[10px] text-muted-foreground">
-                  {total} take{total === 1 ? "" : "s"}
+                <p className="truncate text-[10px] text-muted-foreground">
+                  {s.episodeTitle ?? "Latest episode"}
                   {s.updatedAt ? ` · ${timeAgo(s.updatedAt)}` : ""}
                 </p>
               </div>
@@ -103,23 +90,47 @@ export default function SocialTakes() {
             </button>
             {isOpen && (
               <div className="space-y-3 border-t border-border/60 px-3 py-3">
-                {s.bullets?.length ? (
-                  <ul className="space-y-1.5">
-                    {s.bullets.map((b, i) => <Bullet key={i} text={b} />)}
-                  </ul>
-                ) : (
-                  <p className="text-[11px] text-muted-foreground">
-                    No player-specific takes in the latest episode notes.
-                  </p>
-                )}
-                {s.loveHate && s.loveHate.length > 0 && (
+                {s.episodeTitle && (
                   <div>
-                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Berry's Love / Hate
-                    </p>
-                    <ul className="space-y-1.5">
-                      {s.loveHate.map((b, i) => <Bullet key={i} text={b} />)}
-                    </ul>
+                    <p className="text-[12px] font-semibold leading-snug">{s.episodeTitle}</p>
+                    {s.description && (
+                      <p className="mt-1 whitespace-pre-line text-[11px] leading-relaxed text-muted-foreground">
+                        {s.description}
+                      </p>
+                    )}
+                    {s.sourceUrl && (
+                      <a
+                        href={s.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:underline"
+                      >
+                        Open episode <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {s.loveHate && (
+                  <div className="border-t border-border/40 pt-3">
+                    <div className="mb-1.5 flex items-center justify-between gap-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Berry's Love / Hate (column)
+                      </p>
+                      <a
+                        href={s.loveHate.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-[10px] font-medium text-primary hover:underline"
+                      >
+                        Full article <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                    <div className="prose prose-sm max-w-none text-[11px] leading-relaxed dark:prose-invert prose-headings:text-[12px] prose-headings:font-semibold prose-p:my-1.5 prose-li:my-0.5">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {s.loveHate.markdown}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 )}
               </div>
