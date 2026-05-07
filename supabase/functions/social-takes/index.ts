@@ -86,6 +86,18 @@ async function getFantasyPros(): Promise<Source | null> {
     url,
     markdown: md,
   };
+
+async function getCbsSports(): Promise<Source | null> {
+  const url = "https://www.cbssports.com/fantasy/football/";
+  const md = await firecrawlScrape(url);
+  if (!md) return null;
+  return {
+    id: "cbs",
+    name: "CBS Sports Fantasy",
+    title: "Latest from CBS Sports Fantasy",
+    url,
+    markdown: md,
+  };
 }
 
 let cache: { at: number; data: any } | null = null;
@@ -107,12 +119,13 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const [berry, espn, fp] = await Promise.all([
+    const [berry, espn, fp, cbs] = await Promise.all([
       getBerryLoveHate(),
       getEspnFantasyArticle(),
       getFantasyPros(),
+      getCbsSports(),
     ]);
-    const sources = [berry, espn, fp].filter(Boolean) as Source[];
+    const sources = [berry, espn, fp, cbs].filter(Boolean) as Source[];
     const payload = { sources, generatedAt: new Date().toISOString() };
     cache = { at: Date.now(), data: payload };
     return new Response(JSON.stringify(payload), {
