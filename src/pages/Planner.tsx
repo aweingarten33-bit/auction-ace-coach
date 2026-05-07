@@ -203,27 +203,7 @@ export function PlannerBody() {
   const minNeededForRest = Math.max(0, slotsAfter);
   const canAfford = checkSum > 0 && remainingAfter >= minNeededForRest && slotsAfter >= 0;
 
-  const [lookupBudget, setLookupBudget] = useState("");
-  const [lookupPos, setLookupPos] = useState<"ANY" | Position>("ANY");
-  const draftedKeys = useMemo(
-    () => new Set([...events.map((e) => norm(e.player)), ...keepers.map((k) => norm(k.player))]),
-    [events, keepers]
-  );
-  const lookupResults = useMemo(() => {
-    const target = parseInt(lookupBudget, 10);
-    if (!Number.isFinite(target) || target <= 0) return [];
-    const tol = Math.max(2, Math.round(target * 0.15));
-    return prices
-      .filter((p) => !draftedKeys.has(norm(p.name)))
-      .filter((p) => {
-        const pos = (p as PriceEstimate & { position?: Position }).position;
-        if (lookupPos !== "ANY" && pos && pos !== lookupPos) return false;
-        if (lookupPos !== "ANY" && !pos) return false;
-        return p.price >= target - tol && p.price <= target + tol;
-      })
-      .sort((a, b) => Math.abs(a.price - target) - Math.abs(b.price - target))
-      .slice(0, 12);
-  }, [prices, draftedKeys, lookupBudget, lookupPos]);
+  // (lookup-by-$ removed — Player Search panel now covers it with live filters)
 
   const posBadge = (pos?: Position | "FLEX" | "SUPERFLEX" | "BENCH") => {
     const cls = pos && pos in POS_COLORS ? POS_COLORS[pos as Position] : POS_COLORS.UNK;
