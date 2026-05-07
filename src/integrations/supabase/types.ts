@@ -322,10 +322,14 @@ export type Database = {
           created_at: string
           display_name: string | null
           email: string | null
+          espn_team_id: number | null
+          espn_team_name: string | null
           first_seen_at: string | null
           id: string
           last_seen_at: string | null
           league_id: number | null
+          strategy_custom: string | null
+          strategy_preset: string | null
           updated_at: string
           user_id: string
           visit_count: number
@@ -334,10 +338,14 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string | null
+          espn_team_id?: number | null
+          espn_team_name?: string | null
           first_seen_at?: string | null
           id?: string
           last_seen_at?: string | null
           league_id?: number | null
+          strategy_custom?: string | null
+          strategy_preset?: string | null
           updated_at?: string
           user_id: string
           visit_count?: number
@@ -346,10 +354,14 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           email?: string | null
+          espn_team_id?: number | null
+          espn_team_name?: string | null
           first_seen_at?: string | null
           id?: string
           last_seen_at?: string | null
           league_id?: number | null
+          strategy_custom?: string | null
+          strategy_preset?: string | null
           updated_at?: string
           user_id?: string
           visit_count?: number
