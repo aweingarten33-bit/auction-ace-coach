@@ -21,6 +21,10 @@ function rateLimit(key: string, limit: number, windowMs: number) {
   if (b.count >= limit) return { ok: false as const, retryAfterSec: Math.max(1, Math.ceil((b.resetAt - now) / 1000)) };
   b.count++; return { ok: true as const };
 }
+function titleize(norm: string): string {
+  // crude reverse of norm() — split runs of letters/digits and Title Case
+  return norm.replace(/([a-z])([0-9])/g, "$1 $2").replace(/(^|\s)([a-z])/g, (_, s, c) => s + c.toUpperCase());
+}
 
 const SYSTEM_PROMPT = `You are an elite fantasy football auction draft strategist powering a Spotify-style "Up Next" queue.
 
@@ -97,6 +101,8 @@ Deno.serve(async (req: Request) => {
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const p = await req.json();
 
     // ---- Deterministic pre-compute so the model doesn't have to do math ----
@@ -108,39 +114,95 @@ Deno.serve(async (req: Request) => {
       ].filter(Boolean),
     );
 
-    // Market multiplier from observed paid vs sheet
+    // ---- ANCHOR PRICES from real data sources, in priority order ----
+    // 1) league_auction_history (3yr avg of YOUR league's actual paid prices)
+    // 2) espn_player_ranks (current-season ESPN auction value)
+    // Build a player->price map keyed by normalized name.
+    const anchorByName = new Map<string, { price: number; pos?: string; src: string }>();
+    const sbHeaders = { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` };
+    try {
+      const histResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/league_auction_history?select=player_name,position,bid_amount,season&season=in.(2023,2024,2025)`,
+        { headers: sbHeaders },
+      );
+      if (histResp.ok) {
+        const rows = (await histResp.json()) as any[];
+        const agg = new Map<string, { sum: number; n: number; pos?: string }>();
+        for (const r of rows) {
+          const k = norm(r.player_name);
+          if (!k) continue;
+          const cur = agg.get(k) || { sum: 0, n: 0, pos: r.position };
+          cur.sum += Number(r.bid_amount) || 0;
+          cur.n += 1;
+          cur.pos = cur.pos || r.position;
+          agg.set(k, cur);
+        }
+        for (const [k, v] of agg) {
+          if (v.n > 0) anchorByName.set(k, { price: Math.max(1, Math.round(v.sum / v.n)), pos: v.pos, src: "league3yr" });
+        }
+      }
+    } catch (e) { console.error("league_auction_history fetch", e); }
+
+    try {
+      const ranksResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/espn_player_ranks?select=player_name,position,auction_value&auction_value=not.is.null&order=auction_value.desc&limit=400`,
+        { headers: sbHeaders },
+      );
+      if (ranksResp.ok) {
+        const rows = (await ranksResp.json()) as any[];
+        for (const r of rows) {
+          const k = norm(r.player_name);
+          if (!k) continue;
+          // Don't overwrite league3yr — that's higher signal
+          if (anchorByName.has(k)) continue;
+          const v = Number(r.auction_value) || 0;
+          if (v > 0) anchorByName.set(k, { price: Math.max(1, Math.round(v)), pos: r.position, src: "espn2026" });
+        }
+      }
+    } catch (e) { console.error("espn_player_ranks fetch", e); }
+
+    // Market multiplier from observed paid vs anchor (uses live picks vs real anchors)
     const sheetMap = new Map<string, { price: number; pos?: string }>();
     for (const r of (p.prices ?? []) as any[]) sheetMap.set(norm(r.name), { price: Number(r.price) || 0, pos: r.position });
     let paidSum = 0, sheetSum = 0, n = 0;
     for (const e of (p.events ?? []) as any[]) {
-      const ref = sheetMap.get(norm(e.player));
-      if (!ref || ref.price <= 0) continue;
+      const ref = sheetMap.get(norm(e.player)) ?? anchorByName.get(norm(e.player));
+      if (!ref || !ref.price || ref.price <= 0) continue;
       paidSum += Number(e.price) || 0; sheetSum += ref.price; n++;
     }
     const marketMult = n >= 3 && sheetSum > 0 ? paidSum / sheetSum : 1;
     const confident = n >= 8;
 
-    // Per-position fallback board: top 8 undrafted, sorted by sheet price desc, with market-adjusted "going rate"
+    // Per-position fallback board: merges user sheet + anchor data (3yr league + ESPN).
+    // Each row carries source so the prompt and engine know what we're trusting.
     const POS_LIST = ["QB", "RB", "WR", "TE", "K", "DST"] as const;
-    const fallbackByPos: Record<string, { name: string; sheet: number; going: number }[]> = {};
+    const fallbackByPos: Record<string, { name: string; sheet: number; going: number; src: string }[]> = {};
     for (const pos of POS_LIST) {
-      const list = ((p.prices ?? []) as any[])
-        .filter((r) => r.position === pos && !draftedSet.has(norm(r.name)) && Number(r.price) > 0)
-        .sort((a, b) => Number(b.price) - Number(a.price))
-        .slice(0, 8)
-        .map((r) => ({
-          name: r.name,
-          sheet: Number(r.price),
-          going: Math.max(1, Math.round(Number(r.price) * marketMult)),
-        }));
-      fallbackByPos[pos] = list;
+      const merged = new Map<string, { name: string; sheet: number; going: number; src: string }>();
+      // sheet rows
+      for (const r of (p.prices ?? []) as any[]) {
+        if (r.position !== pos) continue;
+        const k = norm(r.name);
+        if (!k || draftedSet.has(k)) continue;
+        const sheet = Number(r.price) || 0;
+        if (sheet <= 0) continue;
+        merged.set(k, { name: r.name, sheet, going: Math.max(1, Math.round(sheet * marketMult)), src: "sheet" });
+      }
+      // anchor rows (league3yr / espn2026) — fill gaps
+      for (const [k, a] of anchorByName) {
+        if (a.pos !== pos) continue;
+        if (draftedSet.has(k)) continue;
+        if (merged.has(k)) continue;
+        merged.set(k, { name: titleize(k), sheet: a.price, going: Math.max(1, Math.round(a.price * marketMult)), src: a.src });
+      }
+      fallbackByPos[pos] = Array.from(merged.values()).sort((a, b) => b.going - a.going).slice(0, 10);
     }
 
     const fallbackText = POS_LIST
       .map((pos) => {
         const rows = fallbackByPos[pos];
-        if (!rows.length) return `${pos}: (no undrafted on sheet)`;
-        return `${pos}: ${rows.map((r) => `${r.name} sheet$${r.sheet}/going$${r.going}`).join(" | ")}`;
+        if (!rows.length) return `${pos}: (no data)`;
+        return `${pos}: ${rows.map((r) => `${r.name} $${r.going}(${r.src})`).join(" | ")}`;
       })
       .join("\n");
 
@@ -225,23 +287,30 @@ Deno.serve(async (req: Request) => {
 
       for (const t of parsed.targets) {
         const pos = t?.position as string | undefined;
+        const nameKey = norm(t?.name ?? "");
 
-        // 1. Anchor: sheet first, else top-of-board going price for that pos,
-        //    else AI's own number (already player-specific per the prompt).
-        const sheetRef = sheetMap.get(norm(t?.name ?? ""));
+        // 1. Anchor priority: user sheet → league 3yr avg → ESPN 2026 → AI guess
+        const sheetRef = sheetMap.get(nameKey);
+        const anchorRef = anchorByName.get(nameKey);
         const board = (pos && fallbackByPos[pos]) ? fallbackByPos[pos] : [];
         const topGoing = board[0]?.going || 0;
 
         let basePrice: number;
+        let priceSrc: string;
         if (sheetRef && sheetRef.price > 0) {
           basePrice = Math.round(sheetRef.price * marketMult);
+          priceSrc = "sheet";
+        } else if (anchorRef && anchorRef.price > 0) {
+          basePrice = Math.round(anchorRef.price * marketMult);
+          priceSrc = anchorRef.src;
         } else if (allSame && topGoing > 0) {
-          // AI gave the same number for everyone — replace with the position's
-          // top going rate so QB/RB/WR don't all read $134.
           basePrice = topGoing;
+          priceSrc = "board";
         } else {
           basePrice = Number(t?.maxBid) || (topGoing || Math.round(affordabilityCeiling * 0.3));
+          priceSrc = "ai";
         }
+        (t as any).priceSource = priceSrc;
 
         // 2. Scarcity nudge
         const sev = pos ? gapByPos.get(pos) : undefined;
