@@ -795,3 +795,177 @@ function RecentPicksList({
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Plan — strategy picker + slot allocations
+// ─────────────────────────────────────────────────────────────────────────────
+
+function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
+  const settings = useDraftStore((s) => s.settings);
+  const setSettings = useDraftStore((s) => s.setSettings);
+  const strategyId = (settings as any).strategy ?? "balanced";
+  const strategy = getStrategy(strategyId);
+
+  const slots: Array<[string, number]> = [
+    ["QB1", Math.round(budget.totalBudget * (strategy.allocations.QB ?? 0.06))],
+    ["RB1", Math.round(budget.totalBudget * (strategy.allocations.RB ?? 0.3) * 0.55)],
+    ["RB2", Math.round(budget.totalBudget * (strategy.allocations.RB ?? 0.3) * 0.3)],
+    ["WR1", Math.round(budget.totalBudget * (strategy.allocations.WR ?? 0.3) * 0.5)],
+    ["WR2", Math.round(budget.totalBudget * (strategy.allocations.WR ?? 0.3) * 0.3)],
+    ["TE1", Math.round(budget.totalBudget * (strategy.allocations.TE ?? 0.05))],
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Strategy
+        </p>
+        <div className="grid grid-cols-2 gap-1.5">
+          {STRATEGIES.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setSettings({ ...(settings as any), strategy: s.id })}
+              className={`rounded border px-2 py-1.5 text-left text-[11px] transition ${
+                strategyId === s.id
+                  ? "border-primary bg-primary/10 text-foreground"
+                  : "border-border/50 bg-secondary/20 text-muted-foreground hover:bg-secondary/40"
+              }`}
+            >
+              <div className="font-medium">{s.name}</div>
+              <div className="text-[10px] opacity-70">{s.summary}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Slot allocations
+        </p>
+        <div className="space-y-1">
+          {slots.map(([label, amt]) => (
+            <div
+              key={label}
+              className="flex items-center justify-between rounded border border-border/40 bg-secondary/20 px-3 py-1.5 text-[12px]"
+            >
+              <span className="font-medium">{label}</span>
+              <span className="font-mono tabular-nums">${amt}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lookup — affordability + "what can I get for $X"
+// ─────────────────────────────────────────────────────────────────────────────
+
+function LookupSection({
+  prices,
+  events,
+  maxBid,
+  onPick,
+}: {
+  prices: PriceEstimate[];
+  events: ReturnType<typeof useDraftStore.getState>["events"];
+  maxBid: number;
+  onPick: (name: string) => void;
+}) {
+  const [amount, setAmount] = useState(String(Math.max(1, Math.floor(maxBid / 2))));
+  const drafted = useMemo(
+    () => new Set(events.map((e) => norm(e.player))),
+    [events],
+  );
+  const target = Number(amount) || 0;
+  const matches = useMemo(() => {
+    return prices
+      .filter((p) => !drafted.has(norm(p.name)))
+      .filter((p) => p.estimate <= target && p.estimate >= Math.max(1, target - 5))
+      .sort((a, b) => b.estimate - a.estimate)
+      .slice(0, 12);
+  }, [prices, drafted, target]);
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          What can I get for…
+        </p>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">$</span>
+          <Input
+            inputMode="numeric"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
+            className="h-9"
+          />
+          <span className="whitespace-nowrap text-[11px] text-muted-foreground">
+            max ${maxBid}
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        {matches.length === 0 && (
+          <p className="py-4 text-center text-xs text-muted-foreground">
+            No undrafted players around ${target}.
+          </p>
+        )}
+        {matches.map((p) => (
+          <button
+            key={p.name}
+            type="button"
+            onClick={() => onPick(p.name)}
+            className="flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-3 py-2 text-left text-[12px] hover:bg-secondary/40"
+          >
+            {p.position && (
+              <Badge
+                variant="outline"
+                className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}
+              >
+                {p.position}
+              </Badge>
+            )}
+            <span className="flex-1 truncate font-medium">{p.name}</span>
+            <span className="font-mono tabular-nums">${p.estimate}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Refresh league from ESPN
+// ─────────────────────────────────────────────────────────────────────────────
+
+function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={async () => {
+        setBusy(true);
+        try {
+          const { error } = await supabase.functions.invoke("espn-refresh-league");
+          if (error) throw error;
+          toast.success("League refreshed from ESPN.");
+          onDone();
+        } catch (e) {
+          toast.error(e instanceof Error ? e.message : "Refresh failed.");
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left hover:bg-secondary/40 disabled:opacity-50"
+    >
+      <RefreshCw className={`h-4 w-4 text-muted-foreground ${busy ? "animate-spin" : ""}`} />
+      <span className="text-sm">{busy ? "Refreshing…" : "Refresh league from ESPN"}</span>
+    </button>
+  );
+}
