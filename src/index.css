@@ -359,9 +359,9 @@ body {
   position: relative;
   color: hsl(var(--foreground));
   background:
-    radial-gradient(1200px 800px at 75% -10%, hsl(220 30% 14% / 0.6), transparent 65%),
-    radial-gradient(900px 700px at -10% 110%, hsl(12 35% 14% / 0.45), transparent 65%),
-    linear-gradient(180deg, hsl(220 14% 7%), hsl(220 16% 4%));
+    radial-gradient(1200px 800px at 75% -10%, hsl(222 60% 14% / 0.6), transparent 65%),
+    radial-gradient(900px 700px at -10% 110%, hsl(45 60% 14% / 0.25), transparent 65%),
+    linear-gradient(180deg, hsl(222 47% 7%), hsl(222 50% 4%));
   background-attachment: fixed;
 }
 
