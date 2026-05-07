@@ -62,6 +62,7 @@ import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
+import SocialTakes from "@/components/SocialTakes";
 import { PlannerBody } from "@/pages/Planner";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
