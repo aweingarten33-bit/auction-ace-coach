@@ -21,6 +21,10 @@ function rateLimit(key: string, limit: number, windowMs: number) {
   if (b.count >= limit) return { ok: false as const, retryAfterSec: Math.max(1, Math.ceil((b.resetAt - now) / 1000)) };
   b.count++; return { ok: true as const };
 }
+function titleize(norm: string): string {
+  // crude reverse of norm() — split runs of letters/digits and Title Case
+  return norm.replace(/([a-z])([0-9])/g, "$1 $2").replace(/(^|\s)([a-z])/g, (_, s, c) => s + c.toUpperCase());
+}
 
 const SYSTEM_PROMPT = `You are an elite fantasy football auction draft strategist powering a Spotify-style "Up Next" queue.
 
