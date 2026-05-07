@@ -964,7 +964,7 @@ function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
             <button
               key={s.id}
               type="button"
-              onClick={() => setSettings({ ...(settings as any), strategy: s.id })}
+              onClick={() => setStrategyId(s.id)}
               className={`rounded border px-2 py-1.5 text-left text-[11px] transition ${
                 strategyId === s.id
                   ? "border-primary bg-primary/10 text-foreground"
