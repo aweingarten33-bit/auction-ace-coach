@@ -575,30 +575,48 @@ export default function DraftRoom() {
         )}
       </main>
 
-      {/* Floating Budget Planner — chat-bubble style FAB */}
+      {/* Floating AI tools — chat-bubble FAB. Targets + Coach AI live here. */}
       <Sheet>
         <SheetTrigger asChild>
           <button
             type="button"
-            aria-label="Open budget planner"
+            aria-label="Open AI tools"
             className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition hover:scale-105 active:scale-95"
             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
           >
-            <MessageSquare className="h-6 w-6" />
-            <span className="absolute -top-1 -right-1 rounded-full bg-background px-1.5 py-0.5 text-[9px] font-mono font-bold text-foreground border border-border">
-              ${budget.remaining}
-            </span>
+            <Sparkles className="h-6 w-6" />
+            {targets.length > 0 && (
+              <span className="absolute -top-1 -right-1 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[9px] font-mono font-bold text-white">
+                {targets.length}
+              </span>
+            )}
           </button>
         </SheetTrigger>
-        <SheetContent side="right" className="flex w-[88%] max-w-md flex-col p-0 sm:w-96">
+        <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
           <SheetHeader className="border-b border-border/60 px-4 py-3">
-            <SheetTitle className="text-sm font-semibold">Quick panel</SheetTitle>
+            <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="h-4 w-4 text-primary" />
+              AI Tools
+            </SheetTitle>
           </SheetHeader>
-          <div className="flex flex-1 items-center justify-center p-6 text-center">
-            <p className="text-xs text-muted-foreground">
-              Empty for now — tell the coach what you want to live here.
-            </p>
-          </div>
+          <AiQuickPanel
+            targets={targets}
+            targetsLoading={targetsMutation.isPending}
+            onRefreshTargets={() => targetsMutation.mutate()}
+            onPickTarget={(name) => lockToPlayer(name)}
+            coachContext={() => ({
+              settings: {
+                totalBudget: settings.totalBudget, numTeams: settings.numTeams,
+                scoring: settings.scoring, leagueType: settings.leagueType,
+                format: settings.format, context: settings.context,
+              },
+              budget, keepers, myRoster: myItems,
+              rosterRequired: requiredCount, rosterFilled: myCount,
+              events, prices, spendByPosition: spend, recentRuns: runs,
+              draftedPlayers: events.map((e) => e.player),
+              showMath: true,
+            })}
+          />
         </SheetContent>
       </Sheet>
     </div>
