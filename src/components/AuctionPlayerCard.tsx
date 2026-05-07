@@ -53,14 +53,14 @@ export default function AuctionPlayerCard({ d }: Props) {
   const keepers = useDraftStore((s) => s.keepers);
 
   const [meta, setMeta] = useState<SleeperMeta>({ team: null, bye: null });
-  const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null }>({ stats: null, points: null });
+  const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null; posRank: number | null; overallRank: number | null }>({ stats: null, points: null, posRank: null, overallRank: null });
   const [espnId, setEspnId] = useState<number | null>(null);
   const [headshotOk, setHeadshotOk] = useState(true);
 
   useEffect(() => {
     let live = true;
     setMeta({ team: null, bye: null });
-    setProj({ stats: null, points: null });
+    setProj({ stats: null, points: null, posRank: null, overallRank: null });
     setEspnId(null);
     setHeadshotOk(true);
     if (!d.player) return;
@@ -72,13 +72,12 @@ export default function AuctionPlayerCard({ d }: Props) {
       setMeta({ team, bye: byeWeekForTeam(team) ?? null });
     }).catch(() => {});
 
-    // Fetch ESPN projected stat line for this player.
     const norm = d.player.toLowerCase().normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "")
       .replace(/\s+/g, " ").trim();
     supabase
       .from("espn_player_ranks")
-      .select("projected_stats, projected_points, season, espn_player_id")
+      .select("projected_stats, projected_points, season, espn_player_id, pos_rank, overall_rank")
       .eq("player_name_norm", norm)
       .order("season", { ascending: false })
       .limit(1)
@@ -88,6 +87,8 @@ export default function AuctionPlayerCard({ d }: Props) {
         setProj({
           stats: (data.projected_stats as ProjStats) ?? null,
           points: data.projected_points ?? null,
+          posRank: data.pos_rank ?? null,
+          overallRank: data.overall_rank ?? null,
         });
         if (data.espn_player_id) setEspnId(Number(data.espn_player_id));
       });
