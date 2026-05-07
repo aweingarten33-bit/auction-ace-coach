@@ -63,7 +63,7 @@ import {
 } from "@/components/ui/sheet";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
-import DecisionCard from "@/components/DecisionCard";
+import DecisionCard from "@/components/AuctionPlayerCard";
 import MarketHeat from "@/components/MarketHeat";
 import CounterAnchorDetector from "@/components/CounterAnchorDetector";
 import StealReachCounter from "@/components/StealReachCounter";
