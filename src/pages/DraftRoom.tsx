@@ -29,6 +29,7 @@ import {
   Check,
   Sparkles,
   ChevronRight,
+  ListOrdered,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
@@ -73,6 +74,7 @@ import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
 import RedditBuzz from "@/components/RedditBuzz";
 import AffordabilityChecker from "@/components/AffordabilityChecker";
+import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -97,6 +99,7 @@ export default function DraftRoom() {
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [aiOpen, setAiOpen] = useState<boolean>(false);
+  const [top100Open, setTop100Open] = useState<boolean>(false);
   const [query, setQuery] = useState<string>("");
   const [activeName, setActiveName] = useState<string>("");
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
@@ -416,6 +419,10 @@ export default function DraftRoom() {
               onGoToClassicDraft={() => navigate("/draft")}
               onGoToPlanner={() => navigate("/planner")}
               onLockPlayer={lockToPlayer}
+              watchlist={watchlist}
+              keepers={keepers}
+              onPin={pinPlayer}
+              onUnpin={unpinPlayer}
             />
           </Sheet>
 
@@ -428,6 +435,38 @@ export default function DraftRoom() {
               slotsLeft={budget.slotsLeft}
             />
           </div>
+
+          {/* TOP 100 — slide-in from the right (mirrors the hamburger). */}
+          <Sheet open={top100Open} onOpenChange={setTop100Open}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="-mr-2 h-9 w-9"
+                aria-label="Open Top 100"
+              >
+                <ListOrdered className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
+              <SheetHeader className="border-b border-border/60 px-4 py-3">
+                <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <ListOrdered className="h-4 w-4 text-primary" />
+                  Top 100 · math-backed $
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto p-3">
+                <Top100List
+                  prices={prices}
+                  events={events}
+                  onPick={(name) => {
+                    setTop100Open(false);
+                    setTimeout(() => lockToPlayer(name), 220);
+                  }}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
 
         {/* Live nomination strip — only when something's actively up for bid */}
@@ -478,9 +517,6 @@ export default function DraftRoom() {
           />
         </section>
 
-        {/* TOP 100 — math-backed values. All 100 visible at once (no scroll).
-            4 cols × 25 rows of micro-chips. Tap any to open Decision Card. */}
-        <Top100Grid prices={prices} events={events} onPick={lockToPlayer} />
         {/* DECISION CARD — popup bubble when a player is locked in.
             Uses Radix primitives DIRECTLY (not the shared <DialogContent>)
             because the shared one hard-codes `top-[50%] translate-y-[-50%]`
@@ -717,6 +753,10 @@ interface DrawerProps {
   onGoToClassicDraft: () => void;
   onGoToPlanner: () => void;
   onLockPlayer: (name: string) => void;
+  watchlist: string[];
+  keepers: { player: string; cost?: number }[];
+  onPin: (name: string) => void;
+  onUnpin: (name: string) => void;
 }
 
 function DrawerContents({
@@ -734,9 +774,13 @@ function DrawerContents({
   onGoToClassicDraft,
   onGoToPlanner,
   onLockPlayer,
+  watchlist,
+  keepers,
+  onPin,
+  onUnpin,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "afford" | "market" | "reddit"
+    "menu" | "lookup" | "search" | "afford" | "market" | "reddit"
   >("menu");
 
   void activeName;
@@ -745,6 +789,7 @@ function DrawerContents({
 
   const sections = [
     { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player name or dollar amount." },
+    { id: "search" as const, label: "Player search (filters)", icon: ListOrdered, hint: "Position + tier filters, pin to watchlist." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
     { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live r/fantasyfootball threads." },
@@ -842,6 +887,23 @@ function DrawerContents({
               onLockPlayer(name);
               onClose();
             }}
+          />
+        </div>
+      )}
+
+      {section === "search" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <PlayerSearchPanel
+            prices={prices}
+            events={events}
+            watchlist={watchlist}
+            keepers={keepers}
+            onPick={(name) => {
+              onLockPlayer(name);
+              onClose();
+            }}
+            onPin={onPin}
+            onUnpin={onUnpin}
           />
         </div>
       )}
@@ -1148,10 +1210,10 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Top 100 grid — non-scrollable, all 100 math-backed values visible at once.
-// 4 cols × 25 rows of micro-chips. Tap a chip → opens the Decision Card.
+// Top 100 list — ESPN-style PDF rows in a slide-in panel.
+// Rank · Pos · Name · math-backed $. Tap a row → opens the Decision Card.
 // ─────────────────────────────────────────────────────────────────────────────
-function Top100Grid({
+function Top100List({
   prices,
   events,
   onPick,
@@ -1172,55 +1234,55 @@ function Top100Grid({
       .slice(0, 100);
   }, [prices]);
 
-  const lastName = (full: string) => {
-    const parts = full.replace(/\s+(Jr\.?|Sr\.?|II|III|IV)$/i, "").trim().split(/\s+/);
-    return parts[parts.length - 1] ?? full;
-  };
-
-  if (top.length === 0) return null;
+  if (top.length === 0) {
+    return (
+      <p className="py-8 text-center text-xs text-muted-foreground">
+        No prices loaded yet.
+      </p>
+    );
+  }
 
   return (
-    <section className="rounded-lg border border-border/60 bg-card p-2.5 shadow-sm">
-      <div className="mb-2 flex items-center justify-between px-0.5">
-        <h2 className="text-sm font-semibold">Top 100 · math-backed $</h2>
-        <span className="text-[10px] text-muted-foreground">tap → Decision Card</span>
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 px-2 pb-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="w-6 text-right">#</span>
+        <span className="w-9">Pos</span>
+        <span className="flex-1">Player</span>
+        <span className="w-12 text-right">$ Value</span>
       </div>
-      <div className="grid grid-cols-4 gap-[3px]">
-        {top.map((p, i) => {
-          const isDrafted = drafted.has(norm(p.name));
-          const posTint = p.position ? POS_COLORS[p.position] ?? "" : "";
-          return (
-            <button
-              key={`${p.name}-${i}`}
-              type="button"
-              onClick={() => !isDrafted && onPick(p.name)}
-              disabled={isDrafted}
-              className={cn(
-                "flex flex-col items-center justify-center rounded border border-border/40 px-1 py-1 text-center leading-tight",
-                "min-h-[34px]",
-                isDrafted
-                  ? "bg-muted/40 opacity-40 line-through"
-                  : "bg-secondary/20 hover:bg-secondary/60 active:bg-secondary/80",
+      {top.map((p, i) => {
+        const isDrafted = drafted.has(norm(p.name));
+        const posTint = p.position ? POS_COLORS[p.position] ?? "" : "";
+        return (
+          <button
+            key={`${p.name}-${i}`}
+            type="button"
+            onClick={() => !isDrafted && onPick(p.name)}
+            disabled={isDrafted}
+            className={cn(
+              "flex w-full items-center gap-2 rounded border border-border/40 px-2 py-1.5 text-left",
+              isDrafted
+                ? "bg-muted/30 opacity-40 line-through"
+                : "bg-secondary/20 hover:bg-secondary/60 active:bg-secondary/80",
+            )}
+          >
+            <span className="w-6 text-right font-mono text-[11px] tabular-nums text-muted-foreground">
+              {i + 1}
+            </span>
+            <span className="w-9">
+              {p.position && (
+                <Badge variant="outline" className={cn(posTint, "text-[9px] px-1 py-0")}>
+                  {p.position}
+                </Badge>
               )}
-            >
-              <span className="flex w-full items-center justify-between gap-0.5">
-                <span className="text-[8px] font-mono text-muted-foreground">{i + 1}</span>
-                {p.position && (
-                  <span className={cn("rounded px-0.5 text-[7px] font-bold", posTint)}>
-                    {p.position}
-                  </span>
-                )}
-              </span>
-              <span className="w-full truncate text-[10px] font-semibold">
-                {lastName(p.name)}
-              </span>
-              <span className="text-[10px] font-mono tabular-nums text-primary">
-                ${p.price}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </section>
+            </span>
+            <span className="flex-1 truncate text-[12px] font-medium">{p.name}</span>
+            <span className="w-12 text-right font-mono text-[12px] tabular-nums text-primary">
+              ${p.price}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
