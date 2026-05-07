@@ -30,6 +30,7 @@ import {
   WifiOff,
   Pin,
   PinOff,
+  Check,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -642,10 +643,12 @@ function DrawerContents({
   onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "plan" | "lookup" | "market" | "opponents" | "vetri" | "recent"
+    "menu" | "plan" | "lookup" | "afford" | "market" | "opponents" | "vetri" | "recent"
   >("menu");
 
   const sections = [
+    { id: "lookup" as const, label: "Player name or $", icon: Search, hint: "Find a player or what fits a budget" },
+    { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Check 1–3 players against your bank" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
     { id: "vetri" as const, label: "Analyst", icon: MessageSquare, hint: "Vetri's takes" },
@@ -667,7 +670,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "vetri" ? "Analyst" : section}
+            {section === "menu" ? "Menu" : section === "vetri" ? "Analyst" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Player name or $" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
@@ -750,6 +753,12 @@ function DrawerContents({
               onClose();
             }}
           />
+        </div>
+      )}
+
+      {section === "afford" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <PlannerBody />
         </div>
       )}
 
