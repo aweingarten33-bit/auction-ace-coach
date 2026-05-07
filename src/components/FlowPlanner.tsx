@@ -121,7 +121,7 @@ export default function FlowPlanner({
                 </div>
 
                 <div className="text-xs text-gray-400 mb-4">
-                  Edit any slot. Auto-suggest splits your ${budget} using your current strategy.
+                  Edit any slot to plan how you'll spend your ${budget}.
                 </div>
 
                 <div className="space-y-3">
