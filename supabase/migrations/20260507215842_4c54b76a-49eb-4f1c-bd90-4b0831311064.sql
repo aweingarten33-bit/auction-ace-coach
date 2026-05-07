@@ -1,0 +1,1 @@
+ALTER TABLE public.espn_player_ranks ADD COLUMN IF NOT EXISTS projected_stats jsonb;

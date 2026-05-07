@@ -85,6 +85,7 @@ export type Database = {
           prior_ppg: number | null
           prior_season: number | null
           projected_points: number | null
+          projected_stats: Json | null
           season: number
           updated_at: string
         }
@@ -104,6 +105,7 @@ export type Database = {
           prior_ppg?: number | null
           prior_season?: number | null
           projected_points?: number | null
+          projected_stats?: Json | null
           season: number
           updated_at?: string
         }
@@ -123,6 +125,7 @@ export type Database = {
           prior_ppg?: number | null
           prior_season?: number | null
           projected_points?: number | null
+          projected_stats?: Json | null
           season?: number
           updated_at?: string
         }
