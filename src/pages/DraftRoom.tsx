@@ -104,55 +104,9 @@ export default function DraftRoom() {
     loadSleeperPlayers().then(setSleeper).catch(() => {});
   }, []);
 
-  // ── Anchor price map: league 3yr avg + ESPN 2026 auction value ────────
-  // Used by decide() when a player isn't on the user's price sheet so we
-  // never fall back to the user's wallet cap as a "price."
-  const [anchorMap, setAnchorMap] = useState<Record<string, AnchorEntry>>({});
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const [hist, espn] = await Promise.all([
-          supabase
-            .from("league_auction_history")
-            .select("player_name_norm:player_name, bid_amount")
-            .then((r) => r.data ?? []),
-          supabase
-            .from("espn_player_ranks")
-            .select("player_name_norm, auction_value")
-            .then((r) => r.data ?? []),
-        ]);
-        if (cancelled) return;
-
-        // 1) Build league 3yr average per player (highest priority fallback)
-        const leagueAgg = new Map<string, { sum: number; n: number }>();
-        for (const row of hist as Array<{ player_name_norm: string; bid_amount: number | null }>) {
-          if (!row.player_name_norm || row.bid_amount == null) continue;
-          const k = norm(row.player_name_norm);
-          const cur = leagueAgg.get(k) ?? { sum: 0, n: 0 };
-          cur.sum += Number(row.bid_amount);
-          cur.n += 1;
-          leagueAgg.set(k, cur);
-        }
-        const map: Record<string, AnchorEntry> = {};
-        for (const [k, v] of leagueAgg) {
-          if (v.n > 0) map[k] = { price: Math.max(1, Math.round(v.sum / v.n)), source: "league" };
-        }
-        // 2) ESPN as second-tier fallback (only if no league data)
-        for (const row of espn as Array<{ player_name_norm: string; auction_value: number | null }>) {
-          if (!row.player_name_norm || row.auction_value == null) continue;
-          const k = norm(row.player_name_norm);
-          if (!map[k] && row.auction_value > 0) {
-            map[k] = { price: Math.max(1, Math.round(Number(row.auction_value))), source: "espn" };
-          }
-        }
-        setAnchorMap(map);
-      } catch (e) {
-        console.warn("[DraftRoom] anchor map load failed", e);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
+  // Anchor price map: league 3yr avg + ESPN 2026 auction value, used by
+  // decide() so off-sheet players show real numbers instead of the wallet cap.
+  const anchorMap = useAnchorMap();
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!searchWrapRef.current?.contains(e.target as Node)) setSearchOpen(false);
