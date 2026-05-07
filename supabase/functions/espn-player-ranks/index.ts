@@ -37,12 +37,15 @@ Deno.serve(async (req) => {
 
     // kona_player_info returns full draftRanksByRankType + auctionValue.
     // players_wl does NOT — prior runs saved 14k rows with every rank null.
+    // filterStatsForTopScoringPeriodIds asks ESPN to include projected season stats
+    // (statSourceId=1, statSplitTypeId=0, seasonId=current) in player.stats[].
     const filter = {
       players: {
         limit: 600,
         sortDraftRanks: { sortPriority: 100, sortAsc: true, value: "STANDARD" },
         filterSlotIds: { value: [0, 2, 4, 6, 17, 16] },
         filterRanksForSlotIds: { value: [0, 2, 4, 6, 17, 16] },
+        filterStatsForTopScoringPeriodIds: { value: 17, additionalValue: [`10${season}`, `00${season}`] },
       },
     };
 
