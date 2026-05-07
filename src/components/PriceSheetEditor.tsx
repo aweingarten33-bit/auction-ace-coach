@@ -94,8 +94,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Pull positions from cached ESPN ranks so we can filter the list by position.
-  // This is a secondary source — prices now also carry position directly from autoFillFromEspn.
+  // Pull positions from cached ESPN ranks so we can filter the list by position
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -174,8 +173,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       // 4) For each ranked player → tier → league avg $
       // Blend ESPN preseason rank (70%) with last year's PPG rank (30%) so a
       // proven producer ESPN is sleeping on still gets bumped up a tier.
-      // FIX: include position in the built entry so the position filter works immediately
-      const built: { name: string; price: number; position: Position }[] = [];
+      const built: { name: string; price: number }[] = [];
       for (const r of rRows) {
         if (!r.position || !r.pos_rank) continue;
         const ppgRank = ppgRankByName.get(r.player_name);
@@ -188,9 +186,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         // Auto-fade injured players (season-ending → ~$1, soft injuries scaled).
         const mult = injuryMultiplier((r as { injury_status?: string | null }).injury_status);
         const price = mult < 1 ? Math.max(1, Math.round(basePrice * mult)) : basePrice;
-        // Normalise ESPN position label to our Position type (DST covers DEF/D/ST)
-        const pos = (r.position === "DEF" || r.position === "D/ST" ? "DST" : r.position) as Position;
-        if (price > 0) built.push({ name: r.player_name, price, position: pos });
+        if (price > 0) built.push({ name: r.player_name, price });
       }
       if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
       mergeImported(built, "ESPN auto-fill");
@@ -203,23 +199,14 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     }
   };
 
-  // FIX: accept optional position so auto-fill and future imports can carry it through
-  const mergeImported = (incoming: { name: string; price: number; position?: Position }[], filename: string) => {
+  const mergeImported = (incoming: { name: string; price: number }[], filename: string) => {
     if (!incoming.length) {
       toast.error("No players found in file");
       return;
     }
     const map = new Map<string, PriceEstimate>();
     for (const p of prices) map.set(p.name.toLowerCase(), p);
-    for (const p of incoming) {
-      const existing = map.get(p.name.toLowerCase());
-      map.set(p.name.toLowerCase(), {
-        name: p.name,
-        price: p.price,
-        // Prefer incoming position if provided; keep existing position as fallback
-        position: p.position ?? existing?.position,
-      });
-    }
+    for (const p of incoming) map.set(p.name.toLowerCase(), { name: p.name, price: p.price });
     const merged = Array.from(map.values());
     setPrices(merged);
     setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
@@ -309,9 +296,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     }
     if (posFilter !== "ALL") {
       arr = arr.filter((p) => {
-        // FIX: prefer position stored directly on the price entry (set by autoFillFromEspn),
-        // fall back to the Supabase-loaded posByName map for any entries without it.
-        const pos = p.position ?? posByName.get(p.name.toLowerCase());
+        const pos = posByName.get(p.name.toLowerCase());
         if (posFilter === "DST") return pos === "DST" || pos === "DEF" || pos === "D/ST";
         return pos === posFilter;
       });
@@ -451,12 +436,12 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
             Showing {filtered.length} of {prices.length}
             {posFilter !== "ALL" ? ` · ${posFilter} only` : ""}
           </p>
-          {posFilter !== "ALL" && posByName.size === 0 && prices.every((p) => !p.position) && (
+          {posFilter !== "ALL" && posByName.size === 0 && (
             <div className="mb-1 rounded border border-dashed border-border/60 bg-secondary/10 px-2 py-1 text-[11px] italic text-muted-foreground">
               Loading positions…
             </div>
           )}
-          {posFilter !== "ALL" && filtered.length === 0 && (posByName.size > 0 || prices.some((p) => p.position)) && (
+          {posFilter !== "ALL" && posByName.size > 0 && filtered.length === 0 && (
             <div className="mb-1 rounded border border-dashed border-border/60 bg-secondary/10 px-2 py-1 text-[11px] italic text-muted-foreground">
               No {posFilter} players in your price sheet.
             </div>
@@ -472,7 +457,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
                   <button
                     type="button"
                     onClick={() => {
-                      const pos = (p.position ?? posByName.get(p.name.toLowerCase())) as Position | undefined;
+                      const pos = posByName.get(p.name.toLowerCase()) as Position | undefined;
                       setDetailFor({ name: p.name, position: pos, price: p.price });
                     }}
                     className="flex-1 truncate text-left font-medium hover:text-primary hover:underline"

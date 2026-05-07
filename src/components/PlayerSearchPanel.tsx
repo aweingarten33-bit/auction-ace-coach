@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,7 @@ import { Search, X, Pin, PinOff, Gavel } from "lucide-react";
 import { DraftEvent, PriceEstimate, Position } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { tierForPosRank } from "@/lib/league-tier-prices";
-import PlayerDecisionOverlay from "@/components/PlayerDecisionOverlay";
-import { supabase } from "@/integrations/supabase/client";
+import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -27,36 +26,6 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
   const [tier, setTier] = useState<"ALL" | number>("ALL");
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
 
-  // Fallback position lookup — older prices may have been saved without a position
-  // (auto-fill used to drop it). We re-derive position here from cached ESPN ranks
-  // so the QB/RB/WR filters work even on legacy data.
-  const [posByName, setPosByName] = useState<Map<string, Position>>(new Map());
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("espn_player_ranks")
-        .select("player_name, position");
-      if (cancelled || !data) return;
-      const m = new Map<string, Position>();
-      for (const r of data) {
-        if (!r.player_name || !r.position) continue;
-        const p = r.position === "DEF" || r.position === "D/ST" ? "DST" : r.position;
-        if (["QB", "RB", "WR", "TE", "K", "DST"].includes(p)) {
-          m.set(norm(r.player_name), p as Position);
-        }
-      }
-      setPosByName(m);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Resolve a price's position: prefer the field on the price itself, fall back to the ESPN map.
-  const resolvePos = (p: PriceEstimate): Position | undefined =>
-    p.position ?? posByName.get(norm(p.name));
-
   const draftedSet = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
   const pinnedSet = useMemo(() => new Set(watchlist.map(norm)), [watchlist]);
 
@@ -64,11 +33,10 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
   const tierByName = useMemo(() => {
     const byPos = new Map<string, PriceEstimate[]>();
     for (const p of prices) {
-      const position = resolvePos(p);
-      if (!position) continue;
-      const arr = byPos.get(position) ?? [];
+      if (!p.position) continue;
+      const arr = byPos.get(p.position) ?? [];
       arr.push(p);
-      byPos.set(position, arr);
+      byPos.set(p.position, arr);
     }
     const m = new Map<string, number>();
     for (const [position, arr] of byPos) {
@@ -76,33 +44,27 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
       arr.forEach((p, i) => m.set(norm(p.name), tierForPosRank(position, i + 1)));
     }
     return m;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, posByName]);
+  }, [prices]);
 
   // Tiers available for the currently-selected position (so the chips reflect reality).
   const availableTiers = useMemo(() => {
     const set = new Set<number>();
     for (const p of prices) {
-      const position = resolvePos(p);
-      if (pos !== "ALL" && position !== pos) continue;
+      if (pos !== "ALL" && p.position !== pos) continue;
       const t = tierByName.get(norm(p.name));
       if (t != null) set.add(t);
     }
     return [...set].sort((a, b) => a - b);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, pos, tierByName, posByName]);
+  }, [prices, pos, tierByName]);
 
   const results = useMemo(() => {
     const qn = norm(q);
     let arr = prices;
-    if (pos !== "ALL") arr = arr.filter((p) => resolvePos(p) === pos);
+    if (pos !== "ALL") arr = arr.filter((p) => p.position === pos);
     if (tier !== "ALL") arr = arr.filter((p) => tierByName.get(norm(p.name)) === tier);
     if (qn) arr = arr.filter((p) => norm(p.name).includes(qn));
     return [...arr].sort((a, b) => (b.price || 0) - (a.price || 0)).slice(0, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, q, pos, tier, tierByName, posByName]);
-
-  const positionsLoading = posByName.size === 0;
+  }, [prices, q, pos, tier, tierByName]);
 
   return (
     <Card className="min-w-0 overflow-hidden p-3">
@@ -114,6 +76,7 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
       </div>
       <div className="relative mb-2">
         <Input
+          autoFocus
           placeholder="Type a name…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -123,7 +86,6 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
           <button
             onClick={() => setQ("")}
             className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            aria-label="Clear search"
           >
             <X className="h-4 w-4" />
           </button>
@@ -137,10 +99,7 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
             size="sm"
             variant={pos === p ? "default" : "outline"}
             className="h-7 px-2 text-[11px]"
-            onClick={() => {
-              setPos(p);
-              setTier("ALL");
-            }}
+            onClick={() => { setPos(p); setTier("ALL"); }}
           >
             {p}
           </Button>
@@ -175,28 +134,13 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
         </div>
       )}
       <p className="mb-1 text-[10px] text-muted-foreground">
-        Showing {results.length}
-        {results.length === 100 ? "+" : ""} of {prices.length}
+        Showing {results.length}{results.length === 100 ? "+" : ""} of {prices.length}
       </p>
-
-      {/* Hint when positions aren't loaded yet — explains an empty position filter without alarm */}
-      {pos !== "ALL" && positionsLoading && (
-        <div className="mb-1 rounded border border-dashed border-border/60 bg-secondary/10 px-2 py-1 text-[11px] italic text-muted-foreground">
-          Loading positions…
-        </div>
-      )}
-
-      {/* Cap to ~55% of dynamic viewport so the inner list reliably wins the scroll on phones, */}
-      {/* with a 256px floor so very short windows still show several rows. */}
-      <div
-        className="space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1"
-        style={{ WebkitOverflowScrolling: "touch", maxHeight: "max(16rem, 55dvh)" }}
-      >
+      <div className="max-h-[60vh] space-y-1 overflow-y-auto overscroll-contain rounded-md border border-border/60 bg-secondary/20 p-1" style={{ WebkitOverflowScrolling: "touch" }}>
         {results.map((p) => {
           const isDrafted = draftedSet.has(norm(p.name));
           const isPinned = pinnedSet.has(norm(p.name));
-          const position = resolvePos(p);
-          const cls = position && position in POS_COLORS ? POS_COLORS[position] : "";
+          const cls = p.position && p.position in POS_COLORS ? POS_COLORS[p.position as Position] : "";
           return (
             <div
               key={p.name}
@@ -207,15 +151,13 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
               <button
                 type="button"
                 disabled={isDrafted}
-                onClick={() =>
-                  !isDrafted && setDetailFor({ name: p.name, position, price: p.price })
-                }
+                onClick={() => !isDrafted && setDetailFor({ name: p.name, position: p.position, price: p.price })}
                 className="flex flex-1 min-w-0 items-center gap-2 text-left"
               >
                 <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
-                {position && (
+                {p.position && (
                   <Badge variant="outline" className={`${cls} text-[10px] px-1.5 py-0`}>
-                    {position}
+                    {p.position}
                   </Badge>
                 )}
                 {tierByName.get(norm(p.name)) != null && (
@@ -228,7 +170,7 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
               <button
                 type="button"
                 disabled={isDrafted}
-                onClick={() => !isDrafted && onPick(p.name, position, p.price)}
+                onClick={() => !isDrafted && onPick(p.name, p.position, p.price)}
                 title="Load into bid form"
                 className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-30"
               >
@@ -238,28 +180,24 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
                 type="button"
                 onClick={() => (isPinned ? onUnpin(p.name) : onPin(p.name))}
                 className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                aria-label={isPinned ? "Unpin" : "Pin"}
               >
                 {isPinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
               </button>
             </div>
           );
         })}
-        {!results.length && !positionsLoading && (
+        {!results.length && (
           <p className="py-6 text-center text-xs text-muted-foreground">No matches.</p>
         )}
       </div>
       <p className="mt-1.5 text-[10px] text-muted-foreground">
         Tap a name for the full pre-draft card. Gavel loads into the bid form. Pin saves to your watchlist.
       </p>
-
-      {/* Show the actual decision card (bid/pass/stop + math) on live draft, not the bio popup */}
-      <PlayerDecisionOverlay
+      <PlayerDetailsOverlay
         open={!!detailFor}
         onOpenChange={(o) => !o && setDetailFor(null)}
         name={detailFor?.name ?? ""}
         position={detailFor?.position}
-        price={detailFor?.price}
       />
     </Card>
   );

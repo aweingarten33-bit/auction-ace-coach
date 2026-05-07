@@ -95,21 +95,11 @@ export default function SetupWizard() {
               <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => navigate("/espn")}
-              className="bg-[#D40026] text-white shadow-glow hover:bg-[#b8001f]"
-            >
-              Connect
-              <span className="ml-1.5 font-extrabold italic tracking-tighter">ESPN</span>
+          {setupComplete && (
+            <Button size="sm" onClick={() => navigate("/draft")}>
+              Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
-            {setupComplete && (
-              <Button size="sm" variant="outline" onClick={() => navigate("/draft")}>
-                Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            )}
-          </div>
+          )}
         </header>
 
         <Progress value={progress} className="mb-6 h-1.5" />
