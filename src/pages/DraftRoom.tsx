@@ -344,17 +344,13 @@ export default function DraftRoom() {
             />
           </Sheet>
 
-          <div className="flex min-w-0 flex-1 items-center gap-3">
-            <div className="min-w-0">
-              <p className="truncate font-mono text-lg font-bold leading-none tabular-nums">
-                ${budget.remaining}
-              </p>
-              <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-                {events.filter((e) => e.drafter === "me").length >= 3
-                  ? `left · max $${budget.maxBid}`
-                  : "left"}
-              </p>
-            </div>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <MoneyHero
+              remaining={budget.remaining}
+              total={settings.totalBudget}
+              showMax={events.filter((e) => e.drafter === "me").length >= 3}
+              maxBid={budget.maxBid}
+            />
           </div>
 
           <div className="flex items-center gap-1.5 rounded-full border border-border/60 px-2 py-1">
