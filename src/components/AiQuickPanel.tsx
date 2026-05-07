@@ -101,8 +101,7 @@ export default function AiQuickPanel({
             {targets.slice(0, 10).map((t, i) => (
               <li
                 key={t.name}
-                onClick={() => onPickTarget(t.name)}
-                className="flex cursor-pointer items-center gap-2 px-2.5 py-1.5 transition hover:bg-secondary/40"
+                className="flex items-center gap-2 px-2.5 py-1.5"
               >
                 <span className="w-4 shrink-0 text-center font-mono text-[10px] text-muted-foreground">
                   {i + 1}
