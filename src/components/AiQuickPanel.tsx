@@ -84,59 +84,39 @@ export default function AiQuickPanel({
       </TabsList>
 
       {/* ── Targets tab ───────────────────────────────────────────── */}
-      <TabsContent value="targets" className="flex min-h-0 flex-1 flex-col overflow-hidden p-0 data-[state=inactive]:hidden">
-        <div className="flex shrink-0 items-center justify-between px-4 pt-3">
+      <TabsContent value="targets" className="flex min-h-0 flex-1 flex-col p-0 data-[state=inactive]:hidden">
+        <div className="px-4 pt-3 pb-1.5">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Top 10 to go after next
+            Top 10 to draft next
           </p>
-          <Button
-            size="sm" variant="ghost"
-            onClick={onRefreshTargets}
-            disabled={targetsLoading}
-            className="h-7 px-2 text-[11px]"
-          >
-            <RefreshCw className={`mr-1 h-3 w-3 ${targetsLoading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
         </div>
-        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-4 pt-2">
+        <div className="flex-1 px-3 pb-3">
+          {targets.length === 0 && targetsLoading && (
+            <p className="px-2 py-6 text-center text-xs text-muted-foreground">Thinking…</p>
+          )}
           {targets.length === 0 && !targetsLoading && (
-            <p className="px-2 py-6 text-center text-xs text-muted-foreground">
-              No targets yet — tap Refresh to ask the AI.
-            </p>
+            <p className="px-2 py-6 text-center text-xs text-muted-foreground">No targets yet.</p>
           )}
-          {targetsLoading && targets.length === 0 && (
-            <p className="px-2 py-6 text-center text-xs text-muted-foreground">
-              Thinking…
-            </p>
-          )}
-          {targets.slice(0, 10).map((t, i) => (
-            <Card
-              key={t.name}
-              onClick={() => onPickTarget(t.name)}
-              className="cursor-pointer p-3 transition hover:border-primary/50 hover:bg-secondary/40"
-            >
-              <div className="flex items-start gap-2">
-                <span className="mt-0.5 w-4 shrink-0 text-center font-mono text-[10px] text-muted-foreground">
+          <ol className="divide-y divide-border/60 rounded-lg border border-border/60 bg-card">
+            {targets.slice(0, 10).map((t, i) => (
+              <li
+                key={t.name}
+                onClick={() => onPickTarget(t.name)}
+                className="flex cursor-pointer items-center gap-2 px-2.5 py-1.5 transition hover:bg-secondary/40"
+              >
+                <span className="w-4 shrink-0 text-center font-mono text-[10px] text-muted-foreground">
                   {i + 1}
                 </span>
-                <Badge variant="outline" className={`${POS_COLORS[t.position] ?? ""} shrink-0 text-[10px]`}>
+                <Badge variant="outline" className={`${POS_COLORS[t.position] ?? ""} shrink-0 px-1 text-[9px]`}>
                   {t.position}
                 </Badge>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-semibold">{t.name}</p>
-                    <span className="shrink-0 font-mono text-[12px] tabular-nums text-primary">
-                      max ${t.maxBid}
-                    </span>
-                  </div>
-                  <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
-                    {t.reason}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          ))}
+                <p className="min-w-0 flex-1 truncate text-[12px] font-semibold">{t.name}</p>
+                <span className="shrink-0 font-mono text-[12px] tabular-nums text-primary">
+                  ${t.maxBid}
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
       </TabsContent>
 
