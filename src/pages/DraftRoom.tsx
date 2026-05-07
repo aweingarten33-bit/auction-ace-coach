@@ -299,7 +299,7 @@ export default function DraftRoom() {
               prices={prices}
               settings={settings}
               activeName={activeName}
-              onSignOut={signOut}
+              onSignOut={async () => { await signOut(); navigate("/auth"); }}
               onGoToSetup={() => navigate("/setup")}
               onGoToEspn={() => navigate("/espn")}
             />
