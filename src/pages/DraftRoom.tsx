@@ -46,6 +46,7 @@ import {
 } from "@/lib/draft-math";
 import { computeMarketPulse, valueFor as computeValueFor } from "@/lib/value";
 import { decide } from "@/lib/decision-engine";
+import { useAnchorMap } from "@/lib/use-anchor-map";
 import { ApiError, fetchTargets } from "@/lib/api";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
@@ -102,6 +103,10 @@ export default function DraftRoom() {
   useEffect(() => {
     loadSleeperPlayers().then(setSleeper).catch(() => {});
   }, []);
+
+  // Anchor price map: league 3yr avg + ESPN 2026 auction value, used by
+  // decide() so off-sheet players show real numbers instead of the wallet cap.
+  const anchorMap = useAnchorMap();
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       if (!searchWrapRef.current?.contains(e.target as Node)) setSearchOpen(false);
@@ -269,11 +274,12 @@ export default function DraftRoom() {
         player: activeName,
         position: activePosition,
         currentPrice: 0, // pre-bid lookup — show me the ceiling, not "what should I bid against $X"
+        anchorMap,
       });
     } catch {
       return null;
     }
-  }, [activeName, activePosition, settings, keepers, events, prices]);
+  }, [activeName, activePosition, settings, keepers, events, prices, anchorMap]);
 
   // ── Helpers ───────────────────────────────────────────────────────────
   const lockToPlayer = (name: string) => {

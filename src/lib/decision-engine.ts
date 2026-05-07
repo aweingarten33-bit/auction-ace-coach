@@ -38,6 +38,8 @@ export interface PassPath {
   dropoff: "small" | "moderate" | "severe";
 }
 
+export type PriceSource = "sheet" | "league" | "espn" | "none";
+
 export interface DecisionResult {
   hasPlayer: boolean;
   player: string;
@@ -45,6 +47,8 @@ export interface DecisionResult {
   currentPrice: number;
   goUpTo: number;               // YOU CAN GO UP TO
   stopAt: number;               // STOP AT (anything above = bad)
+  anchorPrice: number;          // the per-player anchor we used (0 if none)
+  anchorSource: PriceSource;    // where the anchor came from
   verdict: Verdict;
   oneLiner: string;             // "Too expensive" / "This works" / "Not worth it"
   ladder: PricePoint[];         // 3 price points GOOD/FAIR/STOP
@@ -57,6 +61,11 @@ export interface DecisionResult {
   confidence: "high" | "medium" | "low";
 }
 
+export interface AnchorEntry {
+  price: number;
+  source: "league" | "espn";
+}
+
 interface EngineInput {
   settings: LeagueSettings;
   keepers: Keeper[];
@@ -65,26 +74,41 @@ interface EngineInput {
   player: string;
   position?: Position;
   currentPrice: number;
+  /**
+   * Optional fallback price anchors keyed by normalized player name.
+   * Used when the player isn't on the user's price sheet.
+   * Cascade: sheet (prices) → anchorMap (league avg → ESPN) → cap.
+   */
+  anchorMap?: Record<string, AnchorEntry>;
 }
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 export function decide(input: EngineInput): DecisionResult {
-  const { settings, keepers, events, prices, player, position, currentPrice } = input;
+  const { settings, keepers, events, prices, player, position, currentPrice, anchorMap } = input;
   const budget = computeBudget(settings, keepers, events);
   const pulse = computeMarketPulse(events, prices);
   const mult = pulse.multiplier || 1;
 
-  // Sheet price for this player (going price = sheet * market multiplier)
-  const sheet = prices.find((p) => norm(p.name) === norm(player));
-  const sheetPrice = sheet?.price ?? 0;
-  const goingPrice = sheetPrice > 0 ? Math.max(1, Math.round(sheetPrice * mult)) : 0;
+  // Anchor cascade: sheet → league avg → ESPN → none
+  const key = norm(player);
+  const sheet = prices.find((p) => norm(p.name) === key);
+  let anchorPrice = 0;
+  let anchorSource: PriceSource = "none";
+  if (sheet?.price && sheet.price > 0) {
+    anchorPrice = sheet.price;
+    anchorSource = "sheet";
+  } else if (anchorMap?.[key]) {
+    anchorPrice = anchorMap[key].price;
+    anchorSource = anchorMap[key].source;
+  }
+  const goingPrice = anchorPrice > 0 ? Math.max(1, Math.round(anchorPrice * mult)) : 0;
 
   // YOU CAN GO UP TO: min(market going, your max bid). Cap by leaving $1/slot.
   const cap = Math.max(0, budget.maxBid);
   const goUpTo = goingPrice > 0
     ? Math.min(cap, Math.max(1, goingPrice))
-    : cap; // no sheet info → fall back to your max
+    : cap; // no anchor at all → fall back to your max (last resort)
   // STOP AT: 1 dollar above goUpTo (anything ≥ stopAt is bad)
   const stopAt = goUpTo + 1;
 
@@ -189,7 +213,7 @@ export function decide(input: EngineInput): DecisionResult {
       const goingNext = Math.max(1, Math.round(top.price * mult));
       nextMin = Math.max(1, Math.round(goingNext * 0.85));
       nextMax = Math.round(goingNext * 1.15);
-      const drop = sheetPrice > 0 ? (sheetPrice - top.price) / sheetPrice : 0;
+      const drop = anchorPrice > 0 ? (anchorPrice - top.price) / anchorPrice : 0;
       dropoff = drop >= 0.35 ? "severe" : drop >= 0.18 ? "moderate" : "small";
     }
   }
@@ -257,10 +281,10 @@ export function decide(input: EngineInput): DecisionResult {
     else adjustments.push("Pivot to value tier — no more premium bids");
   }
 
-  // Confidence
+  // Confidence — high if we have a real anchor + confident market, medium if anchor only, low otherwise
   const confidence: DecisionResult["confidence"] =
-    sheetPrice > 0 && pulse.confident ? "high" :
-    sheetPrice > 0 ? "medium" : "low";
+    anchorSource === "sheet" && pulse.confident ? "high" :
+    anchorPrice > 0 ? "medium" : "low";
 
   return {
     hasPlayer: !!player,
@@ -269,6 +293,8 @@ export function decide(input: EngineInput): DecisionResult {
     currentPrice,
     goUpTo,
     stopAt,
+    anchorPrice,
+    anchorSource,
     verdict,
     oneLiner,
     ladder,
