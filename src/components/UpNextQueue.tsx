@@ -204,10 +204,10 @@ export default function UpNextQueue({
                       {t.matchPct}% fit
                     </span>
                     <span
-                      className="rounded border border-border bg-background/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground"
-                      title="Don't bid more than this — your max bid for this player"
+                      className="rounded border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-mono text-primary"
+                      title="Suggested bid — blended from your price sheet, the room's pace, and AI. Already capped by what you can afford."
                     >
-                      Max bid <span className="ml-0.5 font-bold text-foreground">${t.maxBid}</span>
+                      Bid <span className="ml-0.5 font-bold">${t.maxBid}</span>
                     </span>
                   </div>
                 </div>
@@ -282,7 +282,7 @@ export default function UpNextQueue({
                       <p className="text-[9px] text-warning">{wi.budgetDelta}</p>
                     </div>
                     <div>
-                      <p className="text-[9px] uppercase text-muted-foreground">Max bid</p>
+                      <p className="text-[9px] uppercase text-muted-foreground">Bid ceiling</p>
                       <p className="font-bold">${wi.after.maxBid}</p>
                       <p className="text-[9px] text-warning">{wi.maxBidDelta >= 0 ? "+" : ""}{wi.maxBidDelta}</p>
                     </div>
