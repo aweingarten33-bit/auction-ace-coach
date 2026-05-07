@@ -106,41 +106,44 @@ export default function RosterHero({
         ))}
       </div>
 
-      {/* Best next target */}
+      {/* Best next target — clear 3-part layout: TARGET · MAX BID · REASONING */}
       {bestTarget && (
-        <div className="mt-3 flex items-stretch gap-2 rounded-md border border-primary/30 bg-primary/5 p-2.5">
-          <div className="flex h-auto w-9 shrink-0 items-center justify-center rounded bg-primary/10">
-            <Target className="h-4 w-4 text-primary" />
+        <div className="mt-3 rounded-md border border-primary/30 bg-primary/5 p-3">
+          <div className="mb-2 flex items-center gap-1.5">
+            <Target className="h-3.5 w-3.5 text-primary" />
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+              AI Recommendation
+            </span>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Best Next Target
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="truncate text-sm font-semibold text-foreground">
-                {bestTarget.name}
-              </span>
-              <Badge
-                variant="outline"
-                className={`${POS_COLORS[bestTarget.position]} px-1.5 py-0 text-[10px]`}
-              >
-                {bestTarget.position}
-              </Badge>
-              <span className="ml-auto text-sm font-semibold text-primary tabular-nums">
-                ≤ ${bestTarget.maxBid}
-              </span>
+          <div className="grid grid-cols-[1fr_auto] gap-3">
+            <div className="min-w-0">
+              <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Target</p>
+              <div className="mt-0.5 flex items-center gap-1.5">
+                <span className="truncate text-base font-bold text-foreground">{bestTarget.name}</span>
+                <Badge
+                  variant="outline"
+                  className={`${POS_COLORS[bestTarget.position]} px-1.5 py-0 text-[10px]`}
+                >
+                  {bestTarget.position}
+                </Badge>
+              </div>
             </div>
-            <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-              {bestTarget.reason}
-            </p>
+            <div className="text-right">
+              <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Max bid</p>
+              <p className="text-base font-bold text-primary tabular-nums">${bestTarget.maxBid}</p>
+            </div>
+          </div>
+          <div className="mt-2 border-t border-primary/20 pt-2">
+            <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Why</p>
+            <p className="mt-0.5 text-[12px] leading-snug text-foreground/85">{bestTarget.reason}</p>
           </div>
           {onLoadTarget && (
             <Button
               size="sm"
-              className="self-center"
+              className="mt-2 w-full"
               onClick={() => onLoadTarget(bestTarget.name, bestTarget.position)}
             >
-              <Zap className="mr-1 h-3 w-3" /> Load
+              <Zap className="mr-1 h-3 w-3" /> Load into bid form
             </Button>
           )}
         </div>

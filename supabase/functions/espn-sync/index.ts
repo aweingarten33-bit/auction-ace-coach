@@ -81,6 +81,45 @@ Deno.serve(async (req) => {
       })),
     }));
 
+    // Build keepers list for the requesting user's team.
+    // ESPN exposes keeper info two ways:
+    //   1. team.draftStrategy.keeperPlayerIds (just ids)
+    //   2. roster entry's playerPoolEntry.keeperValue / keeperValueFuture (cost)
+    //   3. draftDetail.picks[] with keeper=true and bidAmount (most reliable for $)
+    // We combine them so we get name + position + actual keeper cost.
+    const myTeamId = creds.team_id;
+    const myTeam = (data.teams ?? []).find((t: any) => t.id === myTeamId);
+    const keeperPicks = (data.draftDetail?.picks ?? []).filter(
+      (p: any) => p.keeper === true && p.teamId === myTeamId,
+    );
+    const costByPid = new Map<number, number>();
+    for (const p of keeperPicks) {
+      if (typeof p.playerId === "number" && typeof p.bidAmount === "number") {
+        costByPid.set(p.playerId, p.bidAmount);
+      }
+    }
+    const keepers: { playerId: number; name: string; position: string | null; cost: number }[] = [];
+    if (myTeam) {
+      const keeperIds = new Set<number>([
+        ...((myTeam.draftStrategy?.keeperPlayerIds as number[]) ?? []),
+        ...costByPid.keys(),
+      ]);
+      for (const entry of myTeam.roster?.entries ?? []) {
+        const pid = entry.playerId;
+        const ppe = entry.playerPoolEntry;
+        const kv = ppe?.keeperValue ?? ppe?.keeperValueFuture;
+        const isKeeper = keeperIds.has(pid) || (typeof kv === "number" && kv > 0);
+        if (!isKeeper) continue;
+        const cost = costByPid.get(pid) ?? (typeof kv === "number" ? kv : 0);
+        keepers.push({
+          playerId: pid,
+          name: ppe?.player?.fullName ?? `Player ${pid}`,
+          position: posCode(ppe?.player?.defaultPositionId),
+          cost,
+        });
+      }
+    }
+
     // Infer scoring from receptions stat (statId 53). 1=PPR, 0.5=Half, 0=Standard
     const scoringItems: any[] = settings?.scoringSettings?.scoringItems ?? [];
     const recItem = scoringItems.find((i) => i.statId === 53);
@@ -105,6 +144,7 @@ Deno.serve(async (req) => {
         draftStarted: data.draftDetail?.drafted ?? false,
       },
       teams,
+      keepers,
     });
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : String(e) }, 500);

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useDraftStore } from "@/lib/draft-store";
-import { LeagueType, RosterSlots, Scoring } from "@/lib/draft-types";
+import { Keeper, LeagueType, Position, RosterSlots, Scoring } from "@/lib/draft-types";
 import { toast } from "sonner";
 import { Download, Loader2, CheckCircle2, Link2, ExternalLink } from "lucide-react";
 
@@ -26,6 +26,7 @@ interface Imported {
   leagueType: LeagueType;
   roster: RosterSlots;
   leagueName?: string;
+  keepers: Keeper[];
 }
 
 function mapRoster(slots: Record<string, number>): RosterSlots {
@@ -43,7 +44,7 @@ function mapRoster(slots: Record<string, number>): RosterSlots {
  * shows a confirmation card with the diff, and applies on accept.
  */
 export default function EspnImportButton() {
-  const { setSettings, setRoster } = useDraftStore();
+  const { setSettings, setRoster, setKeepers } = useDraftStore();
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Imported | null>(null);
 
@@ -60,6 +61,15 @@ export default function EspnImportButton() {
       const leagueType: LeagueType =
         roster.SUPERFLEX > 0 ? "Superflex" : roster.QB >= 2 ? "2QB" : "Standard";
 
+      const importedKeepers: Keeper[] = (data.keepers ?? []).map(
+        (k: { name: string; position: string | null; cost: number; playerId: number }) => ({
+          id: `espn-${k.playerId}`,
+          player: k.name,
+          position: (k.position as Position) || undefined,
+          cost: Number(k.cost) || 0,
+        }),
+      );
+
       setPreview({
         budget: lg.budget ?? 200,
         numTeams: lg.size ?? data.teams?.length ?? 12,
@@ -67,6 +77,7 @@ export default function EspnImportButton() {
         leagueType,
         roster,
         leagueName: lg.name,
+        keepers: importedKeepers,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to import");
@@ -86,7 +97,12 @@ export default function EspnImportButton() {
     (Object.keys(preview.roster) as (keyof RosterSlots)[]).forEach((k) =>
       setRoster(k, preview.roster[k])
     );
-    toast.success("League settings imported from ESPN");
+    if (preview.keepers.length) setKeepers(preview.keepers);
+    toast.success(
+      preview.keepers.length
+        ? `League settings + ${preview.keepers.length} keepers imported`
+        : "League settings imported from ESPN",
+    );
     setPreview(null);
   };
 
@@ -123,6 +139,21 @@ export default function EspnImportButton() {
             <Row label="DST" value={String(preview.roster.DST)} />
             <Row label="Bench" value={String(preview.roster.BENCH)} />
           </dl>
+          {preview.keepers.length > 0 && (
+            <div className="mt-2 rounded border border-border/60 bg-secondary/20 p-2">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Keepers ({preview.keepers.length})
+              </p>
+              <ul className="space-y-0.5 text-[11px]">
+                {preview.keepers.map((k) => (
+                  <li key={k.id} className="flex items-center justify-between gap-2">
+                    <span className="truncate">{k.player}{k.position ? ` · ${k.position}` : ""}</span>
+                    <span className="font-mono tabular-nums">${k.cost}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="mt-3 flex gap-2">
             <Button size="sm" onClick={apply} className="flex-1">Confirm & apply</Button>
             <Button size="sm" variant="ghost" onClick={() => setPreview(null)}>Cancel</Button>

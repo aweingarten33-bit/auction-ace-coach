@@ -240,17 +240,22 @@ export default function Draft() {
         .sort((a, b) => b.price - a.price);
       const top = candidates[0];
       if (top) {
-        const v = valueFor(top.name, Math.min(top.price, row.maxBid));
-        const reasonBits: string[] = [];
-        if (row.severity === "critical") reasonBits.push(`Plugs critical ${pos} hole`);
-        else if (row.severity === "need") reasonBits.push(`Fills open ${pos} starter`);
-        else reasonBits.push(`Best ${pos} value left`);
-        if (v?.verdict && v.verdict !== "unknown") reasonBits.push(v.verdict);
-        reasonBits.push(`market $${top.price}`);
+        const cap = Math.min(top.price, row.maxBid);
+        const v = valueFor(top.name, cap);
+        // 1-2 sentence math-grounded reason: gap + dollar math + value verdict.
+        const gapPhrase =
+          row.severity === "critical"
+            ? `Critical ${pos} hole (${row.have}/${row.need} starters).`
+            : row.severity === "need"
+            ? `Open ${pos} starter (${row.have}/${row.need}).`
+            : `Best ${pos} value left.`;
+        const mathPhrase = `Market $${top.price}, your slot cap $${row.maxBid}, max bid $${budget.maxBid}${
+          v?.verdict && v.verdict !== "unknown" ? ` — ${v.verdict}.` : "."
+        }`;
         return {
           name: top.name, position: pos,
-          maxBid: Math.min(row.maxBid, budget.maxBid),
-          reason: reasonBits.join(" · "),
+          maxBid: cap,
+          reason: `${gapPhrase} ${mathPhrase}`,
         };
       }
     }
