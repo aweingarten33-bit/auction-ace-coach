@@ -571,6 +571,11 @@ export default function DraftRoom() {
                   <p className="text-xs text-muted-foreground">
                     No decision available. Make sure setup is complete (budget, roster, prices) and try again.
                   </p>
+                  {decisionError && (
+                    <p className="rounded bg-destructive/10 p-2 text-left font-mono text-[10px] text-destructive">
+                      {decisionError}
+                    </p>
+                  )}
                 </div>
               )}
 
