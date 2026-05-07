@@ -71,7 +71,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
-import SocialTakes from "@/components/SocialTakes";
+import RedditBuzz from "@/components/RedditBuzz";
 import AffordabilityChecker from "@/components/AffordabilityChecker";
 import { PlannerBody } from "@/pages/Planner";
 
@@ -702,7 +702,7 @@ function DrawerContents({
   onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "afford" | "market" | "vetri"
+    "menu" | "lookup" | "afford" | "market" | "reddit"
   >("menu");
 
   void activeName;
@@ -713,7 +713,7 @@ function DrawerContents({
     { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player name or dollar amount." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
-    { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "Player buzz and analyst takes." },
+    { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live r/fantasyfootball threads." },
   ];
 
   return (
@@ -732,7 +732,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section}
+            {section === "menu" ? "Menu" : section === "reddit" ? "Reddit buzz" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
@@ -834,9 +834,9 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "vetri" && (
+      {section === "reddit" && (
         <div className="flex-1 overflow-y-auto p-3">
-          <SocialTakes />
+          <RedditBuzz />
         </div>
       )}
 

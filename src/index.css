@@ -322,16 +322,16 @@
   :root {
     --background: 222 65% 12%;           /* rich navy blue */
     --foreground: 210 30% 95%;
-    --card: 222 60% 16%;                 /* lighter navy panel */
+    --card: 222 50% 7%;                  /* near-black */
     --card-foreground: 210 30% 95%;
-    --popover: 222 60% 14%;
+    --popover: 222 50% 6%;
     --popover-foreground: 210 30% 95%;
     --primary: 45 95% 58%;               /* gold */
     --primary-foreground: 222 65% 8%;
     --primary-glow: 45 100% 65%;
-    --secondary: 222 55% 20%;            /* mid navy */
+    --secondary: 222 45% 9%;             /* dark navy / black */
     --secondary-foreground: 210 30% 95%;
-    --muted: 222 50% 18%;
+    --muted: 222 40% 8%;
     --muted-foreground: 215 25% 72%;
     --accent: 45 95% 58%;                /* gold */
     --accent-foreground: 222 65% 8%;
@@ -341,12 +341,12 @@
     --warning-foreground: 222 65% 8%;
     --success: 150 45% 52%;
     --success-foreground: 0 0% 98%;
-    --border: 222 50% 26%;
-    --input: 222 55% 18%;
+    --border: 222 50% 22%;
+    --input: 222 45% 9%;
     --ring: 45 95% 58%;
-    --grid-line: hsl(222 55% 16%);
-    --grid-line-strong: hsl(222 50% 22%);
-    --gradient-card: linear-gradient(180deg, hsl(222 60% 17%), hsl(222 65% 12%));
+    --grid-line: hsl(222 55% 14%);
+    --grid-line-strong: hsl(222 50% 20%);
+    --gradient-card: linear-gradient(180deg, hsl(222 50% 8%), hsl(222 55% 5%));
     --gradient-primary: linear-gradient(180deg, hsl(45 95% 60%), hsl(42 90% 48%));
     --shadow-card: 0 1px 0 hsl(45 95% 58% / 0.06) inset, 0 8px 28px -16px hsl(222 80% 2% / 0.85);
     --shadow-glow: 0 0 0 1px hsl(45 95% 58% / 0.4);
