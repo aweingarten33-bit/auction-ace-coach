@@ -369,24 +369,30 @@ export default function DraftRoom() {
         {/* Live nomination strip — only when something's actively up for bid */}
         {espnSync.liveBid && (
           <div className="border-t border-border/40 bg-secondary/40 px-4 py-1.5">
-            <p className="mx-auto flex max-w-3xl items-center gap-2 text-[11px]">
-              <span className="font-semibold uppercase tracking-wider text-muted-foreground">
-                On the block:
-              </span>
-              <button
-                type="button"
-                onClick={() => lockToPlayer(espnSync.liveBid!.player)}
-                className="truncate font-medium text-foreground hover:text-primary"
-              >
-                {espnSync.liveBid.player}
-              </button>
-              <span className="ml-auto font-mono tabular-nums text-foreground">
-                ${espnSync.liveBid.price}
-              </span>
-              {espnSync.liveBid.bidder && (
-                <span className="text-muted-foreground">· {espnSync.liveBid.bidder}</span>
-              )}
-            </p>
+            <div className="mx-auto flex max-w-3xl flex-col gap-1">
+              <p className="flex items-center gap-2 text-[11px]">
+                <span className="font-semibold uppercase tracking-wider text-muted-foreground">
+                  On the block:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => lockToPlayer(espnSync.liveBid!.player)}
+                  className="truncate font-medium text-foreground hover:text-primary"
+                >
+                  {espnSync.liveBid.player}
+                </button>
+                <span className="ml-auto font-mono tabular-nums text-foreground">
+                  ${espnSync.liveBid.price}
+                </span>
+                {espnSync.liveBid.bidder && (
+                  <span className="text-muted-foreground">· {espnSync.liveBid.bidder}</span>
+                )}
+              </p>
+              <CounterAnchorDetector
+                player={espnSync.liveBid.player}
+                livePrice={espnSync.liveBid.price}
+              />
+            </div>
           </div>
         )}
       </header>
