@@ -233,34 +233,21 @@ export function PlannerBody() {
   return (
     <>
 
-      {/* Summary bar */}
+      {/* Refresh league action — budget/slots already shown in the top header */}
       <div className="mx-auto max-w-3xl px-3 pt-3">
-        <Card className="flex flex-wrap items-center gap-3 px-3 py-2 text-sm">
-          <div><span className="font-bold">${budget.remaining}</span> <span className="text-muted-foreground">left</span></div>
-          <span className="text-muted-foreground/50">·</span>
-          <div><span className="text-muted-foreground">Max bid</span> <span className="font-bold">${budget.maxBid}</span></div>
-          <span className="text-muted-foreground/50">·</span>
-          <div><span className="font-bold">{budget.slotsLeft}</span> <span className="text-muted-foreground">slots left</span></div>
-          {diff !== 0 && (
-            <>
-              <span className="text-muted-foreground/50">·</span>
-              <span className={`text-[11px] font-semibold ${diff < 0 ? "text-red-500" : "text-amber-500"}`}>
-                {diff > 0 ? `+$${diff} unspent` : `$${Math.abs(diff)} over`}
-              </span>
-            </>
-          )}
+        <div className="flex justify-end">
           <Button
             size="sm"
             variant="outline"
             onClick={refreshFromEspn}
             disabled={refreshing}
-            className="ml-auto h-7 gap-1 text-[11px]"
+            className="h-7 gap-1 text-[11px]"
             title="Re-pull league settings from ESPN"
           >
             <RotateCcw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
             {refreshing ? "Syncing…" : "Refresh league"}
           </Button>
-        </Card>
+        </div>
       </div>
 
       <main className="mx-auto max-w-3xl space-y-4 p-3">
