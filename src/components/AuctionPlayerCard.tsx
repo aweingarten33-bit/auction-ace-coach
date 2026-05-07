@@ -54,11 +54,15 @@ export default function AuctionPlayerCard({ d }: Props) {
 
   const [meta, setMeta] = useState<SleeperMeta>({ team: null, bye: null });
   const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null }>({ stats: null, points: null });
+  const [espnId, setEspnId] = useState<number | null>(null);
+  const [headshotOk, setHeadshotOk] = useState(true);
 
   useEffect(() => {
     let live = true;
     setMeta({ team: null, bye: null });
     setProj({ stats: null, points: null });
+    setEspnId(null);
+    setHeadshotOk(true);
     if (!d.player) return;
     loadSleeperPlayers().then((players) => {
       if (!live) return;
@@ -74,7 +78,7 @@ export default function AuctionPlayerCard({ d }: Props) {
       .replace(/\s+/g, " ").trim();
     supabase
       .from("espn_player_ranks")
-      .select("projected_stats, projected_points, season")
+      .select("projected_stats, projected_points, season, espn_player_id")
       .eq("player_name_norm", norm)
       .order("season", { ascending: false })
       .limit(1)
@@ -85,6 +89,7 @@ export default function AuctionPlayerCard({ d }: Props) {
           stats: (data.projected_stats as ProjStats) ?? null,
           points: data.projected_points ?? null,
         });
+        if (data.espn_player_id) setEspnId(Number(data.espn_player_id));
       });
 
     return () => { live = false; };
