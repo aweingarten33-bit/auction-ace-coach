@@ -198,15 +198,21 @@ export function PlannerBody() {
   const slots = useMemo(() => buildSlots(settings.roster), [settings.roster]);
   const budget = useMemo(() => computeBudget(settings, keepers, events), [settings, keepers, events]);
 
+  // Real league-history-derived bench prices (Backup QB, Handcuff RB, …).
+  const { prices: benchPrices } = useLeagueBenchPrices(
+    settings.numTeams,
+    settings.leagueType !== "Standard" && settings.roster.SUPERFLEX > 0,
+  );
+
   useEffect(() => {
     const known = new Set(Object.keys(slotAllocations));
     const slotIds = new Set(slots.map((s) => s.id));
     const sameSet = known.size === slotIds.size && [...slotIds].every((id) => known.has(id));
-    if (!sameSet) {
-      setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights));
+    if (!sameSet && benchPrices.length > 0) {
+      setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights, benchPrices));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slots.length, settings.totalBudget]);
+  }, [slots.length, settings.totalBudget, benchPrices.length]);
 
   const totalAllocated = useMemo(
     () => slots.reduce((s, sl) => s + (slotAllocations[sl.id] ?? 0), 0),
