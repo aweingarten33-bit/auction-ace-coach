@@ -635,7 +635,6 @@ function DrawerContents({
   >("menu");
 
   const sections = [
-    { id: "plan" as const, label: "Plan", icon: Settings, hint: "Strategy & slot allocations" },
     { id: "lookup" as const, label: "Lookup", icon: Search, hint: "Affordability · what can I get for $X" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
