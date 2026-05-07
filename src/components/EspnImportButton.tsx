@@ -139,6 +139,21 @@ export default function EspnImportButton() {
             <Row label="DST" value={String(preview.roster.DST)} />
             <Row label="Bench" value={String(preview.roster.BENCH)} />
           </dl>
+          {preview.keepers.length > 0 && (
+            <div className="mt-2 rounded border border-border/60 bg-secondary/20 p-2">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Keepers ({preview.keepers.length})
+              </p>
+              <ul className="space-y-0.5 text-[11px]">
+                {preview.keepers.map((k) => (
+                  <li key={k.id} className="flex items-center justify-between gap-2">
+                    <span className="truncate">{k.player}{k.position ? ` · ${k.position}` : ""}</span>
+                    <span className="font-mono tabular-nums">${k.cost}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="mt-3 flex gap-2">
             <Button size="sm" onClick={apply} className="flex-1">Confirm & apply</Button>
             <Button size="sm" variant="ghost" onClick={() => setPreview(null)}>Cancel</Button>
