@@ -406,17 +406,67 @@ export default function DraftRoom() {
             )}
           </div>
 
+        <section ref={searchWrapRef}>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSearchOpen(true);
+                setHighlight(0);
+              }}
+              onFocus={() => setSearchOpen(true)}
+              onKeyDown={(e) => {
+                if (!searchOpen || !suggestions.length) return;
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setHighlight((h) => (h + 1) % suggestions.length);
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setHighlight((h) => (h - 1 + suggestions.length) % suggestions.length);
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  const pick = suggestions[highlight];
+                  if (pick) lockToPlayer(pick.name);
+                } else if (e.key === "Escape") {
+                  setSearchOpen(false);
+                }
+              }}
+              placeholder="Look up a player…"
+              className="h-12 pl-9 pr-9 text-base"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+                aria-label="Clear"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
           {/* Search results dropdown */}
-          {suggestions.length > 0 && (
+          {searchOpen && suggestions.length > 0 && (
             <div className="mt-1.5 overflow-hidden rounded-md border border-border bg-card shadow-lg">
-              {suggestions.map((p) => (
+              {suggestions.map((p, i) => (
                 <button
                   key={p.name}
                   type="button"
+                  onMouseEnter={() => setHighlight(i)}
                   onClick={() => lockToPlayer(p.name)}
-                  className="flex w-full items-center gap-2 border-b border-border/40 px-3 py-2.5 text-left last:border-0 hover:bg-secondary/60"
+                  className={`flex w-full items-center gap-2 border-b border-border/40 px-3 py-2.5 text-left last:border-0 hover:bg-secondary/60 ${
+                    i === highlight ? "bg-secondary/60" : ""
+                  }`}
                 >
                   <span className="flex-1 truncate text-sm">{p.name}</span>
+                  {p.team && (
+                    <span className="text-[10px] text-muted-foreground">{p.team}</span>
+                  )}
                   {p.position && (
                     <Badge
                       variant="outline"
@@ -426,7 +476,7 @@ export default function DraftRoom() {
                     </Badge>
                   )}
                   <span className="w-12 text-right font-mono text-xs tabular-nums text-muted-foreground">
-                    ${p.price}
+                    {p.price != null ? `$${p.price}` : "—"}
                   </span>
                 </button>
               ))}
