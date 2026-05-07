@@ -583,12 +583,8 @@ export default function DraftRoom() {
             targetsLoading={targetsMutation.isPending}
             onRefreshTargets={() => targetsMutation.mutate()}
             onPickTarget={(name) => {
-              lockToPlayer(name);
               setAiOpen(false);
-              // After sheet closes, scroll the decision card into view.
-              setTimeout(() => {
-                document.getElementById("decision-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }, 250);
+              lockToPlayer(name);
             }}
             coachContext={() => ({
               settings: {
