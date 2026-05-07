@@ -50,6 +50,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import DecisionCard from "@/components/DecisionCard";
 import MarketHeat from "@/components/MarketHeat";
