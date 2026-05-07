@@ -85,11 +85,6 @@ export default function AffordabilityChecker() {
             <div className="flex justify-between"><span className="text-muted-foreground">= Money after</span><span className="font-semibold text-foreground">${remainingAfter}</span></div>
             <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Slots left after</span><span>{slotsAfter}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Min to fill them ($1 each)</span><span>${minNeeded}</span></div>
-            <div className="my-1 border-t border-border/60" />
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Spare cash for studs</span>
-              <span className={cushion >= 0 ? "text-emerald-400" : "text-red-400"}>${cushion}</span>
-            </div>
           </div>
         </div>
       )}
