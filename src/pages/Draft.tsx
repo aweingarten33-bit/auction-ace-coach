@@ -116,7 +116,10 @@ export default function Draft() {
   }, [setupComplete, navigate]);
 
   const budget = useMemo(() => computeBudget(settings, keepers, events), [settings, keepers, events]);
-  const { prices: benchPrices } = useLeagueBenchPrices(settings.numTeams);
+  const { prices: benchPrices } = useLeagueBenchPrices(
+    settings.numTeams,
+    settings.leagueType !== "Standard" && settings.roster.SUPERFLEX > 0,
+  );
 
   const myItems = useMemo(
     () => [
