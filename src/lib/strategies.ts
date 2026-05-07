@@ -14,7 +14,8 @@ export type StrategyId =
   | "hero-rb"
   | "zero-rb"
   | "robust-rb"
-  | "modified-zero-rb";
+  | "modified-zero-rb"
+  | "custom";
 
 export interface Strategy {
   id: StrategyId;
