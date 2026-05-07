@@ -567,11 +567,11 @@ function DrawerContents({
   >("menu");
 
   const sections = [
-    { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player to lock the decision card, or a $ amount to see every undrafted player you can afford" },
-    { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Check 1–3 players against your bank" },
-    { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
-    { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
-    { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "Footballers · Berry · Fantasy Focus · ETR" },
+    { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player's name to see if you should bid on him and how high to go. Or type a dollar amount (like 25) to see every player still on the board you could grab for that price." },
+    { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pick up to 3 players you're dreaming about. I'll add up their prices, take it out of your money, and tell you straight up: yes you can pull it off, or no here's why it breaks your team." },
+    { id: "market" as const, label: "Market", icon: TrendingUp, hint: "See what the room is doing right now — who's getting overpaid, who's a steal, and whether a position run is happening so you don't get caught flat-footed." },
+    { id: "opponents" as const, label: "Opponents", icon: Users, hint: "A quick scoreboard of every other team — how much money they've burned, how many roster spots they have left, and who they already own. Spot the desperate teams." },
+    { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "The latest takes from Matthew Berry, ESPN, FantasyPros and CBS — sleepers, busts, who's hot, who's hurt — pulled fresh so you don't have to open 5 tabs." },
   ];
 
   return (
