@@ -103,6 +103,8 @@ export const useDraftStore = create<DraftState>()(
       priceOverrides: [],
       strategyId: "none",
       setStrategyId: (id) => set({ strategyId: id }),
+      customStrategyRules: "",
+      setCustomStrategyRules: (text) => set({ customStrategyRules: text }),
       quickPrompts: DEFAULT_QUICK_PROMPTS,
       setQuickPrompts: (p) => set({ quickPrompts: p }),
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
