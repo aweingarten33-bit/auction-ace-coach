@@ -62,6 +62,7 @@ import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
+import SocialTakes from "@/components/SocialTakes";
 import { PlannerBody } from "@/pages/Planner";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -651,7 +652,7 @@ function DrawerContents({
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Check 1–3 players against your bank" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
-    { id: "vetri" as const, label: "Analyst", icon: MessageSquare, hint: "Vetri's takes" },
+    { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "Footballers · Berry · Fantasy Focus · ETR" },
   ];
 
   return (
@@ -670,7 +671,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "vetri" ? "Analyst" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Player name or $" : section}
+            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Player name or $" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
@@ -785,12 +786,7 @@ function DrawerContents({
 
       {section === "vetri" && (
         <div className="flex-1 overflow-y-auto p-3">
-          <Card className="p-3">
-            <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Recent analyst takes
-            </p>
-            <VetriPlayerSummary />
-          </Card>
+          <SocialTakes />
         </div>
       )}
 

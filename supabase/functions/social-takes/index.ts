@@ -96,7 +96,7 @@ async function fetchBerryLoveHate(): Promise<string | null> {
 
 async function aiBullets(source: string, sourceLabel: string): Promise<string[]> {
   const sys =
-    "You read fantasy football podcast show notes and convert them into ULTRA-SHORT player takes a manager can scan during a live auction draft. Rules: NO prices/dollars. NO episode titles. NO timestamps. NO intros. ONLY player-specific takes. Each bullet under 90 chars. 3-7 bullets total. Format: '<Player Name>: <take>'. Skip the bullet entirely if the source is just promo/news with no player opinion.";
+    "You read fantasy football podcast show notes and convert them into ULTRA-SHORT player takes a manager can scan during a live auction draft. Rules: NO prices/dollars/auction values. NO episode titles. NO timestamps. NO intros. ONLY player-specific takes. Each bullet under 90 chars. 3-8 bullets total. Format: '<Player Name>: <take>'. If the show uses a recurring segment label (like 'Love/Hate', 'Stock Up/Stock Down', 'Buy/Sell', 'Risers/Fallers', 'Studs & Duds') prefix that bullet with the EXACT label from the source in brackets, e.g. '[LOVE] Bucky Irving: workhorse role locked'. Skip bullets that are just promo/news with no player opinion.";
   const user = `Source: ${sourceLabel}\n\n${source.slice(0, 6000)}`;
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
