@@ -128,11 +128,12 @@ export default function AuctionPlayerCard({ d }: Props) {
             <span style={{ fontSize: 9, fontWeight: 900, color: C.orange2, letterSpacing: 1 }}>{LEAGUE_NAME}</span>
             <Star size={9} fill="#fbbf24" color="#fbbf24" />
           </div>
-          <h2 style={{
-            fontSize: 22, fontWeight: 900, lineHeight: 1, letterSpacing: -0.5,
+          <div style={{
+            fontSize: 24, fontWeight: 900, lineHeight: 1, letterSpacing: -0.5,
             color: C.ink, margin: 0, textTransform: "uppercase",
             whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-          }}>{d.player || "PLAYER"}</h2>
+            fontFamily: "Inter, system-ui, sans-serif",
+          }}>{d.player || "PLAYER"}</div>
           <div style={{ fontSize: 9, fontWeight: 800, letterSpacing: 1.5, marginTop: 3 }}>
             <span style={{ color: C.orange }}>{d.position ?? "—"}</span>
             <span style={{ color: C.muted, margin: "0 6px" }}>•</span>
