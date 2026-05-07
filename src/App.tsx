@@ -4,7 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
-import Draft from "./pages/Draft.tsx";
+import DraftRoom from "./pages/DraftRoom.tsx";
+import SetupWizard from "./pages/SetupWizard.tsx";
 import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
@@ -16,7 +17,15 @@ import { LockProvider, useLock } from "@/hooks/useLock";
 
 const queryClient = new QueryClient();
 
-function Protected({ children, allowWhenLocked = false, adminOnly = false }: { children: JSX.Element; allowWhenLocked?: boolean; adminOnly?: boolean }) {
+function Protected({
+  children,
+  allowWhenLocked = false,
+  adminOnly = false,
+}: {
+  children: JSX.Element;
+  allowWhenLocked?: boolean;
+  adminOnly?: boolean;
+}) {
   const { user, loading } = useAuth();
   const { locked, isAdmin, loading: lockLoading } = useLock();
   if (loading || lockLoading) return null;
@@ -45,20 +54,35 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <LockProvider>
+            
             <Routes>
+              {/* Index = router that picks Draft Room or Setup based on setupComplete */}
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
-              <Route path="/draft" element={<Protected><Draft /></Protected>} />
-              <Route path="/draft-v2" element={<Navigate to="/draft" replace />} />
-              <Route path="/draft-os" element={<Navigate to="/draft" replace />} />
+
+              {/* New home page when setup is complete */}
+              <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
+
+              {/* Setup wizard — accessible from drawer */}
+              <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
+
+              {/* Planner kept for now — can be deleted later */}
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
-              <Route path="/espn" element={<Protected adminOnly><EspnSettings /></Protected>} />
+
+              {/* ESPN connection settings */}
+              <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
+
               {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
-              {/* Legacy redirects */}
-              <Route path="/dashboard" element={<Navigate to="/draft" replace />} />
-              <Route path="/m" element={<Navigate to="/draft" replace />} />
-              <Route path="/mobile" element={<Navigate to="/draft" replace />} />
+
+              {/* Legacy redirects — old /draft, /draft-v2 etc all go to the new home */}
+              <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/draft-v2" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/draft-os" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/dashboard" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/m" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/mobile" element={<Navigate to="/draft-room" replace />} />
+
               <Route path="*" element={<NotFound />} />
             </Routes>
           </LockProvider>

@@ -185,14 +185,20 @@ export default function EspnSettings() {
         </Button>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {user?.email}
-          <Button size="sm" variant="ghost" onClick={() => { signOut(); nav("/auth"); }}>Sign out</Button>
         </div>
       </div>
 
       <h1 className="mb-1 text-2xl font-bold">ESPN Connection</h1>
-      <p className="mb-6 text-sm text-muted-foreground">
+      <p className="mb-4 text-sm text-muted-foreground">
         Two paths to live data: paste cookies for league import, install the extension for live draft sync.
       </p>
+
+      <Card className="mb-6 border-warning/40 bg-warning/5 p-4 text-xs">
+        <p className="mb-1 font-semibold text-warning">Heads up — ESPN has no "Sign in with ESPN" API.</p>
+        <p className="text-muted-foreground">
+          The app can't auto-detect you. To connect, you must do one of: <strong>(1)</strong> paste your <code className="rounded bg-secondary px-1">SWID</code> + <code className="rounded bg-secondary px-1">espn_s2</code> cookies in <strong>Path A</strong> below, OR <strong>(2)</strong> install the Chrome extension in <strong>Path B</strong> and paste your token. If you're a league mate of someone who already connected, just enter the League ID in the green box.
+        </p>
+      </Card>
 
       <div className="mb-6">
         <ConnectorStatus />

@@ -85,6 +85,7 @@ export default function Draft() {
   } = useDraftStore();
   const strategy = getStrategy(strategyId);
   const [planGenerating, setPlanGenerating] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
 
   const [playerName, setPlayerName] = useState("");
   const [takesQuery, setTakesQuery] = useState("");
@@ -541,28 +542,42 @@ Keep it tight. No fluff, no closing line.`;
             >
               <Calculator className="h-3.5 w-3.5" /> Planner
             </Button>
-            <AlertDialog>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="More">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
-                    <Download className="mr-2 h-4 w-4" /> Export CSV
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
-                    <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="text-destructive focus:text-destructive">
-                      <RotateCcw className="mr-2 h-4 w-4" /> Reset draft…
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" title="More">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={exportCsv} disabled={!events.length}>
+                  <Download className="mr-2 h-4 w-4" /> Export CSV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/?step=league-basics")}>
+                  <Settings2 className="mr-2 h-4 w-4" /> Setup wizard
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    // Let the dropdown fully close + remove its overlay before opening the dialog,
+                    // otherwise Radix leaves pointer-events:none on body and the screen looks black.
+                    setTimeout(() => setResetOpen(true), 150);
+                  }}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" /> Reset draft…
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <AlertDialog
+              open={resetOpen}
+              onOpenChange={(o) => {
+                setResetOpen(o);
+                if (!o) {
+                  // Belt-and-suspenders: clear any leftover pointer-events lock
+                  setTimeout(() => { document.body.style.pointerEvents = ""; }, 200);
+                }
+              }}
+            >
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Reset draft?</AlertDialogTitle>
@@ -572,7 +587,7 @@ Keep it tight. No fluff, no closing line.`;
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => { resetAll(); navigate("/"); }}>Reset</AlertDialogAction>
+                  <AlertDialogAction onClick={() => { resetAll(); setResetOpen(false); navigate("/"); }}>Reset</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
