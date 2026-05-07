@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import DecisionCard from "@/components/DecisionCard";
+import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import { decide } from "@/lib/decision-engine";
 import { useAnchorMap } from "@/lib/use-anchor-map";
 import { useDraftStore } from "@/lib/draft-store";
@@ -104,7 +104,7 @@ export default function PlayerDecisionOverlay({
           </DialogPrimitive.Title>
 
           {decision ? (
-            <DecisionCard d={decision} />
+            <AuctionPlayerCard d={decision} />
           ) : (
             <div className="space-y-3 rounded-md border border-border bg-secondary/30 p-4">
               <div className="text-center">
