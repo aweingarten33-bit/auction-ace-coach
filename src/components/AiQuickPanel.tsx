@@ -141,7 +141,7 @@ export default function AiQuickPanel({
       </TabsContent>
 
       {/* ── Coach chat tab ────────────────────────────────────────── */}
-      <TabsContent value="coach" className="flex flex-1 flex-col overflow-hidden p-0">
+      <TabsContent value="coach" className="flex min-h-0 flex-1 flex-col overflow-hidden p-0 data-[state=inactive]:hidden">
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3 text-sm">
           {history.length === 0 && !streaming && (
             <div className="flex gap-2">
