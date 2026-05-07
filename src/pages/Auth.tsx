@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Trophy, Gavel, LineChart, Zap } from "lucide-react";
@@ -45,33 +46,21 @@ export default function AuthPage() {
   };
 
   /**
-   * Google OAuth — redirect in the SAME tab.
-   *
-   * Previous code used `lovable.auth.signInWithOAuth` which on mobile Safari
-   * was opening Google in a new tab and force-closing it on return, which
-   * kicked the user out of the app and forced them to dig through tabs to
-   * find their way back.
-   *
-   * `supabase.auth.signInWithOAuth` with `redirectTo` does a full-page
-   * redirect in the same tab — Google login takes over the tab, then
-   * sends the user back to our app. No tab juggling.
-   *
-   * `skipBrowserRedirect: false` (default) is what makes Supabase do the
-   * full-page redirect itself.
+   * Google OAuth via Lovable Cloud managed broker.
+   * Does a full-page redirect in the same tab — no BYO credentials needed.
    */
   const google = async () => {
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/`,
-      },
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/`,
     });
-    if (error) {
-      toast.error(error.message);
+    if (result.error) {
+      toast.error(result.error.message);
       setBusy(false);
+      return;
     }
-    // No setBusy(false) on success — page is about to redirect anyway.
+    if (result.redirected) return;
+    nav("/");
   };
 
   return (
