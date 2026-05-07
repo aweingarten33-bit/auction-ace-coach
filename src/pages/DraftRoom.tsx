@@ -937,6 +937,8 @@ function RecentPicksList({
 function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
   const settings = useDraftStore((s) => s.settings);
   const setSettings = useDraftStore((s) => s.setSettings);
+  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
+  const setCustomStrategyRules = useDraftStore((s) => s.setCustomStrategyRules);
   const strategyId = (settings as any).strategy ?? "balanced";
   const strategy = getStrategy(strategyId);
   const w = (pos: "QB" | "RB" | "WR" | "TE", i = 0) =>
@@ -975,6 +977,24 @@ function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
           ))}
         </div>
       </div>
+
+      {strategyId === "custom" && (
+        <div>
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Your custom rules
+          </p>
+          <textarea
+            value={customStrategyRules}
+            onChange={(e) => setCustomStrategyRules(e.target.value)}
+            placeholder={`Write your draft plan in plain English. Examples:\n• Spend $80 on 2 elite WRs\n• Never pay over $5 for a QB\n• Target a TE in the $8-12 range\n• Save at least $20 for bench dart throws`}
+            rows={8}
+            className="w-full rounded border border-border/60 bg-secondary/20 p-3 text-[12px] leading-relaxed font-mono outline-none focus:border-primary"
+          />
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            The AI coach will follow these rules when judging bids and giving advice.
+          </p>
+        </div>
+      )}
 
       <div>
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
