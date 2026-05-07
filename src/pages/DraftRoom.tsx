@@ -11,7 +11,7 @@
 // Reuses ALL existing engines: computeBudget, computeMarketPulse, valueFor,
 // decide, fetchTargets, useEspnLiveSync. No new backend work needed.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import {
