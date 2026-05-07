@@ -458,7 +458,20 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
-        {/* Search moved to menu → "Find (player or $)" */}
+        {/* FIND (player or $) — promoted to the homepage. This is the only
+            way to open the Decision Card, so it lives here, prominent. */}
+        <section className="rounded-lg border border-primary/40 bg-primary/5 p-3 shadow-sm">
+          <div className="mb-2 flex items-center gap-2">
+            <Search className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Find (player or $)</h2>
+          </div>
+          <LookupSection
+            prices={prices}
+            events={events}
+            maxBid={budget.maxBid}
+            onPick={lockToPlayer}
+          />
+        </section>
         {/* DECISION CARD — popup bubble when a player is locked in.
             Uses Radix primitives DIRECTLY (not the shared <DialogContent>)
             because the shared one hard-codes `top-[50%] translate-y-[-50%]`
@@ -1002,37 +1015,44 @@ function LookupSection({
     () => new Set(events.map((e) => norm(e.player))),
     [events],
   );
-  const target = Number(input.replace(/\D/g, "")) || 0;
+
+  const trimmed = input.trim();
+  const isDollar = /^\$?\d+$/.test(trimmed);
+  const target = isDollar ? Number(trimmed.replace(/\D/g, "")) : 0;
 
   const matches = useMemo(() => {
-    if (target <= 0) return [];
     const pool = prices.filter((p) => !drafted.has(norm(p.name)));
 
-    // Show everyone you can afford at this price: priced ≤ target,
-    // sorted most expensive first (best value for the money).
-    return pool
-      .filter((p) => p.price > 0 && p.price <= target)
-      .sort((a, b) => b.price - a.price)
-      .slice(0, 30);
-  }, [prices, drafted, target]);
+    if (isDollar && target > 0) {
+      return pool
+        .filter((p) => p.price > 0 && p.price <= target)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 30);
+    }
+
+    if (!isDollar && trimmed.length >= 2) {
+      const q = norm(trimmed);
+      return pool
+        .filter((p) => norm(p.name).includes(q))
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 30);
+    }
+
+    return [];
+  }, [prices, drafted, target, trimmed, isDollar]);
 
   return (
     <div className="space-y-3">
       <div className="rounded-md border border-border/50 bg-secondary/20 p-2.5 text-xs text-muted-foreground">
-        Type a <span className="font-semibold text-foreground">dollar amount</span> to see the best undrafted players at or under that price.
+        Type a <span className="font-semibold text-foreground">player name</span> or a <span className="font-semibold text-foreground">dollar amount</span>. Tap a result to open the Decision Card (max bid + math).
       </div>
 
       <div>
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          What can I get for…
-        </p>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">$</span>
           <Input
             value={input}
-            onChange={(e) => setInput(e.target.value.replace(/\D/g, ""))}
-            placeholder="Enter a $ amount"
-            inputMode="numeric"
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="e.g. Bijan Robinson  or  25"
             className="h-9"
             autoComplete="off"
             spellCheck={false}
@@ -1044,15 +1064,17 @@ function LookupSection({
       </div>
 
       <div className="space-y-1">
-        {target <= 0 && (
+        {trimmed.length === 0 && (
           <p className="py-4 text-center text-xs text-muted-foreground">
-            Enter a dollar amount to see undrafted players you can afford.
+            Search a player by name, or enter a $ amount.
           </p>
         )}
 
-        {target > 0 && matches.length === 0 && (
+        {trimmed.length > 0 && matches.length === 0 && (
           <p className="py-4 text-center text-xs text-muted-foreground">
-            No undrafted players priced at or under ${target}.
+            {isDollar
+              ? `No undrafted players priced at or under $${target}.`
+              : "No matches in your price sheet."}
           </p>
         )}
 
