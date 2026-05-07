@@ -936,10 +936,10 @@ function RecentPicksList({
 
 function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
   const settings = useDraftStore((s) => s.settings);
-  const setSettings = useDraftStore((s) => s.setSettings);
   const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
   const setCustomStrategyRules = useDraftStore((s) => s.setCustomStrategyRules);
-  const strategyId = (settings as any).strategy ?? "balanced";
+  const strategyId = useDraftStore((s) => s.strategyId);
+  const setStrategyId = useDraftStore((s) => s.setStrategyId);
   const strategy = getStrategy(strategyId);
   const w = (pos: "QB" | "RB" | "WR" | "TE", i = 0) =>
     strategy.weights?.[pos]?.[i] ?? 1;
