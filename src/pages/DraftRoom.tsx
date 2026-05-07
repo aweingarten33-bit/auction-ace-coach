@@ -352,8 +352,12 @@ export default function DraftRoom() {
   const decisionError = decisionResult.error;
 
   // ── Helpers ───────────────────────────────────────────────────────────
-  const lockToPlayer = (name: string) => {
-    setActiveName(name);
+  const lockToPlayer = (_name: string) => {
+    // Decision Card is temporarily disabled — it's broken and we're
+    // tracking down the root cause. Until then, tapping a player anywhere
+    // (Find, Top 100, Targets, live nomination, watchlist) is a no-op
+    // with a heads-up toast so users know it's intentional.
+    toast.info("Player card is temporarily disabled while we fix it.");
     setQuery("");
   };
 
@@ -780,7 +784,7 @@ function DrawerContents({
   onUnpin,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "search" | "afford" | "market" | "reddit"
+    "menu" | "lookup" | "afford" | "market" | "reddit"
   >("menu");
 
   void activeName;
@@ -789,7 +793,6 @@ function DrawerContents({
 
   const sections = [
     { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player name or dollar amount." },
-    { id: "search" as const, label: "Player search (filters)", icon: ListOrdered, hint: "Position + tier filters, pin to watchlist." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
     { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live r/fantasyfootball threads." },
@@ -891,22 +894,7 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "search" && (
-        <div className="flex-1 overflow-y-auto p-3">
-          <PlayerSearchPanel
-            prices={prices}
-            events={events}
-            watchlist={watchlist}
-            keepers={keepers}
-            onPick={(name) => {
-              onLockPlayer(name);
-              onClose();
-            }}
-            onPin={onPin}
-            onUnpin={onUnpin}
-          />
-        </div>
-      )}
+
 
       {section === "afford" && (
         <div className="flex-1 overflow-y-auto p-3">
