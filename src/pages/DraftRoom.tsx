@@ -430,6 +430,38 @@ export default function DraftRoom() {
               slotsLeft={budget.slotsLeft}
             />
           </div>
+
+          {/* TOP 100 — slide-in from the right (mirrors the hamburger). */}
+          <Sheet open={top100Open} onOpenChange={setTop100Open}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="-mr-2 h-9 w-9"
+                aria-label="Open Top 100"
+              >
+                <ListOrdered className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
+              <SheetHeader className="border-b border-border/60 px-4 py-3">
+                <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <ListOrdered className="h-4 w-4 text-primary" />
+                  Top 100 · math-backed $
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto p-3">
+                <Top100List
+                  prices={prices}
+                  events={events}
+                  onPick={(name) => {
+                    setTop100Open(false);
+                    setTimeout(() => lockToPlayer(name), 220);
+                  }}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
 
         {/* Live nomination strip — only when something's actively up for bid */}
