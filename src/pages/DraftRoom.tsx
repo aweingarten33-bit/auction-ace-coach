@@ -495,7 +495,7 @@ export default function DraftRoom() {
                 Pre-draft card for {activeName || "player"}
               </DialogPrimitive.Title>
 
-              {decision && (
+              {decision ? (
                 <>
                   <div className="mb-2 flex items-center justify-between">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -539,6 +539,13 @@ export default function DraftRoom() {
                     </Card>
                   </div>
                 </>
+              ) : (
+                <div className="space-y-3 rounded-md border border-border bg-secondary/30 p-4 text-center">
+                  <p className="text-base font-semibold">{activeName || "Player"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    No decision available. Make sure setup is complete (budget, roster, prices) and try again.
+                  </p>
+                </div>
               )}
 
               <DialogPrimitive.Close
