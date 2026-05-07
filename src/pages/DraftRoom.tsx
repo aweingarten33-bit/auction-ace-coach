@@ -643,7 +643,7 @@ function DrawerContents({
   onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "plan" | "lookup" | "market" | "opponents" | "vetri" | "recent"
+    "menu" | "plan" | "lookup" | "afford" | "market" | "opponents" | "vetri" | "recent"
   >("menu");
 
   const sections = [
