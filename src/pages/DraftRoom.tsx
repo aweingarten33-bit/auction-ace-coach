@@ -369,12 +369,6 @@ export default function DraftRoom() {
             />
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-full border border-border/60 px-2 py-1">
-            <span className={`h-1.5 w-1.5 rounded-full ${liveColor}`} />
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {liveLabel}
-            </span>
-          </div>
         </div>
 
         {/* Live nomination strip — only when something's actively up for bid */}
