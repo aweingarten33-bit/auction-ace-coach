@@ -213,7 +213,7 @@ export function decide(input: EngineInput): DecisionResult {
       const goingNext = Math.max(1, Math.round(top.price * mult));
       nextMin = Math.max(1, Math.round(goingNext * 0.85));
       nextMax = Math.round(goingNext * 1.15);
-      const drop = sheetPrice > 0 ? (sheetPrice - top.price) / sheetPrice : 0;
+      const drop = anchorPrice > 0 ? (anchorPrice - top.price) / anchorPrice : 0;
       dropoff = drop >= 0.35 ? "severe" : drop >= 0.18 ? "moderate" : "small";
     }
   }
