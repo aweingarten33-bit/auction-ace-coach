@@ -10,27 +10,31 @@ import { toast } from "sonner";
 export default function AuthPage() {
   const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [busy, setBusy] = useState(false);
-  const [sent, setSent] = useState(false);
 
   if (loading) return null;
   if (user) return <Navigate to="/" replace />;
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !password) return;
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin },
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
-      return;
+    if (mode === "signup") {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      setBusy(false);
+      if (error) return toast.error(error.message);
+      toast.success("Account created. You're signed in.");
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      setBusy(false);
+      if (error) return toast.error(error.message);
     }
-    setSent(true);
-    toast.success("Check your email for the login link.");
   };
 
   return (
@@ -40,9 +44,11 @@ export default function AuthPage() {
         className="w-full max-w-sm space-y-4 rounded-lg border border-border bg-card p-6 shadow-sm"
       >
         <div className="space-y-1">
-          <h1 className="text-xl font-semibold text-foreground">Sign in</h1>
+          <h1 className="text-xl font-semibold text-foreground">
+            {mode === "signin" ? "Sign in" : "Create account"}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Enter your email and we'll send you a magic link.
+            Use your email and password.
           </p>
         </div>
         <div className="space-y-2">
@@ -54,12 +60,33 @@ export default function AuthPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            disabled={busy || sent}
+            disabled={busy}
           />
         </div>
-        <Button type="submit" className="w-full" disabled={busy || sent}>
-          {sent ? "Link sent — check your email" : busy ? "Sending…" : "Send magic link"}
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={busy}
+          />
+        </div>
+        <Button type="submit" className="w-full" disabled={busy}>
+          {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
         </Button>
+        <button
+          type="button"
+          className="w-full text-xs text-muted-foreground hover:text-foreground"
+          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+        >
+          {mode === "signin"
+            ? "No account yet? Create one"
+            : "Already have an account? Sign in"}
+        </button>
       </form>
     </div>
   );
