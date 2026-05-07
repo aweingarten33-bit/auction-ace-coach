@@ -834,9 +834,9 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "vetri" && (
+      {section === "reddit" && (
         <div className="flex-1 overflow-y-auto p-3">
-          <SocialTakes />
+          <RedditBuzz />
         </div>
       )}
 
