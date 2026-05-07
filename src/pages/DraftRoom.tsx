@@ -71,7 +71,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
-import SocialTakes from "@/components/SocialTakes";
+import RedditBuzz from "@/components/RedditBuzz";
 import AffordabilityChecker from "@/components/AffordabilityChecker";
 import { PlannerBody } from "@/pages/Planner";
 
