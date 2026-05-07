@@ -61,22 +61,29 @@ async function getBerryLoveHate(): Promise<Source | null> {
 }
 
 async function getEspnFantasyArticle(): Promise<Source | null> {
-  // Look for the most recent player-list style ESPN fantasy football article
-  const results = await firecrawlSearch(
-    "site:espn.com fantasy football sleepers OR busts OR rankings OR \"don't be surprised\" OR \"do not draft\" 2026",
-  );
-  // Prefer URLs with /fantasy/football/ and a story id
-  const hit =
-    results.find((r) => /espn\.com\/fantasy\/football\/story/i.test(r.url ?? "")) ??
-    results[0];
-  if (!hit?.url) return null;
-  const md = await firecrawlScrape(hit.url);
+  // ESPN fantasy football hub — surfaces whatever the latest article is
+  // (rankings/sleepers/busts in pre-season, start-sit in-season).
+  const url = "https://www.espn.com/fantasy/football/";
+  const md = await firecrawlScrape(url);
   if (!md) return null;
   return {
     id: "espn-fantasy",
     name: "ESPN Fantasy Football",
-    title: hit.title ?? "Latest ESPN Fantasy Football article",
-    url: hit.url,
+    title: "Latest from ESPN Fantasy hub",
+    url,
+    markdown: md,
+  };
+}
+
+async function getFantasyPros(): Promise<Source | null> {
+  const url = "https://www.fantasypros.com/nfl/";
+  const md = await firecrawlScrape(url);
+  if (!md) return null;
+  return {
+    id: "fantasypros",
+    name: "FantasyPros",
+    title: "Latest from FantasyPros NFL",
+    url,
     markdown: md,
   };
 }
@@ -100,8 +107,12 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const [berry, espn] = await Promise.all([getBerryLoveHate(), getEspnFantasyArticle()]);
-    const sources = [berry, espn].filter(Boolean) as Source[];
+    const [berry, espn, fp] = await Promise.all([
+      getBerryLoveHate(),
+      getEspnFantasyArticle(),
+      getFantasyPros(),
+    ]);
+    const sources = [berry, espn, fp].filter(Boolean) as Source[];
     const payload = { sources, generatedAt: new Date().toISOString() };
     cache = { at: Date.now(), data: payload };
     return new Response(JSON.stringify(payload), {
