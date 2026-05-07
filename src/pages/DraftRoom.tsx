@@ -69,8 +69,6 @@ import MarketHeat from "@/components/MarketHeat";
 import CounterAnchorDetector from "@/components/CounterAnchorDetector";
 import StealReachCounter from "@/components/StealReachCounter";
 import WalletRace from "@/components/WalletRace";
-import TierCliffHeatmap from "@/components/TierCliffHeatmap";
-import OpponentBidProfiler from "@/components/OpponentBidProfiler";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
@@ -847,9 +845,7 @@ function DrawerContents({
       {section === "market" && (
         <div className="flex-1 space-y-3 overflow-y-auto p-3">
           <StealReachCounter events={events} />
-          <TierCliffHeatmap events={events} />
           <WalletRace totalBudget={settings.totalBudget} numTeams={settings.numTeams} />
-          <OpponentBidProfiler />
           <MarketHeat
             events={events}
             prices={prices}
