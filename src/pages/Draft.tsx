@@ -819,6 +819,7 @@ Keep it tight. No fluff, no closing line.`;
                 prices={prices}
                 events={events}
                 watchlist={watchlist}
+                keepers={keepers}
                 onPick={(name, pos, price) => {
                   setPlayerName(name);
                   if (pos) setPosition(pos);
