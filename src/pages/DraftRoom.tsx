@@ -748,6 +748,10 @@ interface DrawerProps {
   onGoToClassicDraft: () => void;
   onGoToPlanner: () => void;
   onLockPlayer: (name: string) => void;
+  watchlist: string[];
+  keepers: { player: string; cost?: number }[];
+  onPin: (name: string) => void;
+  onUnpin: (name: string) => void;
 }
 
 function DrawerContents({
