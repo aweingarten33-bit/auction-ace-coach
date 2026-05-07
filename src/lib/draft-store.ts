@@ -51,6 +51,8 @@ interface DraftState {
   slotAllocations: Record<string, number>;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
+  // User-written rules text used when strategyId === "custom".
+  customStrategyRules: string;
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
@@ -82,6 +84,7 @@ interface DraftState {
   setSlotAllocations: (a: Record<string, number>) => void;
   clearSlotAllocations: () => void;
   setStrategyId: (id: string) => void;
+  setCustomStrategyRules: (text: string) => void;
 }
 
 export const useDraftStore = create<DraftState>()(
@@ -100,6 +103,8 @@ export const useDraftStore = create<DraftState>()(
       priceOverrides: [],
       strategyId: "none",
       setStrategyId: (id) => set({ strategyId: id }),
+      customStrategyRules: "",
+      setCustomStrategyRules: (text) => set({ customStrategyRules: text }),
       quickPrompts: DEFAULT_QUICK_PROMPTS,
       setQuickPrompts: (p) => set({ quickPrompts: p }),
       resetQuickPrompts: () => set({ quickPrompts: DEFAULT_QUICK_PROMPTS }),
