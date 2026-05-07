@@ -49,6 +49,12 @@ export interface DecisionResult {
   stopAt: number;               // STOP AT (anything above = bad)
   anchorPrice: number;          // the per-player anchor we used (0 if none)
   anchorSource: PriceSource;    // where the anchor came from
+  anchorBreakdown?: {           // transparency: how the anchor was built
+    league?: number;            // your league's weighted history
+    market?: number;            // Sleeper/ESPN consensus
+    espn?: number;              // raw ESPN
+    sleeper?: number;           // raw Sleeper
+  };
   verdict: Verdict;
   oneLiner: string;             // "Too expensive" / "This works" / "Not worth it"
   ladder: PricePoint[];         // 3 price points GOOD/FAIR/STOP
@@ -62,8 +68,11 @@ export interface DecisionResult {
 }
 
 export interface AnchorEntry {
-  price: number;
+  price: number;                  // final blended anchor we use
   source: "league" | "espn";
+  leaguePrice?: number;           // raw weighted league history (if any)
+  marketPrice?: number;           // raw market consensus (Sleeper/ESPN blend)
+  marketSources?: { espn?: number; sleeper?: number };
 }
 
 interface EngineInput {
@@ -299,6 +308,12 @@ export function decide(input: EngineInput): DecisionResult {
     stopAt,
     anchorPrice,
     anchorSource,
+    anchorBreakdown: mapEntry ? {
+      league: mapEntry.leaguePrice,
+      market: mapEntry.marketPrice,
+      espn: mapEntry.marketSources?.espn,
+      sleeper: mapEntry.marketSources?.sleeper,
+    } : undefined,
     verdict,
     oneLiner,
     ladder,

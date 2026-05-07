@@ -137,7 +137,6 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
         // 4) Build the anchor map
         const out: Record<string, AnchorEntry> = {};
-        // a) League history → weighted recency, then BLEND with market consensus.
         for (const [k, v] of leagueAgg) {
           if (v.bySeason.size === 0) continue;
           const leaguePrice = weightedLeague(v.bySeason);
@@ -147,18 +146,22 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             const ratio = mv.val / Math.max(1, leaguePrice);
             const seasonsCount = v.bySeason.size;
             if (ratio >= 1.4) {
-              // Market much higher → ascending player. Lean MARKET (60/40)
-              // because fresh consensus beats stale league history for risers.
               final = leaguePrice * 0.4 + mv.val * 0.6;
             } else if (ratio <= 0.6 && seasonsCount >= 2) {
-              // Market much lower → faded vet. Only trust with 2+ seasons history.
               final = leaguePrice * 0.7 + mv.val * 0.3;
             }
           }
-          out[k] = { price: Math.max(1, Math.round(final)), source: "league" };
+          out[k] = {
+            price: Math.max(1, Math.round(final)),
+            source: "league",
+            leaguePrice: Math.max(1, Math.round(leaguePrice)),
+            marketPrice: mv ? Math.max(1, Math.round(mv.val)) : undefined,
+            marketSources: {
+              espn: espnMap.get(k)?.val,
+              sleeper: sleeperMap.get(k)?.val,
+            },
+          };
         }
-        // b) Market fallback for players with no league history.
-        //    Use consensus value, scaled to league tendencies, with fade for depth.
         const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys()]);
         for (const k of allMarketKeys) {
           if (out[k]) continue;
@@ -168,7 +171,15 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
           const effScale = 1 + (rawScale - 1) * fade;
           const adj = Math.max(1, Math.round(mv.val * effScale));
-          out[k] = { price: adj, source: "espn" };
+          out[k] = {
+            price: adj,
+            source: "espn",
+            marketPrice: Math.max(1, Math.round(mv.val)),
+            marketSources: {
+              espn: espnMap.get(k)?.val,
+              sleeper: sleeperMap.get(k)?.val,
+            },
+          };
         }
 
 
