@@ -65,7 +65,7 @@ import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 import ValueVerdict from "@/components/ValueVerdict";
 import TierBreakAlerts from "@/components/TierBreakAlerts";
-import DecisionCard from "@/components/DecisionCard";
+import DecisionCard from "@/components/AuctionPlayerCard";
 import NominationCard from "@/components/NominationCard";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import VetriVideoList from "@/components/VetriVideoList";
