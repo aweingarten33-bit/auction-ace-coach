@@ -91,7 +91,14 @@ async function fetchBerryLoveHate(): Promise<string | null> {
 
 async function aiBullets(source: string, sourceLabel: string): Promise<string[]> {
   const sys =
-    "You read fantasy football podcast show notes and convert them into ULTRA-SHORT player takes a manager can scan during a live auction draft. Rules: NO prices/dollars/auction values. NO episode titles. NO timestamps. NO intros. ONLY player-specific takes. Each bullet under 90 chars. 3-8 bullets total. Format: '<Player Name>: <take>'. If the show uses a recurring segment label (like 'Love/Hate', 'Stock Up/Stock Down', 'Buy/Sell', 'Risers/Fallers', 'Studs & Duds') prefix that bullet with the EXACT label from the source in brackets, e.g. '[LOVE] Bucky Irving: workhorse role locked'. Skip bullets that are just promo/news with no player opinion.";
+    "You extract player takes from fantasy football podcast show notes. STRICT RULES:\n" +
+    "1. ONLY use information EXPLICITLY present in the provided source text. DO NOT add facts, context, history, draft year, team changes, injury status, coaching changes, or ANY detail not literally written in the source.\n" +
+    "2. DO NOT infer or guess. If show notes only list a player name with no opinion, SKIP that player.\n" +
+    "3. NO prices, dollars, or auction values. NO episode titles, timestamps, or intros.\n" +
+    "4. Each bullet under 90 chars. Return 3-8 bullets total — fewer is fine if source is thin.\n" +
+    "5. Format: '<Player Name>: <take paraphrased from source>'.\n" +
+    "6. If the source uses a recurring label (Love/Hate, Buy/Sell, Stock Up/Down, Risers/Fallers, Studs/Duds, Overreaction), prefix with the EXACT label in brackets: '[LOVE] Player: take'.\n" +
+    "7. If the source contains no concrete player takes (just episode promo/topics), return an empty bullets array.";
   const user = `Source: ${sourceLabel}\n\n${source.slice(0, 6000)}`;
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
