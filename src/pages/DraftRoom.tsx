@@ -356,6 +356,12 @@ export default function DraftRoom() {
     if (!name) return;
     setActiveName(name);
     setQuery("");
+    // Inline card — scroll it into view so the user sees it immediately.
+    setTimeout(() => {
+      document
+        .getElementById("decision-card-inline")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   };
 
   const isPinned = (name: string) => watchlist.includes(name);
