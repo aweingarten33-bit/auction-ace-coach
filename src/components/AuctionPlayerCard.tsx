@@ -171,6 +171,62 @@ export default function AuctionPlayerCard({ d }: Props) {
           </div>
         </div>
 
+        {/* PLAYER PHOTO — ESPN headshot over team-logo backdrop */}
+        <div style={{
+          position: "relative", marginTop: 8,
+          height: 150, borderRadius: 4, overflow: "hidden",
+          border: `1px solid ${C.rule}`,
+          background: `linear-gradient(135deg, ${C.paper} 0%, ${C.edge} 100%)`,
+        }}>
+          {meta.team && (
+            <img
+              src={`https://a.espncdn.com/i/teamlogos/nfl/500/${meta.team.toLowerCase()}.png`}
+              alt=""
+              style={{
+                position: "absolute", inset: 0, margin: "auto",
+                width: "85%", height: "85%", objectFit: "contain",
+                opacity: 0.18,
+              }}
+              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            />
+          )}
+          {espnId && headshotOk ? (
+            <img
+              src={`https://a.espncdn.com/i/headshots/nfl/players/full/${espnId}.png`}
+              alt={d.player ?? ""}
+              style={{
+                position: "absolute", bottom: 0, left: "50%",
+                transform: "translateX(-50%)",
+                height: "100%", objectFit: "contain",
+              }}
+              onError={() => setHeadshotOk(false)}
+            />
+          ) : (
+            <div style={{
+              position: "absolute", inset: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontFamily: "Impact, sans-serif", fontSize: 48, color: C.navy, opacity: 0.35,
+              letterSpacing: 2,
+            }}>
+              {(d.player ?? "?").split(" ").map((p) => p.charAt(0)).join("").slice(0,3).toUpperCase()}
+            </div>
+          )}
+          <div style={{
+            position: "absolute", top: 6, left: 6,
+            background: C.navy, color: "#fbbf24",
+            fontFamily: "Impact, sans-serif", fontSize: 11, letterSpacing: 1.5,
+            padding: "2px 6px", borderRadius: 3, border: `1px solid ${C.orange}`,
+          }}>{d.position ?? "—"}</div>
+          {meta.team && (
+            <div style={{
+              position: "absolute", top: 6, right: 6,
+              background: "#fff", color: C.navy,
+              fontFamily: "Impact, sans-serif", fontSize: 11, letterSpacing: 1.5,
+              padding: "2px 6px", borderRadius: 3, border: `1px solid ${C.navy}`,
+            }}>{meta.team}</div>
+          )}
+        </div>
+
         {/* SUB-HEADER: AI VERDICT */}
         <div style={{
           display: "grid", gridTemplateColumns: "1fr auto 1fr",
