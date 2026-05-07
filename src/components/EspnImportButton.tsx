@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useDraftStore } from "@/lib/draft-store";
-import { LeagueType, RosterSlots, Scoring } from "@/lib/draft-types";
+import { Keeper, LeagueType, Position, RosterSlots, Scoring } from "@/lib/draft-types";
 import { toast } from "sonner";
 import { Download, Loader2, CheckCircle2, Link2, ExternalLink } from "lucide-react";
 
