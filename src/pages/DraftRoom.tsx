@@ -894,22 +894,7 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "search" && (
-        <div className="flex-1 overflow-y-auto p-3">
-          <PlayerSearchPanel
-            prices={prices}
-            events={events}
-            watchlist={watchlist}
-            keepers={keepers}
-            onPick={(name) => {
-              onLockPlayer(name);
-              onClose();
-            }}
-            onPin={onPin}
-            onUnpin={onUnpin}
-          />
-        </div>
-      )}
+
 
       {section === "afford" && (
         <div className="flex-1 overflow-y-auto p-3">
