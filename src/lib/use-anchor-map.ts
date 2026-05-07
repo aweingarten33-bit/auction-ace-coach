@@ -27,7 +27,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
     let cancelled = false;
     (async () => {
       try {
-        const [hist, espn] = await Promise.all([
+        const [hist, espn, sleeper] = await Promise.all([
           supabase
             .from("league_auction_history")
             .select("player_name, position, bid_amount, season")
@@ -35,6 +35,10 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           supabase
             .from("espn_player_ranks")
             .select("player_name_norm, position, auction_value")
+            .then((r) => r.data ?? []),
+          supabase
+            .from("sleeper_players")
+            .select("player_name_norm, position, projected_auction_value, depth_chart_order, search_rank")
             .then((r) => r.data ?? []),
         ]);
         if (cancelled) return;
@@ -45,13 +49,11 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           if (!row.player_name || row.bid_amount == null || row.season == null) continue;
           const k = norm(row.player_name);
           const cur = leagueAgg.get(k) ?? { bySeason: new Map<number, number>(), pos: row.position };
-          // Same player rows can repeat per season (snapshots) — last write wins on amount.
           cur.bySeason.set(Number(row.season), Number(row.bid_amount));
           if (!cur.pos && row.position) cur.pos = row.position;
           leagueAgg.set(k, cur);
         }
 
-        // Weighted recency average (last=0.5, prev=0.3, older avg=0.2)
         const weightedLeague = (bySeason: Map<number, number>): number => {
           const seasons = Array.from(bySeason.entries()).sort((a, b) => b[0] - a[0]);
           if (seasons.length === 0) return 0;
@@ -72,70 +74,103 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           if (v > 0) espnMap.set(k, { val: v, pos: row.position });
         }
 
-        // 3) Per-position scaling for league-history-free players (rookies / depth)
-        const scaleAgg = new Map<string, { sumLeague: number; sumEspn: number; n: number }>();
-        for (const [k, lv] of leagueAgg) {
+        // 2b) Sleeper map — independent free market signal that's typically more
+        //     up-to-date than ESPN for ascending players (rookies stepping into
+        //     starting roles, depth-chart movers). depth_chart_order=1 = starter.
+        const sleeperMap = new Map<string, { val: number; pos: string | null; isStarter: boolean }>();
+        for (const row of sleeper as Array<{ player_name_norm: string | null; position: string | null; projected_auction_value: number | null; depth_chart_order: number | null }>) {
+          if (!row.player_name_norm || row.projected_auction_value == null) continue;
+          const k = norm(row.player_name_norm);
+          const v = Number(row.projected_auction_value);
+          if (v > 0) sleeperMap.set(k, {
+            val: v,
+            pos: row.position,
+            isStarter: row.depth_chart_order != null && Number(row.depth_chart_order) <= 1,
+          });
+        }
+
+        // Market consensus = blend of ESPN and Sleeper. When they agree, high
+        // confidence. When they disagree wildly, take the higher one IF the
+        // player is a confirmed starter (catches ascending players ESPN lags on).
+        const marketConsensus = (k: string): { val: number; pos: string | null } | null => {
           const ev = espnMap.get(k);
-          if (!ev) continue;
-          const pos = ev.pos || lv.pos;
+          const sv = sleeperMap.get(k);
+          if (!ev && !sv) return null;
+          if (ev && !sv) return { val: ev.val, pos: ev.pos };
+          if (sv && !ev) return { val: sv.val, pos: sv.pos };
+          // both present
+          const eVal = ev!.val;
+          const sVal = sv!.val;
+          const pos = ev!.pos || sv!.pos;
+          const ratio = Math.max(eVal, sVal) / Math.max(1, Math.min(eVal, sVal));
+          if (ratio <= 1.5) {
+            // close enough → average
+            return { val: (eVal + sVal) / 2, pos };
+          }
+          // disagreement: if the higher source is Sleeper AND player is a starter,
+          // trust Sleeper (ESPN is lagging on an ascending player).
+          if (sVal > eVal && sv!.isStarter) return { val: sVal, pos };
+          // otherwise meet in the middle, leaning toward the lower (more conservative)
+          return { val: Math.min(eVal, sVal) * 0.4 + Math.max(eVal, sVal) * 0.6, pos };
+        };
+
+        // 3) Per-position scaling — uses market consensus instead of just ESPN
+        const scaleAgg = new Map<string, { sumLeague: number; sumMarket: number; n: number }>();
+        for (const [k, lv] of leagueAgg) {
+          const mv = marketConsensus(k);
+          if (!mv) continue;
+          const pos = mv.pos || lv.pos;
           if (!pos) continue;
-          const cur = scaleAgg.get(pos) ?? { sumLeague: 0, sumEspn: 0, n: 0 };
+          const cur = scaleAgg.get(pos) ?? { sumLeague: 0, sumMarket: 0, n: 0 };
           cur.sumLeague += weightedLeague(lv.bySeason);
-          cur.sumEspn += ev.val;
+          cur.sumMarket += mv.val;
           cur.n += 1;
           scaleAgg.set(pos, cur);
         }
         const scales: PosScale = {};
         for (const [pos, agg] of scaleAgg) {
-          if (agg.n < MIN_SAMPLE || agg.sumEspn <= 0) continue;
-          const raw = agg.sumLeague / agg.sumEspn;
+          if (agg.n < MIN_SAMPLE || agg.sumMarket <= 0) continue;
+          const raw = agg.sumLeague / agg.sumMarket;
           scales[pos] = Math.min(SCALE_MAX, Math.max(SCALE_MIN, raw));
         }
-        console.info("[useAnchorMap] league→ESPN position scaling", scales);
+        console.info("[useAnchorMap] league→market position scaling", scales);
 
         // 4) Build the anchor map
         const out: Record<string, AnchorEntry> = {};
-        // a) League history → weighted recency, then BLEND with ESPN when they disagree.
-        //    Catches breakouts (league has historically underpaid → ESPN spike) and
-        //    fades (league overpays loyalty → ESPN tanks).
+        // a) League history → weighted recency, then BLEND with market consensus.
         for (const [k, v] of leagueAgg) {
           if (v.bySeason.size === 0) continue;
           const leaguePrice = weightedLeague(v.bySeason);
-          const ev = espnMap.get(k);
+          const mv = marketConsensus(k);
           let final = leaguePrice;
-          if (ev && ev.val > 0) {
-            const ratio = ev.val / Math.max(1, leaguePrice);
+          if (mv && mv.val > 0) {
+            const ratio = mv.val / Math.max(1, leaguePrice);
             const seasonsCount = v.bySeason.size;
             if (ratio >= 1.4) {
-              // ESPN much higher → market sees breakout. Meet in the middle.
-              final = (leaguePrice + ev.val) / 2;
+              // Market much higher → ascending player. Lean MARKET (60/40)
+              // because fresh consensus beats stale league history for risers.
+              final = leaguePrice * 0.4 + mv.val * 0.6;
             } else if (ratio <= 0.6 && seasonsCount >= 2) {
-              // ESPN much lower → market faded. Only trust this if league
-              // has 2+ seasons of sustained price (otherwise it's likely
-              // a 2nd-year ascending player ESPN hasn't caught up to —
-              // e.g. last year's rookie now stepping into a starter role).
-              final = leaguePrice * 0.7 + ev.val * 0.3;
+              // Market much lower → faded vet. Only trust with 2+ seasons history.
+              final = leaguePrice * 0.7 + mv.val * 0.3;
             }
           }
           out[k] = { price: Math.max(1, Math.round(final)), source: "league" };
         }
-        // b) ESPN fallback — SCALED for league-history-free players,
-        //    but ONLY for players ESPN already values as starters.
-        //    Rationale: the per-position scaler is computed from starters
-        //    (the only players who appear in BOTH league history and ESPN),
-        //    so applying it to $1-$8 depth/rookies borrows starter inflation
-        //    they don't deserve. A rookie QB ESPN values at $8 in superflex
-        //    is depth — not a Josh Allen discount.
-        for (const [k, ev] of espnMap) {
+        // b) Market fallback for players with no league history.
+        //    Use consensus value, scaled to league tendencies, with fade for depth.
+        const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys()]);
+        for (const k of allMarketKeys) {
           if (out[k]) continue;
-          const rawScale = (ev.pos && scales[ev.pos]) || 1;
-          // Fade scaling smoothly for low-ESPN players. ≤$8 = no scaling,
-          // ≥$20 = full scaling, linear in between.
-          const fade = Math.max(0, Math.min(1, (ev.val - 8) / 12));
+          const mv = marketConsensus(k);
+          if (!mv) continue;
+          const rawScale = (mv.pos && scales[mv.pos]) || 1;
+          const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
           const effScale = 1 + (rawScale - 1) * fade;
-          const adj = Math.max(1, Math.round(ev.val * effScale));
+          const adj = Math.max(1, Math.round(mv.val * effScale));
           out[k] = { price: adj, source: "espn" };
         }
+
 
 
         setMap(out);
