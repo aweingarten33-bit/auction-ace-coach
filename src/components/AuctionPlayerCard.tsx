@@ -5,9 +5,15 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import type { DecisionResult } from "@/lib/decision-engine";
 import { computeCardInsights } from "@/lib/card-insights";
 import { useDraftStore } from "@/lib/draft-store";
+import { supabase } from "@/integrations/supabase/client";
 import {
   byeWeekForTeam, findPlayerByName, loadSleeperPlayers,
 } from "@/lib/sleeper";
+
+type ProjStats = Partial<Record<
+  "passYds"|"passTD"|"int"|"rushAtt"|"rushYds"|"rushTD"|"rec"|"recYds"|"recTD"|"targets"|"games",
+  number
+>>;
 
 const LEAGUE_NAME = "BRO WE'RE SENIOR CITIZENS";
 
