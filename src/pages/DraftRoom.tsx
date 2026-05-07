@@ -304,6 +304,7 @@ export default function DraftRoom() {
               onSignOut={async () => { await signOut(); navigate("/auth"); }}
               onGoToSetup={() => navigate("/setup")}
               onGoToEspn={() => navigate("/espn")}
+              onLockPlayer={lockToPlayer}
             />
           </Sheet>
 
