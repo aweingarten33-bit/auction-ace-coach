@@ -86,6 +86,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeName, setActiveName] = useState(""); // currently-shown player in the decision card
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
@@ -486,7 +487,7 @@ export default function DraftRoom() {
 
         {/* DECISION CARD — when a player is locked in */}
         {decision && (
-          <section>
+          <section id="decision-card" className="scroll-mt-24">
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Decision
@@ -563,7 +564,7 @@ export default function DraftRoom() {
       </main>
 
       {/* Floating AI tools — chat-bubble FAB. Targets + Coach AI live here. */}
-      <Sheet>
+      <Sheet open={aiOpen} onOpenChange={setAiOpen}>
         <SheetTrigger asChild>
           <button
             type="button"
@@ -590,7 +591,14 @@ export default function DraftRoom() {
             targets={targets}
             targetsLoading={targetsMutation.isPending}
             onRefreshTargets={() => targetsMutation.mutate()}
-            onPickTarget={(name) => lockToPlayer(name)}
+            onPickTarget={(name) => {
+              lockToPlayer(name);
+              setAiOpen(false);
+              // After sheet closes, scroll the decision card into view.
+              setTimeout(() => {
+                document.getElementById("decision-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }, 250);
+            }}
             coachContext={() => ({
               settings: {
                 totalBudget: settings.totalBudget, numTeams: settings.numTeams,
