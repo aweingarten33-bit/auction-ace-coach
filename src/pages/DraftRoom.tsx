@@ -226,16 +226,28 @@ export default function DraftRoom() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events.length, setupComplete]);
 
-  // ── Search → suggestions ──────────────────────────────────────────────
+  // ── Search → suggestions (Sleeper full NFL DB + price overlay) ───────
   const draftedSet = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
+  const priceByName = useMemo(() => {
+    const m = new Map<string, PriceEstimate>();
+    for (const p of prices) m.set(norm(p.name), p);
+    return m;
+  }, [prices]);
   const suggestions = useMemo(() => {
-    const q = norm(query);
-    if (!q) return [];
-    return prices
-      .filter((p) => norm(p.name).includes(q) && !draftedSet.has(norm(p.name)))
-      .sort((a, b) => (b.price || 0) - (a.price || 0))
-      .slice(0, 6);
-  }, [query, prices, draftedSet]);
+    if (query.trim().length < 2) return [];
+    const hits = searchPlayers(sleeper, query, 8).filter(
+      (p) => !draftedSet.has(norm(p.full_name)),
+    );
+    return hits.map((p) => {
+      const price = priceByName.get(norm(p.full_name));
+      return {
+        name: p.full_name,
+        position: (price?.position ?? p.position) as Position | undefined,
+        team: p.team ?? null,
+        price: price?.price ?? null,
+      };
+    });
+  }, [query, sleeper, draftedSet, priceByName]);
 
   // ── Decision card for active name ─────────────────────────────────────
   const activePrice = useMemo(
