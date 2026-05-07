@@ -1031,43 +1031,38 @@ function LookupSection({
   maxBid: number;
   onPick: (name: string) => void;
 }) {
-  const [input, setInput] = useState(String(Math.max(1, Math.floor(maxBid / 2))));
+  const [input, setInput] = useState("");
   const drafted = useMemo(
     () => new Set(events.map((e) => norm(e.player))),
     [events],
   );
 
-  const trimmed = input.trim();
-  const isNameMode = /[a-zA-Z]/.test(trimmed);
-  const target = Number(trimmed.replace(/\D/g, "")) || 0;
+  const target = Number(input.replace(/\D/g, "")) || 0;
 
   const matches = useMemo(() => {
+    if (target <= 0) return [];
     const pool = prices.filter((p) => !drafted.has(norm(p.name)));
-    if (isNameMode) {
-      const q = norm(trimmed);
-      return pool
-        .filter((p) => norm(p.name).includes(q))
-        .sort((a, b) => b.price - a.price)
-        .slice(0, 20);
-    }
+    // Show everyone you can afford at this price: priced ≤ target,
+    // sorted most expensive first (best value for the money).
     return pool
-      .filter((p) => p.price <= target && p.price >= Math.max(1, target - 5))
+      .filter((p) => p.price > 0 && p.price <= target)
       .sort((a, b) => b.price - a.price)
-      .slice(0, 12);
-  }, [prices, drafted, target, isNameMode, trimmed]);
+      .slice(0, 30);
+  }, [prices, drafted, target]);
 
   return (
     <div className="space-y-3">
       <div>
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          {isNameMode ? "Player search" : "What can I get for…"}
+          What can I get for…
         </p>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">{isNameMode ? "🔎" : "$"}</span>
+          <span className="text-sm text-muted-foreground">$</span>
           <Input
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a name or a $ amount"
+            onChange={(e) => setInput(e.target.value.replace(/\D/g, ""))}
+            placeholder="Enter a $ amount"
+            inputMode="numeric"
             className="h-9"
             autoComplete="off"
             spellCheck={false}
@@ -1079,11 +1074,14 @@ function LookupSection({
       </div>
 
       <div className="space-y-1">
-        {matches.length === 0 && (
+        {target <= 0 && (
           <p className="py-4 text-center text-xs text-muted-foreground">
-            {isNameMode
-              ? `No undrafted players matching "${trimmed}".`
-              : `No undrafted players around $${target}.`}
+            Enter a dollar amount to see undrafted players you can afford.
+          </p>
+        )}
+        {target > 0 && matches.length === 0 && (
+          <p className="py-4 text-center text-xs text-muted-foreground">
+            No undrafted players priced at or under ${target}.
           </p>
         )}
         {matches.map((p) => (
