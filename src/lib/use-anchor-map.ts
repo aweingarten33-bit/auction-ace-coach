@@ -1,15 +1,28 @@
-// Shared anchor-price map: league 3yr auction average + ESPN 2026 auction value.
-// Consumed by decide() so when a player is NOT on the user's price sheet,
-// we still show a real per-player anchor instead of falling back to the
-// user's wallet cap (which made every off-sheet player look like $213).
+// Shared anchor-price map.
+// Cascade priority (per decision-engine): league 3yr avg → sheet (Vetri) → ESPN → none.
+//
+// CRITICAL: For players with NO league history (rookies, never-drafted), the raw ESPN
+// auction value is generic — not tuned to your league's tendencies (Superflex, scoring,
+// roster size, who pays up for what). We compute a per-position SCALE FACTOR from the
+// overlap of players who appear in BOTH your league history AND ESPN, then apply it to
+// every league-history-free ESPN price. Result: even rookies are league-adjusted.
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "./decision-engine";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-export function useAnchorMap(): Record<string, AnchorEntry> {
+// Sane bounds — even with thin samples we never let the scaler go wild.
+const SCALE_MIN = 0.4;
+const SCALE_MAX = 5.0;
+const MIN_SAMPLE = 5; // need ≥5 overlap players for a position to trust the scaler
+
+export type PosScale = Record<string, number>; // position -> multiplier
+
+export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: PosScale } {
   const [map, setMap] = useState<Record<string, AnchorEntry>>({});
+  const [posScale, setPosScale] = useState<PosScale>({});
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -17,46 +30,80 @@ export function useAnchorMap(): Record<string, AnchorEntry> {
         const [hist, espn] = await Promise.all([
           supabase
             .from("league_auction_history")
-            .select("player_name, bid_amount")
+            .select("player_name, position, bid_amount")
             .then((r) => r.data ?? []),
           supabase
             .from("espn_player_ranks")
-            .select("player_name_norm, auction_value")
+            .select("player_name_norm, position, auction_value")
             .then((r) => r.data ?? []),
         ]);
         if (cancelled) return;
 
-        const out: Record<string, AnchorEntry> = {};
-
-        // 1) League 3yr average — highest priority fallback after the sheet
-        const agg = new Map<string, { sum: number; n: number }>();
-        for (const row of hist as Array<{ player_name: string | null; bid_amount: number | null }>) {
+        // 1) League 3yr average per player
+        const leagueAgg = new Map<string, { sum: number; n: number; pos: string | null }>();
+        for (const row of hist as Array<{ player_name: string | null; position: string | null; bid_amount: number | null }>) {
           if (!row.player_name || row.bid_amount == null) continue;
           const k = norm(row.player_name);
-          const cur = agg.get(k) ?? { sum: 0, n: 0 };
+          const cur = leagueAgg.get(k) ?? { sum: 0, n: 0, pos: row.position };
           cur.sum += Number(row.bid_amount);
           cur.n += 1;
-          agg.set(k, cur);
-        }
-        for (const [k, v] of agg) {
-          if (v.n > 0) out[k] = { price: Math.max(1, Math.round(v.sum / v.n)), source: "league" };
+          if (!cur.pos && row.position) cur.pos = row.position;
+          leagueAgg.set(k, cur);
         }
 
-        // 2) ESPN as second-tier fallback (only if no league data)
-        for (const row of espn as Array<{ player_name_norm: string | null; auction_value: number | null }>) {
+        // 2) ESPN map
+        const espnMap = new Map<string, { val: number; pos: string | null }>();
+        for (const row of espn as Array<{ player_name_norm: string | null; position: string | null; auction_value: number | null }>) {
           if (!row.player_name_norm || row.auction_value == null) continue;
           const k = norm(row.player_name_norm);
-          if (!out[k] && Number(row.auction_value) > 0) {
-            out[k] = { price: Math.max(1, Math.round(Number(row.auction_value))), source: "espn" };
-          }
+          const v = Number(row.auction_value);
+          if (v > 0) espnMap.set(k, { val: v, pos: row.position });
+        }
+
+        // 3) Compute per-position scaling from overlap (league$ / ESPN$)
+        const scaleAgg = new Map<string, { sumLeague: number; sumEspn: number; n: number }>();
+        for (const [k, lv] of leagueAgg) {
+          const ev = espnMap.get(k);
+          if (!ev) continue;
+          const pos = ev.pos || lv.pos;
+          if (!pos) continue;
+          const leagueAvg = lv.sum / lv.n;
+          const cur = scaleAgg.get(pos) ?? { sumLeague: 0, sumEspn: 0, n: 0 };
+          cur.sumLeague += leagueAvg;
+          cur.sumEspn += ev.val;
+          cur.n += 1;
+          scaleAgg.set(pos, cur);
+        }
+        const scales: PosScale = {};
+        for (const [pos, agg] of scaleAgg) {
+          if (agg.n < MIN_SAMPLE || agg.sumEspn <= 0) continue;
+          const raw = agg.sumLeague / agg.sumEspn;
+          scales[pos] = Math.min(SCALE_MAX, Math.max(SCALE_MIN, raw));
+        }
+        console.info("[useAnchorMap] league→ESPN position scaling", scales);
+
+        // 4) Build the anchor map
+        const out: Record<string, AnchorEntry> = {};
+        // a) League history wins (already actual league $)
+        for (const [k, v] of leagueAgg) {
+          if (v.n > 0) out[k] = { price: Math.max(1, Math.round(v.sum / v.n)), source: "league" };
+        }
+        // b) ESPN fallback — SCALED by position factor so rookies/depth get league-tuned $
+        for (const [k, ev] of espnMap) {
+          if (out[k]) continue;
+          const scale = (ev.pos && scales[ev.pos]) || 1;
+          const adj = Math.max(1, Math.round(ev.val * scale));
+          out[k] = { price: adj, source: "espn" };
         }
 
         setMap(out);
+        setPosScale(scales);
       } catch (e) {
         console.warn("[useAnchorMap] load failed", e);
       }
     })();
     return () => { cancelled = true; };
   }, []);
-  return map;
+
+  return { map, posScale };
 }
