@@ -116,13 +116,12 @@ export default function FlowPlanner({
                 <div className="flex justify-between items-center mb-3">
                   <div className="text-sm font-medium">$ per roster slot</div>
                   <div className="flex gap-4 text-xs text-gray-400">
-                    <button className="hover:text-white">Suggest</button>
                     <button onClick={reset} className="hover:text-white">Reset</button>
                   </div>
                 </div>
 
                 <div className="text-xs text-gray-400 mb-4">
-                  Edit any slot. Auto-suggest splits your ${budget} using your current strategy.
+                  Edit any slot to plan how you'll spend your ${budget}.
                 </div>
 
                 <div className="space-y-3">
