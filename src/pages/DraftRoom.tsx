@@ -352,12 +352,9 @@ export default function DraftRoom() {
   const decisionError = decisionResult.error;
 
   // ── Helpers ───────────────────────────────────────────────────────────
-  const lockToPlayer = (_name: string) => {
-    // Decision Card is temporarily disabled — it's broken and we're
-    // tracking down the root cause. Until then, tapping a player anywhere
-    // (Find, Top 100, Targets, live nomination, watchlist) is a no-op
-    // with a heads-up toast so users know it's intentional.
-    toast.info("Player card is temporarily disabled while we fix it.");
+  const lockToPlayer = (name: string) => {
+    if (!name) return;
+    setActiveName(name);
     setQuery("");
   };
 
