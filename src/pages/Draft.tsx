@@ -71,7 +71,7 @@ import VetriVideoList from "@/components/VetriVideoList";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import { decide } from "@/lib/decision-engine";
 import { computeDrain, computeGet } from "@/lib/nomination";
-import { getStrategy } from "@/lib/strategies";
+import { getStrategy, buildCoachGuidance } from "@/lib/strategies";
 
 
 export default function Draft() {
