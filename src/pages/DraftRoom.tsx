@@ -886,7 +886,7 @@ function LookupSection({
   const matches = useMemo(() => {
     return prices
       .filter((p) => !drafted.has(norm(p.name)))
-      .filter((p) => p.estimate <= target && p.estimate >= Math.max(1, target - 5))
+      .filter((p) => p.price <= target && p.price >= Math.max(1, target - 5))
       .sort((a, b) => b.estimate - a.estimate)
       .slice(0, 12);
   }, [prices, drafted, target]);
@@ -933,7 +933,7 @@ function LookupSection({
               </Badge>
             )}
             <span className="flex-1 truncate font-medium">{p.name}</span>
-            <span className="font-mono tabular-nums">${p.estimate}</span>
+            <span className="font-mono tabular-nums">${p.price}</span>
           </button>
         ))}
       </div>
