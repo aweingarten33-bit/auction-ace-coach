@@ -681,6 +681,7 @@ function DrawerContents({
               <Wifi className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">ESPN connection</span>
             </button>
+            <RefreshLeagueButton onDone={onClose} />
             <button
               type="button"
               onClick={onSignOut}
