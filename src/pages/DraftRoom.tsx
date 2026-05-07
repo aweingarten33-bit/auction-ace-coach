@@ -641,6 +641,8 @@ interface DrawerProps {
   onSignOut: () => void;
   onGoToSetup: () => void;
   onGoToEspn: () => void;
+  onGoToClassicDraft: () => void;
+  onGoToPlanner: () => void;
   onLockPlayer: (name: string) => void;
 }
 
