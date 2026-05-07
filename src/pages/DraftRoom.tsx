@@ -670,7 +670,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "vetri" ? "Analyst" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Player name or $" : section}
+            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Player name or $" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
