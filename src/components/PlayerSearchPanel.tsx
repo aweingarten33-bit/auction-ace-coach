@@ -98,12 +98,13 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
   const results = useMemo(() => {
     const qn = norm(q);
     let arr = prices;
+    if (keepersOnly) arr = arr.filter((p) => keeperSet.has(norm(p.name)));
     if (pos !== "ALL") arr = arr.filter((p) => resolvePos(p) === pos);
     if (tier !== "ALL") arr = arr.filter((p) => tierByName.get(norm(p.name)) === tier);
     if (qn) arr = arr.filter((p) => norm(p.name).includes(qn));
     return [...arr].sort((a, b) => (b.price || 0) - (a.price || 0)).slice(0, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, q, pos, tier, tierByName, posByName]);
+  }, [prices, q, pos, tier, tierByName, posByName, keepersOnly, keeperSet]);
 
   const positionsLoading = posByName.size === 0;
 
