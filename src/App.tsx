@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
+import CardPreview from "./pages/CardPreview.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 
