@@ -332,6 +332,8 @@ export default function DraftRoom() {
               onSignOut={async () => { await signOut(); navigate("/auth"); }}
               onGoToSetup={() => navigate("/setup")}
               onGoToEspn={() => navigate("/espn")}
+              onGoToClassicDraft={() => navigate("/draft")}
+              onGoToPlanner={() => navigate("/planner")}
               onLockPlayer={lockToPlayer}
             />
           </Sheet>
@@ -639,6 +641,8 @@ interface DrawerProps {
   onSignOut: () => void;
   onGoToSetup: () => void;
   onGoToEspn: () => void;
+  onGoToClassicDraft: () => void;
+  onGoToPlanner: () => void;
   onLockPlayer: (name: string) => void;
 }
 
@@ -654,6 +658,8 @@ function DrawerContents({
   onSignOut,
   onGoToSetup,
   onGoToEspn,
+  onGoToClassicDraft,
+  onGoToPlanner,
   onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
@@ -708,6 +714,34 @@ function DrawerContents({
                 <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             ))}
+          </div>
+
+          <div className="border-t border-border/40 px-3 py-3">
+            <p className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              More tools
+            </p>
+            <button
+              type="button"
+              onClick={() => { onClose(); onGoToClassicDraft(); }}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left hover:bg-secondary/40"
+            >
+              <History className="h-4 w-4 text-muted-foreground" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm">Classic Draft view</p>
+                <p className="text-[11px] text-muted-foreground">Roster hero · tier alerts · coach chat · watchlist</p>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => { onClose(); onGoToPlanner(); }}
+              className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left hover:bg-secondary/40"
+            >
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm">Planner</p>
+                <p className="text-[11px] text-muted-foreground">Slot allocations & flow planner</p>
+              </div>
+            </button>
           </div>
 
           <div className="border-t border-border/40 px-3 py-3">

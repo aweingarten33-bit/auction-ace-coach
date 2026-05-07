@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
 import Planner from "./pages/Planner.tsx";
@@ -76,7 +77,7 @@ const App = () => (
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
 
               {/* Legacy redirects — old /draft, /draft-v2 etc all go to the new home */}
-              <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/draft" element={<Protected><Draft /></Protected>} />
               <Route path="/draft-v2" element={<Navigate to="/draft-room" replace />} />
               <Route path="/draft-os" element={<Navigate to="/draft-room" replace />} />
               <Route path="/dashboard" element={<Navigate to="/draft-room" replace />} />
