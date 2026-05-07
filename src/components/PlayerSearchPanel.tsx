@@ -16,16 +16,19 @@ interface Props {
   prices: PriceEstimate[];
   events: DraftEvent[];
   watchlist: string[];
+  keepers?: { player: string }[];
   onPick: (name: string, position?: Position, price?: number) => void;
   onPin: (name: string) => void;
   onUnpin: (name: string) => void;
 }
 
-export default function PlayerSearchPanel({ prices, events, watchlist, onPick, onPin, onUnpin }: Props) {
+export default function PlayerSearchPanel({ prices, events, watchlist, keepers = [], onPick, onPin, onUnpin }: Props) {
   const [q, setQ] = useState("");
   const [pos, setPos] = useState<"ALL" | Position>("ALL");
   const [tier, setTier] = useState<"ALL" | number>("ALL");
+  const [keepersOnly, setKeepersOnly] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
+  const keeperSet = useMemo(() => new Set(keepers.map((k) => norm(k.player))), [keepers]);
 
   // Fallback position lookup — older prices may have been saved without a position
   // (auto-fill used to drop it). We re-derive position here from cached ESPN ranks
@@ -95,12 +98,13 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
   const results = useMemo(() => {
     const qn = norm(q);
     let arr = prices;
+    if (keepersOnly) arr = arr.filter((p) => keeperSet.has(norm(p.name)));
     if (pos !== "ALL") arr = arr.filter((p) => resolvePos(p) === pos);
     if (tier !== "ALL") arr = arr.filter((p) => tierByName.get(norm(p.name)) === tier);
     if (qn) arr = arr.filter((p) => norm(p.name).includes(qn));
     return [...arr].sort((a, b) => (b.price || 0) - (a.price || 0)).slice(0, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, q, pos, tier, tierByName, posByName]);
+  }, [prices, q, pos, tier, tierByName, posByName, keepersOnly, keeperSet]);
 
   const positionsLoading = posByName.size === 0;
 
@@ -145,6 +149,18 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
             {p}
           </Button>
         ))}
+        {keepers.length > 0 && (
+          <Button
+            type="button"
+            size="sm"
+            variant={keepersOnly ? "default" : "outline"}
+            className="h-7 px-2 text-[11px]"
+            onClick={() => setKeepersOnly((v) => !v)}
+            title="Show only your keepers"
+          >
+            Keepers
+          </Button>
+        )}
       </div>
       {availableTiers.length > 1 && (
         <div className="mb-2 flex flex-wrap items-center gap-1">
