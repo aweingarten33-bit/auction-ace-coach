@@ -404,6 +404,17 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
+        {/* How values are calculated — intentionally vague */}
+        <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-[11px] leading-snug text-foreground/85">
+          <p>
+            <span className="font-semibold text-primary">How we get our numbers:</span>{" "}
+            Every price, max bid, and recommendation on this screen comes from a
+            proprietary math model — not guesses, and not AI. We blend your
+            league's own auction history, current roster needs, remaining budget
+            per slot, and live market behavior into a set of equations that
+            update in real time as the draft moves.
+          </p>
+        </div>
         {/* Search moved to menu → "Find (player or $)" */}
 
         {/* DECISION CARD — popup bubble when a player is locked in */}
