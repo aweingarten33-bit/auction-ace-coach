@@ -244,8 +244,26 @@ export default function DraftRoom() {
     return m;
   }, [prices]);
   const suggestions = useMemo(() => {
-    if (query.trim().length < 2) return [];
-    const hits = searchPlayers(sleeper, query, 8).filter(
+    const trimmed = query.trim();
+    if (trimmed.length === 0) return [];
+    // $-amount mode: starts with $ or is pure digits → "what can I afford"
+    const dollarMatch = trimmed.match(/^\$?(\d{1,3})$/);
+    if (dollarMatch) {
+      const target = parseInt(dollarMatch[1], 10);
+      if (target <= 0) return [];
+      return prices
+        .filter((p) => !draftedSet.has(norm(p.name)) && p.price > 0 && p.price <= target)
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 12)
+        .map((p) => ({
+          name: p.name,
+          position: (p as PriceEstimate & { position?: Position }).position,
+          team: null as string | null,
+          price: p.price,
+        }));
+    }
+    if (trimmed.length < 2) return [];
+    const hits = searchPlayers(sleeper, trimmed, 8).filter(
       (p) => !draftedSet.has(norm(p.full_name)),
     );
     return hits.map((p) => {
@@ -257,7 +275,7 @@ export default function DraftRoom() {
         price: price?.price ?? null,
       };
     });
-  }, [query, sleeper, draftedSet, priceByName]);
+  }, [query, sleeper, draftedSet, priceByName, prices]);
 
   // ── Decision card for active name ─────────────────────────────────────
   const activePrice = useMemo(
@@ -399,8 +417,83 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-5 pb-24">
-        {/* BUDGET PLANNER — strategy, slots, affordability, lookup */}
-        <PlannerBody />
+        {/* SMART SEARCH — name OR $ amount */}
+        <section ref={searchWrapRef}>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSearchOpen(true);
+                setHighlight(0);
+              }}
+              onFocus={() => setSearchOpen(true)}
+              onKeyDown={(e) => {
+                if (!searchOpen || !suggestions.length) return;
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setHighlight((h) => (h + 1) % suggestions.length);
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setHighlight((h) => (h - 1 + suggestions.length) % suggestions.length);
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  const pick = suggestions[highlight];
+                  if (pick) lockToPlayer(pick.name);
+                } else if (e.key === "Escape") {
+                  setSearchOpen(false);
+                }
+              }}
+              placeholder="Player name or $ amount (e.g. 28)"
+              className="h-12 pl-9 pr-9 text-base"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
+                aria-label="Clear"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {searchOpen && suggestions.length > 0 && (
+            <div className="mt-1.5 max-h-80 overflow-y-auto rounded-md border border-border bg-card shadow-lg">
+              {suggestions.map((p, i) => (
+                <button
+                  key={p.name}
+                  type="button"
+                  onMouseEnter={() => setHighlight(i)}
+                  onClick={() => lockToPlayer(p.name)}
+                  className={`flex w-full items-center gap-2 border-b border-border/40 px-3 py-2.5 text-left last:border-0 hover:bg-secondary/60 ${
+                    i === highlight ? "bg-secondary/60" : ""
+                  }`}
+                >
+                  <span className="flex-1 truncate text-sm">{p.name}</span>
+                  {p.team && (
+                    <span className="text-[10px] text-muted-foreground">{p.team}</span>
+                  )}
+                  {p.position && (
+                    <Badge
+                      variant="outline"
+                      className={`${POS_COLORS[p.position as Position] ?? ""} text-[10px] px-1.5 py-0`}
+                    >
+                      {p.position}
+                    </Badge>
+                  )}
+                  <span className="w-12 text-right font-mono text-xs tabular-nums text-muted-foreground">
+                    {p.price != null ? `$${p.price}` : "—"}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
 
         {/* DECISION CARD — when a player is locked in */}
         {decision && (
@@ -441,7 +534,6 @@ export default function DraftRoom() {
               </div>
             </div>
             <DecisionCard d={decision} />
-            {/* Vetri's take on this player, inline */}
             <div className="mt-3">
               <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Analyst take
@@ -456,88 +548,8 @@ export default function DraftRoom() {
           </section>
         )}
 
-        {/* TARGETS */}
-        <section>
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Targets
-            </p>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => targetsMutation.mutate()}
-              disabled={targetsMutation.isPending}
-              className="h-7 px-2 text-[11px]"
-            >
-              <RefreshCw
-                className={`mr-1 h-3 w-3 ${targetsMutation.isPending ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
-          </div>
-
-          {openMan && (
-            <div className="mb-2 rounded-md border border-accent/40 bg-accent/10 px-3 py-2 text-[11px]">
-              <span className="font-semibold text-accent">Nobody's bidding on:</span>{" "}
-              <button
-                type="button"
-                onClick={() => lockToPlayer(openMan)}
-                className="font-medium text-foreground hover:text-primary"
-              >
-                {openMan}
-              </button>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            {targetsMutation.isPending && targets.length === 0 && (
-              <>
-                <div className="h-16 animate-pulse rounded-md border border-border bg-secondary/30" />
-                <div className="h-16 animate-pulse rounded-md border border-border bg-secondary/30" />
-                <div className="h-16 animate-pulse rounded-md border border-border bg-secondary/30" />
-              </>
-            )}
-            {!targetsMutation.isPending && targets.length === 0 && (
-              <p className="py-6 text-center text-xs text-muted-foreground">
-                Tap Refresh to generate targets.
-              </p>
-            )}
-            {targets.slice(0, 5).map((t) => (
-              <button
-                key={t.name}
-                type="button"
-                onClick={() => lockToPlayer(t.name)}
-                className="block w-full overflow-hidden rounded-md border border-border bg-secondary/30 p-3 text-left transition hover:border-primary/50 hover:bg-secondary/50"
-              >
-                <div className="flex items-start gap-3">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className={`${POS_COLORS[t.position] ?? ""} text-[10px] px-1.5 py-0`}
-                      >
-                        {t.position}
-                      </Badge>
-                      <span className="truncate text-sm font-semibold">{t.name}</span>
-                      {watchlist.includes(t.name) && (
-                        <Pin className="h-3 w-3 fill-primary text-primary" />
-                      )}
-                    </div>
-                    <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
-                      {t.reason}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-mono text-sm font-bold tabular-nums">${t.maxBid}</p>
-                    <p className="text-[9px] uppercase tracking-wider text-muted-foreground">
-                      max
-                    </p>
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* BUDGET PLANNER — strategy, slots, affordability, lookup */}
+        <PlannerBody />
 
         {/* WATCHLIST — only shown if user has pinned anyone */}
         {watchlist.length > 0 && (
