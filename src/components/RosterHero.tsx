@@ -71,13 +71,6 @@ export default function RosterHero({
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Max Bid</p>
             <AnimatedNumber value={maxBid} prefix="$" className="block text-base font-semibold text-foreground" />
           </div>
-          <div className="text-right">
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Slots</p>
-            <p className="text-base font-semibold text-foreground">
-              <AnimatedNumber value={slotsLeft} />
-              <span className="text-xs text-muted-foreground">/{slotsTotal}</span>
-            </p>
-          </div>
         </div>
       </div>
 
