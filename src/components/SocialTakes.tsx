@@ -62,9 +62,20 @@ export default function SocialTakes() {
 
   return (
     <div className="space-y-2">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-        What's social saying
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          What's social saying
+        </p>
+        <Button
+          size="sm" variant="ghost"
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="h-6 px-2 text-[10px]"
+        >
+          <RefreshCw className={`mr-1 h-3 w-3 ${isFetching ? "animate-spin" : ""}`} />
+          Refresh
+        </Button>
+      </div>
 
       {shows.map((s) => {
         const isOpen = open === s.id;
