@@ -702,7 +702,7 @@ function DrawerContents({
   onLockPlayer,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "plan" | "lookup" | "afford" | "market" | "opponents" | "vetri" | "recent"
+    "menu" | "lookup" | "afford" | "market" | "vetri" | "recent"
   >("menu");
 
   void activeName;
@@ -712,11 +712,9 @@ function DrawerContents({
   const sections = [
     { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player name or dollar amount." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
-    { id: "market" as const, label: "Market", icon: TrendingUp, hint: "See what the room is doing." },
-    { id: "opponents" as const, label: "Opponents", icon: Users, hint: "A quick scan of other teams." },
+    { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
     { id: "vetri" as const, label: "What's social saying", icon: MessageSquare, hint: "Player buzz and analyst takes." },
     { id: "recent" as const, label: "Recent picks", icon: RefreshCw, hint: "Last 30 draft events." },
-    { id: "plan" as const, label: "Plan", icon: Settings, hint: "Strategy and slot allocations." },
   ];
 
   return (
