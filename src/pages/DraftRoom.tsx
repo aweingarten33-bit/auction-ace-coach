@@ -66,6 +66,7 @@ import {
 
 import DecisionCard from "@/components/DecisionCard";
 import MarketHeat from "@/components/MarketHeat";
+import StealReachCounter from "@/components/StealReachCounter";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriPlayerSummary from "@/components/VetriPlayerSummary";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
