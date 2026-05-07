@@ -115,11 +115,21 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           }
           out[k] = { price: Math.max(1, Math.round(final)), source: "league" };
         }
-        // b) ESPN fallback — SCALED for league-history-free players
+        // b) ESPN fallback — SCALED for league-history-free players,
+        //    but ONLY for players ESPN already values as starters.
+        //    Rationale: the per-position scaler is computed from starters
+        //    (the only players who appear in BOTH league history and ESPN),
+        //    so applying it to $1-$8 depth/rookies borrows starter inflation
+        //    they don't deserve. A rookie QB ESPN values at $8 in superflex
+        //    is depth — not a Josh Allen discount.
         for (const [k, ev] of espnMap) {
           if (out[k]) continue;
-          const scale = (ev.pos && scales[ev.pos]) || 1;
-          const adj = Math.max(1, Math.round(ev.val * scale));
+          const rawScale = (ev.pos && scales[ev.pos]) || 1;
+          // Fade scaling smoothly for low-ESPN players. ≤$8 = no scaling,
+          // ≥$20 = full scaling, linear in between.
+          const fade = Math.max(0, Math.min(1, (ev.val - 8) / 12));
+          const effScale = 1 + (rawScale - 1) * fade;
+          const adj = Math.max(1, Math.round(ev.val * effScale));
           out[k] = { price: adj, source: "espn" };
         }
 
