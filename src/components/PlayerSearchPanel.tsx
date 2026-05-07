@@ -16,7 +16,7 @@ interface Props {
   prices: PriceEstimate[];
   events: DraftEvent[];
   watchlist: string[];
-  keepers?: { player: string }[];
+  keepers?: { player: string; cost?: number }[];
   onPick: (name: string, position?: Position, price?: number) => void;
   onPin: (name: string) => void;
   onUnpin: (name: string) => void;
@@ -26,9 +26,12 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
   const [q, setQ] = useState("");
   const [pos, setPos] = useState<"ALL" | Position>("ALL");
   const [tier, setTier] = useState<"ALL" | number>("ALL");
-  const [keepersOnly, setKeepersOnly] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
-  const keeperSet = useMemo(() => new Set(keepers.map((k) => norm(k.player))), [keepers]);
+  const keeperPriceByName = useMemo(() => {
+    const m = new Map<string, number | undefined>();
+    for (const k of keepers) m.set(norm(k.player), k.cost);
+    return m;
+  }, [keepers]);
 
   // Fallback position lookup — older prices may have been saved without a position
   // (auto-fill used to drop it). We re-derive position here from cached ESPN ranks
