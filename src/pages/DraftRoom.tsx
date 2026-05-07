@@ -383,6 +383,7 @@ export default function DraftRoom() {
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-5 pb-24">
         {/* SEARCH / LOOKUP */}
+        <section ref={searchWrapRef}>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
