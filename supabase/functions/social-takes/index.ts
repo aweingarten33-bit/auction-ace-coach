@@ -1,18 +1,17 @@
-// Pull latest episode show notes from 4 fantasy podcasts (+ Berry Love/Hate),
-// run through Lovable AI to extract 3-6 actionable player takes per source.
-// Returns: { shows: [{ id, name, updatedAt, bullets: string[], sourceUrl }] }
+// Pulls latest episode info (title + description + link) from 3 fantasy podcasts
+// via their RSS feeds, plus Matthew Berry's written Love/Hate column from NBC
+// via Firecrawl. NO AI summarization — what's in the source is what you see.
 //
-// Cached in-memory per cold start; client also caches with react-query.
+// Returns: { shows: [{ id, name, episodeTitle, description, sourceUrl, updatedAt, loveHate? }] }
 
 import { corsHeaders } from "https://esm.sh/@supabase/supabase-js@2.95.0/cors";
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
 const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
 type Show = {
   id: string;
   name: string;
-  rss?: string;
+  rss: string;
   extra?: "berry-love-hate";
 };
 
@@ -35,7 +34,6 @@ const SHOWS: Show[] = [
   },
 ];
 
-// crude XML extraction — just need the latest <item>'s title + description + pubDate
 function parseLatestEpisode(xml: string) {
   const itemMatch = xml.match(/<item[\s\S]*?<\/item>/);
   if (!itemMatch) return null;
@@ -46,9 +44,15 @@ function parseLatestEpisode(xml: string) {
     return m[1]
       .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
       .replace(/<[^>]+>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
       .replace(/\s+/g, " ")
       .trim();
   };
+  const linkMatch = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
+  const link = linkMatch ? linkMatch[1].trim() : "";
   return {
     title: get("title"),
     description:
@@ -57,117 +61,92 @@ function parseLatestEpisode(xml: string) {
       get("itunes:summary") ||
       get("itunes:subtitle"),
     pubDate: get("pubDate"),
+    link,
   };
 }
 
-async function fetchBerryLoveHate(): Promise<string | null> {
+// Find the latest Berry Love/Hate column URL via Firecrawl search, then scrape it
+async function fetchBerryLoveHate(): Promise<{ url: string; markdown: string; title: string } | null> {
   if (!FIRECRAWL_API_KEY) return null;
   try {
-    // Search for the latest love/hate column
-    const search = await fetch("https://api.firecrawl.dev/v2/search", {
+    // Search Berry's NBC column hub for recent love/hate articles
+    const map = await fetch("https://api.firecrawl.dev/v2/search", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: "Matthew Berry Love Hate week NBC Sports fantasy",
-        limit: 3,
-        tbs: "qdr:w",
-        scrapeOptions: { formats: ["markdown"] },
+        query: "site:nbcsports.com Matthew Berry love hate fantasy football",
+        limit: 5,
+        tbs: "qdr:m",
       }),
     });
-    if (!search.ok) return null;
-    const data = await search.json();
-    const hit =
-      data?.data?.find?.((r: any) =>
-        /love.*hate/i.test(`${r.title} ${r.url}`),
-      ) ?? data?.data?.[0];
-    return hit?.markdown ? hit.markdown.slice(0, 8000) : null;
-  } catch {
+    if (!map.ok) return null;
+    const mapData = await map.json();
+    const results: any[] = mapData?.data ?? mapData?.web?.results ?? [];
+    const hit = results.find((r: any) =>
+      /love.*hate/i.test(`${r.title ?? ""} ${r.url ?? ""}`),
+    ) ?? results[0];
+    if (!hit?.url) return null;
+
+    const scrape = await fetch("https://api.firecrawl.dev/v2/scrape", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url: hit.url,
+        formats: ["markdown"],
+        onlyMainContent: true,
+      }),
+    });
+    if (!scrape.ok) return null;
+    const scrapeData = await scrape.json();
+    const md: string =
+      scrapeData?.data?.markdown ?? scrapeData?.markdown ?? "";
+    if (!md) return null;
+    return {
+      url: hit.url,
+      title: hit.title ?? "Matthew Berry's Love/Hate",
+      markdown: md.slice(0, 20000),
+    };
+  } catch (e) {
+    console.error("fetchBerryLoveHate error:", e);
     return null;
   }
 }
 
-async function aiBullets(source: string, sourceLabel: string): Promise<string[]> {
-  const sys =
-    "You extract player takes from fantasy football podcast show notes. STRICT RULES:\n" +
-    "1. ONLY use information EXPLICITLY present in the provided source text. DO NOT add facts, context, history, draft year, team changes, injury status, coaching changes, or ANY detail not literally written in the source.\n" +
-    "2. DO NOT infer or guess. If show notes only list a player name with no opinion, SKIP that player.\n" +
-    "3. NO prices, dollars, or auction values. NO episode titles, timestamps, or intros.\n" +
-    "4. Each bullet under 90 chars. Return 3-8 bullets total — fewer is fine if source is thin.\n" +
-    "5. Format: '<Player Name>: <take paraphrased from source>'.\n" +
-    "6. If the source uses a recurring label (Love/Hate, Buy/Sell, Stock Up/Down, Risers/Fallers, Studs/Duds, Overreaction), prefix with the EXACT label in brackets: '[LOVE] Player: take'.\n" +
-    "7. If the source contains no concrete player takes (just episode promo/topics), return an empty bullets array.";
-  const user = `Source: ${sourceLabel}\n\n${source.slice(0, 6000)}`;
-  try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: sys },
-          { role: "user", content: user },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "emit_takes",
-              description: "Emit player takes",
-              parameters: {
-                type: "object",
-                properties: {
-                  bullets: {
-                    type: "array",
-                    items: { type: "string" },
-                  },
-                },
-                required: ["bullets"],
-              },
-            },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "emit_takes" } },
-      }),
-    });
-    if (!res.ok) return [];
-    const data = await res.json();
-    const args =
-      data?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
-    if (!args) return [];
-    const parsed = JSON.parse(args);
-    return Array.isArray(parsed.bullets) ? parsed.bullets.slice(0, 8) : [];
-  } catch {
-    return [];
-  }
-}
-
 async function processShow(show: Show) {
-  const out: any = { id: show.id, name: show.name, bullets: [], updatedAt: null, sourceUrl: null };
+  const out: any = {
+    id: show.id,
+    name: show.name,
+    episodeTitle: null,
+    description: null,
+    sourceUrl: null,
+    updatedAt: null,
+  };
   try {
-    if (show.rss) {
-      const r = await fetch(show.rss, { headers: { "User-Agent": "Mozilla/5.0" } });
-      if (r.ok) {
-        const xml = await r.text();
-        const ep = parseLatestEpisode(xml);
-        if (ep) {
-          out.updatedAt = ep.pubDate;
-          out.episodeTitle = ep.title;
-          const text = `${ep.title}\n\n${ep.description}`;
-          out.bullets = await aiBullets(text, show.name);
-        }
+    const r = await fetch(show.rss, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (r.ok) {
+      const xml = await r.text();
+      const ep = parseLatestEpisode(xml);
+      if (ep) {
+        out.episodeTitle = ep.title;
+        out.description = ep.description;
+        out.sourceUrl = ep.link || null;
+        out.updatedAt = ep.pubDate;
       }
     }
     if (show.extra === "berry-love-hate") {
       const lh = await fetchBerryLoveHate();
       if (lh) {
-        const lhBullets = await aiBullets(lh, "Matthew Berry Love/Hate column");
-        out.loveHate = lhBullets;
+        out.loveHate = {
+          title: lh.title,
+          url: lh.url,
+          markdown: lh.markdown,
+        };
       }
     }
   } catch (e) {
