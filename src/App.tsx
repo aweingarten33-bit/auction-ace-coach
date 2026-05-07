@@ -70,7 +70,7 @@ const App = () => (
               <Route path="/planner" element={<Protected><Planner /></Protected>} />
 
               {/* ESPN connection settings */}
-              <Route path="/espn" element={<Protected adminOnly><EspnSettings /></Protected>} />
+              <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
 
               {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
