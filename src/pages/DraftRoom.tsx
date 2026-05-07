@@ -509,20 +509,7 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
-        {/* FIND (player or $) — promoted to the homepage. This is the only
-            way to open the Decision Card, so it lives here, prominent. */}
-        <section className="rounded-lg border border-primary/40 bg-primary/5 p-3 shadow-sm">
-          <div className="mb-2 flex items-center gap-2">
-            <Search className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Find (player or $)</h2>
-          </div>
-          <LookupSection
-            prices={prices}
-            events={events}
-            maxBid={budget.maxBid}
-            onPick={lockToPlayer}
-          />
-        </section>
+        {/* Find (player or $) lives in the hamburger drawer now. */}
 
         {/* DECISION CARD — rendered INLINE (no Dialog/Portal/Overlay).
             Every previous popup attempt failed silently on mobile. Going
