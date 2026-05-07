@@ -41,6 +41,7 @@ export default function PlayerDecisionOverlay({
   const keepers = useDraftStore((s) => s.keepers);
   const events = useDraftStore((s) => s.events);
   const prices = useDraftStore((s) => s.prices);
+  const anchorMap = useAnchorMap();
 
   // Run the engine. Capture errors so the popup never silently blanks.
   const { decision, error } = useMemo(() => {
@@ -55,6 +56,7 @@ export default function PlayerDecisionOverlay({
           player: name,
           position,
           currentPrice: price ?? 0,
+          anchorMap,
         }),
         error: null,
       };
@@ -63,7 +65,7 @@ export default function PlayerDecisionOverlay({
       console.error("[PlayerDecisionOverlay] decide() threw:", e);
       return { decision: null, error: msg };
     }
-  }, [name, position, price, settings, keepers, events, prices]);
+  }, [name, position, price, settings, keepers, events, prices, anchorMap]);
 
   // Setup completeness — most common reason the engine has nothing useful to say
   const setupComplete =
