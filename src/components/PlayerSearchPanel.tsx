@@ -16,7 +16,7 @@ interface Props {
   prices: PriceEstimate[];
   events: DraftEvent[];
   watchlist: string[];
-  keepers?: { player: string }[];
+  keepers?: { player: string; cost?: number }[];
   onPick: (name: string, position?: Position, price?: number) => void;
   onPin: (name: string) => void;
   onUnpin: (name: string) => void;
@@ -26,9 +26,12 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
   const [q, setQ] = useState("");
   const [pos, setPos] = useState<"ALL" | Position>("ALL");
   const [tier, setTier] = useState<"ALL" | number>("ALL");
-  const [keepersOnly, setKeepersOnly] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position; price?: number } | null>(null);
-  const keeperSet = useMemo(() => new Set(keepers.map((k) => norm(k.player))), [keepers]);
+  const keeperPriceByName = useMemo(() => {
+    const m = new Map<string, number | undefined>();
+    for (const k of keepers) m.set(norm(k.player), k.cost);
+    return m;
+  }, [keepers]);
 
   // Fallback position lookup — older prices may have been saved without a position
   // (auto-fill used to drop it). We re-derive position here from cached ESPN ranks
@@ -98,13 +101,12 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
   const results = useMemo(() => {
     const qn = norm(q);
     let arr = prices;
-    if (keepersOnly) arr = arr.filter((p) => keeperSet.has(norm(p.name)));
     if (pos !== "ALL") arr = arr.filter((p) => resolvePos(p) === pos);
     if (tier !== "ALL") arr = arr.filter((p) => tierByName.get(norm(p.name)) === tier);
     if (qn) arr = arr.filter((p) => norm(p.name).includes(qn));
     return [...arr].sort((a, b) => (b.price || 0) - (a.price || 0)).slice(0, 100);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prices, q, pos, tier, tierByName, posByName, keepersOnly, keeperSet]);
+  }, [prices, q, pos, tier, tierByName, posByName]);
 
   const positionsLoading = posByName.size === 0;
 
@@ -149,18 +151,6 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
             {p}
           </Button>
         ))}
-        {keepers.length > 0 && (
-          <Button
-            type="button"
-            size="sm"
-            variant={keepersOnly ? "default" : "outline"}
-            className="h-7 px-2 text-[11px]"
-            onClick={() => setKeepersOnly((v) => !v)}
-            title="Show only your keepers"
-          >
-            Keepers
-          </Button>
-        )}
       </div>
       {availableTiers.length > 1 && (
         <div className="mb-2 flex flex-wrap items-center gap-1">
@@ -209,15 +199,19 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
         style={{ WebkitOverflowScrolling: "touch", maxHeight: "max(16rem, 55dvh)" }}
       >
         {results.map((p) => {
-          const isDrafted = draftedSet.has(norm(p.name));
-          const isPinned = pinnedSet.has(norm(p.name));
+          const nm = norm(p.name);
+          const isPicked = draftedSet.has(nm);
+          const isKeeper = keeperPriceByName.has(nm);
+          const keeperCost = keeperPriceByName.get(nm);
+          const isDrafted = isPicked || isKeeper;
+          const isPinned = pinnedSet.has(nm);
           const position = resolvePos(p);
           const cls = position && position in POS_COLORS ? POS_COLORS[position] : "";
           return (
             <div
               key={p.name}
               className={`flex items-center gap-2 rounded px-2 py-2 transition ${
-                isDrafted ? "opacity-40 line-through" : "hover:bg-secondary/60"
+                isDrafted ? "opacity-50" : "hover:bg-secondary/60"
               }`}
             >
               <button
@@ -228,18 +222,27 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
                 }
                 className="flex flex-1 min-w-0 items-center gap-2 text-left"
               >
-                <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
+                <span className={`flex-1 truncate text-sm font-medium ${isPicked ? "line-through" : ""}`}>
+                  {p.name}
+                </span>
+                {isKeeper && (
+                  <Badge variant="outline" className="text-[9px] px-1 py-0 border-amber-500/60 text-amber-600 dark:text-amber-400">
+                    KEPT
+                  </Badge>
+                )}
                 {position && (
                   <Badge variant="outline" className={`${cls} text-[10px] px-1.5 py-0`}>
                     {position}
                   </Badge>
                 )}
-                {tierByName.get(norm(p.name)) != null && (
+                {tierByName.get(nm) != null && (
                   <span className="rounded border border-border/60 px-1 text-[10px] font-mono text-muted-foreground">
-                    T{tierByName.get(norm(p.name))}
+                    T{tierByName.get(nm)}
                   </span>
                 )}
-                <span className="w-12 text-right font-mono text-xs tabular-nums">${p.price}</span>
+                <span className="w-12 text-right font-mono text-xs tabular-nums">
+                  ${isKeeper && keeperCost != null ? keeperCost : p.price}
+                </span>
               </button>
               <button
                 type="button"
