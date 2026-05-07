@@ -249,9 +249,15 @@ export default function PlayerSearchPanel({ prices, events, watchlist, onPick, o
           <p className="py-6 text-center text-xs text-muted-foreground">No matches.</p>
         )}
       </div>
-      <p className="mt-1.5 text-[10px] text-muted-foreground">
-        Tap a name for the full pre-draft card. Gavel loads into the bid form. Pin saves to your watchlist.
-      </p>
+      <div className="mt-2 rounded-md border border-border/50 bg-secondary/20 px-2 py-1.5 text-[10px] leading-snug text-muted-foreground">
+        <p className="mb-0.5 font-semibold uppercase tracking-wider text-foreground/80">How prices work</p>
+        <p>
+          Each $ is your league's avg paid for that tier (last 3 drafts), nudged
+          up/down by ESPN's per-player value. Drafted players grey out & strike
+          through in real time. Tap a name for details, gavel = load into bid
+          form, pin = watchlist.
+        </p>
+      </div>
 
       {/* Show the actual decision card (bid/pass/stop + math) on live draft, not the bio popup */}
       <PlayerDecisionOverlay
