@@ -144,6 +144,7 @@ Deno.serve(async (req) => {
         draftStarted: data.draftDetail?.drafted ?? false,
       },
       teams,
+      keepers,
     });
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : String(e) }, 500);
