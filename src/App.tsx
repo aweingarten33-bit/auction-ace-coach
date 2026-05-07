@@ -77,7 +77,7 @@ const App = () => (
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
 
               {/* Legacy redirects — old /draft, /draft-v2 etc all go to the new home */}
-              <Route path="/draft" element={<Protected><Draft /></Protected>} />
+              <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
               <Route path="/draft-v2" element={<Navigate to="/draft-room" replace />} />
               <Route path="/draft-os" element={<Navigate to="/draft-room" replace />} />
               <Route path="/dashboard" element={<Navigate to="/draft-room" replace />} />
