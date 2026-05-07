@@ -81,9 +81,10 @@ export default function Draft() {
     addEvent, undoEvent, resetAll, pinPlayer, unpinPlayer, dismissPlayer,
     quickPrompts, setQuickPrompts, resetQuickPrompts,
     showMath, setShowMath, setDraftPlan,
-    strategyId,
+    strategyId, customStrategyRules,
   } = useDraftStore();
   const strategy = getStrategy(strategyId);
+  const coachGuidance = buildCoachGuidance(strategyId, customStrategyRules);
   const [planGenerating, setPlanGenerating] = useState(false);
   const [resetOpen, setResetOpen] = useState(false);
 
