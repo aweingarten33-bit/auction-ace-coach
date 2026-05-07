@@ -784,7 +784,7 @@ function DrawerContents({
   onUnpin,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "search" | "afford" | "market" | "reddit"
+    "menu" | "lookup" | "afford" | "market" | "reddit"
   >("menu");
 
   void activeName;
@@ -793,7 +793,6 @@ function DrawerContents({
 
   const sections = [
     { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player name or dollar amount." },
-    { id: "search" as const, label: "Player search (filters)", icon: ListOrdered, hint: "Position + tier filters, pin to watchlist." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
     { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live r/fantasyfootball threads." },
