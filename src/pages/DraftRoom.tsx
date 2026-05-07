@@ -86,6 +86,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeName, setActiveName] = useState(""); // currently-shown player in the decision card
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
