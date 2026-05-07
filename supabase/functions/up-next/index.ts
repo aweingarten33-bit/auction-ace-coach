@@ -221,7 +221,7 @@ Deno.serve(async (req: Request) => {
       `## User Price Sheet (first 100)\n${(p.prices ?? []).slice(0, 100).map((x: any) => `${x.name} $${x.price}`).join("\n") || "(none)"}`,
       `## Watchlist (user pinned — prefer when fit is real)\n${(p.watchlist ?? []).join(", ") || "(none)"}`,
       `## Dismissed (user rejected — DO NOT suggest these)\n${(p.dismissed ?? []).join(", ") || "(none)"}`,
-      `## Task\nCall emit_queue with the 3 best targets right now. Never include any name from the Dismissed list.\n\nFor each target's "worstCase": the alternative MUST be the highest-ranked name from the Fallback Board for that POS that is NOT the target itself, and the $ MUST equal that row's "going" value. The gap consequence MUST cite the actual Roster Gaps entry for that POS (severity + starterShort).\n\nFor each target's "knockoff": pull from the same Fallback Board for the same POS where going$ < target.maxBid * 0.6; use the highest-going row that satisfies that. If none qualify, pick the cheapest row on the board for that POS.`,
+      `## Task\nCall emit_queue with the 10 best targets right now, ranked best→worst by matchPct. Never include any name from the Dismissed list.\n\nFor each target's "worstCase": the alternative MUST be the highest-ranked name from the Fallback Board for that POS that is NOT the target itself, and the $ MUST equal that row's "going" value.\n\nFor each target's "knockoff": pull from the same Fallback Board for the same POS where going$ < target.maxBid * 0.6; use the highest-going row that satisfies that. If none qualify, pick the cheapest row on the board for that POS.`,
     ].join("\n\n");
 
 
