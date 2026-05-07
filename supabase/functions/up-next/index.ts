@@ -97,6 +97,8 @@ Deno.serve(async (req: Request) => {
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+    const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const p = await req.json();
 
     // ---- Deterministic pre-compute so the model doesn't have to do math ----
@@ -108,13 +110,60 @@ Deno.serve(async (req: Request) => {
       ].filter(Boolean),
     );
 
-    // Market multiplier from observed paid vs sheet
+    // ---- ANCHOR PRICES from real data sources, in priority order ----
+    // 1) league_auction_history (3yr avg of YOUR league's actual paid prices)
+    // 2) espn_player_ranks (current-season ESPN auction value)
+    // Build a player->price map keyed by normalized name.
+    const anchorByName = new Map<string, { price: number; pos?: string; src: string }>();
+    const sbHeaders = { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` };
+    try {
+      const histResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/league_auction_history?select=player_name,position,bid_amount,season&season=in.(2023,2024,2025)`,
+        { headers: sbHeaders },
+      );
+      if (histResp.ok) {
+        const rows = (await histResp.json()) as any[];
+        const agg = new Map<string, { sum: number; n: number; pos?: string }>();
+        for (const r of rows) {
+          const k = norm(r.player_name);
+          if (!k) continue;
+          const cur = agg.get(k) || { sum: 0, n: 0, pos: r.position };
+          cur.sum += Number(r.bid_amount) || 0;
+          cur.n += 1;
+          cur.pos = cur.pos || r.position;
+          agg.set(k, cur);
+        }
+        for (const [k, v] of agg) {
+          if (v.n > 0) anchorByName.set(k, { price: Math.max(1, Math.round(v.sum / v.n)), pos: v.pos, src: "league3yr" });
+        }
+      }
+    } catch (e) { console.error("league_auction_history fetch", e); }
+
+    try {
+      const ranksResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/espn_player_ranks?select=player_name,position,auction_value&auction_value=not.is.null&order=auction_value.desc&limit=400`,
+        { headers: sbHeaders },
+      );
+      if (ranksResp.ok) {
+        const rows = (await ranksResp.json()) as any[];
+        for (const r of rows) {
+          const k = norm(r.player_name);
+          if (!k) continue;
+          // Don't overwrite league3yr — that's higher signal
+          if (anchorByName.has(k)) continue;
+          const v = Number(r.auction_value) || 0;
+          if (v > 0) anchorByName.set(k, { price: Math.max(1, Math.round(v)), pos: r.position, src: "espn2026" });
+        }
+      }
+    } catch (e) { console.error("espn_player_ranks fetch", e); }
+
+    // Market multiplier from observed paid vs anchor (uses live picks vs real anchors)
     const sheetMap = new Map<string, { price: number; pos?: string }>();
     for (const r of (p.prices ?? []) as any[]) sheetMap.set(norm(r.name), { price: Number(r.price) || 0, pos: r.position });
     let paidSum = 0, sheetSum = 0, n = 0;
     for (const e of (p.events ?? []) as any[]) {
-      const ref = sheetMap.get(norm(e.player));
-      if (!ref || ref.price <= 0) continue;
+      const ref = sheetMap.get(norm(e.player)) ?? anchorByName.get(norm(e.player));
+      if (!ref || !ref.price || ref.price <= 0) continue;
       paidSum += Number(e.price) || 0; sheetSum += ref.price; n++;
     }
     const marketMult = n >= 3 && sheetSum > 0 ? paidSum / sheetSum : 1;
