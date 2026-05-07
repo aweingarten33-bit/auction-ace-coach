@@ -1011,33 +1011,46 @@ function LookupSection({
   maxBid: number;
   onPick: (name: string) => void;
 }) {
-  const [amount, setAmount] = useState(String(Math.max(1, Math.floor(maxBid / 2))));
+  const [input, setInput] = useState(String(Math.max(1, Math.floor(maxBid / 2))));
   const drafted = useMemo(
     () => new Set(events.map((e) => norm(e.player))),
     [events],
   );
-  const target = Number(amount) || 0;
+
+  const trimmed = input.trim();
+  const isNameMode = /[a-zA-Z]/.test(trimmed);
+  const target = Number(trimmed.replace(/\D/g, "")) || 0;
+
   const matches = useMemo(() => {
-    return prices
-      .filter((p) => !drafted.has(norm(p.name)))
+    const pool = prices.filter((p) => !drafted.has(norm(p.name)));
+    if (isNameMode) {
+      const q = norm(trimmed);
+      return pool
+        .filter((p) => norm(p.name).includes(q))
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 20);
+    }
+    return pool
       .filter((p) => p.price <= target && p.price >= Math.max(1, target - 5))
       .sort((a, b) => b.price - a.price)
       .slice(0, 12);
-  }, [prices, drafted, target]);
+  }, [prices, drafted, target, isNameMode, trimmed]);
 
   return (
     <div className="space-y-3">
       <div>
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          What can I get for…
+          {isNameMode ? "Player search" : "What can I get for…"}
         </p>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">$</span>
+          <span className="text-sm text-muted-foreground">{isNameMode ? "🔎" : "$"}</span>
           <Input
-            inputMode="numeric"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value.replace(/\D/g, ""))}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type a name or a $ amount"
             className="h-9"
+            autoComplete="off"
+            spellCheck={false}
           />
           <span className="whitespace-nowrap text-[11px] text-muted-foreground">
             max ${maxBid}
@@ -1048,7 +1061,9 @@ function LookupSection({
       <div className="space-y-1">
         {matches.length === 0 && (
           <p className="py-4 text-center text-xs text-muted-foreground">
-            No undrafted players around ${target}.
+            {isNameMode
+              ? `No undrafted players matching "${trimmed}".`
+              : `No undrafted players around $${target}.`}
           </p>
         )}
         {matches.map((p) => (
