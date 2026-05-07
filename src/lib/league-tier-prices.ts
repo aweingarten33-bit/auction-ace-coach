@@ -46,9 +46,22 @@ function tierFor(pos: string, rankInPos: number): number {
 }
 
 export function buildTierPrices(rows: AuctionRow[]): TierPrice[] {
+  // Dedupe duplicate (season, player) rows — the historical importer
+  // sometimes writes the same pick multiple times (e.g. 4×). Without this,
+  // a single elite price fills a whole tier bucket and inflates the next
+  // tier with the runner-up's price (e.g. Allen ends up "T2" because
+  // Lamar's 4 dup rows fill T1).
+  const seen = new Set<string>();
+  const deduped: AuctionRow[] = [];
+  for (const r of rows) {
+    const key = `${r.season}|${(r.player_name ?? "").toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(r);
+  }
   // Group by season + position, rank by bid desc, assign tier.
   const bySeasonPos = new Map<string, AuctionRow[]>();
-  for (const r of rows) {
+  for (const r of deduped) {
     if (!r.position) continue;
     const k = `${r.season}|${r.position}`;
     const arr = bySeasonPos.get(k) ?? [];
