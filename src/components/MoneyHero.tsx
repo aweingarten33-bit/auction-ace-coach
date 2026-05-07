@@ -10,7 +10,7 @@ interface Props {
   slotsLeft?: number;
 }
 
-export default function MoneyHero({ remaining, total, showMax, maxBid }: Props) {
+export default function MoneyHero({ remaining, total, showMax, maxBid, slotsLeft }: Props) {
   const prev = useRef(remaining);
   const [delta, setDelta] = useState<number | null>(null);
   const [bump, setBump] = useState(false);
