@@ -563,7 +563,7 @@ export default function DraftRoom() {
       </main>
 
       {/* Floating AI tools — chat-bubble FAB. Targets + Coach AI live here. */}
-      <Sheet>
+      <Sheet open={aiOpen} onOpenChange={setAiOpen}>
         <SheetTrigger asChild>
           <button
             type="button"
