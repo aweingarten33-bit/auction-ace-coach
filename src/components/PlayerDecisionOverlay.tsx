@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import DecisionCard from "@/components/DecisionCard";
+import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import { decide } from "@/lib/decision-engine";
 import { useAnchorMap } from "@/lib/use-anchor-map";
 import { useDraftStore } from "@/lib/draft-store";
