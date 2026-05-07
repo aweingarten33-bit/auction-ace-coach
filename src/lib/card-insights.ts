@@ -82,12 +82,12 @@ export function computeCardInsights(
   const auto = Math.max(1, Math.round(anchor * 0.6));
   const strong = Math.max(auto + 1, Math.round(anchor * 0.85));
   const fair = anchor;
-  const risk = Math.round(anchor * 1.12);
+  const riskPrice = Math.round(anchor * 1.12);
   const ladder: LadderRow[] = [
     { label: "AUTO BUY",     price: `$${auto}`,            tone: "good" },
     { label: "STRONG BUY",   price: `$${strong}`,          tone: "good" },
     { label: "FAIR VALUE",   price: `$${fair}`,            tone: "ok"   },
-    { label: "RISK ZONE",    price: `$${risk}`,            tone: "warn" },
+    { label: "RISK ZONE",    price: `$${riskPrice}`,       tone: "warn" },
     { label: "DO NOT CHASE", price: `$${stop}+`,           tone: "stop" },
   ];
 
@@ -123,7 +123,7 @@ export function computeCardInsights(
     tone: benchAfter >= 5 ? "good" : benchAfter >= 3 ? "ok" : "bad",
   };
 
-  const risk: OutcomeRow = {
+  const riskRow: OutcomeRow = {
     label: "RISK PROFILE",
     value: d.plan.status === "broken" ? "Reckless" : d.plan.status === "tight" ? "Stretched" : "Controlled",
     tone: d.plan.status === "broken" ? "bad" : d.plan.status === "tight" ? "warn" : "good",
@@ -135,7 +135,7 @@ export function computeCardInsights(
     tone: anchor >= 45 ? "good" : anchor >= 25 ? "good" : anchor >= 12 ? "ok" : "warn",
   };
 
-  const outcomes = [rbStrat, qbStrat, flexCeil, benchDepth, risk, ceiling];
+  const outcomes: OutcomeRow[] = [rbStrat, qbStrat, flexCeil, benchDepth, riskRow, ceiling];
 
   // Team identity — heuristic
   let identity: TeamIdentity = "BALANCED VALUE BUILD";
