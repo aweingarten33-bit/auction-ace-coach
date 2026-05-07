@@ -436,74 +436,9 @@ input, textarea, select {
 }
 input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground)) !important; }
 
-/* ── Draft-night MONEY METER ─────────────────────────────────────────
-   The hero number on the page. Big, glowing, alive. */
-.money-hero {
-  position: relative;
-  font-family: 'Anton', 'Bebas Neue', system-ui, sans-serif;
-  font-weight: 900;
-  letter-spacing: 0.01em;
-  line-height: 1;
-  background: linear-gradient(180deg,
-    hsl(48 90% 72%) 0%,
-    hsl(42 85% 58%) 55%,
-    hsl(36 70% 42%) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  text-shadow: 0 0 24px hsl(42 90% 55% / 0.35);
-  filter: drop-shadow(0 1px 0 hsl(0 0% 0% / 0.4));
-  animation: money-pulse 3.2s ease-in-out infinite;
-}
-.money-hero::after {
-  content: "";
-  position: absolute;
-  inset: -8px -12px;
-  border-radius: 12px;
-  background: radial-gradient(ellipse at center,
-    hsl(42 90% 55% / 0.18) 0%,
-    transparent 70%);
-  z-index: -1;
-  pointer-events: none;
-  animation: money-glow 3.2s ease-in-out infinite;
-}
-@keyframes money-pulse {
-  0%, 100% { filter: drop-shadow(0 0 0 hsl(42 90% 55% / 0)) drop-shadow(0 1px 0 hsl(0 0% 0% / 0.4)); }
-  50%      { filter: drop-shadow(0 0 14px hsl(42 90% 55% / 0.55)) drop-shadow(0 1px 0 hsl(0 0% 0% / 0.4)); }
-}
-@keyframes money-glow {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50%      { opacity: 1;   transform: scale(1.06); }
-}
-.money-hero.is-low {
-  background: linear-gradient(180deg, hsl(0 95% 72%), hsl(0 85% 50%));
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: 0 0 24px hsl(0 90% 55% / 0.5);
-}
-.money-hero.is-flush {
-  background: linear-gradient(180deg, hsl(140 80% 70%), hsl(150 70% 45%));
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: 0 0 24px hsl(145 80% 50% / 0.45);
-}
-.money-spark {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: ui-monospace, SFMono-Regular, monospace;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 999px;
-  background: hsl(0 90% 55% / 0.15);
-  color: hsl(0 90% 75%);
-  border: 1px solid hsl(0 90% 55% / 0.3);
-  animation: spark-in 600ms ease-out;
-}
-@keyframes spark-in {
-  from { opacity: 0; transform: translateY(-4px) scale(0.9); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes fade-out {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-3px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
