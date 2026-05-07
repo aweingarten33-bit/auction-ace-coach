@@ -216,15 +216,29 @@ export default function DraftRoom() {
       toast.error(e instanceof ApiError ? e.message : "Couldn't refresh targets."),
   });
 
-  // First-load and auto-refresh every 12 picks
+  // First-load
   useEffect(() => {
     if (!setupComplete) return;
     if (targets.length === 0 && !targetsMutation.isPending) targetsMutation.mutate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setupComplete]);
+
+  // Event-driven refresh: any new pick → debounce 10s → re-fetch targets.
+  // Decision Engine, budget, roster all recompute instantly via useMemo above.
+  // No polling, no LLM thrash. Falls back to immediate refresh every 12 picks.
+  const lastRefreshRef = useRef(0);
   useEffect(() => {
-    if (!setupComplete) return;
-    if (events.length > 0 && events.length % 12 === 0) targetsMutation.mutate();
+    if (!setupComplete || events.length === 0) return;
+    const sinceLast = Date.now() - lastRefreshRef.current;
+    const force = events.length % 12 === 0;
+    const delay = force ? 0 : Math.max(0, 10_000 - sinceLast);
+    const t = setTimeout(() => {
+      if (!targetsMutation.isPending) {
+        lastRefreshRef.current = Date.now();
+        targetsMutation.mutate();
+      }
+    }, delay);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events.length, setupComplete]);
 
