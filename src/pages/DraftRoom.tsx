@@ -356,6 +356,12 @@ export default function DraftRoom() {
     if (!name) return;
     setActiveName(name);
     setQuery("");
+    // Inline card — scroll it into view so the user sees it immediately.
+    setTimeout(() => {
+      document
+        .getElementById("decision-card-inline")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   };
 
   const isPinned = (name: string) => watchlist.includes(name);
@@ -518,114 +524,77 @@ export default function DraftRoom() {
           />
         </section>
 
-        {/* DECISION CARD — popup bubble when a player is locked in.
-            Uses Radix primitives DIRECTLY (not the shared <DialogContent>)
-            because the shared one hard-codes `top-[50%] translate-y-[-50%]`
-            which positions off-screen on short mobile viewports. The
-            override classes don't always win the cn()/tailwind-merge
-            race — and you only see the dimmed overlay (the "black screen"
-            bug). Bypassing the shared component eliminates that risk. */}
-        <DialogPrimitive.Root
-          open={!!activeName}
-          onOpenChange={(o) => {
-            if (!o) setActiveName("");
-          }}
-        >
-          <DialogPrimitive.Portal>
-            <DialogPrimitive.Overlay
-              className={cn(
-                "fixed inset-0 z-[100] bg-black/80",
-                "data-[state=open]:animate-in data-[state=closed]:animate-out",
-                "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-              )}
-            />
-            <DialogPrimitive.Content
-              className={cn(
-                "fixed inset-x-2 top-4 z-[101] mx-auto w-auto max-w-md",
-                "max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain",
-                "rounded-lg border bg-background p-4 shadow-lg",
-                "data-[state=open]:animate-in data-[state=closed]:animate-out",
-                "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-                "data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-              )}
-              style={{ WebkitOverflowScrolling: "touch" }}
-            >
-              <DialogPrimitive.Title className="sr-only">
-                Pre-draft card for {activeName || "player"}
-              </DialogPrimitive.Title>
-
-              {decision ? (
-                <>
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Decision
-                    </p>
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 px-2 text-[11px]"
-                        onClick={() =>
-                          isPinned(activeName) ? unpinPlayer(activeName) : pinPlayer(activeName)
-                        }
-                      >
-                        {isPinned(activeName) ? (
-                          <>
-                            <PinOff className="mr-1 h-3 w-3" />
-                            Unpin
-                          </>
-                        ) : (
-                          <>
-                            <Pin className="mr-1 h-3 w-3" />
-                            Pin
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <DecisionCard d={decision} />
-
-                  <div className="mt-3">
-                    <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Analyst take
-                    </p>
-                    <Card className="p-3 text-[12px]">
-                      <VetriTakesForPlayer
-                        player={activeName}
-                        emptyText="No analyst take on this player yet."
-                      />
-                    </Card>
-                  </div>
-                </>
-              ) : (
-                <div className="space-y-3 rounded-md border border-border bg-secondary/30 p-4 text-center">
-                  <p className="text-base font-semibold">{activeName || "Player"}</p>
-                  <p className="text-xs text-muted-foreground">
-                    No decision available. Make sure setup is complete (budget, roster, prices) and try again.
-                  </p>
-                  {decisionError && (
-                    <p className="rounded bg-destructive/10 p-2 text-left font-mono text-[10px] text-destructive">
-                      {decisionError}
-                    </p>
+        {/* DECISION CARD — rendered INLINE (no Dialog/Portal/Overlay).
+            Every previous popup attempt failed silently on mobile. Going
+            inline removes every variable: no portals, no animations, no
+            stacking contexts, no pointer-events traps. If a player is
+            selected, the card is in the DOM right here. Period. */}
+        {activeName && (
+          <section
+            id="decision-card-inline"
+            className="rounded-lg border-2 border-primary bg-background p-3 shadow-glow"
+          >
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Decision · {activeName}
+              </p>
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-[11px]"
+                  onClick={() =>
+                    isPinned(activeName) ? unpinPlayer(activeName) : pinPlayer(activeName)
+                  }
+                >
+                  {isPinned(activeName) ? (
+                    <><PinOff className="mr-1 h-3 w-3" />Unpin</>
+                  ) : (
+                    <><Pin className="mr-1 h-3 w-3" />Pin</>
                   )}
-                </div>
-              )}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-7 px-2 text-[11px]"
+                  onClick={() => setActiveName("")}
+                  aria-label="Close decision card"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
 
-              <DialogPrimitive.Close
-                aria-label="Close"
-                className={cn(
-                  "absolute right-3 top-3 rounded-sm bg-background/80 p-1 opacity-70",
-                  "ring-offset-background transition-opacity hover:opacity-100",
-                  "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                  "disabled:pointer-events-none",
+            {decision ? (
+              <>
+                <DecisionCard d={decision} />
+                <div className="mt-3">
+                  <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Analyst take
+                  </p>
+                  <Card className="p-3 text-[12px]">
+                    <VetriTakesForPlayer
+                      player={activeName}
+                      emptyText="No analyst take on this player yet."
+                    />
+                  </Card>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-2 rounded-md border border-border bg-secondary/30 p-4 text-center">
+                <p className="text-base font-semibold">{activeName}</p>
+                <p className="text-xs text-muted-foreground">
+                  No decision available. Make sure setup is complete (budget, roster, prices).
+                </p>
+                {decisionError && (
+                  <p className="rounded bg-destructive/10 p-2 text-left font-mono text-[10px] text-destructive">
+                    {decisionError}
+                  </p>
                 )}
-              >
-                <X className="h-4 w-4" />
-              </DialogPrimitive.Close>
-            </DialogPrimitive.Content>
-          </DialogPrimitive.Portal>
-        </DialogPrimitive.Root>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* BUDGET PLANNER — strategy, slots, affordability, lookup */}
         <PlannerBody />
