@@ -1,0 +1,219 @@
+// AI tools that live inside the floating FAB sheet on the home page.
+// Two tabs: AI target recommendations + Matthew Berry-style coach chat.
+import { useRef, useState } from "react";
+import { Sparkles, RefreshCw, Send } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CoachMessage from "@/components/CoachMessage";
+import { POS_COLORS } from "@/lib/positions";
+import { ApiError, streamCoach } from "@/lib/api";
+import type { QueueTarget } from "@/components/UpNextQueue";
+import { toast } from "sonner";
+
+interface Props {
+  targets: QueueTarget[];
+  targetsLoading: boolean;
+  onRefreshTargets: () => void;
+  onPickTarget: (name: string) => void;
+  // everything streamCoach needs
+  coachContext: () => Parameters<typeof streamCoach>[0];
+}
+
+const QUICK_PROMPTS = [
+  "Who should I target next?",
+  "What's my biggest roster hole?",
+  "Any sleepers left?",
+  "Is the room overpaying RBs?",
+];
+
+export default function AiQuickPanel({
+  targets, targetsLoading, onRefreshTargets, onPickTarget, coachContext,
+}: Props) {
+  const [tab, setTab] = useState<"targets" | "coach">("targets");
+
+  // ── Coach chat state ────────────────────────────────────────────
+  const [history, setHistory] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [streaming, setStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [input, setInput] = useState("");
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const ask = async (question: string) => {
+    if (!question.trim() || streaming) return;
+    setHistory((h) => [...h, { role: "user", content: question }]);
+    setInput("");
+    setStreaming(true);
+    setStreamingText("");
+    let acc = "";
+    try {
+      const ctx = coachContext();
+      await streamCoach(
+        { ...ctx, userQuestion: question, history: history.slice(-6) },
+        (chunk) => {
+          acc += chunk;
+          setStreamingText(acc);
+          scrollRef.current?.scrollTo({ top: 1e9 });
+        },
+      );
+    } catch (e) {
+      const msg = e instanceof ApiError ? e.message : "Coach unavailable.";
+      toast.error(msg);
+      acc = acc || "⚠️ Coach unavailable — try again.";
+    } finally {
+      setStreaming(false);
+      if (acc) setHistory((h) => [...h, { role: "assistant", content: acc }]);
+      setStreamingText("");
+    }
+  };
+
+  return (
+    <Tabs value={tab} onValueChange={(v) => setTab(v as "targets" | "coach")} className="flex h-full flex-col">
+      <TabsList className="mx-3 mt-2 grid grid-cols-2">
+        <TabsTrigger value="targets" className="text-xs">
+          <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+          Targets
+        </TabsTrigger>
+        <TabsTrigger value="coach" className="text-xs">
+          Coach AI
+        </TabsTrigger>
+      </TabsList>
+
+      {/* ── Targets tab ───────────────────────────────────────────── */}
+      <TabsContent value="targets" className="flex-1 overflow-hidden p-0">
+        <div className="flex items-center justify-between px-4 pt-3">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Who to go after next
+          </p>
+          <Button
+            size="sm" variant="ghost"
+            onClick={onRefreshTargets}
+            disabled={targetsLoading}
+            className="h-7 px-2 text-[11px]"
+          >
+            <RefreshCw className={`mr-1 h-3 w-3 ${targetsLoading ? "animate-spin" : ""}`} />
+            Refresh
+          </Button>
+        </div>
+        <div className="space-y-2 overflow-y-auto px-3 pb-4 pt-2">
+          {targets.length === 0 && !targetsLoading && (
+            <p className="px-2 py-6 text-center text-xs text-muted-foreground">
+              No targets yet — tap Refresh to ask the AI.
+            </p>
+          )}
+          {targetsLoading && targets.length === 0 && (
+            <p className="px-2 py-6 text-center text-xs text-muted-foreground">
+              Thinking…
+            </p>
+          )}
+          {targets.slice(0, 6).map((t) => (
+            <Card
+              key={t.name}
+              onClick={() => onPickTarget(t.name)}
+              className="cursor-pointer p-3 transition hover:border-primary/50 hover:bg-secondary/40"
+            >
+              <div className="flex items-start gap-2">
+                <Badge variant="outline" className={`${POS_COLORS[t.position] ?? ""} shrink-0 text-[10px]`}>
+                  {t.position}
+                </Badge>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="truncate text-sm font-semibold">{t.name}</p>
+                    <span className="shrink-0 font-mono text-[12px] tabular-nums text-primary">
+                      max ${t.maxBid}
+                    </span>
+                  </div>
+                  <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+                    {t.reason}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </TabsContent>
+
+      {/* ── Coach chat tab ────────────────────────────────────────── */}
+      <TabsContent value="coach" className="flex flex-1 flex-col overflow-hidden p-0">
+        <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3 text-sm">
+          {history.length === 0 && !streaming && (
+            <div className="flex gap-2">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
+                <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <div className="text-[12px] text-muted-foreground">
+                Ask anything — like talking to Matthew Berry mid-draft. "Should I take Bijan at $45?" "Who's the best WR2 left?"
+              </div>
+            </div>
+          )}
+          {history.map((m, i) => m.role === "user" ? (
+            <div key={i} className="flex justify-end">
+              <div className="max-w-[85%] rounded-2xl rounded-br-md bg-secondary px-3 py-1.5 text-[13px]">
+                <ReactMarkdown>{m.content}</ReactMarkdown>
+              </div>
+            </div>
+          ) : (
+            <div key={i} className="flex gap-2">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
+                <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <CoachMessage content={m.content} />
+              </div>
+            </div>
+          ))}
+          {streaming && streamingText && (
+            <div className="flex gap-2">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
+                <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <CoachMessage content={streamingText} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-border/60 px-3 pb-3 pt-2">
+          {history.length === 0 && (
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {QUICK_PROMPTS.map((p) => (
+                <Button
+                  key={p}
+                  size="sm" variant="outline"
+                  disabled={streaming}
+                  onClick={() => ask(p)}
+                  className="h-7 rounded-full px-2.5 text-[11px] font-normal"
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+          )}
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-primary/40 bg-background px-3 py-1.5 focus-within:border-primary">
+            <Input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && ask(input)}
+              placeholder="Ask Coach AI…"
+              disabled={streaming}
+              className="h-9 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
+            />
+            <Button
+              onClick={() => ask(input)}
+              disabled={streaming || !input.trim()}
+              size="sm"
+              className="h-8 w-8 shrink-0 rounded-full p-0"
+            >
+              <Send className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+}
