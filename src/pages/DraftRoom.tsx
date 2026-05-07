@@ -66,6 +66,7 @@ import {
 
 import DecisionCard from "@/components/DecisionCard";
 import MarketHeat from "@/components/MarketHeat";
+import CounterAnchorDetector from "@/components/CounterAnchorDetector";
 import StealReachCounter from "@/components/StealReachCounter";
 import WalletRace from "@/components/WalletRace";
 import TierCliffHeatmap from "@/components/TierCliffHeatmap";
