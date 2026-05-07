@@ -643,7 +643,7 @@ function DrawerContents({
   >("menu");
 
   const sections = [
-    { id: "lookup" as const, label: "Player name or $", icon: Search, hint: "Find a player or what fits a budget" },
+    { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player to lock the decision card, or a $ amount to see every undrafted player you can afford" },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Check 1–3 players against your bank" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
