@@ -275,7 +275,7 @@ export function PlannerBody() {
           strategy={strategy}
           onPick={(id, weights) => {
             setStrategyId(id);
-            setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, weights));
+            setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, weights, benchPrices));
           }}
         />
 
@@ -292,7 +292,7 @@ export function PlannerBody() {
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost" size="sm"
-                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights))}
+                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights, benchPrices))}
                 title="Auto-suggest from chosen strategy"
               >
                 <RotateCcw className="mr-1 h-3.5 w-3.5" /> Suggest
