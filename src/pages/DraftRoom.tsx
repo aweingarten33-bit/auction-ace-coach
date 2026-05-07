@@ -417,7 +417,7 @@ export default function DraftRoom() {
       </header>
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
-      <main className="mx-auto max-w-3xl space-y-6 px-4 py-5 pb-24">
+      <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
         {/* SMART SEARCH — name OR $ amount */}
         <section ref={searchWrapRef}>
           <div className="relative">
