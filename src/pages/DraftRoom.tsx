@@ -36,6 +36,8 @@ import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 import { useAuth } from "@/hooks/useAuth";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
+import { STRATEGIES, getStrategy } from "@/lib/strategies";
+import { supabase } from "@/integrations/supabase/client";
 import {
   computeBudget,
   countByPosition,
