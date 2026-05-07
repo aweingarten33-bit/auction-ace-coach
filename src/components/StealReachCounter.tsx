@@ -6,16 +6,16 @@
 // Net edge: Σ(anchor − paid) across YOUR picks only. Positive = you're winning.
 import { useMemo } from "react";
 import type { DraftEvent } from "@/lib/draft-types";
-import type { AnchorEntry } from "@/lib/decision-engine";
+import { useAnchorMap } from "@/lib/use-anchor-map";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 interface Props {
   events: DraftEvent[];
-  anchorMap: Record<string, AnchorEntry>;
 }
 
-export default function StealReachCounter({ events, anchorMap }: Props) {
+export default function StealReachCounter({ events }: Props) {
+  const { map: anchorMap } = useAnchorMap();
   const stats = useMemo(() => {
     let steals = 0;
     let reaches = 0;
