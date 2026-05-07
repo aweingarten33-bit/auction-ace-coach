@@ -86,6 +86,7 @@ async function getFantasyPros(): Promise<Source | null> {
     url,
     markdown: md,
   };
+}
 
 async function getCbsSports(): Promise<Source | null> {
   const url = "https://www.cbssports.com/fantasy/football/";
