@@ -840,11 +840,6 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "recent" && (
-        <div className="flex-1 overflow-y-auto p-3">
-          <RecentPicksList events={events} />
-        </div>
-      )}
     </SheetContent>
   );
 }
