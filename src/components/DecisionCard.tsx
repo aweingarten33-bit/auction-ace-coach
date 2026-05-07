@@ -46,14 +46,9 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
           </div>
           <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
             current ${d.currentPrice || 0} · confidence {d.confidence}
-            {d.anchorPrice > 0 && d.anchorSource === "league" && (
+            {d.anchorPrice > 0 && (
               <span className="ml-1.5 rounded bg-secondary/60 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
-                3yr league avg ${d.anchorPrice}
-              </span>
-            )}
-            {d.anchorPrice > 0 && d.anchorSource === "espn" && (
-              <span className="ml-1.5 rounded bg-secondary/60 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
-                ESPN 2026 ${d.anchorPrice}
+                anchor ${d.anchorPrice}
               </span>
             )}
             {d.anchorPrice === 0 && (
@@ -62,6 +57,13 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
               </span>
             )}
           </p>
+          {d.anchorBreakdown && (
+            <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/80">
+              {d.anchorBreakdown.league != null && <>league ${d.anchorBreakdown.league} · </>}
+              {d.anchorBreakdown.sleeper != null && <>sleeper ${d.anchorBreakdown.sleeper} · </>}
+              {d.anchorBreakdown.espn != null && <>espn ${d.anchorBreakdown.espn}</>}
+            </p>
+          )}
         </div>
         <div className={`shrink-0 rounded-md px-3 py-1.5 ring-1 ${v.bg} ${v.ring}`}>
           <p className={`text-2xl font-extrabold leading-none tracking-tight ${v.text}`}>
