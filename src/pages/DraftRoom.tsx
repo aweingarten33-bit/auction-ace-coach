@@ -478,9 +478,6 @@ export default function DraftRoom() {
           />
         </section>
 
-        {/* TOP 100 — math-backed values. All 100 visible at once (no scroll).
-            4 cols × 25 rows of micro-chips. Tap any to open Decision Card. */}
-        <Top100Grid prices={prices} events={events} onPick={lockToPlayer} />
         {/* DECISION CARD — popup bubble when a player is locked in.
             Uses Radix primitives DIRECTLY (not the shared <DialogContent>)
             because the shared one hard-codes `top-[50%] translate-y-[-50%]`
