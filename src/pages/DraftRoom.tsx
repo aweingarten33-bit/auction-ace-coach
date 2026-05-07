@@ -350,7 +350,9 @@ export default function DraftRoom() {
                 ${budget.remaining}
               </p>
               <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
-                {budget.slotsLeft} slots · max ${budget.maxBid}
+                {events.filter((e) => e.event_type === "PICK_MADE" && e.drafter_team_id === settings.myTeamId).length >= 3
+                  ? `left · max $${budget.maxBid}`
+                  : "left"}
               </p>
             </div>
           </div>
