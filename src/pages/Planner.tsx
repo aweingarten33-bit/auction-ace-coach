@@ -322,65 +322,7 @@ export function PlannerBody() {
           </div>
         </Card>
 
-        {/* ---------- Affordability checker ---------- */}
-        <Card className="p-3">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">3</span>
-            <Check className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Can I afford X + Y + Z?</h2>
-          </div>
-          <p className="mb-2 text-[11px] text-muted-foreground">
-            Add up to 3 players you're thinking about (e.g. Josh Jacobs <span className="text-muted-foreground/60">+</span> Josh Allen <span className="text-muted-foreground/60">+</span> Justin Herbert). I'll add their prices, subtract from your bank, and tell you yes or no with the exact math.
-          </p>
-          <div className="space-y-2">
-            <PricedPlayerAutocomplete value={checkA} onChange={setCheckA} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="Player 1 (e.g. Josh Jacobs)" />
-            <PricedPlayerAutocomplete value={checkB} onChange={setCheckB} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="+ Player 2 (e.g. Josh Allen)" />
-            <PricedPlayerAutocomplete value={checkC} onChange={setCheckC} prices={prices} excludeNames={[...events.map(e=>e.player), ...keepers.map(k=>k.player)]} placeholder="+ Player 3 (e.g. Justin Herbert)" />
-          </div>
-          {checkRows.length > 0 && (
-            <div className="mt-3 space-y-2 rounded-md border bg-muted/30 p-3 text-sm">
-              {/* Per-player breakdown */}
-              <div className="space-y-1">
-                {checkResults.map((r) => (
-                  <div key={r.name} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{r.name}</span>
-                      {r.info?.pos && posBadge(r.info.pos)}
-                    </div>
-                    <span className={`font-mono tabular-nums ${r.info ? "" : "text-muted-foreground"}`}>
-                      {r.info ? `$${r.info.price}` : "no price on sheet"}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Verdict pill */}
-              <div className={`flex items-center gap-2 rounded-md border px-2.5 py-2 font-semibold ${canAfford ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-400" : "border-red-500/40 bg-red-500/10 text-red-400"}`}>
-                {canAfford ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
-                {canAfford
-                  ? `Yes — you can afford this`
-                  : slotsAfter < 0
-                    ? `No — you only have ${budget.slotsLeft} roster spot${budget.slotsLeft === 1 ? "" : "s"} left`
-                    : `No — leaves only $${remainingAfter} for ${slotsAfter} more slot${slotsAfter === 1 ? "" : "s"} ($1/slot minimum)`}
-              </div>
-
-              {/* Exact math */}
-              <div className="rounded-md border border-border/60 bg-background/60 p-2 font-mono text-[11px] tabular-nums leading-relaxed">
-                <div className="mb-1 font-sans text-[10px] uppercase tracking-wide text-muted-foreground">The math</div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Money now</span><span>${budget.remaining}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">− Cost of these {checkResults.filter(r=>r.info).length} player{checkResults.filter(r=>r.info).length===1?"":"s"}</span><span>−${checkSum}</span></div>
-                <div className="my-1 border-t border-border/60" />
-                <div className="flex justify-between"><span className="text-muted-foreground">= Money after</span><span className="font-semibold text-foreground">${remainingAfter}</span></div>
-                <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Slots open now</span><span>{budget.slotsLeft}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">− Slots used</span><span>−{checkResults.filter(r=>r.info).length}</span></div>
-                <div className="my-1 border-t border-border/60" />
-                <div className="flex justify-between"><span className="text-muted-foreground">= Slots left after</span><span className="font-semibold text-foreground">{slotsAfter}</span></div>
-                <div className="mt-2 flex justify-between"><span className="text-muted-foreground">Min $ needed (1/slot)</span><span>${minNeededForRest}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Cushion (left − min)</span><span className={remainingAfter - minNeededForRest >= 0 ? "text-emerald-400" : "text-red-400"}>${remainingAfter - minNeededForRest}</span></div>
-              </div>
-            </div>
-          )}
-        </Card>
+        {/* Affordability checker moved to the menu (Can I afford X+Y+Z?) */}
 
         {/* "$X → players" lookup removed — Player Search on the home tab covers this with live filters. */}
       </main>
