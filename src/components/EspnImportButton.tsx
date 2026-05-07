@@ -44,7 +44,7 @@ function mapRoster(slots: Record<string, number>): RosterSlots {
  * shows a confirmation card with the diff, and applies on accept.
  */
 export default function EspnImportButton() {
-  const { setSettings, setRoster } = useDraftStore();
+  const { setSettings, setRoster, setKeepers } = useDraftStore();
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Imported | null>(null);
 
@@ -61,6 +61,15 @@ export default function EspnImportButton() {
       const leagueType: LeagueType =
         roster.SUPERFLEX > 0 ? "Superflex" : roster.QB >= 2 ? "2QB" : "Standard";
 
+      const importedKeepers: Keeper[] = (data.keepers ?? []).map(
+        (k: { name: string; position: string | null; cost: number; playerId: number }) => ({
+          id: `espn-${k.playerId}`,
+          player: k.name,
+          position: (k.position as Position) || undefined,
+          cost: Number(k.cost) || 0,
+        }),
+      );
+
       setPreview({
         budget: lg.budget ?? 200,
         numTeams: lg.size ?? data.teams?.length ?? 12,
@@ -68,6 +77,7 @@ export default function EspnImportButton() {
         leagueType,
         roster,
         leagueName: lg.name,
+        keepers: importedKeepers,
       });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to import");
@@ -87,7 +97,12 @@ export default function EspnImportButton() {
     (Object.keys(preview.roster) as (keyof RosterSlots)[]).forEach((k) =>
       setRoster(k, preview.roster[k])
     );
-    toast.success("League settings imported from ESPN");
+    if (preview.keepers.length) setKeepers(preview.keepers);
+    toast.success(
+      preview.keepers.length
+        ? `League settings + ${preview.keepers.length} keepers imported`
+        : "League settings imported from ESPN",
+    );
     setPreview(null);
   };
 
