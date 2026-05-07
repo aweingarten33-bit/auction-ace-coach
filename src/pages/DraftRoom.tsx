@@ -578,10 +578,12 @@ export default function DraftRoom() {
         </SheetTrigger>
         <SheetContent side="right" className="flex w-[88%] max-w-md flex-col p-0 sm:w-96">
           <SheetHeader className="border-b border-border/60 px-4 py-3">
-            <SheetTitle className="text-sm font-semibold">Budget Planner</SheetTitle>
+            <SheetTitle className="text-sm font-semibold">Quick panel</SheetTitle>
           </SheetHeader>
-          <div className="flex-1 overflow-y-auto p-3">
-            <PlanSection budget={budget} />
+          <div className="flex flex-1 items-center justify-center p-6 text-center">
+            <p className="text-xs text-muted-foreground">
+              Empty for now — tell the coach what you want to live here.
+            </p>
           </div>
         </SheetContent>
       </Sheet>
