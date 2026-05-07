@@ -329,7 +329,7 @@ Deno.serve(async (req: Request) => {
         const maxBid = suggested;
         const ceiling = maxBid * 0.6;
         const ceilingFloor = Math.max(0, Math.floor(ceiling));
-        const board = (pos && fallbackByPos[pos]) ? fallbackByPos[pos] : [];
+        // (board already computed above)
 
         const eligible = board.filter(
           (r) =>
