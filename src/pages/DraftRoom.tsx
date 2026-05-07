@@ -15,22 +15,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import {
-  Menu,
-  Search,
-  Settings,
-  RefreshCw,
-  X,
-  TrendingUp,
-  Users,
-  MessageSquare,
-  Mic,
-  History,
-  ChevronRight,
-  Wifi,
-  WifiOff,
-  Pin,
-  PinOff,
-  Check,
+  Menu, Search, Settings, RefreshCw, X, TrendingUp, Users, MessageSquare,
+  Mic, History, ChevronRight, Wifi, WifiOff, Pin, PinOff, Check, Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
