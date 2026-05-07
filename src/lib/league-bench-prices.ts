@@ -40,7 +40,13 @@ interface Row {
   player_name: string;
 }
 
-export function buildBenchPrices(rows: Row[], numTeams: number): BenchPrice[] {
+export function buildBenchPrices(
+  rows: Row[],
+  numTeams: number,
+  opts: { superflex?: boolean } = {},
+): BenchPrice[] {
+  const superflex = !!opts.superflex;
+
   // Dedupe (season, player) — historical importer can write dups.
   const seen = new Set<string>();
   const deduped: Row[] = [];
@@ -51,7 +57,6 @@ export function buildBenchPrices(rows: Row[], numTeams: number): BenchPrice[] {
     deduped.push(r);
   }
 
-  // Group by season+pos, sort desc by bid → posRank.
   const bucketBids: Record<BenchRole, number[]> = {
     BACKUP_QB: [], HANDCUFF_RB: [], DEPTH_WR: [], DEPTH_TE: [], DART: [],
   };
@@ -65,16 +70,20 @@ export function buildBenchPrices(rows: Row[], numTeams: number): BenchPrice[] {
     bySeasonPos.set(k, arr);
   }
 
+  // Starter cutoffs per position. QB cutoff doubles in superflex leagues
+  // because the superflex slot is ~90% filled by a 2nd QB — so QB13+ in a
+  // 12-team superflex league is still a starter, not a bench piece. True
+  // backup QB only starts at QB(2*numTeams)+1.
+  const qbStarterCount = superflex ? numTeams * 2 : numTeams;
+
   for (const [k, arr] of bySeasonPos) {
     const [, pos] = k.split("|");
     arr.sort((a, b) => b.bid_amount - a.bid_amount);
     arr.forEach((r, i) => {
-      const rank = i + 1; // posRank within that season's draft
-      // Starter cutoffs based on league size (rough but league-specific).
+      const rank = i + 1;
       if (pos === "QB") {
-        if (rank > numTeams) bucketBids.BACKUP_QB.push(r.bid_amount);
+        if (rank > qbStarterCount) bucketBids.BACKUP_QB.push(r.bid_amount);
       } else if (pos === "RB") {
-        // RB1/RB2 + flex roughly = numTeams * 2.5 starters; backup tier starts after.
         if (rank > Math.round(numTeams * 2.5)) bucketBids.HANDCUFF_RB.push(r.bid_amount);
       } else if (pos === "WR") {
         if (rank > Math.round(numTeams * 3)) bucketBids.DEPTH_WR.push(r.bid_amount);
@@ -88,22 +97,18 @@ export function buildBenchPrices(rows: Row[], numTeams: number): BenchPrice[] {
   (Object.keys(bucketBids) as BenchRole[]).forEach((role) => {
     const bids = bucketBids[role];
     if (!bids.length) return;
-    // Trim the long tail of $1 darts so a true backup median isn't dragged to $1.
-    // We compute the median of bids strictly greater than $1 — those are the
-    // "real" backup buys. If everything is $1, fall back to $1.
     const meaningful = bids.filter((b) => b > 1);
     const m = meaningful.length >= 2 ? median(meaningful) : median(bids);
     out.push({ role, label: ROLE_LABEL[role], median: Math.max(1, m), count: bids.length });
   });
 
-  // Always include a dart row at $1 so the user sees the full ladder.
   if (!out.find((b) => b.role === "DART")) {
     out.push({ role: "DART", label: ROLE_LABEL.DART, median: 1, count: 0 });
   }
   return out;
 }
 
-export function useLeagueBenchPrices(numTeams: number) {
+export function useLeagueBenchPrices(numTeams: number, superflex = false) {
   const [prices, setPrices] = useState<BenchPrice[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -119,13 +124,14 @@ export function useLeagueBenchPrices(numTeams: number) {
         setLoading(false);
         return;
       }
-      setPrices(buildBenchPrices(data as Row[], numTeams));
+      setPrices(buildBenchPrices(data as Row[], numTeams, { superflex }));
       setLoading(false);
     })();
     return () => {
       cancelled = true;
     };
-  }, [numTeams]);
+  }, [numTeams, superflex]);
 
   return { prices, loading };
 }
+
