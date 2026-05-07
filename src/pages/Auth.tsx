@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Trophy, Gavel, LineChart, Zap } from "lucide-react";
@@ -19,30 +18,60 @@ export default function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   if (loading) return null;
-  if (user) return <Navigate to="/dashboard" replace />;
+  // Redirect to the new home page (Draft Room takes over from /draft now)
+  if (user) return <Navigate to="/" replace />;
 
   const signIn = async () => {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
     setBusy(false);
     if (error) toast.error(error.message);
-    else nav("/dashboard");
+    else nav("/");
   };
+
   const signUp = async () => {
     setBusy(true);
     const { error } = await supabase.auth.signUp({
-      email, password: pw,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+      email,
+      password: pw,
+      options: { emailRedirectTo: `${window.location.origin}/` },
     });
     setBusy(false);
     if (error) toast.error(error.message);
-    else { toast.success("Account created"); nav("/dashboard"); }
+    else {
+      toast.success("Account created");
+      nav("/");
+    }
   };
+
+  /**
+   * Google OAuth — redirect in the SAME tab.
+   *
+   * Previous code used `lovable.auth.signInWithOAuth` which on mobile Safari
+   * was opening Google in a new tab and force-closing it on return, which
+   * kicked the user out of the app and forced them to dig through tabs to
+   * find their way back.
+   *
+   * `supabase.auth.signInWithOAuth` with `redirectTo` does a full-page
+   * redirect in the same tab — Google login takes over the tab, then
+   * sends the user back to our app. No tab juggling.
+   *
+   * `skipBrowserRedirect: false` (default) is what makes Supabase do the
+   * full-page redirect itself.
+   */
   const google = async () => {
-    const r = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/dashboard`,
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/`,
+      },
     });
-    if (r.error) toast.error(r.error.message);
+    if (error) {
+      toast.error(error.message);
+      setBusy(false);
+    }
+    // No setBusy(false) on success — page is about to redirect anyway.
   };
 
   return (
@@ -98,14 +127,14 @@ export default function AuthPage() {
             </div>
           </div>
 
-          <Button className="w-full" size="lg" onClick={() => google()}>
+          <Button className="w-full" size="lg" onClick={google} disabled={busy}>
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.4 29.3 35.5 24 35.5c-6.4 0-11.5-5.1-11.5-11.5S17.6 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.6 6.3 29 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.4-.4-3.5z" />
               <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.6 6.3 29 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z" />
               <path fill="#4CAF50" d="M24 43.5c5 0 9.5-1.7 13-4.6l-6-5.1c-2 1.4-4.4 2.2-7 2.2-5.3 0-9.7-3.1-11.3-7.5l-6.5 5C9.6 39 16.2 43.5 24 43.5z" />
               <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6 5.1c-.4.4 6.7-4.9 6.7-14.6 0-1.2-.1-2.4-.4-3.5z" />
             </svg>
-            Continue with Google
+            {busy ? "Signing in…" : "Continue with Google"}
           </Button>
 
           <p className="mt-5 text-center text-[11px] text-muted-foreground">
