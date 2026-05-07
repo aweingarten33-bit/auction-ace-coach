@@ -5,9 +5,15 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import type { DecisionResult } from "@/lib/decision-engine";
 import { computeCardInsights } from "@/lib/card-insights";
 import { useDraftStore } from "@/lib/draft-store";
+import { supabase } from "@/integrations/supabase/client";
 import {
   byeWeekForTeam, findPlayerByName, loadSleeperPlayers,
 } from "@/lib/sleeper";
+
+type ProjStats = Partial<Record<
+  "passYds"|"passTD"|"int"|"rushAtt"|"rushYds"|"rushTD"|"rec"|"recYds"|"recTD"|"targets"|"games",
+  number
+>>;
 
 const LEAGUE_NAME = "BRO WE'RE SENIOR CITIZENS";
 
@@ -47,10 +53,12 @@ export default function AuctionPlayerCard({ d }: Props) {
   const keepers = useDraftStore((s) => s.keepers);
 
   const [meta, setMeta] = useState<SleeperMeta>({ team: null, bye: null });
+  const [proj, setProj] = useState<{ stats: ProjStats | null; points: number | null }>({ stats: null, points: null });
 
   useEffect(() => {
     let live = true;
     setMeta({ team: null, bye: null });
+    setProj({ stats: null, points: null });
     if (!d.player) return;
     loadSleeperPlayers().then((players) => {
       if (!live) return;
@@ -59,6 +67,26 @@ export default function AuctionPlayerCard({ d }: Props) {
       const team = p.team ?? null;
       setMeta({ team, bye: byeWeekForTeam(team) ?? null });
     }).catch(() => {});
+
+    // Fetch ESPN projected stat line for this player.
+    const norm = d.player.toLowerCase().normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]/g, "")
+      .replace(/\s+/g, " ").trim();
+    supabase
+      .from("espn_player_ranks")
+      .select("projected_stats, projected_points, season")
+      .eq("player_name_norm", norm)
+      .order("season", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!live || !data) return;
+        setProj({
+          stats: (data.projected_stats as ProjStats) ?? null,
+          points: data.projected_points ?? null,
+        });
+      });
+
     return () => { live = false; };
   }, [d.player]);
 
@@ -178,6 +206,41 @@ export default function AuctionPlayerCard({ d }: Props) {
             </div>
           ))}
         </div>
+
+        {/* PROJECTED STAT LINE — like a real Topps card back */}
+        {proj.stats && Object.keys(proj.stats).length > 0 && (
+          <div style={{ marginTop: 10 }}>
+            <SectionRule>PROJECTED STAT LINE</SectionRule>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${Math.min(5, projStatCells(d.position, proj.stats).length) || 1}, 1fr)`,
+              gap: 2, marginTop: 4,
+              fontFamily: "Georgia, serif",
+            }}>
+              {projStatCells(d.position, proj.stats).slice(0,5).map((c) => (
+                <div key={c.label} style={{
+                  textAlign: "center", borderRight: `1px solid ${C.rule}`, padding: "0 2px",
+                }}>
+                  <div style={{ fontSize: 7, letterSpacing: 1.2, color: C.muted, textTransform: "uppercase" }}>
+                    {c.label}
+                  </div>
+                  <div style={{
+                    fontSize: 13, fontWeight: 700, color: C.ink, lineHeight: 1.1,
+                    fontFamily: "'Courier New', monospace",
+                  }}>{c.value}</div>
+                </div>
+              ))}
+            </div>
+            {proj.points != null && (
+              <div style={{
+                fontSize: 8, color: C.muted, letterSpacing: 1.2, fontFamily: "Georgia,serif",
+                textAlign: "right", marginTop: 2,
+              }}>
+                PROJ. FANTASY PTS: <span style={{ color: C.ink, fontWeight: 700 }}>{proj.points}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* STAT TABLE — auction price ladder, like a stat line on card back */}
         <div style={{ marginTop: 10 }}>
@@ -428,4 +491,37 @@ function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardIns
   })();
 
   return { recBig, recColor, vitals, scoutingReport, pathToSmash, risks, stacks, didYouKnow };
+}
+
+function projStatCells(pos: string | null | undefined, s: ProjStats): { label: string; value: string }[] {
+  const fmt = (n?: number) => (n == null ? "—" : n.toLocaleString());
+  if (pos === "QB") {
+    return [
+      { label: "Pa Yds", value: fmt(s.passYds) },
+      { label: "Pa TD",  value: fmt(s.passTD) },
+      { label: "Int",    value: fmt(s.int) },
+      { label: "Ru Yds", value: fmt(s.rushYds) },
+      { label: "Ru TD",  value: fmt(s.rushTD) },
+    ].filter((c) => c.value !== "—");
+  }
+  if (pos === "RB") {
+    return [
+      { label: "Att",    value: fmt(s.rushAtt) },
+      { label: "Ru Yds", value: fmt(s.rushYds) },
+      { label: "Ru TD",  value: fmt(s.rushTD) },
+      { label: "Rec",    value: fmt(s.rec) },
+      { label: "Re Yds", value: fmt(s.recYds) },
+    ].filter((c) => c.value !== "—");
+  }
+  if (pos === "WR" || pos === "TE") {
+    return [
+      { label: "Tgt",    value: fmt(s.targets) },
+      { label: "Rec",    value: fmt(s.rec) },
+      { label: "Re Yds", value: fmt(s.recYds) },
+      { label: "Re TD",  value: fmt(s.recTD) },
+      { label: "Games",  value: fmt(s.games) },
+    ].filter((c) => c.value !== "—");
+  }
+  // Fallback: show whatever is present
+  return Object.entries(s).slice(0, 5).map(([k, v]) => ({ label: k, value: fmt(v) }));
 }
