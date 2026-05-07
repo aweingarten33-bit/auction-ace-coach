@@ -694,6 +694,26 @@ function DrawerContents({
         </div>
       )}
 
+      {section === "plan" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <PlanSection budget={budget} />
+        </div>
+      )}
+
+      {section === "lookup" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <LookupSection
+            prices={prices}
+            events={events}
+            maxBid={budget.maxBid}
+            onPick={(name) => {
+              onLockPlayer(name);
+              onClose();
+            }}
+          />
+        </div>
+      )}
+
       {section === "market" && (
         <div className="flex-1 overflow-y-auto p-3">
           <MarketHeat
