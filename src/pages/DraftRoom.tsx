@@ -383,30 +383,6 @@ export default function DraftRoom() {
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-5 pb-24">
         {/* SEARCH / LOOKUP */}
-        <section>
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Look up a player…"
-              className="h-12 pl-9 pr-9 text-base"
-              autoComplete="off"
-              spellCheck={false}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={() => setQuery("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground"
-                aria-label="Clear"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-
-        <section ref={searchWrapRef}>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
