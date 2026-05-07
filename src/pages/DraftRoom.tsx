@@ -94,6 +94,21 @@ export default function DraftRoom() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeName, setActiveName] = useState(""); // currently-shown player in the decision card
+  const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
+  const [highlight, setHighlight] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadSleeperPlayers().then(setSleeper).catch(() => {});
+  }, []);
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!searchWrapRef.current?.contains(e.target as Node)) setSearchOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
 
   // Force users into setup if it's not done yet
   useEffect(() => {
