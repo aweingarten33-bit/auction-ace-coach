@@ -89,6 +89,9 @@ export default function AiQuickPanel({
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             Top 10 to draft next
           </p>
+          <p className="mt-1 text-[10px] leading-snug text-muted-foreground/80">
+            $ values are AI estimates of where these players will go in your league — they may differ from the math-based numbers on the Decision Card.
+          </p>
         </div>
         <div className="flex-1 px-3 pb-3">
           {targets.length === 0 && targetsLoading && (
