@@ -959,6 +959,9 @@ function LookupSection({
 
   return (
     <div className="space-y-3">
+      <div className="rounded-md border border-border/50 bg-secondary/20 p-2.5 text-[11px] leading-snug text-muted-foreground">
+        Two tools in one box. Type a <span className="font-semibold text-foreground">player name</span> to pull up their decision card (bid / pass / max bid). Type a <span className="font-semibold text-foreground">dollar amount</span> to see every undrafted player you can grab at or under that price, sorted best value first.
+      </div>
       <div>
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           What can I get for…
