@@ -58,50 +58,81 @@ function defaultAlloc(slot: Slot, idx: number, total: number, budget: number): R
   return {}; // unused — calculator below produces values directly
 }
 
-function suggestedAllocations(slots: Slot[], budget: number, strategyWeights?: Partial<Record<Slot["pos"], number[]>>): Record<string, number> {
-  // Baseline weights (no-strategy default) — SUPERFLEX league:
-  // QBs are heavily upweighted because nearly every team starts 2 of them,
-  // and the SUPERFLEX slot itself is treated as a 2nd-QB-quality spot.
-  const base: Record<Slot["pos"], number[]> = {
-    QB: [10, 7, 1],          // QB1 elite, QB2 still very valuable
+// Bench prices come from real league history (Backup QB, Handcuff RB, Depth WR,
+// Backup TE, Dart). Order matters — first bench slot gets the most expensive role.
+interface BenchPriceLite { role: string; median: number }
+
+function suggestedAllocations(
+  slots: Slot[],
+  budget: number,
+  strategyWeights?: Partial<Record<Slot["pos"], number[]>>,
+  benchPrices?: BenchPriceLite[],
+): Record<string, number> {
+  // Baseline weights for STARTING slots (no-strategy default) — SUPERFLEX league.
+  // Bench is no longer in the weight table — it's set from real league history below.
+  const base: Record<Exclude<Slot["pos"], "BENCH">, number[]> = {
+    QB: [10, 7, 1],
     RB: [7, 4.5, 2.5, 1.5, 1],
     WR: [6.5, 4.5, 3, 1.5, 1],
     TE: [2.5, 1],
     FLEX: [2.5],
-    SUPERFLEX: [7, 1],       // superflex slot ≈ a 2nd starting QB
+    SUPERFLEX: [7, 1],
     K: [0.05],
     DST: [0.05],
-    BENCH: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
   };
-  // Apply per-position multipliers from the chosen strategy (if any)
-  const weights: Record<Slot["pos"], number[]> = { ...base };
+  const weights = { ...base } as Record<Exclude<Slot["pos"], "BENCH">, number[]>;
   if (strategyWeights) {
-    for (const k of Object.keys(strategyWeights) as (keyof typeof base)[]) {
+    for (const k of Object.keys(base) as (keyof typeof base)[]) {
       const mult = strategyWeights[k] ?? [];
       weights[k] = base[k].map((w, i) => w * (mult[i] ?? mult[mult.length - 1] ?? 1));
     }
   }
+
+  // 1) Bench: assign from league history medians (most-expensive role first).
+  const benchSlots = slots.filter((s) => s.pos === "BENCH");
+  const starterSlots = slots.filter((s) => s.pos !== "BENCH");
+  const out: Record<string, number> = {};
+
+  // Build the bench ladder: highest median first, then $1 fillers for the rest.
+  // Order: Backup QB → Handcuff RB → Depth WR → Backup TE → Dart → $1.
+  const ROLE_ORDER = ["BACKUP_QB", "HANDCUFF_RB", "DEPTH_WR", "DEPTH_TE", "DART"];
+  const ladder: number[] = [];
+  if (benchPrices && benchPrices.length) {
+    const byRole = new Map(benchPrices.map((b) => [b.role, b.median]));
+    for (const r of ROLE_ORDER) {
+      const v = byRole.get(r);
+      if (typeof v === "number") ladder.push(Math.max(1, v));
+    }
+  }
+  benchSlots.forEach((s, i) => {
+    out[s.id] = ladder[i] ?? 1;
+  });
+  const benchTotal = benchSlots.reduce((a, s) => a + (out[s.id] ?? 0), 0);
+
+  // 2) Starters: distribute remaining $ by weights with $1 floor each.
+  const remainingForStarters = Math.max(starterSlots.length, budget - benchTotal);
   const counters: Record<string, number> = {};
-  const raw: number[] = slots.map((s) => {
+  const raw: number[] = starterSlots.map((s) => {
     const idx = counters[s.pos] ?? 0;
     counters[s.pos] = idx + 1;
-    const w = weights[s.pos]?.[idx] ?? weights[s.pos]?.[weights[s.pos].length - 1] ?? 0.1;
-    return w;
+    const ws = (weights as Record<string, number[]>)[s.pos] ?? [0.1];
+    return ws[idx] ?? ws[ws.length - 1] ?? 0.1;
   });
-  const floor = slots.length;
-  if (budget <= floor) return Object.fromEntries(slots.map((s) => [s.id, 1]));
-  const pool = budget - floor;
+  const floor = starterSlots.length;
+  const pool = Math.max(0, remainingForStarters - floor);
   const sumW = raw.reduce((a, b) => a + b, 0) || 1;
-  const out: Record<string, number> = {};
   let allocated = 0;
-  slots.forEach((s, i) => {
+  starterSlots.forEach((s, i) => {
     const v = Math.max(1, Math.round(1 + (raw[i] / sumW) * pool));
     out[s.id] = v;
     allocated += v;
   });
-  const diff = budget - allocated;
-  if (diff !== 0) {
-    const biggestId = [...slots].sort((a, b) => out[b.id] - out[a.id])[0].id;
+
+  // 3) Reconcile rounding diff against the largest starter slot.
+  const grandTotal = allocated + benchTotal;
+  const diff = budget - grandTotal;
+  if (diff !== 0 && starterSlots.length > 0) {
+    const biggestId = [...starterSlots].sort((a, b) => out[b.id] - out[a.id])[0].id;
     out[biggestId] = Math.max(1, out[biggestId] + diff);
   }
   return out;
