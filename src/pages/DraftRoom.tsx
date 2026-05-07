@@ -887,7 +887,7 @@ function LookupSection({
     return prices
       .filter((p) => !drafted.has(norm(p.name)))
       .filter((p) => p.price <= target && p.price >= Math.max(1, target - 5))
-      .sort((a, b) => b.estimate - a.estimate)
+      .sort((a, b) => b.price - a.price)
       .slice(0, 12);
   }, [prices, drafted, target]);
 
