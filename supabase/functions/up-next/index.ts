@@ -161,6 +161,37 @@ Deno.serve(async (req: Request) => {
       }
     } catch (e) { console.error("espn_player_ranks fetch", e); }
 
+    // ---- VALIDATION SET — names AI is allowed to return ----
+    // Built from: price sheet + anchor map + sleeper_players (full NFL DB).
+    // Anything not in this set is hallucinated → dropped server-side.
+    const allowedNames = new Map<string, { name: string; pos?: string }>();
+    for (const r of (p.prices ?? []) as any[]) {
+      const k = norm(r.name); if (k) allowedNames.set(k, { name: r.name, pos: r.position });
+    }
+    for (const [k, a] of anchorByName) {
+      if (!allowedNames.has(k)) allowedNames.set(k, { name: titleize(k), pos: a.pos });
+    }
+    // Sleeper full NFL DB (active skill players only)
+    const sleeperByPos: Record<string, { name: string; nameKey: string }[]> = {};
+    try {
+      const sleeperResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/sleeper_players?select=player_name,player_name_norm,position,status&position=in.(QB,RB,WR,TE,K,DST)&order=search_rank.asc.nullslast&limit=2000`,
+        { headers: sbHeaders },
+      );
+      if (sleeperResp.ok) {
+        const rows = (await sleeperResp.json()) as any[];
+        for (const r of rows) {
+          const k = r.player_name_norm || norm(r.player_name);
+          if (!k) continue;
+          if (!allowedNames.has(k)) allowedNames.set(k, { name: r.player_name, pos: r.position });
+          if (r.position && !draftedSet.has(k)) {
+            (sleeperByPos[r.position] ||= []).push({ name: r.player_name, nameKey: k });
+          }
+        }
+      }
+    } catch (e) { console.error("sleeper_players fetch", e); }
+
+
     // Market multiplier from observed paid vs anchor (uses live picks vs real anchors)
     const sheetMap = new Map<string, { price: number; pos?: string }>();
     for (const r of (p.prices ?? []) as any[]) sheetMap.set(norm(r.name), { price: Number(r.price) || 0, pos: r.position });
@@ -361,6 +392,57 @@ Deno.serve(async (req: Request) => {
           delete t.knockoff;
           t.knockoffNote = `No ${pos} alt under $${ceilingFloor} on your sheet`;
         }
+      }
+    }
+
+    // ---- VALIDATION: drop hallucinated names + dedupe + drop drafted ----
+    if (Array.isArray(parsed?.targets)) {
+      const seen = new Set<string>();
+      parsed.targets = parsed.targets.filter((t: any) => {
+        const k = norm(t?.name ?? "");
+        if (!k) return false;
+        if (seen.has(k) || draftedSet.has(k)) return false;
+        if (!allowedNames.has(k)) return false; // hallucinated
+        seen.add(k);
+        return true;
+      });
+
+      // ---- LATE-ROUND FALLBACK: if AI returned < 5 valid names, pad from Sleeper ----
+      if (parsed.targets.length < 5) {
+        const need = 10 - parsed.targets.length;
+        const usedKeys = new Set(parsed.targets.map((t: any) => norm(t.name)));
+        // Prefer positions where user still has gaps
+        const orderedPos = [...((p.gaps ?? []) as any[])]
+          .sort((a, b) => {
+            const sev = (s: string) => s === "critical" ? 0 : s === "need" ? 1 : s === "depth" ? 2 : 3;
+            return sev(a.severity) - sev(b.severity);
+          })
+          .map((g) => g.pos);
+        const pad: any[] = [];
+        for (const pos of orderedPos) {
+          if (pad.length >= need) break;
+          for (const sp of (sleeperByPos[pos] ?? [])) {
+            if (pad.length >= need) break;
+            if (usedKeys.has(sp.nameKey) || draftedSet.has(sp.nameKey)) continue;
+            usedKeys.add(sp.nameKey);
+            const anchor = anchorByName.get(sp.nameKey);
+            const sheet = sheetMap.get(sp.nameKey);
+            const base = sheet?.price || anchor?.price || 1;
+            const suggested = Math.max(1, Math.min(affordabilityCeiling, Math.round(base * marketMult)));
+            pad.push({
+              name: sp.name,
+              position: pos,
+              matchPct: 50,
+              maxBid: suggested,
+              reason: `Best ${pos} left in your league per Sleeper.`,
+              grade: 2,
+              worstCase: "Streamer/depth tier — limited upside.",
+              dossier: `Late-round ${pos} from Sleeper depth chart.`,
+              priceSource: sheet ? "sheet" : anchor ? anchor.src : "sleeper-fallback",
+            });
+          }
+        }
+        parsed.targets.push(...pad);
       }
     }
 
