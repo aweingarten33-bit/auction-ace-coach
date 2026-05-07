@@ -1179,10 +1179,10 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Top 100 grid — non-scrollable, all 100 math-backed values visible at once.
-// 4 cols × 25 rows of micro-chips. Tap a chip → opens the Decision Card.
+// Top 100 list — ESPN-style PDF rows in a slide-in panel.
+// Rank · Pos · Name · math-backed $. Tap a row → opens the Decision Card.
 // ─────────────────────────────────────────────────────────────────────────────
-function Top100Grid({
+function Top100List({
   prices,
   events,
   onPick,
@@ -1203,55 +1203,55 @@ function Top100Grid({
       .slice(0, 100);
   }, [prices]);
 
-  const lastName = (full: string) => {
-    const parts = full.replace(/\s+(Jr\.?|Sr\.?|II|III|IV)$/i, "").trim().split(/\s+/);
-    return parts[parts.length - 1] ?? full;
-  };
-
-  if (top.length === 0) return null;
+  if (top.length === 0) {
+    return (
+      <p className="py-8 text-center text-xs text-muted-foreground">
+        No prices loaded yet.
+      </p>
+    );
+  }
 
   return (
-    <section className="rounded-lg border border-border/60 bg-card p-2.5 shadow-sm">
-      <div className="mb-2 flex items-center justify-between px-0.5">
-        <h2 className="text-sm font-semibold">Top 100 · math-backed $</h2>
-        <span className="text-[10px] text-muted-foreground">tap → Decision Card</span>
+    <div className="space-y-1">
+      <div className="flex items-center gap-2 px-2 pb-1 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="w-6 text-right">#</span>
+        <span className="w-9">Pos</span>
+        <span className="flex-1">Player</span>
+        <span className="w-12 text-right">$ Value</span>
       </div>
-      <div className="grid grid-cols-4 gap-[3px]">
-        {top.map((p, i) => {
-          const isDrafted = drafted.has(norm(p.name));
-          const posTint = p.position ? POS_COLORS[p.position] ?? "" : "";
-          return (
-            <button
-              key={`${p.name}-${i}`}
-              type="button"
-              onClick={() => !isDrafted && onPick(p.name)}
-              disabled={isDrafted}
-              className={cn(
-                "flex flex-col items-center justify-center rounded border border-border/40 px-1 py-1 text-center leading-tight",
-                "min-h-[34px]",
-                isDrafted
-                  ? "bg-muted/40 opacity-40 line-through"
-                  : "bg-secondary/20 hover:bg-secondary/60 active:bg-secondary/80",
+      {top.map((p, i) => {
+        const isDrafted = drafted.has(norm(p.name));
+        const posTint = p.position ? POS_COLORS[p.position] ?? "" : "";
+        return (
+          <button
+            key={`${p.name}-${i}`}
+            type="button"
+            onClick={() => !isDrafted && onPick(p.name)}
+            disabled={isDrafted}
+            className={cn(
+              "flex w-full items-center gap-2 rounded border border-border/40 px-2 py-1.5 text-left",
+              isDrafted
+                ? "bg-muted/30 opacity-40 line-through"
+                : "bg-secondary/20 hover:bg-secondary/60 active:bg-secondary/80",
+            )}
+          >
+            <span className="w-6 text-right font-mono text-[11px] tabular-nums text-muted-foreground">
+              {i + 1}
+            </span>
+            <span className="w-9">
+              {p.position && (
+                <Badge variant="outline" className={cn(posTint, "text-[9px] px-1 py-0")}>
+                  {p.position}
+                </Badge>
               )}
-            >
-              <span className="flex w-full items-center justify-between gap-0.5">
-                <span className="text-[8px] font-mono text-muted-foreground">{i + 1}</span>
-                {p.position && (
-                  <span className={cn("rounded px-0.5 text-[7px] font-bold", posTint)}>
-                    {p.position}
-                  </span>
-                )}
-              </span>
-              <span className="w-full truncate text-[10px] font-semibold">
-                {lastName(p.name)}
-              </span>
-              <span className="text-[10px] font-mono tabular-nums text-primary">
-                ${p.price}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </section>
+            </span>
+            <span className="flex-1 truncate text-[12px] font-medium">{p.name}</span>
+            <span className="w-12 text-right font-mono text-[12px] tabular-nums text-primary">
+              ${p.price}
+            </span>
+          </button>
+        );
+      })}
+    </div>
   );
 }
