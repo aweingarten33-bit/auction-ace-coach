@@ -29,7 +29,7 @@ import {
   Check,
   Sparkles,
   ChevronRight,
-} from "lucide-react";
+  ListOrdered,
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 import { useAuth } from "@/hooks/useAuth";
