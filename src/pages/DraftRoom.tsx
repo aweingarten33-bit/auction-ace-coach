@@ -418,6 +418,53 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
+        {/* WAR ROOM COMMAND STRIP — gap pills + spend bar */}
+        {!espnSync.liveBid && (
+          <div className="rounded-md border border-border/60 bg-gradient-to-r from-card to-secondary/40 px-3 py-2">
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider">
+              <span className="flex items-center gap-1.5 text-primary">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                War Room
+              </span>
+              <span className="text-muted-foreground">·</span>
+              <span className="text-muted-foreground">{events.length} picks</span>
+              <span className="ml-auto text-muted-foreground">
+                ${budget.spent}<span className="opacity-50"> / ${settings.totalBudget}</span>
+              </span>
+            </div>
+            <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full bg-gradient-to-r from-primary to-primary/60 transition-all"
+                style={{ width: `${Math.min(100, (budget.spent / settings.totalBudget) * 100)}%` }}
+              />
+            </div>
+            {gaps.filter((g) => g.severity !== "done").length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {gaps
+                  .filter((g) => g.severity !== "done")
+                  .slice(0, 6)
+                  .map((g) => {
+                    const tone =
+                      g.severity === "critical"
+                        ? "border-destructive/60 bg-destructive/10 text-destructive"
+                        : g.severity === "need"
+                          ? "border-amber-500/60 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                          : "border-border bg-secondary/50 text-muted-foreground";
+                    return (
+                      <span
+                        key={g.pos}
+                        className={`flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-mono uppercase ${tone}`}
+                      >
+                        {g.pos}
+                        {g.starterShort > 0 && <span>−{g.starterShort}</span>}
+                      </span>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* SMART SEARCH — name OR $ amount */}
         <section ref={searchWrapRef}>
           <div className="relative">
