@@ -26,6 +26,7 @@ interface Imported {
   leagueType: LeagueType;
   roster: RosterSlots;
   leagueName?: string;
+  keepers: Keeper[];
 }
 
 function mapRoster(slots: Record<string, number>): RosterSlots {
