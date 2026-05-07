@@ -492,3 +492,36 @@ function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardIns
 
   return { recBig, recColor, vitals, scoutingReport, pathToSmash, risks, stacks, didYouKnow };
 }
+
+function projStatCells(pos: string | null | undefined, s: ProjStats): { label: string; value: string }[] {
+  const fmt = (n?: number) => (n == null ? "—" : n.toLocaleString());
+  if (pos === "QB") {
+    return [
+      { label: "Pa Yds", value: fmt(s.passYds) },
+      { label: "Pa TD",  value: fmt(s.passTD) },
+      { label: "Int",    value: fmt(s.int) },
+      { label: "Ru Yds", value: fmt(s.rushYds) },
+      { label: "Ru TD",  value: fmt(s.rushTD) },
+    ].filter((c) => c.value !== "—");
+  }
+  if (pos === "RB") {
+    return [
+      { label: "Att",    value: fmt(s.rushAtt) },
+      { label: "Ru Yds", value: fmt(s.rushYds) },
+      { label: "Ru TD",  value: fmt(s.rushTD) },
+      { label: "Rec",    value: fmt(s.rec) },
+      { label: "Re Yds", value: fmt(s.recYds) },
+    ].filter((c) => c.value !== "—");
+  }
+  if (pos === "WR" || pos === "TE") {
+    return [
+      { label: "Tgt",    value: fmt(s.targets) },
+      { label: "Rec",    value: fmt(s.rec) },
+      { label: "Re Yds", value: fmt(s.recYds) },
+      { label: "Re TD",  value: fmt(s.recTD) },
+      { label: "Games",  value: fmt(s.games) },
+    ].filter((c) => c.value !== "—");
+  }
+  // Fallback: show whatever is present
+  return Object.entries(s).slice(0, 5).map(([k, v]) => ({ label: k, value: fmt(v) }));
+}
