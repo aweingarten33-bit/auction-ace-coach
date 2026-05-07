@@ -86,6 +86,18 @@ async function getFantasyPros(): Promise<Source | null> {
     url,
     markdown: md,
   };
+
+async function getCbsSports(): Promise<Source | null> {
+  const url = "https://www.cbssports.com/fantasy/football/";
+  const md = await firecrawlScrape(url);
+  if (!md) return null;
+  return {
+    id: "cbs",
+    name: "CBS Sports Fantasy",
+    title: "Latest from CBS Sports Fantasy",
+    url,
+    markdown: md,
+  };
 }
 
 let cache: { at: number; data: any } | null = null;
