@@ -113,11 +113,6 @@ export default function MarketHeat({ events, prices, gaps, maxBid, remaining, pu
             <HelpCircle className="h-3 w-3" />
           </Button>
           <span className="text-[9px] text-muted-foreground">{updatedLabel}</span>
-          <Button
-            size="sm" variant="ghost" onClick={load} disabled={loading} className="h-6 px-1.5"
-          >
-            <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
-          </Button>
         </div>
       </div>
 
