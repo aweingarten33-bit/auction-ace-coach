@@ -90,7 +90,7 @@ export default function AiQuickPanel({
             Top 10 to draft next
           </p>
           <p className="mt-1 text-[10px] leading-snug text-muted-foreground/80">
-            $ values are AI estimates of where these players will go in your league — they may differ from the math-based numbers on the Decision Card.
+            $ values are AI estimates of where these players will go. To get the math-based max bid for any player, use Find in the menu.
           </p>
         </div>
         <div className="flex-1 px-3 pb-3">
