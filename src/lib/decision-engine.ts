@@ -281,10 +281,10 @@ export function decide(input: EngineInput): DecisionResult {
     else adjustments.push("Pivot to value tier — no more premium bids");
   }
 
-  // Confidence
+  // Confidence — high if we have a real anchor + confident market, medium if anchor only, low otherwise
   const confidence: DecisionResult["confidence"] =
-    sheetPrice > 0 && pulse.confident ? "high" :
-    sheetPrice > 0 ? "medium" : "low";
+    anchorSource === "sheet" && pulse.confident ? "high" :
+    anchorPrice > 0 ? "medium" : "low";
 
   return {
     hasPlayer: !!player,
@@ -293,6 +293,8 @@ export function decide(input: EngineInput): DecisionResult {
     currentPrice,
     goUpTo,
     stopAt,
+    anchorPrice,
+    anchorSource,
     verdict,
     oneLiner,
     ladder,
