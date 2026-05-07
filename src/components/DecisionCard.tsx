@@ -46,19 +46,24 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
           </div>
           <p className="mt-0.5 font-mono text-[11px] text-muted-foreground">
             current ${d.currentPrice || 0} · confidence {d.confidence}
-            {d.anchorPrice > 0 && d.anchorSource !== "sheet" && (
-              <span className="ml-1.5 rounded bg-secondary/60 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
-                {d.anchorSource === "league" ? `league avg $${d.anchorPrice}` : `ESPN $${d.anchorPrice}`}
-              </span>
-            )}
             {d.anchorPrice > 0 && d.anchorSource === "sheet" && (
               <span className="ml-1.5 rounded bg-secondary/60 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
-                sheet ${d.anchorPrice}
+                your price ${d.anchorPrice}
+              </span>
+            )}
+            {d.anchorPrice > 0 && d.anchorSource === "league" && (
+              <span className="ml-1.5 rounded bg-secondary/60 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
+                3yr league avg ${d.anchorPrice}
+              </span>
+            )}
+            {d.anchorPrice > 0 && d.anchorSource === "espn" && (
+              <span className="ml-1.5 rounded bg-secondary/60 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-foreground/80">
+                ESPN 2026 ${d.anchorPrice}
               </span>
             )}
             {d.anchorPrice === 0 && (
               <span className="ml-1.5 rounded bg-warning/20 px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-warning">
-                no anchor — capped to wallet
+                ⚠ no price data — showing your max budget
               </span>
             )}
           </p>
