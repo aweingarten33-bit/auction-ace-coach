@@ -169,27 +169,36 @@ Deno.serve(async (req: Request) => {
     const marketMult = n >= 3 && sheetSum > 0 ? paidSum / sheetSum : 1;
     const confident = n >= 8;
 
-    // Per-position fallback board: top 8 undrafted, sorted by sheet price desc, with market-adjusted "going rate"
+    // Per-position fallback board: merges user sheet + anchor data (3yr league + ESPN).
+    // Each row carries source so the prompt and engine know what we're trusting.
     const POS_LIST = ["QB", "RB", "WR", "TE", "K", "DST"] as const;
-    const fallbackByPos: Record<string, { name: string; sheet: number; going: number }[]> = {};
+    const fallbackByPos: Record<string, { name: string; sheet: number; going: number; src: string }[]> = {};
     for (const pos of POS_LIST) {
-      const list = ((p.prices ?? []) as any[])
-        .filter((r) => r.position === pos && !draftedSet.has(norm(r.name)) && Number(r.price) > 0)
-        .sort((a, b) => Number(b.price) - Number(a.price))
-        .slice(0, 8)
-        .map((r) => ({
-          name: r.name,
-          sheet: Number(r.price),
-          going: Math.max(1, Math.round(Number(r.price) * marketMult)),
-        }));
-      fallbackByPos[pos] = list;
+      const merged = new Map<string, { name: string; sheet: number; going: number; src: string }>();
+      // sheet rows
+      for (const r of (p.prices ?? []) as any[]) {
+        if (r.position !== pos) continue;
+        const k = norm(r.name);
+        if (!k || draftedSet.has(k)) continue;
+        const sheet = Number(r.price) || 0;
+        if (sheet <= 0) continue;
+        merged.set(k, { name: r.name, sheet, going: Math.max(1, Math.round(sheet * marketMult)), src: "sheet" });
+      }
+      // anchor rows (league3yr / espn2026) — fill gaps
+      for (const [k, a] of anchorByName) {
+        if (a.pos !== pos) continue;
+        if (draftedSet.has(k)) continue;
+        if (merged.has(k)) continue;
+        merged.set(k, { name: titleize(k), sheet: a.price, going: Math.max(1, Math.round(a.price * marketMult)), src: a.src });
+      }
+      fallbackByPos[pos] = Array.from(merged.values()).sort((a, b) => b.going - a.going).slice(0, 10);
     }
 
     const fallbackText = POS_LIST
       .map((pos) => {
         const rows = fallbackByPos[pos];
-        if (!rows.length) return `${pos}: (no undrafted on sheet)`;
-        return `${pos}: ${rows.map((r) => `${r.name} sheet$${r.sheet}/going$${r.going}`).join(" | ")}`;
+        if (!rows.length) return `${pos}: (no data)`;
+        return `${pos}: ${rows.map((r) => `${r.name} $${r.going}(${r.src})`).join(" | ")}`;
       })
       .join("\n");
 
