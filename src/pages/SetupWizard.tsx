@@ -75,7 +75,7 @@ export default function SetupWizard() {
   const finish = () => {
     setPrices(parsePriceSheet(pricesText));
     completeSetup();
-    navigate("/draft");
+    navigate("/draft-room");
   };
 
   const keeperSpend = keepers.reduce((s, k) => s + k.cost, 0);
