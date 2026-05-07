@@ -805,14 +805,16 @@ function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
   const setSettings = useDraftStore((s) => s.setSettings);
   const strategyId = (settings as any).strategy ?? "balanced";
   const strategy = getStrategy(strategyId);
+  const w = (pos: "QB" | "RB" | "WR" | "TE", i = 0) =>
+    strategy.weights?.[pos]?.[i] ?? 1;
 
   const slots: Array<[string, number]> = [
-    ["QB1", Math.round(budget.totalBudget * (strategy.allocations.QB ?? 0.06))],
-    ["RB1", Math.round(budget.totalBudget * (strategy.allocations.RB ?? 0.3) * 0.55)],
-    ["RB2", Math.round(budget.totalBudget * (strategy.allocations.RB ?? 0.3) * 0.3)],
-    ["WR1", Math.round(budget.totalBudget * (strategy.allocations.WR ?? 0.3) * 0.5)],
-    ["WR2", Math.round(budget.totalBudget * (strategy.allocations.WR ?? 0.3) * 0.3)],
-    ["TE1", Math.round(budget.totalBudget * (strategy.allocations.TE ?? 0.05))],
+    ["QB1", Math.round(budget.totalBudget * 0.06 * w("QB", 0))],
+    ["RB1", Math.round(budget.totalBudget * 0.18 * w("RB", 0))],
+    ["RB2", Math.round(budget.totalBudget * 0.1 * w("RB", 1))],
+    ["WR1", Math.round(budget.totalBudget * 0.18 * w("WR", 0))],
+    ["WR2", Math.round(budget.totalBudget * 0.1 * w("WR", 1))],
+    ["TE1", Math.round(budget.totalBudget * 0.05 * w("TE", 0))],
   ];
 
   return (
@@ -833,8 +835,8 @@ function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
                   : "border-border/50 bg-secondary/20 text-muted-foreground hover:bg-secondary/40"
               }`}
             >
-              <div className="font-medium">{s.name}</div>
-              <div className="text-[10px] opacity-70">{s.summary}</div>
+              <div className="font-medium">{s.label}</div>
+              <div className="text-[10px] opacity-70">{s.short}</div>
             </button>
           ))}
         </div>
