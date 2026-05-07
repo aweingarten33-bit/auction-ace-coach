@@ -395,6 +395,57 @@ Deno.serve(async (req: Request) => {
       }
     }
 
+    // ---- VALIDATION: drop hallucinated names + dedupe + drop drafted ----
+    if (Array.isArray(parsed?.targets)) {
+      const seen = new Set<string>();
+      parsed.targets = parsed.targets.filter((t: any) => {
+        const k = norm(t?.name ?? "");
+        if (!k) return false;
+        if (seen.has(k) || draftedSet.has(k)) return false;
+        if (!allowedNames.has(k)) return false; // hallucinated
+        seen.add(k);
+        return true;
+      });
+
+      // ---- LATE-ROUND FALLBACK: if AI returned < 5 valid names, pad from Sleeper ----
+      if (parsed.targets.length < 5) {
+        const need = 10 - parsed.targets.length;
+        const usedKeys = new Set(parsed.targets.map((t: any) => norm(t.name)));
+        // Prefer positions where user still has gaps
+        const orderedPos = [...((p.gaps ?? []) as any[])]
+          .sort((a, b) => {
+            const sev = (s: string) => s === "critical" ? 0 : s === "need" ? 1 : s === "depth" ? 2 : 3;
+            return sev(a.severity) - sev(b.severity);
+          })
+          .map((g) => g.pos);
+        const pad: any[] = [];
+        for (const pos of orderedPos) {
+          if (pad.length >= need) break;
+          for (const sp of (sleeperByPos[pos] ?? [])) {
+            if (pad.length >= need) break;
+            if (usedKeys.has(sp.nameKey) || draftedSet.has(sp.nameKey)) continue;
+            usedKeys.add(sp.nameKey);
+            const anchor = anchorByName.get(sp.nameKey);
+            const sheet = sheetMap.get(sp.nameKey);
+            const base = sheet?.price || anchor?.price || 1;
+            const suggested = Math.max(1, Math.min(affordabilityCeiling, Math.round(base * marketMult)));
+            pad.push({
+              name: sp.name,
+              position: pos,
+              matchPct: 50,
+              maxBid: suggested,
+              reason: `Best ${pos} left in your league per Sleeper.`,
+              grade: 2,
+              worstCase: "Streamer/depth tier — limited upside.",
+              dossier: `Late-round ${pos} from Sleeper depth chart.`,
+              priceSource: sheet ? "sheet" : anchor ? anchor.src : "sleeper-fallback",
+            });
+          }
+        }
+        parsed.targets.push(...pad);
+      }
+    }
+
     return new Response(JSON.stringify(parsed), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("up-next error", e);
