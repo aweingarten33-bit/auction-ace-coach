@@ -49,6 +49,7 @@ import { decide } from "@/lib/decision-engine";
 import { ApiError, fetchTargets } from "@/lib/api";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
+import { loadSleeperPlayers, searchPlayers, SleeperPlayer } from "@/lib/sleeper";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
