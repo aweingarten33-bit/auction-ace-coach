@@ -21,7 +21,8 @@ async function firecrawlSearch(query: string) {
   });
   if (!r.ok) return [];
   const data = await r.json();
-  return (data?.data ?? data?.web?.results ?? []) as any[];
+  const raw = data?.data ?? data?.web?.results ?? data?.results ?? [];
+  return (Array.isArray(raw) ? raw : []) as any[];
 }
 
 async function firecrawlScrape(url: string): Promise<string | null> {
