@@ -60,6 +60,7 @@ import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
+import { useLeagueBenchPrices } from "@/lib/league-bench-prices";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
 import ValueVerdict from "@/components/ValueVerdict";
