@@ -55,7 +55,9 @@ export default function PlayerDecisionOverlay({
           prices,
           player: name,
           position,
-          currentPrice: price ?? 0,
+          // Pre-draft: there's no active bid. Passing the sheet price here
+          // would make the engine think bidding is already at sheet value.
+          currentPrice: 0,
           anchorMap,
         }),
         error: null,
