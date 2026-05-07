@@ -84,10 +84,10 @@ export default function AiQuickPanel({
       </TabsList>
 
       {/* ── Targets tab ───────────────────────────────────────────── */}
-      <TabsContent value="targets" className="flex-1 overflow-hidden p-0">
-        <div className="flex items-center justify-between px-4 pt-3">
+      <TabsContent value="targets" className="flex min-h-0 flex-1 flex-col overflow-hidden p-0 data-[state=inactive]:hidden">
+        <div className="flex shrink-0 items-center justify-between px-4 pt-3">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Who to go after next
+            Top 10 to go after next
           </p>
           <Button
             size="sm" variant="ghost"
@@ -99,7 +99,7 @@ export default function AiQuickPanel({
             Refresh
           </Button>
         </div>
-        <div className="space-y-2 overflow-y-auto px-3 pb-4 pt-2">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-3 pb-4 pt-2">
           {targets.length === 0 && !targetsLoading && (
             <p className="px-2 py-6 text-center text-xs text-muted-foreground">
               No targets yet — tap Refresh to ask the AI.
@@ -110,13 +110,16 @@ export default function AiQuickPanel({
               Thinking…
             </p>
           )}
-          {targets.slice(0, 6).map((t) => (
+          {targets.slice(0, 10).map((t, i) => (
             <Card
               key={t.name}
               onClick={() => onPickTarget(t.name)}
               className="cursor-pointer p-3 transition hover:border-primary/50 hover:bg-secondary/40"
             >
               <div className="flex items-start gap-2">
+                <span className="mt-0.5 w-4 shrink-0 text-center font-mono text-[10px] text-muted-foreground">
+                  {i + 1}
+                </span>
                 <Badge variant="outline" className={`${POS_COLORS[t.position] ?? ""} shrink-0 text-[10px]`}>
                   {t.position}
                 </Badge>
