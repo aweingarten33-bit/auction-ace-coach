@@ -643,7 +643,7 @@ function DrawerContents({
   >("menu");
 
   const sections = [
-    { id: "lookup" as const, label: "Player name or $", icon: Search, hint: "Find a player or what fits a budget" },
+    { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player to lock the decision card, or a $ amount to see every undrafted player you can afford" },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Check 1–3 players against your bank" },
     { id: "market" as const, label: "Market", icon: TrendingUp, hint: "Trending picks · run alerts" },
     { id: "opponents" as const, label: "Opponents", icon: Users, hint: "What every team has spent" },
@@ -666,7 +666,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Player name or $" : section}
+            {section === "menu" ? "Menu" : section === "vetri" ? "What's social saying" : section === "afford" ? "Can I afford X + Y + Z?" : section === "lookup" ? "Find (player or $)" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
@@ -959,6 +959,9 @@ function LookupSection({
 
   return (
     <div className="space-y-3">
+      <div className="rounded-md border border-border/50 bg-secondary/20 p-2.5 text-[11px] leading-snug text-muted-foreground">
+        Type a <span className="font-semibold text-foreground">dollar amount</span> and I'll list every undrafted player on your price sheet you can afford at or under that price — sorted most expensive first so you see the best value for the money. Tap a result to lock its decision card.
+      </div>
       <div>
         <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           What can I get for…
