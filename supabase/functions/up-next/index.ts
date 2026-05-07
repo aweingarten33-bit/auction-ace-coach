@@ -195,26 +195,65 @@ Deno.serve(async (req: Request) => {
     }
     const parsed = JSON.parse(call.function.arguments);
 
-    // ---- Server-side enforcement of DHgate knockoff rules ----
-    // Knockoff MUST: come from the user's price sheet, match the target's
-    // position, not be drafted, not be the target itself, and have
-    // price < maxBid * 0.6. If the AI violates any rule we overwrite with the
-    // best deterministic candidate from fallbackByPos. If none exist we
-    // gracefully drop knockoff and set knockoffNote.
+    // ---- Suggested-bid engine (deterministic, capped by affordability) ----
+    // Blend = 0.6 × MarketPrice + 0.4 × AIPrice (AI = its own maxBid guess).
+    // ScarcityMult: critical=+25%, need=+10%, else 1.0.
+    // RunMult: +5% per recent same-pos pick in window (cap +20%).
+    // Hard ceiling: user's affordability max (budget.maxBid). Never exceeds it.
+    const affordabilityCeiling = Math.max(1, Number(p?.budget?.maxBid) || 1);
+    const gapByPos = new Map<string, string>();
+    for (const g of (p.gaps ?? []) as any[]) gapByPos.set(g.pos, g.severity);
+    const runCounts = (p?.recentRuns?.counts ?? {}) as Record<string, number>;
+
+    // Replacement price per position (used when player isn't on the sheet —
+    // we use the median of the top-8 fallback going prices for that position
+    // so we never default to the affordability ceiling).
+    const replacementByPos: Record<string, number> = {};
+    for (const pos of POS_LIST) {
+      const board = fallbackByPos[pos] ?? [];
+      if (board.length) {
+        const sorted = [...board].map((r) => r.going).sort((a, b) => a - b);
+        replacementByPos[pos] = sorted[Math.floor(sorted.length / 2)] || 1;
+      }
+    }
+
     if (Array.isArray(parsed?.targets)) {
       for (const t of parsed.targets) {
         const pos = t?.position as string | undefined;
 
-        // ---- Snap maxBid to deterministic going-price ----
-        // The model picks WHO to target; the $ comes from sheet × marketMult so
-        // the user sees the same number on every refresh. Falls back to AI value
-        // only when the player isn't on the sheet.
+        // 1. Market price (sheet × marketMult) — anchor when available
         const sheetRef = sheetMap.get(norm(t?.name ?? ""));
-        if (sheetRef && sheetRef.price > 0) {
-          t.maxBid = Math.max(1, Math.round(sheetRef.price * marketMult));
-        }
+        const marketPrice = sheetRef && sheetRef.price > 0
+          ? Math.max(1, Math.round(sheetRef.price * marketMult))
+          : (pos && replacementByPos[pos]) || 0;
 
-        const maxBid = Number(t?.maxBid) || 0;
+        // 2. AI price (model's own maxBid guess) — clamp to a sane band so a
+        //    runaway $213 doesn't poison the blend
+        const aiRaw = Number(t?.maxBid) || 0;
+        const aiPrice = marketPrice > 0
+          ? Math.max(1, Math.min(aiRaw, Math.round(marketPrice * 1.5)))
+          : Math.max(1, Math.min(aiRaw, Math.round(affordabilityCeiling * 0.5)));
+
+        // 3. Blend
+        let blend = marketPrice > 0
+          ? 0.6 * marketPrice + 0.4 * aiPrice
+          : aiPrice;
+
+        // 4. Scarcity nudge
+        const sev = pos ? gapByPos.get(pos) : undefined;
+        const scarcityMult = sev === "critical" ? 1.25 : sev === "need" ? 1.10 : 1.0;
+
+        // 5. Run nudge (mid-run = pay up a bit)
+        const runN = pos ? Number(runCounts[pos] || 0) : 0;
+        const runMult = 1 + Math.min(0.20, runN * 0.05);
+
+        const suggested = Math.max(
+          1,
+          Math.min(affordabilityCeiling, Math.round(blend * scarcityMult * runMult)),
+        );
+        t.maxBid = suggested;
+
+        const maxBid = suggested;
         const ceiling = maxBid * 0.6;
         const ceilingFloor = Math.max(0, Math.floor(ceiling));
         const board = (pos && fallbackByPos[pos]) ? fallbackByPos[pos] : [];
