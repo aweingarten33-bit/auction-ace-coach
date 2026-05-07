@@ -324,11 +324,15 @@ export default function DraftRoom() {
 
   void activePrice;
 
+  const [decisionError, setDecisionError] = useState<string>("");
   const decision = useMemo(() => {
-    if (!activeName) return null;
+    if (!activeName) {
+      setDecisionError("");
+      return null;
+    }
 
     try {
-      return decide({
+      const d = decide({
         settings,
         keepers,
         events,
@@ -338,7 +342,12 @@ export default function DraftRoom() {
         currentPrice: 0,
         anchorMap,
       });
-    } catch {
+      setDecisionError("");
+      return d;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[decide] threw for", activeName, e);
+      setDecisionError(msg);
       return null;
     }
   }, [activeName, activePosition, settings, keepers, events, prices, anchorMap]);
