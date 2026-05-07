@@ -88,6 +88,43 @@ Deno.serve(async (req) => {
         const position = POS[p.defaultPositionId] ?? null;
         // Prefer PPR (most leagues, incl. half-PPR which ESPN doesn't publish separately).
         const ranks = p.draftRanksByRankType?.PPR ?? p.draftRanksByRankType?.STANDARD ?? null;
+
+        // ESPN projected season stat line. statSourceId=1 (projected),
+        // statSplitTypeId=0 (full season), seasonId=current.
+        let projected_stats: Record<string, number> | null = null;
+        let projected_points: number | null = null;
+        if (Array.isArray(p.stats)) {
+          const proj = p.stats.find((s: any) =>
+            s.seasonId === season && s.statSourceId === 1 && s.statSplitTypeId === 0
+          );
+          if (proj) {
+            projected_points = typeof proj.appliedTotal === "number" ? Math.round(proj.appliedTotal * 10) / 10 : null;
+            const st = proj.stats || {};
+            const num = (k: string | number) => {
+              const v = st[String(k)];
+              return typeof v === "number" ? Math.round(v) : null;
+            };
+            // ESPN stat IDs: 3 passYds, 4 passTD, 20 int, 23 rushAtt, 24 rushYds, 25 rushTD,
+            // 41 rec, 42 recYds, 43 recTD, 53 targets, 210 games. Only keep non-null fields.
+            const raw: Record<string, number | null> = {
+              passYds: num(3),
+              passTD: num(4),
+              int: num(20),
+              rushAtt: num(23),
+              rushYds: num(24),
+              rushTD: num(25),
+              rec: num(53) ?? num(41),
+              recYds: num(42),
+              recTD: num(43),
+              targets: num(58),
+              games: num(210),
+            };
+            const cleaned: Record<string, number> = {};
+            for (const [k, v] of Object.entries(raw)) if (v != null && v !== 0) cleaned[k] = v;
+            if (Object.keys(cleaned).length) projected_stats = cleaned;
+          }
+        }
+
         return {
           season,
           espn_player_id: id,
@@ -97,12 +134,13 @@ Deno.serve(async (req) => {
           overall_rank: ranks?.rank ?? null,
           pos_rank: ranks?.positionalRank ?? null,
           auction_value: ranks?.auctionValue ?? null,
-          projected_points: null,
+          projected_points,
+          projected_stats,
           prior_ppg: null as number | null,
           prior_season: null as number | null,
         };
       })
-      .filter(Boolean) as Array<{ season: number; espn_player_id: number; player_name: string; player_name_norm: string; position: string | null; overall_rank: number | null; pos_rank: number | null; auction_value: number | null; projected_points: number | null; prior_ppg: number | null; prior_season: number | null }>;
+      .filter(Boolean) as Array<any>;
 
     // Compute pos_rank ourselves when ESPN omits positionalRank: rank players
     // within each position by overall_rank ascending. This is what the auto-fill
