@@ -119,12 +119,13 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const [berry, espn, fp] = await Promise.all([
+    const [berry, espn, fp, cbs] = await Promise.all([
       getBerryLoveHate(),
       getEspnFantasyArticle(),
       getFantasyPros(),
+      getCbsSports(),
     ]);
-    const sources = [berry, espn, fp].filter(Boolean) as Source[];
+    const sources = [berry, espn, fp, cbs].filter(Boolean) as Source[];
     const payload = { sources, generatedAt: new Date().toISOString() };
     cache = { at: Date.now(), data: payload };
     return new Response(JSON.stringify(payload), {
