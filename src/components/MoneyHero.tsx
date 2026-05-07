@@ -54,12 +54,20 @@ export default function MoneyHero({ remaining, total, showMax, maxBid, slotsLeft
             {delta}
           </span>
         )}
-        {showMax && (
-          <span className="ml-auto flex items-baseline gap-1 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
-            <span>max</span>
-            <span className="text-foreground tabular-nums">${maxBid}</span>
-          </span>
-        )}
+        <span className="ml-auto flex items-baseline gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
+          {showMax && (
+            <span className="flex items-baseline gap-1">
+              <span>max</span>
+              <span className="text-foreground tabular-nums">${maxBid}</span>
+            </span>
+          )}
+          {slotsLeft != null && (
+            <span className="flex items-baseline gap-1">
+              <span className="text-foreground tabular-nums">{slotsLeft}</span>
+              <span>slots</span>
+            </span>
+          )}
+        </span>
       </div>
 
       {/* Drain meter — thin oscilloscope rail */}
