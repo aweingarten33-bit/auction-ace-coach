@@ -30,7 +30,7 @@ const SYSTEM_PROMPT = `You are an elite fantasy football auction draft strategis
 
 You will receive deterministic draft state (budget, slots, max bid, roster gaps, draft log, the user's price sheet, recent runs).
 
-Your ONLY job is to call the emit_queue tool with the THREE best players the user should target RIGHT NOW.
+Your ONLY job is to call the emit_queue tool with the TEN best players the user should target RIGHT NOW, ranked best→worst.
 
 Rules:
 - Pick from the user's price sheet when possible. Otherwise use widely known players appropriate for the format.
@@ -38,27 +38,27 @@ Rules:
 - "maxBid" = the REALISTIC AUCTION PRICE this specific player goes for in a $${"{BUDGET}"} ${"{LEAGUE_TYPE}"} league. NOT the user's affordability ceiling. Each player should have a DIFFERENT, player-specific price reflecting their actual market value (e.g. Mahomes $55, McCaffrey $65, Jefferson $60 — NOT all the same number). Must be <= user's affordability max and leave $1 per remaining slot, but otherwise reflect true market.
 - "matchPct" (0-100) reflects how well the player fits the user's needs RIGHT NOW (positional gap urgency + value vs price sheet + market timing). Higher = better fit.
 - "reason" is ONE short punchy line (max ~70 chars). Concrete: positional fit + value angle. No fluff.
-- Order the 3 by matchPct descending.
+- Order all 10 by matchPct descending.
 - "openMan" (optional, max ~60 chars): one line on which position the room is sleeping on, if any.
 
 For EACH target also emit (all required):
 - "grade" (1-5 integer): consensus quality score for this player at the suggested bid given current draft state. 5 = elite call, 1 = desperate.
-- "worstCase" (max ~90 chars): plain-English downside if user PASSES. Must name the realistic next-best player at that position with a $ estimate, and say what it costs the roster in everyday words. Format: "You'll likely settle for <Alt Name> at ~$X, and you'd still be short a starting <POS>." Example: "You'll likely settle for Pollard at ~$14, and you'd still be short a starting RB." No jargon like "starter shorts", "critical", or "leaves N".
-- "knockoff" ({ "name": string, "position": same enum, "price": int >= 1 }): a meaningfully cheaper DHgate-style alternative at the SAME position. Knockoff price MUST be < maxBid * 0.6 and >= 1. Pull from the price sheet when possible. If literally no cheaper alternative exists, repeat the player with price = maxBid (rare).
+- "worstCase" (max ~90 chars): plain-English downside if user PASSES. Must name the realistic next-best player at that position with a $ estimate. Format: "You'll likely settle for <Alt Name> at ~$X."
+- "knockoff" ({ "name": string, "position": same enum, "price": int >= 1 }): a meaningfully cheaper alternative at the SAME position. Knockoff price MUST be < maxBid * 0.6 and >= 1.
 - "dossier" (max ~110 chars): IMDb-style one-liner — role, team if known, key trait, why-now. No fluff.`;
 
 const TOOL = {
   type: "function",
   function: {
     name: "emit_queue",
-    description: "Emit the top 3 players the user should target next.",
+    description: "Emit the top 10 players the user should target next, ranked best to worst.",
     parameters: {
       type: "object",
       properties: {
         targets: {
           type: "array",
-          minItems: 3,
-          maxItems: 3,
+          minItems: 5,
+          maxItems: 10,
           items: {
             type: "object",
             properties: {
