@@ -308,6 +308,12 @@ export function decide(input: EngineInput): DecisionResult {
     stopAt,
     anchorPrice,
     anchorSource,
+    anchorBreakdown: mapEntry ? {
+      league: mapEntry.leaguePrice,
+      market: mapEntry.marketPrice,
+      espn: mapEntry.marketSources?.espn,
+      sleeper: mapEntry.marketSources?.sleeper,
+    } : undefined,
     verdict,
     oneLiner,
     ladder,
