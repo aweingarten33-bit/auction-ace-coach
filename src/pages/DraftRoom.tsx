@@ -1136,3 +1136,81 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
     </button>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Top 100 grid — non-scrollable, all 100 math-backed values visible at once.
+// 4 cols × 25 rows of micro-chips. Tap a chip → opens the Decision Card.
+// ─────────────────────────────────────────────────────────────────────────────
+function Top100Grid({
+  prices,
+  events,
+  onPick,
+}: {
+  prices: PriceEstimate[];
+  events: ReturnType<typeof useDraftStore.getState>["events"];
+  onPick: (name: string) => void;
+}) {
+  const drafted = useMemo(
+    () => new Set(events.map((e) => norm(e.player))),
+    [events],
+  );
+
+  const top = useMemo(() => {
+    return prices
+      .filter((p) => p.price > 0)
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 100);
+  }, [prices]);
+
+  const lastName = (full: string) => {
+    const parts = full.replace(/\s+(Jr\.?|Sr\.?|II|III|IV)$/i, "").trim().split(/\s+/);
+    return parts[parts.length - 1] ?? full;
+  };
+
+  if (top.length === 0) return null;
+
+  return (
+    <section className="rounded-lg border border-border/60 bg-card p-2.5 shadow-sm">
+      <div className="mb-2 flex items-center justify-between px-0.5">
+        <h2 className="text-sm font-semibold">Top 100 · math-backed $</h2>
+        <span className="text-[10px] text-muted-foreground">tap → Decision Card</span>
+      </div>
+      <div className="grid grid-cols-4 gap-[3px]">
+        {top.map((p, i) => {
+          const isDrafted = drafted.has(norm(p.name));
+          const posTint = p.position ? POS_COLORS[p.position] ?? "" : "";
+          return (
+            <button
+              key={`${p.name}-${i}`}
+              type="button"
+              onClick={() => !isDrafted && onPick(p.name)}
+              disabled={isDrafted}
+              className={cn(
+                "flex flex-col items-center justify-center rounded border border-border/40 px-1 py-1 text-center leading-tight",
+                "min-h-[34px]",
+                isDrafted
+                  ? "bg-muted/40 opacity-40 line-through"
+                  : "bg-secondary/20 hover:bg-secondary/60 active:bg-secondary/80",
+              )}
+            >
+              <span className="flex w-full items-center justify-between gap-0.5">
+                <span className="text-[8px] font-mono text-muted-foreground">{i + 1}</span>
+                {p.position && (
+                  <span className={cn("rounded px-0.5 text-[7px] font-bold", posTint)}>
+                    {p.position}
+                  </span>
+                )}
+              </span>
+              <span className="w-full truncate text-[10px] font-semibold">
+                {lastName(p.name)}
+              </span>
+              <span className="text-[10px] font-mono tabular-nums text-primary">
+                ${p.price}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
