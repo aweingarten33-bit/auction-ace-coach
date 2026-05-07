@@ -105,11 +105,15 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           let final = leaguePrice;
           if (ev && ev.val > 0) {
             const ratio = ev.val / Math.max(1, leaguePrice);
+            const seasonsCount = v.bySeason.size;
             if (ratio >= 1.4) {
               // ESPN much higher → market sees breakout. Meet in the middle.
               final = (leaguePrice + ev.val) / 2;
-            } else if (ratio <= 0.6) {
-              // ESPN much lower → market faded. Pull league down 70/30.
+            } else if (ratio <= 0.6 && seasonsCount >= 2) {
+              // ESPN much lower → market faded. Only trust this if league
+              // has 2+ seasons of sustained price (otherwise it's likely
+              // a 2nd-year ascending player ESPN hasn't caught up to —
+              // e.g. last year's rookie now stepping into a starter role).
               final = leaguePrice * 0.7 + ev.val * 0.3;
             }
           }
