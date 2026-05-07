@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Trophy, Gavel, LineChart, Zap } from "lucide-react";
@@ -45,22 +44,16 @@ export default function AuthPage() {
     }
   };
 
-  /**
-   * Google OAuth via Lovable Cloud managed broker.
-   * Does a full-page redirect in the same tab — no BYO credentials needed.
-   */
   const google = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/`,
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/` },
     });
-    if (result.error) {
-      toast.error(result.error.message);
+    if (error) {
+      toast.error(error.message);
       setBusy(false);
-      return;
     }
-    if (result.redirected) return;
-    nav("/");
   };
 
   return (
