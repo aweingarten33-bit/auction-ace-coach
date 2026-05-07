@@ -59,6 +59,26 @@ export interface CoachInput {
   showMath?: boolean;
   /** Chosen draft strategy: id + label + coach guidance to pin into the system prompt. */
   strategy?: { id: string; label: string; guidance: string };
+  /**
+   * Decision Engine's deterministic verdict for the player currently in focus.
+   * When present, the Coach is instructed to use these numbers as ground truth
+   * and never contradict the verdict, goUpTo, or stopAt. The Coach can still
+   * add color/context, but the math is non-negotiable.
+   */
+  engineDecision?: {
+    player: string;
+    position?: string;
+    verdict: "BID" | "PASS" | "STOP" | "ONLY IF CHEAP";
+    oneLiner: string;
+    goUpTo: number;
+    stopAt: number;
+    anchorPrice: number;
+    anchorSource: "sheet" | "league" | "espn" | "none";
+    plan: { status: "ok" | "tight" | "broken"; reason: string };
+    better: "buy" | "pass" | "tie";
+    betterReason: string;
+    confidence: "high" | "medium" | "low";
+  };
 }
 
 /**

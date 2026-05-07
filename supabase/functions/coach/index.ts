@@ -97,12 +97,27 @@ HOW TO ANSWER:
 - Markdown is fine (bold, bullets). No headers like "Verdict/Why/Targets" unless the user asks for that format.
 
 HARD RULES:
+- If an "ENGINE VERDICT (GROUND TRUTH)" block is present, treat its verdict, goUpTo, and stopAt as fixed law. Your job is to EXPLAIN those numbers in plain English with context (analyst takes, market read, opportunity cost). NEVER recommend bidding above goUpTo, NEVER flip the verdict, NEVER suggest a different stopAt. If the verdict is STOP, you can't tell the user to push higher — only explain why stopping is correct. If you disagree with the engine on color reasoning, that's fine, but the numbers don't move.
 - NEVER recommend a player who appears in the "Drafted Players" list — they're gone.
 - NEVER recommend a max bid above the user's stated max bid or one that leaves <$1 per remaining slot.
 - If you genuinely don't know something current (recent injury, trade, depth chart change), say so instead of guessing.
 - No "good luck!", no closing sign-offs, no emojis.`;
 
 interface DraftEventPayload { player: string; position?: string; price: number; drafter: "me" | "other" }
+interface EngineDecision {
+  player: string;
+  position?: string;
+  verdict: "BID" | "PASS" | "STOP" | "ONLY IF CHEAP";
+  oneLiner: string;
+  goUpTo: number;
+  stopAt: number;
+  anchorPrice: number;
+  anchorSource: "sheet" | "league" | "espn" | "none";
+  plan: { status: "ok" | "tight" | "broken"; reason: string };
+  better: "buy" | "pass" | "tie";
+  betterReason: string;
+  confidence: "high" | "medium" | "low";
+}
 interface CoachPayload {
   settings: Record<string, unknown>;
   budget: Record<string, unknown>;
@@ -120,6 +135,9 @@ interface CoachPayload {
   draftedPlayers?: string[];
   showMath?: boolean;
   strategy?: { id: string; label: string; guidance: string };
+  /** Pure-math verdict from the Decision Engine. When present, Coach must
+   *  not contradict the verdict, goUpTo, or stopAt — only explain. */
+  engineDecision?: EngineDecision;
 }
 
 const MATH_ADDENDUM = ``;
@@ -151,6 +169,29 @@ function buildUserMessage(p: CoachPayload): string {
     .map((r) => `${r.name}${r.position ? ` (${r.position})` : ""} sheet$${r.price} going$${Math.max(1, Math.round(Number(r.price) * mult))}`);
 
   const parts: string[] = [];
+
+  // ENGINE GROUND TRUTH — first thing the model sees, formatted to be
+  // unmistakable. The system prompt instructs the model to treat this
+  // as non-negotiable math.
+  if (p.engineDecision) {
+    const e = p.engineDecision;
+    parts.push(
+      `## ENGINE VERDICT (GROUND TRUTH — DO NOT CONTRADICT)\n` +
+        `Player: ${e.player}${e.position ? ` (${e.position})` : ""}\n` +
+        `Verdict: ${e.verdict}\n` +
+        `Reason: ${e.oneLiner}\n` +
+        `Go up to: $${e.goUpTo}\n` +
+        `Stop at: $${e.stopAt} (anything ≥ this is wrong)\n` +
+        `Anchor price: $${e.anchorPrice} (source: ${e.anchorSource})\n` +
+        `Plan status: ${e.plan.status} — ${e.plan.reason}\n` +
+        `Better path: ${e.better} — ${e.betterReason}\n` +
+        `Confidence: ${e.confidence}\n` +
+        `\nYour job: explain this verdict in plain English. Add color, context, ` +
+        `analyst takes, market reads — but NEVER tell the user to bid past $${e.goUpTo}, ` +
+        `flip the verdict, or override these numbers. The math is fixed.`,
+    );
+  }
+
   parts.push(`## Settings\n${JSON.stringify(p.settings)}`);
   parts.push(`## Budget\n${JSON.stringify(p.budget)}`);
   parts.push(`## Roster (you)\nfilled=${JSON.stringify(p.rosterFilled)}\nrequired=${JSON.stringify(p.rosterRequired)}`);
