@@ -174,8 +174,9 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
       // 4) For each ranked player → tier → league avg $
       // Blend ESPN preseason rank (70%) with last year's PPG rank (30%) so a
       // proven producer ESPN is sleeping on still gets bumped up a tier.
-      // FIX: include position in the built entry so the position filter works immediately
-      const built: { name: string; price: number; position: Position }[] = [];
+      // First, compute each player's tier so we can build a per-tier ESPN-value mean.
+      type Pre = { r: typeof rRows[number]; tier: number; pos: Position };
+      const pre: Pre[] = [];
       for (const r of rRows) {
         if (!r.position || !r.pos_rank) continue;
         const ppgRank = ppgRankByName.get(r.player_name);
@@ -183,13 +184,45 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           ? Math.round(r.pos_rank * 0.7 + ppgRank * 0.3)
           : r.pos_rank;
         const tier = tierForPosRank(r.position, blendedRank);
+        const pos = (r.position === "DEF" || r.position === "D/ST" ? "DST" : r.position) as Position;
+        pre.push({ r, tier, pos });
+      }
+
+      // Per (position, tier) mean of ESPN's auction_value — used to convert
+      // ESPN's scale into a *relative* tilt within the tier. We don't trust
+      // ESPN's absolute dollars (their league settings ≠ yours), only the
+      // shape of who's worth more than whom inside the same tier.
+      const tierEspnMean = new Map<string, number>();
+      {
+        const sums = new Map<string, { sum: number; n: number }>();
+        for (const { r, tier, pos } of pre) {
+          const v = Number(r.auction_value);
+          if (!Number.isFinite(v) || v <= 0) continue;
+          const k = `${pos}|${tier}`;
+          const cur = sums.get(k) ?? { sum: 0, n: 0 };
+          cur.sum += v;
+          cur.n += 1;
+          sums.set(k, cur);
+        }
+        for (const [k, { sum, n }] of sums) tierEspnMean.set(k, sum / n);
+      }
+
+      // Build final prices: league tier avg × per-player tilt × injury fade.
+      const built: { name: string; price: number; position: Position }[] = [];
+      for (const { r, tier, pos } of pre) {
         const tp = tierPrices.find((t) => t.position === r.position && t.tier === tier);
-        const basePrice = tp?.avg ? Math.max(1, Math.round(tp.avg)) : (r.auction_value ?? 0);
+        const tierAvg = tp?.avg ? tp.avg : (r.auction_value ?? 0);
+        const espnVal = Number(r.auction_value);
+        const espnMean = tierEspnMean.get(`${pos}|${tier}`);
+        // Tilt is clamped to ±35% so an outlier ESPN number can't blow up the tier.
+        let tilt = 1;
+        if (Number.isFinite(espnVal) && espnVal > 0 && espnMean && espnMean > 0) {
+          tilt = Math.min(1.35, Math.max(0.65, espnVal / espnMean));
+        }
+        const basePrice = Math.max(1, Math.round(tierAvg * tilt));
         // Auto-fade injured players (season-ending → ~$1, soft injuries scaled).
         const mult = injuryMultiplier((r as { injury_status?: string | null }).injury_status);
         const price = mult < 1 ? Math.max(1, Math.round(basePrice * mult)) : basePrice;
-        // Normalise ESPN position label to our Position type (DST covers DEF/D/ST)
-        const pos = (r.position === "DEF" || r.position === "D/ST" ? "DST" : r.position) as Position;
         if (price > 0) built.push({ name: r.player_name, price, position: pos });
       }
       if (!built.length) throw new Error("Couldn't map ranks to league tier prices");
