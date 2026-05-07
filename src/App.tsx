@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
 import Planner from "./pages/Planner.tsx";
