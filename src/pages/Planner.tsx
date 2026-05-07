@@ -429,7 +429,7 @@ export function PlannerBody() {
           ) : null}
         </Card>
       </main>
-    </div>
+    </>
   );
 }
 
