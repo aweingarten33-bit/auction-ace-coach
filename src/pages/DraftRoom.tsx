@@ -484,7 +484,7 @@ export default function DraftRoom() {
 
         {/* DECISION CARD — popup bubble when a player is locked in */}
         <Dialog open={!!decision} onOpenChange={(o) => { if (!o) setActiveName(""); }}>
-          <DialogContent className="max-h-[90vh] w-[94vw] max-w-md overflow-y-auto p-4">
+          <DialogContent className="top-4 left-1/2 -translate-x-1/2 translate-y-0 max-h-[calc(100dvh-2rem)] w-[94vw] max-w-md overflow-y-auto p-4 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-top-0">
             {decision && (
               <>
                 <div className="mb-2 flex items-center justify-between">
