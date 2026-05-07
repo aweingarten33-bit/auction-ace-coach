@@ -759,7 +759,7 @@ function DrawerContents({
 
       {section === "afford" && (
         <div className="flex-1 overflow-y-auto p-3">
-          <PlannerBody />
+          <AffordabilityChecker />
         </div>
       )}
 
