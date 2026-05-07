@@ -51,6 +51,8 @@ interface DraftState {
   slotAllocations: Record<string, number>;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
+  // User-written rules text used when strategyId === "custom".
+  customStrategyRules: string;
   // actions
   setSettings: (s: Partial<LeagueSettings>) => void;
   setRoster: (key: keyof LeagueSettings["roster"], value: number) => void;
