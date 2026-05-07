@@ -161,6 +161,37 @@ Deno.serve(async (req: Request) => {
       }
     } catch (e) { console.error("espn_player_ranks fetch", e); }
 
+    // ---- VALIDATION SET — names AI is allowed to return ----
+    // Built from: price sheet + anchor map + sleeper_players (full NFL DB).
+    // Anything not in this set is hallucinated → dropped server-side.
+    const allowedNames = new Map<string, { name: string; pos?: string }>();
+    for (const r of (p.prices ?? []) as any[]) {
+      const k = norm(r.name); if (k) allowedNames.set(k, { name: r.name, pos: r.position });
+    }
+    for (const [k, a] of anchorByName) {
+      if (!allowedNames.has(k)) allowedNames.set(k, { name: titleize(k), pos: a.pos });
+    }
+    // Sleeper full NFL DB (active skill players only)
+    const sleeperByPos: Record<string, { name: string; nameKey: string }[]> = {};
+    try {
+      const sleeperResp = await fetch(
+        `${SUPABASE_URL}/rest/v1/sleeper_players?select=player_name,player_name_norm,position,status&position=in.(QB,RB,WR,TE,K,DST)&order=search_rank.asc.nullslast&limit=2000`,
+        { headers: sbHeaders },
+      );
+      if (sleeperResp.ok) {
+        const rows = (await sleeperResp.json()) as any[];
+        for (const r of rows) {
+          const k = r.player_name_norm || norm(r.player_name);
+          if (!k) continue;
+          if (!allowedNames.has(k)) allowedNames.set(k, { name: r.player_name, pos: r.position });
+          if (r.position && !draftedSet.has(k)) {
+            (sleeperByPos[r.position] ||= []).push({ name: r.player_name, nameKey: k });
+          }
+        }
+      }
+    } catch (e) { console.error("sleeper_players fetch", e); }
+
+
     // Market multiplier from observed paid vs anchor (uses live picks vs real anchors)
     const sheetMap = new Map<string, { price: number; pos?: string }>();
     for (const r of (p.prices ?? []) as any[]) sheetMap.set(norm(r.name), { price: Number(r.price) || 0, pos: r.position });
