@@ -20,23 +20,18 @@ const SHOWS: Show[] = [
   {
     id: "footballers",
     name: "The Fantasy Footballers",
-    rss: "https://feeds.megaphone.fm/thefantasyfootballers",
+    rss: "https://feeds.simplecast.com/sw7PGWfw",
   },
   {
     id: "happy-hour",
     name: "Fantasy Football Happy Hour with Matthew Berry",
-    rss: "https://rss.art19.com/fantasy-football-happy-hour-with-matthew-berry",
+    rss: "https://www.omnycontent.com/d/playlist/006cbbeb-1b7a-4729-b380-b3df0127e8db/2cb90df4-a4ac-4bdc-a5f9-b3df0134b66d/f0d76f16-f5bd-4148-a13a-b3df0134b677/podcast.rss",
     extra: "berry-love-hate",
   },
   {
     id: "fantasy-focus",
     name: "Fantasy Focus Football (ESPN)",
     rss: "https://www.espn.com/espnradio/feeds/rss/podcast.xml?id=2942325",
-  },
-  {
-    id: "etr",
-    name: "Establish The Run",
-    rss: "https://feeds.megaphone.fm/establishtherun",
   },
 ];
 
