@@ -315,45 +315,43 @@
 .coach-md code { @apply px-1 py-0.5 rounded bg-muted text-accent-foreground text-xs; }
 
 /* =====================================================================
-   MATURE NOIR — dark, restrained, cinematic
-   Replaces the prior cartoon/comic overlays. Deep blacks, desaturated
-   steel/oxblood accents, fine grain, soft vignette. No neon, no POW,
-   no halftones, no slashes. Built to feel grown-up and serious.
+   AUCTION COACH — Blue / Black / Gold
+   Deep navy canvas, near-black surfaces, gold as the only accent.
    ===================================================================== */
 @layer base {
   :root {
-    --background: 220 14% 6%;
-    --foreground: 210 14% 86%;
-    --card: 220 12% 9%;
-    --card-foreground: 210 14% 88%;
-    --popover: 220 12% 9%;
-    --popover-foreground: 210 14% 90%;
-    --primary: 12 55% 48%;            /* oxblood */
-    --primary-foreground: 0 0% 98%;
-    --primary-glow: 12 60% 55%;
-    --secondary: 220 10% 13%;
-    --secondary-foreground: 210 14% 86%;
-    --muted: 220 10% 12%;
-    --muted-foreground: 215 8% 58%;
-    --accent: 38 22% 58%;             /* aged brass */
-    --accent-foreground: 220 20% 8%;
-    --destructive: 0 65% 45%;
+    --background: 222 47% 6%;            /* near-black with blue tint */
+    --foreground: 210 30% 92%;
+    --card: 222 45% 10%;                 /* deep navy */
+    --card-foreground: 210 30% 92%;
+    --popover: 222 45% 9%;
+    --popover-foreground: 210 30% 94%;
+    --primary: 45 90% 55%;               /* gold */
+    --primary-foreground: 222 47% 6%;
+    --primary-glow: 45 95% 62%;
+    --secondary: 222 40% 14%;            /* navy panel */
+    --secondary-foreground: 210 30% 92%;
+    --muted: 222 35% 13%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 45 90% 55%;                /* gold */
+    --accent-foreground: 222 47% 6%;
+    --destructive: 0 75% 55%;
     --destructive-foreground: 0 0% 98%;
-    --warning: 36 55% 52%;
-    --warning-foreground: 220 20% 8%;
-    --success: 150 25% 42%;
+    --warning: 45 90% 55%;
+    --warning-foreground: 222 47% 6%;
+    --success: 150 40% 50%;
     --success-foreground: 0 0% 98%;
-    --border: 220 10% 16%;
-    --input: 220 10% 12%;
-    --ring: 12 55% 48%;
-    --grid-line: hsl(220 10% 10%);
-    --grid-line-strong: hsl(220 10% 13%);
-    --gradient-card: linear-gradient(180deg, hsl(220 12% 10%), hsl(220 12% 7%));
-    --gradient-primary: linear-gradient(180deg, hsl(12 55% 48%), hsl(12 55% 38%));
-    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 8px 28px -16px hsl(0 0% 0% / 0.85);
-    --shadow-glow: 0 0 0 1px hsl(12 55% 48% / 0.35);
+    --border: 222 35% 18%;
+    --input: 222 40% 12%;
+    --ring: 45 90% 55%;
+    --grid-line: hsl(222 40% 10%);
+    --grid-line-strong: hsl(222 40% 14%);
+    --gradient-card: linear-gradient(180deg, hsl(222 45% 11%), hsl(222 47% 7%));
+    --gradient-primary: linear-gradient(180deg, hsl(45 90% 58%), hsl(42 85% 45%));
+    --shadow-card: 0 1px 0 hsl(45 90% 55% / 0.04) inset, 0 8px 28px -16px hsl(0 0% 0% / 0.85);
+    --shadow-glow: 0 0 0 1px hsl(45 90% 55% / 0.35);
   }
-  .dark { --background: 220 14% 6%; }
+  .dark { --background: 222 47% 6%; }
 }
 
 html, body, #root { background: hsl(var(--background)); }
