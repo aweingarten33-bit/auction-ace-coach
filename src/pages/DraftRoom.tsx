@@ -526,7 +526,7 @@ export default function DraftRoom() {
             race — and you only see the dimmed overlay (the "black screen"
             bug). Bypassing the shared component eliminates that risk. */}
         <DialogPrimitive.Root
-          open={!!decision}
+          open={!!activeName}
           onOpenChange={(o) => {
             if (!o) setActiveName("");
           }}
