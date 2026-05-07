@@ -458,7 +458,20 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
-        {/* Search moved to menu → "Find (player or $)" */}
+        {/* FIND (player or $) — promoted to the homepage. This is the only
+            way to open the Decision Card, so it lives here, prominent. */}
+        <section className="rounded-lg border border-primary/40 bg-primary/5 p-3 shadow-sm">
+          <div className="mb-2 flex items-center gap-2">
+            <Search className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Find (player or $)</h2>
+          </div>
+          <LookupSection
+            prices={prices}
+            events={events}
+            maxBid={budget.maxBid}
+            onPick={lockToPlayer}
+          />
+        </section>
         {/* DECISION CARD — popup bubble when a player is locked in.
             Uses Radix primitives DIRECTLY (not the shared <DialogContent>)
             because the shared one hard-codes `top-[50%] translate-y-[-50%]`
