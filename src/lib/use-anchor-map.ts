@@ -30,7 +30,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         const [hist, espn] = await Promise.all([
           supabase
             .from("league_auction_history")
-            .select("player_name, position, bid_amount")
+            .select("player_name, position, bid_amount, season")
             .then((r) => r.data ?? []),
           supabase
             .from("espn_player_ranks")
@@ -39,17 +39,29 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         ]);
         if (cancelled) return;
 
-        // 1) League 3yr average per player
-        const leagueAgg = new Map<string, { sum: number; n: number; pos: string | null }>();
-        for (const row of hist as Array<{ player_name: string | null; position: string | null; bid_amount: number | null }>) {
-          if (!row.player_name || row.bid_amount == null) continue;
+        // 1) League history per player — keep season-by-season for recency weighting.
+        const leagueAgg = new Map<string, { bySeason: Map<number, number>; pos: string | null }>();
+        for (const row of hist as Array<{ player_name: string | null; position: string | null; bid_amount: number | null; season: number | null }>) {
+          if (!row.player_name || row.bid_amount == null || row.season == null) continue;
           const k = norm(row.player_name);
-          const cur = leagueAgg.get(k) ?? { sum: 0, n: 0, pos: row.position };
-          cur.sum += Number(row.bid_amount);
-          cur.n += 1;
+          const cur = leagueAgg.get(k) ?? { bySeason: new Map<number, number>(), pos: row.position };
+          // Same player rows can repeat per season (snapshots) — last write wins on amount.
+          cur.bySeason.set(Number(row.season), Number(row.bid_amount));
           if (!cur.pos && row.position) cur.pos = row.position;
           leagueAgg.set(k, cur);
         }
+
+        // Weighted recency average (last=0.5, prev=0.3, older avg=0.2)
+        const weightedLeague = (bySeason: Map<number, number>): number => {
+          const seasons = Array.from(bySeason.entries()).sort((a, b) => b[0] - a[0]);
+          if (seasons.length === 0) return 0;
+          if (seasons.length === 1) return seasons[0][1];
+          if (seasons.length === 2) return seasons[0][1] * 0.65 + seasons[1][1] * 0.35;
+          const last = seasons[0][1];
+          const prev = seasons[1][1];
+          const olderAvg = seasons.slice(2).reduce((s, [, v]) => s + v, 0) / (seasons.length - 2);
+          return last * 0.5 + prev * 0.3 + olderAvg * 0.2;
+        };
 
         // 2) ESPN map
         const espnMap = new Map<string, { val: number; pos: string | null }>();
@@ -60,16 +72,15 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           if (v > 0) espnMap.set(k, { val: v, pos: row.position });
         }
 
-        // 3) Compute per-position scaling from overlap (league$ / ESPN$)
+        // 3) Per-position scaling for league-history-free players (rookies / depth)
         const scaleAgg = new Map<string, { sumLeague: number; sumEspn: number; n: number }>();
         for (const [k, lv] of leagueAgg) {
           const ev = espnMap.get(k);
           if (!ev) continue;
           const pos = ev.pos || lv.pos;
           if (!pos) continue;
-          const leagueAvg = lv.sum / lv.n;
           const cur = scaleAgg.get(pos) ?? { sumLeague: 0, sumEspn: 0, n: 0 };
-          cur.sumLeague += leagueAvg;
+          cur.sumLeague += weightedLeague(lv.bySeason);
           cur.sumEspn += ev.val;
           cur.n += 1;
           scaleAgg.set(pos, cur);
@@ -84,17 +95,34 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
         // 4) Build the anchor map
         const out: Record<string, AnchorEntry> = {};
-        // a) League history wins (already actual league $)
+        // a) League history → weighted recency, then BLEND with ESPN when they disagree.
+        //    Catches breakouts (league has historically underpaid → ESPN spike) and
+        //    fades (league overpays loyalty → ESPN tanks).
         for (const [k, v] of leagueAgg) {
-          if (v.n > 0) out[k] = { price: Math.max(1, Math.round(v.sum / v.n)), source: "league" };
+          if (v.bySeason.size === 0) continue;
+          const leaguePrice = weightedLeague(v.bySeason);
+          const ev = espnMap.get(k);
+          let final = leaguePrice;
+          if (ev && ev.val > 0) {
+            const ratio = ev.val / Math.max(1, leaguePrice);
+            if (ratio >= 1.4) {
+              // ESPN much higher → market sees breakout. Meet in the middle.
+              final = (leaguePrice + ev.val) / 2;
+            } else if (ratio <= 0.6) {
+              // ESPN much lower → market faded. Pull league down 70/30.
+              final = leaguePrice * 0.7 + ev.val * 0.3;
+            }
+          }
+          out[k] = { price: Math.max(1, Math.round(final)), source: "league" };
         }
-        // b) ESPN fallback — SCALED by position factor so rookies/depth get league-tuned $
+        // b) ESPN fallback — SCALED for league-history-free players
         for (const [k, ev] of espnMap) {
           if (out[k]) continue;
           const scale = (ev.pos && scales[ev.pos]) || 1;
           const adj = Math.max(1, Math.round(ev.val * scale));
           out[k] = { price: adj, source: "espn" };
         }
+
 
         setMap(out);
         setPosScale(scales);
