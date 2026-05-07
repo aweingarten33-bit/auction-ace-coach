@@ -49,6 +49,12 @@ export interface DecisionResult {
   stopAt: number;               // STOP AT (anything above = bad)
   anchorPrice: number;          // the per-player anchor we used (0 if none)
   anchorSource: PriceSource;    // where the anchor came from
+  anchorBreakdown?: {           // transparency: how the anchor was built
+    league?: number;            // your league's weighted history
+    market?: number;            // Sleeper/ESPN consensus
+    espn?: number;              // raw ESPN
+    sleeper?: number;           // raw Sleeper
+  };
   verdict: Verdict;
   oneLiner: string;             // "Too expensive" / "This works" / "Not worth it"
   ladder: PricePoint[];         // 3 price points GOOD/FAIR/STOP
