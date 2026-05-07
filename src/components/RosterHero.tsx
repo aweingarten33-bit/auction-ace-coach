@@ -13,6 +13,8 @@ interface SlotRow {
   short: number;
   maxBid: number;
   severity: "critical" | "need" | "depth" | "done";
+  /** Optional sub-role label, e.g. "Backup QB", "Handcuff RB". Used for bench rows. */
+  label?: string;
 }
 
 interface BestTarget {
