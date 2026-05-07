@@ -11,7 +11,7 @@
 // Reuses ALL existing engines: computeBudget, computeMarketPulse, valueFor,
 // decide, fetchTargets, useEspnLiveSync. No new backend work needed.
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -49,6 +49,7 @@ import { decide } from "@/lib/decision-engine";
 import { ApiError, fetchTargets } from "@/lib/api";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
+import { loadSleeperPlayers, searchPlayers, SleeperPlayer } from "@/lib/sleeper";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -93,6 +94,21 @@ export default function DraftRoom() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeName, setActiveName] = useState(""); // currently-shown player in the decision card
+  const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
+  const [highlight, setHighlight] = useState(0);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    loadSleeperPlayers().then(setSleeper).catch(() => {});
+  }, []);
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (!searchWrapRef.current?.contains(e.target as Node)) setSearchOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
 
   // Force users into setup if it's not done yet
   useEffect(() => {
@@ -210,16 +226,28 @@ export default function DraftRoom() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events.length, setupComplete]);
 
-  // ── Search → suggestions ──────────────────────────────────────────────
+  // ── Search → suggestions (Sleeper full NFL DB + price overlay) ───────
   const draftedSet = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
+  const priceByName = useMemo(() => {
+    const m = new Map<string, PriceEstimate>();
+    for (const p of prices) m.set(norm(p.name), p);
+    return m;
+  }, [prices]);
   const suggestions = useMemo(() => {
-    const q = norm(query);
-    if (!q) return [];
-    return prices
-      .filter((p) => norm(p.name).includes(q) && !draftedSet.has(norm(p.name)))
-      .sort((a, b) => (b.price || 0) - (a.price || 0))
-      .slice(0, 6);
-  }, [query, prices, draftedSet]);
+    if (query.trim().length < 2) return [];
+    const hits = searchPlayers(sleeper, query, 8).filter(
+      (p) => !draftedSet.has(norm(p.full_name)),
+    );
+    return hits.map((p) => {
+      const price = priceByName.get(norm(p.full_name));
+      return {
+        name: p.full_name,
+        position: (price?.position ?? p.position) as Position | undefined,
+        team: p.team ?? null,
+        price: price?.price ?? null,
+      };
+    });
+  }, [query, sleeper, draftedSet, priceByName]);
 
   // ── Decision card for active name ─────────────────────────────────────
   const activePrice = useMemo(
@@ -355,12 +383,33 @@ export default function DraftRoom() {
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-6 px-4 py-5 pb-24">
         {/* SEARCH / LOOKUP */}
-        <section>
+        <section ref={searchWrapRef}>
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSearchOpen(true);
+                setHighlight(0);
+              }}
+              onFocus={() => setSearchOpen(true)}
+              onKeyDown={(e) => {
+                if (!searchOpen || !suggestions.length) return;
+                if (e.key === "ArrowDown") {
+                  e.preventDefault();
+                  setHighlight((h) => (h + 1) % suggestions.length);
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setHighlight((h) => (h - 1 + suggestions.length) % suggestions.length);
+                } else if (e.key === "Enter") {
+                  e.preventDefault();
+                  const pick = suggestions[highlight];
+                  if (pick) lockToPlayer(pick.name);
+                } else if (e.key === "Escape") {
+                  setSearchOpen(false);
+                }
+              }}
               placeholder="Look up a player…"
               className="h-12 pl-9 pr-9 text-base"
               autoComplete="off"
@@ -379,16 +428,22 @@ export default function DraftRoom() {
           </div>
 
           {/* Search results dropdown */}
-          {suggestions.length > 0 && (
+          {searchOpen && suggestions.length > 0 && (
             <div className="mt-1.5 overflow-hidden rounded-md border border-border bg-card shadow-lg">
-              {suggestions.map((p) => (
+              {suggestions.map((p, i) => (
                 <button
                   key={p.name}
                   type="button"
+                  onMouseEnter={() => setHighlight(i)}
                   onClick={() => lockToPlayer(p.name)}
-                  className="flex w-full items-center gap-2 border-b border-border/40 px-3 py-2.5 text-left last:border-0 hover:bg-secondary/60"
+                  className={`flex w-full items-center gap-2 border-b border-border/40 px-3 py-2.5 text-left last:border-0 hover:bg-secondary/60 ${
+                    i === highlight ? "bg-secondary/60" : ""
+                  }`}
                 >
                   <span className="flex-1 truncate text-sm">{p.name}</span>
+                  {p.team && (
+                    <span className="text-[10px] text-muted-foreground">{p.team}</span>
+                  )}
                   {p.position && (
                     <Badge
                       variant="outline"
@@ -398,7 +453,7 @@ export default function DraftRoom() {
                     </Badge>
                   )}
                   <span className="w-12 text-right font-mono text-xs tabular-nums text-muted-foreground">
-                    ${p.price}
+                    {p.price != null ? `$${p.price}` : "—"}
                   </span>
                 </button>
               ))}
