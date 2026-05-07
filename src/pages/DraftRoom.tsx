@@ -45,7 +45,8 @@ import {
   recentRuns,
 } from "@/lib/draft-math";
 import { computeMarketPulse, valueFor as computeValueFor } from "@/lib/value";
-import { decide, type AnchorEntry } from "@/lib/decision-engine";
+import { decide } from "@/lib/decision-engine";
+import { useAnchorMap } from "@/lib/use-anchor-map";
 import { ApiError, fetchTargets } from "@/lib/api";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
