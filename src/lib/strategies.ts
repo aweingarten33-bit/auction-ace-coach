@@ -181,7 +181,32 @@ export const STRATEGIES: Strategy[] = [
     coachGuidance:
       "User is going Anchor RB in a SUPERFLEX (a softer Zero RB — one mid-tier RB anchor, not pure zero): one RB anchor (~10–15% of budget), TWO startable QBs, then heavy WR + TE. Approve ONE moderate RB buy, then fade RBs. Push WR depth hard but never at the cost of QB2.",
   },
+  {
+    id: "custom",
+    label: "Custom (your own rules)",
+    short: "Write your own plan. The app follows it.",
+    description:
+      "Type your own draft rules in plain English (e.g. 'Spend $80 on 2 elite WRs, never pay over $5 for a QB, target a TE in the $8-12 range'). The AI coach uses your text as its guidance.",
+    weights: {},
+    coachGuidance:
+      "User has written their own custom strategy. Follow their rules exactly as written — do not override them with conventional wisdom. If their rules conflict with sound roster construction (e.g. ending up with no QB in superflex), gently flag it but defer to their stated plan.",
+  },
 ];
 
 export const getStrategy = (id: string | undefined | null): Strategy =>
   STRATEGIES.find((s) => s.id === id) ?? STRATEGIES[0];
+
+// Build the actual coach guidance for a given strategy id, optionally merging
+// user-supplied custom rules text (used when id === "custom").
+export const buildCoachGuidance = (
+  id: string | undefined | null,
+  customRules?: string | null,
+): string => {
+  const s = getStrategy(id);
+  if (s.id === "custom") {
+    const rules = (customRules ?? "").trim();
+    if (!rules) return s.coachGuidance + " (User has not written any rules yet — ask them to fill in their custom plan.)";
+    return `${s.coachGuidance}\n\nUSER'S CUSTOM RULES (follow these):\n${rules}`;
+  }
+  return s.coachGuidance;
+};
