@@ -13,6 +13,7 @@ import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
+import GlobalSignOutButton from "@/components/GlobalSignOutButton";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <LockProvider>
+            <GlobalSignOutButton />
             <Routes>
               {/* Index = router that picks Draft Room or Setup based on setupComplete */}
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
