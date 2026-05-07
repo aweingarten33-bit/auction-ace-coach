@@ -114,7 +114,7 @@ export default function AuctionPlayerCard({ d }: Props) {
   const ladderRows = insights.ladder.slice(0, 5);
 
   return (
-    <article className="mx-auto w-full max-w-[402px] overflow-hidden rounded-2xl bg-[#f5efe4] text-slate-900 shadow-2xl ring-1 ring-slate-900/15">
+    <article style={{ backgroundColor: "#f5efe4", color: "#0f172a" }} className="mx-auto w-full max-w-[402px] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-slate-900/15">
       {/* LEAGUE BANNER */}
       <div className="flex items-center justify-center gap-1.5 px-3 pt-3">
         <div className="flex items-center gap-1.5 rounded-full bg-slate-950 px-3 py-1">
