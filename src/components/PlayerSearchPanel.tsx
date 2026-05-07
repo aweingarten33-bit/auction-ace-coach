@@ -150,6 +150,7 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
           >
             {p}
           </Button>
+        ))}
       </div>
       {availableTiers.length > 1 && (
         <div className="mb-2 flex flex-wrap items-center gap-1">
