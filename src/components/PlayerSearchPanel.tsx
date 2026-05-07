@@ -149,6 +149,18 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
             {p}
           </Button>
         ))}
+        {keepers.length > 0 && (
+          <Button
+            type="button"
+            size="sm"
+            variant={keepersOnly ? "default" : "outline"}
+            className="h-7 px-2 text-[11px]"
+            onClick={() => setKeepersOnly((v) => !v)}
+            title="Show only your keepers"
+          >
+            Keepers
+          </Button>
+        )}
       </div>
       {availableTiers.length > 1 && (
         <div className="mb-2 flex flex-wrap items-center gap-1">
