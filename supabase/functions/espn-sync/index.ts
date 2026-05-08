@@ -12,6 +12,7 @@ Deno.serve(async (req) => {
   try {
     const url = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const auth = req.headers.get("Authorization");
     if (!auth) return j({ error: "missing auth" }, 401);
 
@@ -19,15 +20,31 @@ Deno.serve(async (req) => {
     const { data: u } = await sb.auth.getUser();
     if (!u.user) return j({ error: "unauthorized" }, 401);
 
-    const { data: creds } = await sb
+    // Prefer the caller's own creds; if their row lacks a league, fall back to
+    // any configured league (ESPN connection is admin-owned/shared in this app).
+    let { data: creds } = await sb
       .from("espn_credentials")
       .select("swid, espn_s2, league_id, season_id")
       .eq("user_id", u.user.id)
       .maybeSingle();
 
     if (!creds?.league_id || !creds?.season_id) {
-      return j({ error: "No league configured. Connect ESPN first." }, 400);
+      const admin = createClient(url, service);
+      const { data: shared } = await admin
+        .from("espn_credentials")
+        .select("swid, espn_s2, league_id, season_id")
+        .not("league_id", "is", null)
+        .not("season_id", "is", null)
+        .order("last_verified_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (shared?.league_id && shared?.season_id) creds = shared;
     }
+
+    if (!creds?.league_id || !creds?.season_id) {
+      return j({ error: "No league configured. Commissioner needs to connect ESPN first." }, 400);
+    }
+
 
     const cookie = `SWID=${creds.swid}; espn_s2=${creds.espn_s2}`;
     // ESPN moved fantasy endpoints under lm-api-reads.fantasy.espn.com for recent seasons.
