@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { PriceEstimate, Position } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { loadSleeperPlayers, searchPlayers, SleeperPlayer } from "@/lib/sleeper";
+import { useAnchorMap } from "@/lib/use-anchor-map";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -37,6 +38,7 @@ export default function PricedPlayerAutocomplete({
   const [highlight, setHighlight] = useState(0);
   const [sleeperPlayers, setSleeperPlayers] = useState<SleeperPlayer[]>([]);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const { map: anchorMap } = useAnchorMap();
 
   useEffect(() => {
     loadSleeperPlayers().then(setSleeperPlayers).catch(() => {});
@@ -51,11 +53,19 @@ export default function PricedPlayerAutocomplete({
   }, []);
 
   const excluded = useMemo(() => new Set(excludeNames.map(norm)), [excludeNames]);
+
+  // Override sheet prices with cascade anchors so all consumers see the same math.
+  const effectivePrice = (name: string, sheetPrice?: number): number | undefined => {
+    const anchor = anchorMap[norm(name)]?.price;
+    if (anchor && anchor > 0) return anchor;
+    return sheetPrice;
+  };
+
   const priceMap = useMemo(() => {
     const m = new Map<string, PriceEstimate>();
-    for (const p of prices) m.set(norm(p.name), p);
+    for (const p of prices) m.set(norm(p.name), { ...p, price: effectivePrice(p.name, p.price) ?? p.price });
     return m;
-  }, [prices]);
+  }, [prices, anchorMap]);
 
   const suggestions = useMemo<Suggestion[]>(() => {
     const q = value.trim();
@@ -68,6 +78,7 @@ export default function PricedPlayerAutocomplete({
     // 1) Price sheet matches first (have $ values)
     const priceMatches = prices
       .filter((p) => !excluded.has(norm(p.name)) && norm(p.name).includes(qn))
+      .map((p) => ({ ...p, price: effectivePrice(p.name, p.price) ?? p.price }))
       .sort((a, b) => {
         const aStarts = norm(a.name).startsWith(qn) ? 0 : 1;
         const bStarts = norm(b.name).startsWith(qn) ? 0 : 1;
