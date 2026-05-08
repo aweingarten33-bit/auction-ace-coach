@@ -12,12 +12,12 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default:     "bg-background text-foreground shadow-[var(--shadow-inset-sm)]",
-        secondary:   "bg-background text-muted-foreground shadow-[var(--shadow-inset-sm)]",
-        outline:     "bg-background text-foreground shadow-[var(--shadow-extruded-sm)]",
-        destructive: "bg-background text-destructive shadow-[var(--shadow-inset-sm)]",
-        success:     "bg-background text-accent shadow-[var(--shadow-inset-sm)]",
-        primary:     "bg-background text-primary shadow-[var(--shadow-inset-sm)]",
+        default:     "bg-background text-foreground shadow-[var(--neu-inset-sm)]",
+        secondary:   "bg-background text-muted-foreground shadow-[var(--neu-inset-sm)]",
+        outline:     "bg-background text-foreground shadow-[var(--neu-extruded-sm)]",
+        destructive: "bg-background text-destructive shadow-[var(--neu-inset-sm)]",
+        success:     "bg-background text-accent shadow-[var(--neu-inset-sm)]",
+        primary:     "bg-background text-primary shadow-[var(--neu-inset-sm)]",
       },
     },
     defaultVariants: { variant: "default" },

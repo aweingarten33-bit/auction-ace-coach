@@ -80,12 +80,11 @@ export default {
         },
       },
       borderRadius: {
-        // Neo-brutalism — sharp corners only (or fully round via rounded-full)
-        sm:   "0px",
-        md:   "0px",
-        lg:   "0px",
-        xl:   "0px",
-        "2xl":"0px",
+        sm:   "0.75rem",
+        md:   "1rem",
+        lg:   "1.25rem",
+        xl:   "1.5rem",
+        "2xl":"2rem",
       },
       keyframes: {
         "accordion-down": {
