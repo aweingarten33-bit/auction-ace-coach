@@ -686,9 +686,9 @@ export default function DraftRoom() {
         <p className="inline-flex items-center justify-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           <span>Built by A.</span>
           <img
-            src={superFootballLogo}
+            src={wuWOutline}
             alt="W"
-            className="inline-block h-4 w-4 object-contain align-[-2px]"
+            className="inline-block h-3.5 w-4 object-contain align-[-2px]"
           />
           <span>eingarten</span>
         </p>
