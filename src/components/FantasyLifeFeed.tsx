@@ -92,12 +92,17 @@ export default function FantasyLifeFeed() {
         {players.map((p) => (
           <div
             key={`${p.name}-${p.rank}`}
-            className="flex items-center gap-2 rounded-md border border-border/40 bg-secondary/20 px-2 py-1.5"
+            className="rounded-md border border-border/40 bg-secondary/20 px-2 py-1.5"
           >
-            <span className="w-6 text-right text-[11px] font-mono text-muted-foreground">{p.rank}</span>
-            <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
-            {p.position && <Badge variant="outline" className="text-[10px]">{p.position}</Badge>}
-            <span className="w-9 text-right text-[10px] text-muted-foreground">{p.team}</span>
+            <div className="flex items-center gap-2">
+              <span className="w-6 text-right text-[11px] font-mono text-muted-foreground">{p.rank}</span>
+              <span className="flex-1 truncate text-sm font-medium">{p.name}</span>
+              {p.position && <Badge variant="outline" className="text-[10px]">{p.position}</Badge>}
+              <span className="w-9 text-right text-[10px] text-muted-foreground">{p.team}</span>
+            </div>
+            {p.note && (
+              <p className="ml-8 mt-1 text-[11px] leading-snug text-muted-foreground">{p.note}</p>
+            )}
           </div>
         ))}
         {!loading && !err && players.length === 0 && (
