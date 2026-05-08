@@ -38,24 +38,20 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    supabase.functions
-      .invoke("team-trends", { method: "GET" as any, body: undefined as any })
-      .catch(() => null)
-      .then(async () => {
-        // functions.invoke doesn't pass query params cleanly — use direct fetch
+    (async () => {
+      try {
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/team-trends?team_id=${teamId}&seasons=3`;
-        try {
-          const res = await fetch(url, {
-            headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
-          });
-          const json = (await res.json()) as Payload;
-          if (!cancelled) setData(json);
-        } catch (e) {
-          if (!cancelled) setData(null);
-        } finally {
-          if (!cancelled) setLoading(false);
-        }
-      });
+        const res = await fetch(url, {
+          headers: { apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        });
+        const json = (await res.json()) as Payload;
+        if (!cancelled) setData(json);
+      } catch {
+        if (!cancelled) setData(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
     return () => {
       cancelled = true;
     };
