@@ -774,20 +774,19 @@ function DrawerContents({
               slotsLeft={budget.slotsLeft}
             />
           </div>
-          <div className="space-y-1 p-3">
+          <div className="grid grid-cols-2 gap-3 p-4">
             {sections.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setSection(s.id)}
-                className="flex w-full items-center gap-3 rounded-md border border-border/40 bg-secondary/20 px-3 py-2.5 text-left hover:bg-secondary/40"
+                className="flex aspect-square flex-col justify-between rounded-2xl bg-[#141414] p-4 text-left active:scale-[0.98] transition"
               >
-                <s.icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{s.label}</p>
-                  <p className="text-[11px] text-muted-foreground">{s.hint}</p>
+                <s.icon className="h-7 w-7 text-primary" strokeWidth={1.5} />
+                <div>
+                  <p className="text-[15px] font-semibold leading-tight text-foreground">{s.label}</p>
+                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{s.hint}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             ))}
           </div>
