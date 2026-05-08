@@ -136,6 +136,44 @@ export default function NextTargetCard({
           (score {Math.round(runnerUp.score)})
         </p>
       )}
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="mt-2 flex w-full items-center gap-1 border-t border-border/50 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground"
+      >
+        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+        Score breakdown
+      </button>
+      {open && (
+        <div className="mt-2 overflow-x-auto">
+          <table className="w-full text-[11px] tabular-nums">
+            <thead className="text-muted-foreground">
+              <tr className="text-left">
+                <th className="py-1 pr-2 font-semibold">Pos</th>
+                <th className="py-1 pr-2 font-semibold" title="Roster shortage weight">Short</th>
+                <th className="py-1 pr-2 font-semibold" title="Spent / fair-share target">Spend/Tgt</th>
+                <th className="py-1 pr-2 font-semibold" title="Top remaining player price on your sheet">Top $</th>
+                <th className="py-1 pr-2 font-semibold text-right">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scored.map((s) => (
+                <tr key={s.pos} className={`border-t border-border/30 ${s.pos === top.pos ? "text-foreground font-semibold" : "text-foreground/75"}`}>
+                  <td className="py-1 pr-2">{s.pos}</td>
+                  <td className="py-1 pr-2">{s.short} <span className="text-muted-foreground">({s.sev})</span></td>
+                  <td className="py-1 pr-2">${s.spent}/${s.target}</td>
+                  <td className="py-1 pr-2">${s.top}</td>
+                  <td className="py-1 pr-2 text-right">{Math.round(s.score)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-1.5 text-[10px] leading-snug text-muted-foreground">
+            Score = shortage (crit 100 / need 60 / depth 15) + under-fair-share × 40 + top-left/remaining × 60 (cap 20). Market: ×{pulse.multiplier.toFixed(2)} ({pulse.confident ? `n=${pulse.sampleSize}` : "low sample"}).
+          </p>
+        </div>
+      )}
     </section>
   );
 }
