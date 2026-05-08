@@ -4,19 +4,17 @@ import { cn } from "@/lib/utils";
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
-/**
- * Neumorphic Textarea — carved well, deepens on focus.
- */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => {
   return (
     <textarea
       className={cn(
-        "flex min-h-[96px] w-full rounded-2xl bg-background px-5 py-3 text-base text-foreground",
-        "shadow-[var(--shadow-inset)]",
-        "transition-shadow duration-300 ease-out",
-        "placeholder:text-muted-foreground/70",
-        "focus-visible:outline-none focus-visible:shadow-[var(--shadow-inset-deep)]",
-        "focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "flex min-h-[96px] w-full rounded-none border-2 border-foreground/60 bg-[hsl(var(--surface-2))] px-3 py-2",
+        "font-mono-rough text-base text-foreground",
+        "shadow-[3px_3px_0_rgba(0,0,0,0.9)]",
+        "placeholder:text-muted-foreground",
+        "transition-[border-color,box-shadow] duration-100",
+        "focus-visible:outline-none focus-visible:border-primary",
+        "focus-visible:shadow-[3px_3px_0_rgba(0,0,0,0.9),0_0_0_2px_hsl(var(--primary)),0_0_14px_rgba(227,6,19,0.55)]",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
