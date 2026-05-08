@@ -222,6 +222,43 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
   return out.slice(0, 60);
 }
 
+// Sleeper / breakout articles: each candidate is typically introduced via a
+// heading. We try to capture name + (pos/team) and the first sentence of body
+// text as the blurb.
+function parseSleeperList(md: string, defaultPos: string): Player[] {
+  const out: Player[] = [];
+  const seen = new Set<string>();
+  const clean = md.replace(/\\/g, "");
+
+  // Heading patterns:
+  //   ## Marvin Mims, WR, DEN
+  //   ### **Keon Coleman | BUF**
+  //   ## Sean Tucker (RB, TB)
+  //   ## 1. Marvin Mims | WR | DEN
+  const headingRe = /(^|\n)#{2,4}\s+(?:\*\*)?\s*(?:\d{1,2}\.\s+)?([A-Z][A-Za-z'.\-]+(?:\s+[A-Za-z'.\-]+){1,3})\s*[,|(\s]+\s*(QB|RB|WR|TE|K|D\/ST|DST)?[\s,|)]*\s*(ARI|ATL|BAL|BUF|CAR|CHI|CIN|CLE|DAL|DEN|DET|GB|HOU|IND|JAC|JAX|KC|LV|LAC|LA|LAR|MIA|MIN|NE|NO|NYG|NYJ|PHI|PIT|SEA|SF|TB|TEN|WAS)?/g;
+
+  let rank = 0;
+  let m: RegExpExecArray | null;
+  while ((m = headingRe.exec(clean)) !== null) {
+    const name = m[2].trim();
+    // Skip section/admin headings
+    if (/^(The|Sleeper|Breakout|Late|Year|Wide|Running|Quarterback|Tight|Note|Why|How|What|Final|Honorable|Conclusion|Introduction|Last|First|My|Our|Top|Bottom|Bonus)\b/i.test(name)) continue;
+    if (name.split(/\s+/).length < 2) continue;
+    const k = name.toLowerCase();
+    if (seen.has(k)) continue;
+    const pos = m[3] ? (m[3] === "DST" ? "D/ST" : m[3]) : (defaultPos === "ALL" ? "" : defaultPos);
+    const team = m[4] ?? "";
+    // Grab a short blurb: first non-empty line after the heading
+    const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 800);
+    const blurb = after.split(/\n+/).map((s) => s.trim()).find((s) => s.length > 40 && !s.startsWith("#") && !s.startsWith("![") && !s.startsWith("|"));
+    seen.add(k);
+    rank += 1;
+    out.push({ rank, name, position: pos, team, note: blurb ? blurb.replace(/\*\*/g, "").slice(0, 220) : undefined });
+  }
+
+  return out.slice(0, 40);
+}
+
 function j(b: unknown, s = 200) {
   return new Response(JSON.stringify(b), {
     status: s,
