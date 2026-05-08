@@ -83,7 +83,10 @@ Deno.serve(async (req) => {
       SOURCES.map(async (s): Promise<RankList> => {
         try {
           const md = await scrape(s.url, key);
-          return { ...s, players: parseArticleList(md, s.position) };
+          const players = s.kind === "sleeper"
+            ? parseSleeperList(md, s.position)
+            : parseArticleList(md, s.position);
+          return { ...s, players };
         } catch (e) {
           console.error(s.source, e);
           return { ...s, players: [] };
