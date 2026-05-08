@@ -288,6 +288,26 @@ function parseSleeperList(md: string, defaultPos: string): Player[] {
   consume(headingRe, true);
   consume(headingRe2, false);
 
+  // Pattern 3: "### Team POS Name" — note we already stripped ** so heading is plain
+  if (out.length === 0) {
+    const re3 = new RegExp(
+      `(^|\\n)#{2,4}\\s+${teamWordRe}\\s+(QB|RB|WR|TE|K|D\\/ST|DST)\\s+([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})`,
+      "g",
+    );
+    for (const m of clean.matchAll(re3)) {
+      const teamRaw = m[2];
+      const pos = m[3] === "DST" ? "D/ST" : m[3];
+      const name = m[4].trim();
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      const team = teamMap[teamRaw] ?? ((teamRaw.length === 2 || teamRaw.length === 3) ? teamRaw : "");
+      const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 1200);
+      const blurb = after.split(/\n+/).map((s) => s.trim()).find((s) => s.length > 50 && !s.startsWith("#") && !s.startsWith("-") && !s.startsWith("[") && !s.startsWith("|") && !s.startsWith("!"));
+      seen.add(k);
+      out.push({ rank: out.length + 1, name, position: pos, team, note: blurb ? blurb.slice(0, 240) : undefined });
+    }
+  }
+
   return out.slice(0, 40);
 }
 
