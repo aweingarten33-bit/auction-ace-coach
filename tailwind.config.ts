@@ -70,6 +70,16 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Banksy × Football extended palette
+        turf:    "hsl(var(--primary))",
+        penalty: "hsl(var(--secondary))",
+        blood:   "hsl(var(--accent))",
+        sweat:   { DEFAULT: "hsl(var(--sweat))",  foreground: "hsl(var(--sweat-foreground))" },
+        bruise:  { DEFAULT: "hsl(var(--bruise))", foreground: "hsl(var(--bruise-foreground))" },
+        rust:    "hsl(var(--rust))",
+        chalk:   "hsl(var(--foreground))",
+        locker:  "hsl(var(--background))",
+        concrete: "hsl(var(--concrete))",
       },
       borderRadius: {
         lg: "var(--radius)",

@@ -12,62 +12,71 @@
 
 @layer base {
   :root {
-    --background: 0 0% 10%;             /* #1A1A1A wet concrete */
-    --foreground: 0 0% 91%;             /* #E8E8E8 stadium light */
+    --background: 0 0% 5%;              /* #0D0D0D locker room void */
+    --foreground: 60 11% 95%;           /* #F5F5F0 chalk line, dirty white */
 
-    --card: 0 0% 14%;                   /* #242424 lighter slab */
-    --card-foreground: 0 0% 91%;
+    --card: 0 0% 8%;                    /* #141414 wheat-paste poster */
+    --card-foreground: 60 11% 95%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 91%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 60 11% 95%;
 
-    --primary: 127 65% 49%;             /* #2ECC40 turf green */
-    --primary-foreground: 0 0% 4%;
-    --primary-glow: 127 65% 60%;
+    --primary: 111 100% 54%;            /* #39FF14 RADIOACTIVE turf — pushed two stops */
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 111 100% 65%;
 
-    --secondary: 27 100% 55%;           /* #FF851B penalty orange */
-    --secondary-foreground: 0 0% 4%;
+    --secondary: 16 100% 50%;           /* #FF4500 penalty flag — hot, immediate */
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 29%;                  /* #4A4A4A weathered concrete */
-    --muted-foreground: 0 0% 63%;       /* #A0A0A0 faded graffiti */
+    --muted: 0 0% 33%;                  /* #555555 old tape, washed jersey */
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 3 100% 60%;               /* #FF4136 challenge flag red */
-    --accent-foreground: 0 0% 100%;
+    --accent: 348 83% 47%;              /* #DC143C BLOOD — fresh, wet */
+    --accent-foreground: 60 11% 95%;
 
-    --destructive: 3 100% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 348 83% 47%;
+    --destructive-foreground: 60 11% 95%;
 
-    --warning: 27 100% 55%;
-    --warning-foreground: 0 0% 4%;
+    --warning: 16 100% 50%;
+    --warning-foreground: 0 0% 5%;
 
-    --success: 127 65% 49%;
-    --success-foreground: 0 0% 4%;
+    --success: 111 100% 54%;
+    --success-foreground: 0 0% 5%;
 
-    --border: 0 0% 20%;                 /* #333333 sidewalk crack */
-    --input: 0 0% 14%;
-    --ring: 127 65% 49%;
+    /* extended palette — sweat (championship gold), bruise (IR purple), rust (chain-link) */
+    --sweat: 46 65% 52%;                /* #D4AF37 dirty championship gold */
+    --sweat-foreground: 0 0% 5%;
+    --bruise: 275 100% 25%;             /* #4B0082 IR / concussion protocol */
+    --bruise-foreground: 60 11% 95%;
+    --rust: 25 60% 31%;                 /* #8B4513 chain-link decay */
+    --concrete: 0 0% 11%;               /* #1C1C1C the tunnel */
+
+    --border: 0 0% 13%;                 /* #222222 hairline separation */
+    --input: 0 0% 8%;
+    --ring: 111 100% 54%;
 
     --radius: 0px;                      /* sharp. cut. torn. */
 
-    /* hard offset shadows — no blur */
-    --shadow-stencil: 4px 4px 0px hsl(127 65% 49% / 0.4);
-    --shadow-spray: 6px 6px 0px hsl(27 100% 55% / 0.3);
-    --shadow-depth: 8px 8px 0px hsl(0 0% 0% / 0.8);
-    --shadow-card: 4px 4px 0px hsl(0 0% 0% / 0.8);
-    --shadow-card-hover: 2px 2px 0px hsl(0 0% 0% / 0.8);
-    --shadow-glow: 4px 4px 0px hsl(127 65% 49% / 0.4);
-    --shadow-flag: 4px 4px 0px hsl(3 100% 60% / 0.5);
+    /* hard offset shadows — stadium light from upper-left, no blur */
+    --shadow-stencil: 6px 6px 0px hsl(111 100% 54% / 0.45);
+    --shadow-spray: 6px 6px 0px hsl(16 100% 50% / 0.4);
+    --shadow-depth: 8px 8px 0px hsl(0 0% 0% / 0.95);
+    --shadow-card: 6px 6px 0px hsl(0 0% 0% / 0.9);
+    --shadow-card-hover: 3px 3px 0px hsl(0 0% 0% / 0.9);
+    --shadow-glow: 8px 8px 0px hsl(0 0% 0% / 0.9), 0 0 30px hsl(111 100% 54% / 0.18);
+    --shadow-flag: 6px 6px 0px hsl(348 83% 47% / 0.5);
+    --shadow-blood: 8px 8px 0px hsl(0 0% 0% / 0.9), 0 0 30px hsl(348 83% 47% / 0.2);
 
-    --gradient-primary: linear-gradient(135deg, hsl(127 65% 49%), hsl(127 65% 40%));
+    --gradient-primary: linear-gradient(135deg, hsl(111 100% 54%), hsl(111 100% 42%));
 
-    --sidebar-background: 0 0% 6%;
-    --sidebar-foreground: 0 0% 91%;
-    --sidebar-primary: 127 65% 49%;
-    --sidebar-primary-foreground: 0 0% 4%;
-    --sidebar-accent: 0 0% 14%;
-    --sidebar-accent-foreground: 0 0% 91%;
-    --sidebar-border: 0 0% 20%;
-    --sidebar-ring: 127 65% 49%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 60 11% 95%;
+    --sidebar-primary: 111 100% 54%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 60 11% 95%;
+    --sidebar-border: 0 0% 13%;
+    --sidebar-ring: 111 100% 54%;
   }
 
   .dark { /* same — only dark exists */ }
@@ -106,9 +115,9 @@
     pointer-events: none;
     z-index: 9998;
     mix-blend-mode: multiply;
-    opacity: 0.55;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    background-size: 220px 220px;
+    opacity: 0.7;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 240px 240px;
   }
 
   body::after {
@@ -117,14 +126,14 @@
     inset: 0;
     pointer-events: none;
     z-index: 9999;
-    opacity: 0.18;
+    opacity: 0.22;
     background-image:
-      /* CCTV scan lines */
+      /* CCTV scan lines — every 3px */
       repeating-linear-gradient(
         to bottom,
         transparent 0px,
         transparent 2px,
-        hsl(0 0% 0% / 0.45) 3px,
+        hsl(0 0% 0% / 0.55) 3px,
         transparent 4px
       ),
       /* yard-line markers — every 10vw */
@@ -132,14 +141,18 @@
         to right,
         transparent 0,
         transparent calc(10vw - 1px),
-        hsl(0 0% 91% / 0.06) calc(10vw - 1px),
-        hsl(0 0% 91% / 0.06) 10vw
+        hsl(60 11% 95% / 0.05) calc(10vw - 1px),
+        hsl(60 11% 95% / 0.05) 10vw
       ),
-      /* spray splatter blotches */
-      radial-gradient(circle at 12% 18%, hsl(127 65% 49% / 0.10) 0, transparent 60px),
-      radial-gradient(circle at 82% 28%, hsl(27 100% 55% / 0.08) 0, transparent 80px),
-      radial-gradient(circle at 28% 78%, hsl(3 100% 60% / 0.07) 0, transparent 90px),
-      radial-gradient(circle at 92% 88%, hsl(127 65% 49% / 0.08) 0, transparent 70px);
+      /* spray splatter — turf, penalty, blood, bruise, sweat */
+      radial-gradient(circle at 8% 14%, hsl(111 100% 54% / 0.14) 0, transparent 70px),
+      radial-gradient(circle at 88% 22%, hsl(16 100% 50% / 0.12) 0, transparent 90px),
+      radial-gradient(circle at 24% 72%, hsl(348 83% 47% / 0.11) 0, transparent 100px),
+      radial-gradient(circle at 72% 56%, hsl(275 100% 25% / 0.10) 0, transparent 110px),
+      radial-gradient(circle at 94% 90%, hsl(46 65% 52% / 0.09) 0, transparent 80px),
+      radial-gradient(circle at 4% 92%, hsl(111 100% 54% / 0.10) 0, transparent 70px),
+      /* heavy corner vignette — disappearing into the tunnel */
+      radial-gradient(ellipse at center, transparent 45%, hsl(0 0% 5% / 0.85) 100%);
   }
 
   h1, h2, h3, h4 {
@@ -160,8 +173,8 @@
   }
 
   ::selection {
-    background: hsl(127 65% 49% / 0.85);
-    color: hsl(0 0% 4%);
+    background: hsl(111 100% 54% / 0.85);
+    color: hsl(0 0% 5%);
   }
 }
 
@@ -182,22 +195,58 @@
     filter: url(#banksy-rough);
   }
 
-  /* overspray halo — fresh paint still wet */
+  /* overspray halo — fresh paint still wet, pushed two stops */
   .overspray-green {
     text-shadow:
-      0 0 8px hsl(127 65% 49% / 0.45),
-      0 0 18px hsl(127 65% 49% / 0.25);
+      2px 0 0 hsl(111 100% 54% / 0.35),
+      -2px 0 0 hsl(111 100% 54% / 0.35),
+      0 0 10px hsl(111 100% 54% / 0.55),
+      0 0 22px hsl(111 100% 54% / 0.3);
   }
   .overspray-orange {
     text-shadow:
-      0 0 8px hsl(27 100% 55% / 0.45),
-      0 0 18px hsl(27 100% 55% / 0.25);
+      2px 0 0 hsl(16 100% 50% / 0.35),
+      -2px 0 0 hsl(16 100% 50% / 0.35),
+      0 0 10px hsl(16 100% 50% / 0.55),
+      0 0 22px hsl(16 100% 50% / 0.3);
   }
   .overspray-red {
     text-shadow:
-      0 0 8px hsl(3 100% 60% / 0.45),
-      0 0 18px hsl(3 100% 60% / 0.25);
+      2px 0 0 hsl(348 83% 47% / 0.35),
+      -2px 0 0 hsl(348 83% 47% / 0.35),
+      0 0 10px hsl(348 83% 47% / 0.55),
+      0 0 22px hsl(348 83% 47% / 0.3);
   }
+  .overspray-sweat {
+    text-shadow:
+      0 0 10px hsl(46 65% 52% / 0.55),
+      0 0 22px hsl(46 65% 52% / 0.3);
+  }
+  .overspray-bruise {
+    text-shadow:
+      0 0 10px hsl(275 100% 25% / 0.7),
+      0 0 22px hsl(275 100% 25% / 0.4);
+  }
+
+  /* color utilities for extended palette */
+  .text-blood    { color: hsl(348 83% 47%); }
+  .text-sweat    { color: hsl(46 65% 52%); }
+  .text-bruise   { color: hsl(275 100% 25%); }
+  .text-rust     { color: hsl(25 60% 31%); }
+  .text-chalk    { color: hsl(60 11% 95%); }
+  .text-turf     { color: hsl(111 100% 54%); }
+  .text-penalty  { color: hsl(16 100% 50%); }
+  .bg-blood      { background-color: hsl(348 83% 47%); }
+  .bg-sweat      { background-color: hsl(46 65% 52%); }
+  .bg-bruise     { background-color: hsl(275 100% 25%); }
+  .bg-locker     { background-color: hsl(0 0% 5%); }
+  .bg-concrete   { background-color: hsl(0 0% 11%); }
+  .border-blood   { border-color: hsl(348 83% 47%); }
+  .border-sweat   { border-color: hsl(46 65% 52%); }
+  .border-bruise  { border-color: hsl(275 100% 25%); }
+  .border-rust    { border-color: hsl(25 60% 31%); }
+  .border-turf    { border-color: hsl(111 100% 54%); }
+  .border-penalty { border-color: hsl(16 100% 50%); }
 
   /* hard offset shadows */
   .shadow-stencil   { box-shadow: var(--shadow-stencil); }
@@ -206,6 +255,7 @@
   .shadow-card      { box-shadow: var(--shadow-card); }
   .shadow-flag      { box-shadow: var(--shadow-flag); }
   .shadow-glow      { box-shadow: var(--shadow-glow); }
+  .shadow-blood     { box-shadow: var(--shadow-blood); }
 
   /* press-down stencil interaction */
   .press-stencil {
@@ -328,6 +378,69 @@
   .animate-slam-right { animation: slam-in-right 0.32s steps(2) both; }
   .animate-flag-drop  { animation: flag-drop 0.4s steps(3) both; }
   .animate-flicker    { animation: flicker 4s steps(1) infinite; }
+
+  /* SHAKE — last 10 seconds on the clock, the stadium tilts */
+  @keyframes shake-violent {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    20% { transform: translate(-3px, 2px) rotate(-0.6deg); }
+    40% { transform: translate(3px, -2px) rotate(0.6deg); }
+    60% { transform: translate(-2px, 3px) rotate(-0.3deg); }
+    80% { transform: translate(2px, -3px) rotate(0.3deg); }
+  }
+  .animate-shake { animation: shake-violent 0.3s steps(3) infinite; }
+
+  /* FLASHBULB — touchdown / draft pick made / siren */
+  @keyframes flashbulb {
+    0% { background: hsl(60 11% 95% / 0); }
+    8% { background: hsl(60 11% 95% / 0.85); }
+    20% { background: hsl(60 11% 95% / 0); }
+    100% { background: hsl(60 11% 95% / 0); }
+  }
+  .flashbulb-once::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 10000;
+    animation: flashbulb 220ms steps(2) 1;
+  }
+
+  /* GLITCH — score updates, ##.# before reveal */
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); text-shadow: 0 0 0 transparent; }
+    20% { transform: translate(-2px, 1px); text-shadow: 2px 0 hsl(348 83% 47%), -2px 0 hsl(111 100% 54%); }
+    40% { transform: translate(2px, -1px); text-shadow: -2px 0 hsl(348 83% 47%), 2px 0 hsl(111 100% 54%); }
+    60% { transform: translate(-1px, 2px); text-shadow: 1px 0 hsl(16 100% 50%), -1px 0 hsl(111 100% 54%); }
+    80% { transform: translate(1px, -2px); text-shadow: 0 0 0 transparent; }
+  }
+  .animate-glitch { animation: glitch 200ms steps(2) 1; }
+
+  /* BRUISE PULSE — questionable / IR */
+  @keyframes bruise-pulse {
+    0%, 100% { box-shadow: inset 4px 0 0 hsl(275 100% 25%); }
+    50% { box-shadow: inset 4px 0 0 hsl(275 100% 25% / 0.35); }
+  }
+  .animate-bruise { animation: bruise-pulse 2s steps(4) infinite; }
+
+  /* SCORE FLASH — turf hit / blood loss */
+  @keyframes score-hit {
+    0% { color: hsl(60 11% 95%); transform: scale(1); }
+    20% { color: hsl(111 100% 54%); transform: scale(1.15); text-shadow: 0 0 18px hsl(111 100% 54% / 0.7); }
+    100% { color: hsl(60 11% 95%); transform: scale(1); text-shadow: 0 0 0 transparent; }
+  }
+  .animate-score-hit { animation: score-hit 0.6s steps(3) 1; }
+  @keyframes score-loss {
+    0% { color: hsl(60 11% 95%); }
+    20% { color: hsl(348 83% 47%); transform: translateX(-2px); }
+    40% { color: hsl(348 83% 47%); transform: translateX(2px); }
+    100% { color: hsl(60 11% 95%); transform: translateX(0); }
+  }
+  .animate-score-loss { animation: score-loss 0.6s steps(3) 1; }
+
+  /* respect reduced motion — kill the violence */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-shake, .animate-glitch, .animate-bruise, .animate-flicker,
+    .animate-score-hit, .animate-score-loss,
+    .flashbulb-once::after { animation: none !important; }
+  }
 
   /* slight asymmetric tilt */
   .tilt-slight   { transform: rotate(-0.6deg); }
