@@ -38,6 +38,7 @@ export default function PricedPlayerAutocomplete({
   const [highlight, setHighlight] = useState(0);
   const [sleeperPlayers, setSleeperPlayers] = useState<SleeperPlayer[]>([]);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const { map: anchorMap } = useAnchorMap();
 
   useEffect(() => {
     loadSleeperPlayers().then(setSleeperPlayers).catch(() => {});
@@ -52,11 +53,19 @@ export default function PricedPlayerAutocomplete({
   }, []);
 
   const excluded = useMemo(() => new Set(excludeNames.map(norm)), [excludeNames]);
+
+  // Override sheet prices with cascade anchors so all consumers see the same math.
+  const effectivePrice = (name: string, sheetPrice?: number): number | undefined => {
+    const anchor = anchorMap[norm(name)]?.price;
+    if (anchor && anchor > 0) return anchor;
+    return sheetPrice;
+  };
+
   const priceMap = useMemo(() => {
     const m = new Map<string, PriceEstimate>();
-    for (const p of prices) m.set(norm(p.name), p);
+    for (const p of prices) m.set(norm(p.name), { ...p, price: effectivePrice(p.name, p.price) ?? p.price });
     return m;
-  }, [prices]);
+  }, [prices, anchorMap]);
 
   const suggestions = useMemo<Suggestion[]>(() => {
     const q = value.trim();
