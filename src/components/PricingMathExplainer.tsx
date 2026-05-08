@@ -1,34 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ChevronDown, ChevronUp, Sigma } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Plain-English explainer of how every dollar value in the app gets calculated.
- * Admin-only. Collapsed by default.
+ * Visible to everyone, collapsed by default.
  */
 export default function PricingMathExplainer() {
-  const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!user) { setIsAdmin(false); return; }
-    (async () => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      if (!cancelled) setIsAdmin(!!data);
-    })();
-    return () => { cancelled = true; };
-  }, [user]);
-
-  if (!isAdmin) return null;
 
   return (
     <Card className="p-4 md:p-5 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
