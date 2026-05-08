@@ -299,6 +299,14 @@ export default function DraftRoom() {
             <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
           )}
 
+          {/* Spending vs target by position */}
+          <PositionBudgetBar
+            settings={settings}
+            keepers={keepers}
+            events={events}
+            myTeamId={myTeamId}
+          />
+
           {/* Recent picks (read-only live ticker) */}
           {events.length > 0 && (
             <section>
