@@ -434,19 +434,27 @@ export default function DraftRoom() {
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
-                size="icon"
-                className="-ml-2 h-16 w-16 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30 group"
+                className="-ml-2 h-16 w-auto px-2 flex items-center gap-1.5 text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30 group"
                 aria-label="Open menu"
               >
-                <img
-                  src={superFootballLogo}
-                  alt="Menu"
-                  className={`h-14 w-14 object-contain block transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_0_8px_rgba(255,180,80,0.55)] group-hover:drop-shadow-[0_0_14px_rgba(255,180,80,0.95)] group-active:scale-90 ${
-                    drawerOpen
-                      ? "rotate-[200deg] scale-110 drop-shadow-[0_0_16px_rgba(255,180,80,1)]"
-                      : "rotate-0 scale-100"
-                  }`}
-                />
+                <span className="relative inline-flex items-center justify-center">
+                  <img
+                    src={superFootballLogo}
+                    alt="Menu"
+                    className={`h-14 w-14 object-contain block transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_0_8px_rgba(255,180,80,0.55)] group-hover:drop-shadow-[0_0_14px_rgba(255,180,80,0.95)] group-active:scale-90 ${
+                      drawerOpen
+                        ? "rotate-[200deg] scale-110 drop-shadow-[0_0_16px_rgba(255,180,80,1)]"
+                        : "rotate-0 scale-100"
+                    }`}
+                  />
+                  <span className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full border border-background bg-foreground text-background shadow-md">
+                    <Menu className="h-3 w-3" strokeWidth={3} />
+                  </span>
+                </span>
+                <span className="flex flex-col items-start leading-tight">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Tap</span>
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-foreground">Menu</span>
+                </span>
               </Button>
             </SheetTrigger>
             <DrawerContents
