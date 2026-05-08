@@ -14,6 +14,12 @@ import {
 import type { Position } from "@/lib/draft-types";
 import type { AnchorEntry } from "@/lib/decision-engine";
 
+interface RosterGap {
+  pos: string;
+  starterShort: number;
+  severity: "critical" | "need" | "depth" | "done";
+}
+
 interface Props {
   name: string;
   position?: Position;
@@ -22,6 +28,11 @@ interface Props {
   anchor?: AnchorEntry;
   posRank?: number;
   totalAtPos?: number;
+  // Roster context — drives the personalized section copy
+  remaining?: number;        // $ left in your budget
+  maxBid?: number;           // most you can spend on any one player
+  slotsLeft?: number;        // roster slots remaining
+  gaps?: RosterGap[];        // your starter gaps by position
 }
 
 export default function AuctionPlayerCard({
