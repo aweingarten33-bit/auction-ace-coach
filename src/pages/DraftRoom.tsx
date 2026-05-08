@@ -403,10 +403,10 @@ export default function DraftRoom() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="-ml-2 h-12 w-12"
+                className="-ml-2 h-12 w-12 text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
                 aria-label="Open menu"
               >
-                <Menu className="h-7 w-7" />
+                <FootballShieldIcon className="h-7 w-7" />
               </Button>
             </SheetTrigger>
             <DrawerContents
