@@ -878,23 +878,6 @@ function DrawerContents({
               slotsLeft={budget.slotsLeft}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3 p-4">
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => setSection(s.id)}
-                className="flex aspect-square flex-col justify-between rounded-2xl bg-[#141414] p-4 text-left active:scale-[0.98] transition"
-              >
-                <s.icon className="h-7 w-7 text-primary" strokeWidth={1.5} />
-                <div>
-                  <p className="text-[15px] font-semibold leading-tight text-foreground">{s.label}</p>
-                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{s.hint}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-
           <div className="hidden" />
 
           <div className="border-t border-border/40 px-3 py-3">
