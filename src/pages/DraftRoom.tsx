@@ -446,8 +446,8 @@ export default function DraftRoom() {
             <button
               key={id}
               type="button"
-              onClick={() => { setDrawerInitial(id); setDrawerOpen(true); }}
-              className="flex flex-col items-center gap-2 shrink-0 text-foreground"
+              onClick={() => setToolPage(id)}
+              className="flex flex-col items-center gap-2 shrink-0 text-foreground active:opacity-70 transition"
             >
               <Icon strokeWidth={1.25} className="size-9" />
               <span className="text-[13px] font-normal whitespace-nowrap">{label}</span>
