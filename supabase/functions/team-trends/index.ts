@@ -137,6 +137,7 @@ Deno.serve(async (req) => {
         perSeason,
         trends: {
           avgByPos,
+          avgCountByPos,
           avgTotal,
           avgTop3Pct,
           avgTopBid,
