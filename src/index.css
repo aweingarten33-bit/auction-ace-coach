@@ -1,215 +1,199 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   BANKSY FOOTBALL — Street-art stencil system
-   Dark concrete, bleached-paper text, blood-red spray, hard offsets.
-   No soft shadows. No gradients. Edges are torn, not smoothed.
+   INDUSTRIAL SKEUOMORPHISM
+   Chassis grey. Top-left light source at 45°. Dual neumorphic shadows.
+   Safety-orange used like an emergency-stop button — sparingly.
    ===================================================================== */
 
 @layer base {
   :root {
-    /* Concrete & paint */
-    --background: 0 0% 6%;              /* #0F0F0F asphalt */
-    --foreground: 45 16% 97%;           /* #FAF9F6 bleached paper */
+    /* Chassis & panels (HSL of the spec hexes) */
+    --background: 216 19% 90%;          /* #e0e5ec chassis */
+    --foreground: 195 7% 19%;           /* #2d3436 ink */
 
-    --surface: 0 0% 10%;                /* #1A1A1A wall surface */
-    --surface-2: 0 0% 14%;              /* slightly raised wall */
+    --surface: 220 14% 95%;             /* #f0f2f5 raised panel */
+    --recessed: 218 22% 86%;            /* #d1d9e6 sunken */
 
-    --card: 0 0% 10%;
-    --card-foreground: 45 16% 97%;
+    --card: 216 19% 90%;
+    --card-foreground: 195 7% 19%;
 
-    --popover: 0 0% 6%;
-    --popover-foreground: 45 16% 97%;
+    --popover: 216 19% 90%;
+    --popover-foreground: 195 7% 19%;
 
-    --primary: 357 96% 46%;             /* #E30613 Banksy red */
-    --primary-foreground: 45 16% 97%;
-    --primary-glow: 357 96% 56%;
+    --primary: 354 100% 67%;            /* #ff4757 safety orange */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 354 100% 75%;
 
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 45 16% 97%;
+    --secondary: 216 19% 90%;
+    --secondary-foreground: 195 7% 19%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 60%;       /* #999 weathered grey, AA on dark */
+    --muted: 218 22% 86%;
+    --muted-foreground: 218 17% 35%;    /* #4a5568 WCAG-AA */
 
-    --accent: 51 100% 50%;              /* #FFD700 caution yellow */
-    --accent-foreground: 0 0% 6%;
+    --accent: 354 100% 67%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 357 96% 46%;
-    --destructive-foreground: 45 16% 97%;
+    --destructive: 354 100% 67%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 51 100% 50%;
+    --warning: 38 92% 55%;
     --warning-foreground: 0 0% 6%;
 
-    --success: 152 71% 14%;             /* pitch green */
-    --success-foreground: 45 16% 97%;
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
 
-    --border: 0 0% 18%;                 /* visible: stencil cuts */
-    --input: 0 0% 14%;
-    --ring: 357 96% 46%;
+    --border: 220 13% 77%;              /* #babecc shadow side */
+    --input: 218 22% 86%;
+    --ring: 354 100% 67%;
 
-    --radius: 0;                        /* sharp by default */
+    --radius: 1rem;
 
-    /* Stencil shadow system — hard, offset, no blur */
-    --shadow-stencil:    4px 4px 0 rgba(0, 0, 0, 0.95);
-    --shadow-stencil-lg: 6px 6px 0 rgba(0, 0, 0, 0.95);
-    --shadow-spray-red:  0 0 14px rgba(227, 6, 19, 0.55), 4px 4px 0 rgba(0, 0, 0, 0.95);
-    --shadow-spray-soft: 0 0 18px rgba(227, 6, 19, 0.35);
-    --shadow-cut:        2px 2px 0 rgba(227, 6, 19, 0.9), -2px -2px 0 rgba(0, 0, 0, 0.95);
+    /* Neumorphic dual-shadow tokens (the core visual signature) */
+    --shadow-card:      8px 8px 16px #babecc, -8px -8px 16px #ffffff;
+    --shadow-floating:  12px 12px 24px #babecc, -12px -12px 24px #ffffff, inset 1px 1px 0 rgba(255,255,255,0.5);
+    --shadow-pressed:   inset 6px 6px 12px #babecc, inset -6px -6px 12px #ffffff;
+    --shadow-recessed:  inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff;
+    --shadow-sharp:     4px 4px 8px rgba(0,0,0,0.15), -1px -1px 1px rgba(255,255,255,0.8);
+    --shadow-glow:      0 0 10px 2px rgba(255, 71, 87, 0.6);
+    --shadow-led-green: 0 0 10px 2px rgba(34, 197, 94, 0.85);
 
-    /* Aged-paper / concrete grain (SVG noise) */
-    --noise-url: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    /* Primary-tinted neumorphic shadows for the accent button */
+    --shadow-primary:   4px 4px 8px rgba(166,50,60,0.4), -4px -4px 8px rgba(255,100,110,0.4);
 
-    --sidebar-background: 0 0% 6%;
-    --sidebar-foreground: 45 16% 97%;
-    --sidebar-primary: 357 96% 46%;
-    --sidebar-primary-foreground: 45 16% 97%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 45 16% 97%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 357 96% 46%;
+    /* Matte plastic micro-noise */
+    --noise-url: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+    --sidebar-background: 216 19% 90%;
+    --sidebar-foreground: 195 7% 19%;
+    --sidebar-primary: 354 100% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 216 19% 90%;
+    --sidebar-accent-foreground: 195 7% 19%;
+    --sidebar-border: 220 13% 77%;
+    --sidebar-ring: 354 100% 67%;
   }
 
   .dark { /* single-mode system */ }
 
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; border-color: transparent; }
 
   html {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    font-size: 16px;
-    scroll-behavior: smooth;
+    width: 100%; max-width: 100%; overflow-x: hidden;
+    font-size: 16px; scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    font-family: "Space Grotesk", "Courier New", ui-monospace, monospace;
-    font-weight: 500;
+    width: 100%; max-width: 100%; overflow-x: hidden;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
-    background-image: var(--noise-url);
-    background-repeat: repeat;
-    background-size: 160px 160px;
+    background-image:
+      radial-gradient(ellipse at 0% 0%, rgba(255,255,255,0.55), transparent 55%),
+      var(--noise-url);
+    background-repeat: no-repeat, repeat;
+    background-size: auto, 180px 180px;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
-    font-weight: 400;            /* Anton is naturally heavy */
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-family: "Inter", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: hsl(var(--foreground));
-    line-height: 0.95;
+    text-shadow: 0 1px 0 #ffffff;       /* embossed highlight */
   }
-  h1 { letter-spacing: 0.02em; }
+  h1 { font-weight: 800; letter-spacing: -0.03em; }
 
-  ::selection {
-    background: hsl(var(--primary));
-    color: hsl(var(--foreground));
-  }
+  ::selection { background: hsl(var(--primary) / 0.35); color: hsl(var(--foreground)); }
 }
 
 @layer utilities {
-  .font-display { font-family: "Anton", "Bebas Neue", "Impact", sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
-  .font-body    { font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif; }
-  .font-stencil { font-family: "Anton", "Bebas Neue", "Impact", sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
-  .font-mono-rough { font-family: "Courier New", ui-monospace, monospace; letter-spacing: 0.02em; }
+  .font-display { font-family: "Inter", sans-serif; letter-spacing: -0.02em; }
+  .font-body    { font-family: "Inter", sans-serif; }
+  .font-mono    { font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace; }
 
-  .shadow-stencil    { box-shadow: var(--shadow-stencil); }
-  .shadow-stencil-lg { box-shadow: var(--shadow-stencil-lg); }
-  .shadow-spray-red  { box-shadow: var(--shadow-spray-red); }
-  .shadow-cut        { box-shadow: var(--shadow-cut); }
-
-  /* Spray drop-shadow on text and icons */
-  .stencil-text {
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.95);
-  }
-  .stencil-text-red {
-    color: hsl(var(--primary));
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.95), 0 0 12px rgba(227, 6, 19, 0.5);
+  /* Stamped/printed label */
+  .label-stamped {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: hsl(var(--muted-foreground));
   }
 
-  /* Slight rebellious tilt */
-  .tilt-l { transform: rotate(-1.5deg); }
-  .tilt-r { transform: rotate(1.2deg); }
+  .shadow-card      { box-shadow: var(--shadow-card); }
+  .shadow-floating  { box-shadow: var(--shadow-floating); }
+  .shadow-pressed   { box-shadow: var(--shadow-pressed); }
+  .shadow-recessed  { box-shadow: var(--shadow-recessed); }
+  .shadow-sharp     { box-shadow: var(--shadow-sharp); }
+  .shadow-glow      { box-shadow: var(--shadow-glow); }
+  .shadow-primary-key { box-shadow: var(--shadow-primary); }
 
-  /* Torn-poster bottom edge */
-  .torn-bottom {
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 14px), transparent 100%),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='14' preserveAspectRatio='none'><path d='M0,14 L0,8 L6,12 L12,4 L20,11 L28,3 L36,12 L44,6 L52,13 L60,2 L70,11 L78,5 L86,12 L96,4 L104,13 L114,7 L122,12 L132,3 L140,12 L150,6 L160,13 L170,4 L180,12 L190,7 L200,13 L210,5 L220,12 L230,4 L240,13 L250,6 L260,12 L270,3 L280,12 L290,7 L300,13 L310,4 L320,13 L330,8 L340,12 L350,4 L360,13 L370,6 L380,12 L390,3 L400,13 L1000,13 L1000,14 Z' fill='black'/></svg>");
-    mask-composite: intersect;
-  }
+  /* Embossed text */
+  .text-emboss { text-shadow: 0 1px 0 #ffffff; }
 
-  /* Concrete grain overlay you can drop on hero blocks */
-  .grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: var(--noise-url);
-    opacity: 0.55;
-    mix-blend-mode: overlay;
+  /* LED indicator base */
+  .led { width: 0.6rem; height: 0.6rem; border-radius: 9999px; display: inline-block; box-shadow: var(--shadow-glow); background: hsl(var(--primary)); }
+  .led-green { background: hsl(142 71% 45%); box-shadow: var(--shadow-led-green); }
+
+  /* Bolted-module corner screws (apply to a relatively-positioned container) */
+  .screws::before,
+  .screws::after,
+  .screws > .screws-bottom::before,
+  .screws > .screws-bottom::after {
+    content: ""; position: absolute; width: 8px; height: 8px; border-radius: 9999px;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(0,0,0,0.18) 65%, rgba(0,0,0,0.35) 100%);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.25);
     pointer-events: none;
   }
+  .screws::before { top: 10px;  left: 10px; }
+  .screws::after  { top: 10px;  right: 10px; }
+  .screws > .screws-bottom { position: absolute; inset: 0; pointer-events: none; }
+  .screws > .screws-bottom::before { bottom: 10px; left: 10px; }
+  .screws > .screws-bottom::after  { bottom: 10px; right: 10px; }
 
-  /* Pitch lines decorative bg */
-  .pitch-lines {
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent 0 24px,
-      hsl(var(--foreground) / 0.04) 24px 25px
-    );
+  /* Vent slots (use as element) */
+  .vent-slot { width: 4px; height: 22px; border-radius: 9999px; background: hsl(var(--recessed)); box-shadow: inset 1px 1px 2px rgba(0,0,0,0.18); }
+
+  /* Scanlines for "screen" surfaces */
+  .scanlines {
+    background-image: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.18) 50%);
+    background-size: 100% 4px;
   }
 
-  /* Quick spray reveal */
-  @keyframes spray-in {
-    0%   { opacity: 0; filter: blur(6px); transform: translateY(4px); }
-    60%  { opacity: 1; filter: blur(0); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  .animate-spray { animation: spray-in 350ms ease-out both; }
+  /* Mechanical easing helper */
+  .ease-mech { transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-  /* Vibration on press */
-  @keyframes shake {
-    0%,100% { transform: translate(0,0); }
-    25%     { transform: translate(-1px, 1px); }
-    50%     { transform: translate(1px, -1px); }
-    75%     { transform: translate(-1px, -1px); }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-4px); }
   }
-  .active\:shake:active { animation: shake 120ms linear 1; }
-
-  /* Banksy red glow pulse */
-  @keyframes red-pulse {
-    0%,100% { box-shadow: var(--shadow-spray-soft); }
-    50%     { box-shadow: 0 0 28px rgba(227,6,19,0.7); }
-  }
-  .animate-red-pulse { animation: red-pulse 2.4s ease-in-out infinite; }
+  .animate-float { animation: float 3s ease-in-out infinite; }
 }
 
 /* =====================================================================
    AUTO-PROMOTION LAYER
-   Convert the existing DraftRoom utility patterns to Banksy stencil
-   without touching JSX.
+   Maps existing DraftRoom utility patterns → industrial skeuomorphism.
+   No JSX changes required.
    ===================================================================== */
 @layer components {
-  /* Sticky header: thick black bar with red underline */
+  /* Sticky header — chassis with subtle highlight */
   header.sticky,
   .sticky.top-0 {
     background-color: hsl(var(--background)) !important;
-    border-bottom: 2px solid hsl(var(--primary)) !important;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.9);
+    border-color: transparent !important;
+    box-shadow: 0 6px 12px -8px #babecc, 0 1px 0 #ffffff inset !important;
     backdrop-filter: none !important;
   }
 
-  /* Generic raised surfaces — stencilled wall posters */
+  /* Generic raised surfaces — bolted panels */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
@@ -218,34 +202,33 @@
   [class*="bg-secondary/40"],
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
-    background-color: hsl(var(--surface)) !important;
-    border: 1.5px solid hsl(var(--foreground) / 0.85) !important;
-    border-radius: 0 !important;
-    box-shadow: var(--shadow-stencil);
-    color: hsl(var(--foreground));
+    background-color: hsl(var(--background)) !important;
+    border-color: transparent !important;
+    box-shadow: var(--shadow-card) !important;
+    border-radius: 1rem !important;
   }
 
-  /* "Hero" / active card — red spray glow */
+  /* Active/hero card — orange rim + floating shadow */
   .border-2.border-primary {
-    background-color: hsl(var(--surface)) !important;
-    border: 2px solid hsl(var(--primary)) !important;
-    border-radius: 0 !important;
-    box-shadow: var(--shadow-spray-red);
+    background-color: hsl(var(--background)) !important;
+    border: 1px solid hsl(var(--primary) / 0.35) !important;
+    box-shadow: var(--shadow-floating), 0 0 0 1px hsl(var(--primary) / 0.25) !important;
+    border-radius: 1rem !important;
   }
 
-  /* Pills / chips — stencil tags */
+  /* Pills / chips — flat embossed tags */
   .rounded-full.border {
-    background-color: hsl(var(--surface)) !important;
-    border: 1.5px solid hsl(var(--foreground) / 0.8) !important;
-    border-radius: 0 !important;
-    box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
+    background-color: hsl(var(--background)) !important;
+    border-color: transparent !important;
+    box-shadow: var(--shadow-recessed) !important;
     color: hsl(var(--foreground));
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
+    font-family: "JetBrains Mono", monospace;
     font-weight: 700;
   }
 
-  /* Inputs — flat dark slates with red focus */
+  /* Inputs — recessed wells */
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -253,78 +236,73 @@
   input:not([type]),
   textarea,
   select {
-    background-color: hsl(var(--surface-2)) !important;
-    color: hsl(var(--foreground)) !important;
-    border: 1.5px solid hsl(var(--foreground) / 0.6) !important;
-    border-radius: 0 !important;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.9) !important;
-    font-family: "Courier New", ui-monospace, monospace !important;
-    transition: box-shadow 120ms steps(2), border-color 120ms steps(2);
+    background-color: hsl(var(--background)) !important;
+    border-color: transparent !important;
+    box-shadow: var(--shadow-recessed) !important;
+    border-radius: 0.5rem !important;
+    font-family: "JetBrains Mono", ui-monospace, monospace !important;
+    color: hsl(var(--foreground));
+    transition: box-shadow 200ms ease-out;
   }
-  input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground)); }
+  input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground) / 0.6); }
   input:focus, textarea:focus, select:focus {
     outline: none !important;
-    border-color: hsl(var(--primary)) !important;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.9), 0 0 0 2px hsl(var(--primary)), 0 0 14px rgba(227,6,19,0.55) !important;
+    box-shadow: var(--shadow-recessed), 0 0 0 2px hsl(var(--primary)), var(--shadow-glow) !important;
   }
 
-  /* Floating coach orb — red spray-can target */
+  /* Floating coach orb — physical key */
   .fixed.bottom-5.right-5 {
-    background-color: hsl(var(--primary)) !important;
-    border: 2px solid hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
     border-radius: 9999px;
-    box-shadow: var(--shadow-spray-red);
-    transition: transform 120ms steps(2), box-shadow 120ms steps(2);
+    box-shadow: var(--shadow-floating);
+    transition: box-shadow 200ms cubic-bezier(0.175,0.885,0.32,1.275), transform 150ms ease-out;
   }
-  .fixed.bottom-5.right-5:hover { transform: rotate(-3deg) scale(1.04); }
-  .fixed.bottom-5.right-5:active { transform: translate(2px, 2px) rotate(2deg); box-shadow: 2px 2px 0 rgba(0,0,0,0.95); }
+  .fixed.bottom-5.right-5:hover  { transform: translateY(-2px); box-shadow: var(--shadow-floating), var(--shadow-glow); }
+  .fixed.bottom-5.right-5:active { transform: translateY(2px); box-shadow: var(--shadow-pressed); }
 
   /* Code/destructive callout */
   .rounded.bg-destructive\/10 {
-    border-radius: 0 !important;
-    background-color: hsl(var(--primary) / 0.15) !important;
-    border-left: 4px solid hsl(var(--primary)) !important;
-    box-shadow: var(--shadow-stencil);
+    border-radius: 0.5rem !important;
+    background-color: hsl(var(--background)) !important;
+    box-shadow: var(--shadow-recessed), inset 4px 0 0 hsl(var(--primary)) !important;
     color: hsl(var(--foreground));
   }
 
-  /* Strip soft glows */
-  .shadow-glow { box-shadow: var(--shadow-spray-red) !important; }
-
-  /* Old neumorphic primetime helpers, retargeted to stencil */
+  /* Primetime helpers retargeted to industrial */
   .scoreboard-tile {
     background-color: hsl(var(--background)) !important;
-    border: 2px solid hsl(var(--foreground)) !important;
-    border-radius: 0 !important;
-    box-shadow: var(--shadow-stencil) !important;
+    border-color: transparent !important;
+    border-radius: 0.5rem !important;
+    box-shadow: var(--shadow-recessed) !important;
     padding: 0.5rem 0.75rem;
+    font-family: "JetBrains Mono", monospace !important;
     color: hsl(var(--foreground));
   }
   .scoreboard-plinth {
-    background-color: hsl(var(--surface)) !important;
-    border: 2px solid hsl(var(--primary)) !important;
-    border-radius: 0 !important;
-    box-shadow: var(--shadow-spray-red) !important;
+    background-color: hsl(var(--background)) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--shadow-floating), 0 0 0 1px hsl(var(--primary) / 0.25) !important;
     padding: 1.5rem 2rem;
   }
-  .font-score   { font-family: "Anton", "Bebas Neue", "Impact", sans-serif; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
-  .score-digit  { color: hsl(var(--foreground)); text-shadow: 3px 3px 0 rgba(0,0,0,0.95); }
+  .font-score   { font-family: "JetBrains Mono", monospace; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  .score-digit  { color: hsl(var(--foreground)); text-shadow: 0 1px 0 #ffffff; }
   .broadcast-label {
-    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
+    font-family: "JetBrains Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.25em;
-    font-size: 0.75rem;
-    color: hsl(var(--primary));
+    letter-spacing: 0.18em;
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: hsl(var(--muted-foreground));
   }
   .accent-flare { position: relative; }
   .accent-flare::after {
     content: ""; position: absolute; inset: -10%;
-    background: radial-gradient(closest-side, hsl(var(--primary) / 0.45), transparent 70%);
-    z-index: -1; pointer-events: none;
+    background: radial-gradient(closest-side, hsl(var(--primary) / 0.35), transparent 70%);
+    z-index: -1; pointer-events: none; border-radius: inherit;
   }
   .whistle-focus:focus-visible {
-    outline: none;
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.9), 0 0 0 2px hsl(var(--primary)) !important;
+    outline: none !important;
+    box-shadow: var(--shadow-recessed), 0 0 0 2px hsl(var(--primary)), var(--shadow-glow) !important;
   }
 }
 
@@ -332,6 +310,6 @@
 .coach-md p { @apply mb-2 leading-relaxed; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply text-foreground font-bold; color: hsl(var(--primary)); }
+.coach-md strong { @apply text-foreground font-semibold; }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground font-display; }
-.coach-md code { @apply px-1 py-0.5 text-xs; background: hsl(var(--surface-2)); color: hsl(var(--primary)); font-family: "Courier New", monospace; }
+.coach-md code { @apply px-1 py-0.5 rounded bg-background text-foreground text-xs shadow-recessed font-mono; }

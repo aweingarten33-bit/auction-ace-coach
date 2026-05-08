@@ -5,43 +5,40 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Banksy Button — sharp stencil, hard offset shadow, vibration on press.
+ * Industrial Button — physical key. Press translates Y + inverts shadow.
  */
 const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-display tracking-[0.08em] uppercase",
-    "border-2 border-foreground rounded-none",
-    "bg-background text-foreground",
-    "shadow-[var(--shadow-stencil)]",
-    "transition-[transform,box-shadow,background-color,color] duration-100",
-    "hover:-translate-y-px hover:shadow-[var(--shadow-stencil-lg)]",
-    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_rgba(0,0,0,0.95)]",
-    "focus-visible:outline-none focus-visible:shadow-[var(--shadow-spray-red)]",
+    "font-display font-bold uppercase tracking-[0.05em]",
+    "rounded-lg",
+    "transition-all duration-150 ease-mech",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "disabled:pointer-events-none disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+    "active:translate-y-[2px]",
   ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground border-foreground hover:bg-primary/90",
+          "bg-primary text-primary-foreground shadow-[var(--shadow-primary)] hover:brightness-110 active:shadow-[var(--shadow-pressed)]",
         secondary:
-          "bg-surface text-foreground border-foreground hover:bg-surface/70",
+          "bg-background text-foreground shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-floating)] active:shadow-[var(--shadow-pressed)]",
         outline:
-          "bg-transparent text-foreground border-foreground hover:bg-foreground hover:text-background",
+          "bg-background text-foreground shadow-[var(--shadow-card)] hover:text-primary hover:shadow-[var(--shadow-floating)] active:shadow-[var(--shadow-pressed)]",
         destructive:
-          "bg-primary text-primary-foreground border-foreground hover:bg-primary/90",
+          "bg-primary text-primary-foreground shadow-[var(--shadow-primary)] hover:brightness-110 active:shadow-[var(--shadow-pressed)]",
         ghost:
-          "bg-transparent text-foreground border-transparent shadow-none hover:bg-foreground/10 hover:border-foreground/40 hover:shadow-none active:translate-x-0 active:translate-y-0",
+          "bg-transparent text-muted-foreground hover:bg-background hover:text-foreground hover:shadow-[var(--shadow-recessed)] active:shadow-[var(--shadow-pressed)]",
         link:
-          "bg-transparent border-transparent shadow-none text-primary underline underline-offset-4 hover:no-underline hover:-translate-y-0 active:translate-x-0 active:translate-y-0 active:shadow-none",
+          "bg-transparent text-primary underline-offset-4 hover:underline active:translate-y-0",
       },
       size: {
         default: "h-12 px-6 text-sm",
-        sm:      "h-9 px-4 text-xs",
-        lg:      "h-14 px-8 text-base",
-        icon:    "h-12 w-12",
+        sm:      "h-10 px-4 text-xs rounded-md",
+        lg:      "h-14 px-8 text-base rounded-xl",
+        icon:    "h-12 w-12 rounded-lg",
       },
     },
     defaultVariants: { variant: "default", size: "default" },
