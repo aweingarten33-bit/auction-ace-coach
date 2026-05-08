@@ -42,7 +42,10 @@ Deno.serve(async (req) => {
     const data = await r.json();
     const teams = (data.teams ?? []).map((t: any) => ({
       id: t.id,
-      name: `${t.location ?? ""} ${t.nickname ?? ""}`.trim() || `Team ${t.id}`,
+      name:
+        (typeof t.name === "string" && t.name.trim()) ||
+        `${t.location ?? ""} ${t.nickname ?? ""}`.trim() ||
+        `Team ${t.id}`,
       abbrev: t.abbrev,
     }));
     return j({ ok: true, teams, league: { id: creds.league_id, season: creds.season_id, name: data?.settings?.name } });
