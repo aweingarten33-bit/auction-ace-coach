@@ -55,6 +55,10 @@ export default function PlayerDetailsOverlay({
   onOpenChange,
   name,
   position,
+  sheetPrice,
+  anchor,
+  posRank,
+  totalAtPos,
   matchPct,
   maxBid,
   reason,
@@ -66,6 +70,7 @@ export default function PlayerDetailsOverlay({
 }: Props) {
   const [meta, setMeta] = useState<SleeperPlayer | null | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState<Array<{ season: number; bid: number }>>([]);
 
   useEffect(() => {
     if (!open || !name) return;
@@ -78,9 +83,26 @@ export default function PlayerDetailsOverlay({
       })
       .catch(() => !cancelled && setMeta(null))
       .finally(() => !cancelled && setLoading(false));
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
+  }, [open, name]);
+
+  // Pull this player's auction history in your league (last 3 yrs)
+  useEffect(() => {
+    if (!open || !name) { setHistory([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("league_auction_history")
+        .select("season, bid_amount, player_name")
+        .ilike("player_name", name)
+        .order("season", { ascending: false })
+        .limit(5);
+      if (cancelled) return;
+      setHistory(((data ?? []) as Array<{ season: number; bid_amount: number }>).map(
+        (r) => ({ season: r.season, bid: r.bid_amount })
+      ));
+    })();
+    return () => { cancelled = true; };
   }, [open, name]);
 
   const team = meta?.team ?? undefined;
@@ -88,6 +110,11 @@ export default function PlayerDetailsOverlay({
   const pos = (meta?.position as Position | undefined) ?? position;
   const injury = meta?.injury_status ?? meta?.status;
   const showInjury = injury && injury !== "Active";
+
+  // Pick the headline price: sheet → blended anchor → ESPN value
+  const espnVal = anchor?.marketSources?.espn ?? anchor?.marketPrice;
+  const leagueVal = anchor?.leaguePrice;
+  const suggested = sheetPrice ?? anchor?.price ?? espnVal;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
