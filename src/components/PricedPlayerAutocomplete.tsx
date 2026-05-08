@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { PriceEstimate, Position } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { loadSleeperPlayers, searchPlayers, SleeperPlayer } from "@/lib/sleeper";
+import { useAnchorMap } from "@/lib/use-anchor-map";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
