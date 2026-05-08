@@ -402,10 +402,10 @@ export default function DraftRoom() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="-ml-2 h-9 w-9"
+                className="-ml-2 h-12 w-12"
                 aria-label="Open menu"
               >
-                <Menu className="h-5 w-5" />
+                <Menu className="h-7 w-7" />
               </Button>
             </SheetTrigger>
             <DrawerContents
@@ -444,19 +444,19 @@ export default function DraftRoom() {
             />
           </div>
 
-          {/* TOP 100 — slide-in from the right (mirrors the hamburger). */}
+          {/* TOP 100 — pull-tab anchored to the LEFT edge, under the hamburger. */}
           <Sheet open={top100Open} onOpenChange={setTop100Open}>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="-mr-2 h-9 w-9"
-                aria-label="Open Top 100"
+              <button
+                aria-label="Pull out Top 100"
+                className="fixed left-0 top-24 z-40 flex items-center gap-1 rounded-r-lg border border-l-0 border-primary/40 bg-primary/90 py-3 pl-1.5 pr-2 text-primary-foreground shadow-lg backdrop-blur transition-transform hover:translate-x-1 active:translate-x-2"
+                style={{ writingMode: "vertical-rl" }}
               >
-                <ListOrdered className="h-5 w-5" />
-              </Button>
+                <ListOrdered className="h-4 w-4 -rotate-90" />
+                <span className="text-[11px] font-semibold tracking-wide uppercase">Top 100</span>
+              </button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
+            <SheetContent side="left" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
               <SheetHeader className="border-b border-border/60 px-4 py-3">
                 <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
                   <ListOrdered className="h-4 w-4 text-primary" />
