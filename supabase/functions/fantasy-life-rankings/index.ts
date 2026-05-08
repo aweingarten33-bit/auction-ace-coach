@@ -88,9 +88,9 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
   const clean = md.replace(/\\/g, "").replace(/\*/g, "");
 
   // Pattern A: "1. Name, POS, TEAM"
-  const reA = new RegExp(`(?:^|\\n)\\s*(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*,\\s*(${POS})\\s*,\\s*(${TEAM})\\b`, "g");
+  const reA = new RegExp(`\\b(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*,\\s*(${POS})\\s*,\\s*(${TEAM})\\b`, "g");
   // Pattern B: "1. Name | TEAM"  (position from default)
-  const reB = new RegExp(`(?:^|\\n)\\s*(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${TEAM})\\b`, "g");
+  const reB = new RegExp(`\\b(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${TEAM})\\b`, "g");
 
   for (const m of clean.matchAll(reA)) {
     const rank = parseInt(m[1], 10);
