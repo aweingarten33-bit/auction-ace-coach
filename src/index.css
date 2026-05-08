@@ -11,40 +11,40 @@
 
 @layer base {
   :root {
-    --background: 48 100% 98%;           /* #FFFDF5 cream */
-    --foreground: 0 0% 0%;               /* #000000 */
+    --background: 0 0% 6%;               /* near-black */
+    --foreground: 0 0% 96%;              /* bone white */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 0 100% 71%;               /* #FF6B6B hot red */
-    --primary-foreground: 0 0% 0%;
-    --primary-glow: 0 100% 71%;
+    --primary: 0 90% 50%;                /* blood red */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 95% 55%;
 
-    --secondary: 50 100% 62%;            /* #FFD93D vivid yellow */
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 0 0% 96%;               /* bone white block */
+    --secondary-foreground: 0 0% 6%;
 
-    --muted: 252 96% 85%;                /* #C4B5FD soft violet */
-    --muted-foreground: 0 0% 0%;
+    --muted: 0 0% 18%;                   /* charcoal */
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 0 100% 71%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 0 90% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 100% 71%;
-    --destructive-foreground: 0 0% 0%;
+    --destructive: 0 90% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 50 100% 62%;
-    --warning-foreground: 0 0% 0%;
+    --warning: 0 0% 96%;
+    --warning-foreground: 0 0% 6%;
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 0%;
+    --success: 0 0% 96%;
+    --success-foreground: 0 0% 6%;
 
-    --border: 0 0% 0%;
-    --input: 0 0% 100%;
-    --ring: 0 0% 0%;
+    --border: 0 0% 96%;
+    --input: 0 0% 10%;
+    --ring: 0 0% 96%;
 
     --radius: 0px;
 
