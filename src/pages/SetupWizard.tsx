@@ -344,6 +344,7 @@ export default function SetupWizard() {
               </Button>
             )}
           </div>
+          </>)}
         </Card>
       </div>
     </div>
