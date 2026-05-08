@@ -72,7 +72,7 @@ export interface AnchorEntry {
   source: "league" | "espn";
   leaguePrice?: number;           // raw weighted league history (if any)
   marketPrice?: number;           // raw market consensus (Sleeper/ESPN blend)
-  marketSources?: { espn?: number; sleeper?: number };
+  marketSources?: { espn?: number; sleeper?: number; berry?: number };
   injuryDiscount?: { factor: number; reason: string; preInjuryPrice: number };
 }
 

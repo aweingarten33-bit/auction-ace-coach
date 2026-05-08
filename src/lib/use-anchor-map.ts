@@ -31,7 +31,8 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
     let cancelled = false;
     (async () => {
       try {
-        const [hist, espn, sleeper] = await Promise.all([
+        const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
+        const [hist, espn, sleeper, blendedRes] = await Promise.all([
           supabase
             .from("league_auction_history")
             .select("player_name, position, bid_amount, season")
@@ -44,8 +45,20 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             .from("sleeper_players")
             .select("player_name_norm, position, projected_auction_value, depth_chart_order, search_rank, injury_status, injury_notes")
             .then((r) => r.data ?? []),
+          supabase.functions.invoke("blended-values", {
+            body: { superflex: isSF, teams: settings.numTeams, budget: settings.totalBudget },
+          }).then((r) => (r.data ?? null) as { values?: Record<string, { berry: number | null; sleeper: number | null; blended: number; position: string }> } | null).catch(() => null),
         ]);
         if (cancelled) return;
+        const berryMap = new Map<string, { val: number; pos: string | null }>();
+        const blendedMap = new Map<string, { val: number; pos: string | null }>();
+        if (blendedRes?.values) {
+          const entries = Object.entries(blendedRes.values) as Array<[string, { berry: number | null; sleeper: number | null; blended: number; position: string }]>;
+          for (const [k, v] of entries) {
+            if (v.berry != null && v.berry > 0) berryMap.set(k, { val: v.berry, pos: v.position });
+            if (v.blended > 0) blendedMap.set(k, { val: v.blended, pos: v.position });
+          }
+        }
 
         // 1) League history per player — keep season-by-season for recency weighting.
         const leagueAgg = new Map<string, { bySeason: Map<number, number>; pos: string | null }>();
@@ -182,15 +195,11 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
 
 
-        // Market consensus = blend of ESPN and Sleeper. When they agree, high
-        // confidence. When they disagree wildly, take the higher one IF the
-        // player is a confirmed starter (catches ascending players ESPN lags on).
-        // Market consensus — SLEEPER FIRST (more current, picks up depth-chart shifts).
-        // ESPN is fallback when Sleeper is silent. When both exist and disagree by
-        // >50%, Sleeper still wins (it's the more recent signal); we just blend
-        // 70/30 toward Sleeper instead of pure replacement, so ESPN acts as a
-        // stabilizer if Sleeper is way out of pocket.
+        // Market consensus — Berry+Sleeper blended (from blended-values edge fn)
+        // is now the primary signal. ESPN is a stabilizer fallback only.
         const marketConsensus = (k: string): { val: number; pos: string | null } | null => {
+          const bl = blendedMap.get(k);
+          if (bl) return bl;
           const ev = espnMap.get(k);
           const sv = sleeperMap.get(k);
           if (!ev && !sv) return null;
@@ -199,12 +208,6 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const eVal = ev!.val;
           const sVal = sv!.val;
           const pos = sv!.pos || ev!.pos;
-          const ratio = Math.max(eVal, sVal) / Math.max(1, Math.min(eVal, sVal));
-          if (ratio <= 1.5) {
-            // close enough → 80/20 Sleeper-lean
-            return { val: sVal * 0.8 + eVal * 0.2, pos };
-          }
-          // big disagreement: Sleeper wins harder, ESPN brakes lightly
           return { val: sVal * 0.8 + eVal * 0.2, pos };
         };
 
@@ -369,6 +372,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
+              berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
@@ -390,6 +394,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
+              berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: v.price }
@@ -398,7 +403,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
 
         // 6) Market consensus — last fallback for non-projected players (K, DST, etc.)
-        const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys()]);
+        const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys(), ...berryMap.keys(), ...blendedMap.keys()]);
         for (const k of allMarketKeys) {
           if (out[k]) continue;
           const mv = marketConsensus(k);
@@ -416,6 +421,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
+              berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: adj }
