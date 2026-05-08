@@ -218,6 +218,51 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
         console.info("[useAnchorMap] league→market position scaling", scales);
 
+        // 3.5) LLM tiebreaker — for any player whose note has an ambiguous trigger
+        //      word but no clean phrase match, ask Lovable AI to classify. Cached
+        //      in localStorage by note hash so we only pay once per unique note.
+        const llmMap = new Map<string, { factor: number; reason: string }>();
+        const ambigItems: Array<{ id: string; name: string; status: string | null; note: string | null; cacheKey: string }> = [];
+        const cache: Record<string, { factor: number; reason: string } | null> = (() => {
+          try { return JSON.parse(localStorage.getItem("availability-llm-cache") || "{}"); } catch { return {}; }
+        })();
+        for (const k of injuryMap.keys()) {
+          const r = regexAvailability(k);
+          if (!r.ambiguous) continue;
+          const inj = injuryMap.get(k)!;
+          const cacheKey = `${(inj.status || "").trim()}|${(inj.note || "").trim()}`;
+          if (cacheKey in cache) {
+            const v = cache[cacheKey];
+            if (v) llmMap.set(k, v);
+            continue;
+          }
+          ambigItems.push({ id: k, name: k, status: inj.status, note: inj.note, cacheKey });
+        }
+        if (ambigItems.length > 0 && !cancelled) {
+          try {
+            const { data, error } = await supabase.functions.invoke("classify-availability", {
+              body: { items: ambigItems.map(({ cacheKey: _c, ...rest }) => rest) },
+            });
+            if (!error && data?.classifications) {
+              for (const c of data.classifications as Array<{ id: string; missing: boolean; reason: string; factor: number }>) {
+                const item = ambigItems.find((x) => x.id === c.id);
+                if (!item) continue;
+                if (c.missing && c.factor < 1) {
+                  const v = { factor: c.factor, reason: c.reason };
+                  llmMap.set(c.id, v);
+                  cache[item.cacheKey] = v;
+                } else {
+                  cache[item.cacheKey] = null;
+                }
+              }
+              try { localStorage.setItem("availability-llm-cache", JSON.stringify(cache)); } catch { /* quota */ }
+            }
+          } catch (e) {
+            console.warn("[useAnchorMap] availability LLM failed (non-fatal)", e);
+          }
+        }
+        if (cancelled) return;
+
         // 4) Build the anchor map
         //    Cascade: LEAGUE history (blended w/ VORP) → VORP → market consensus → none
         const out: Record<string, AnchorEntry> = {};
