@@ -94,6 +94,9 @@ Deno.serve(async (req) => {
     // Average position spend + count across seasons
     const avgByPos: Record<string, number> = {};
     const avgCountByPos: Record<string, number> = {};
+    const avgPerPlayerByPos: Record<string, number> = {};
+    const medianPerPlayerByPos: Record<string, number> = {};
+    const seasonSpreadByPos: Record<string, { season: number; spend: number }[]> = {};
     for (const pos of POS_GROUPS) {
       const sumSpend = perSeason.reduce((s, ps) => s + (ps.byPos[pos]?.spend ?? 0), 0);
       const sumCount = perSeason.reduce((s, ps) => s + (ps.byPos[pos]?.count ?? 0), 0);
@@ -101,6 +104,27 @@ Deno.serve(async (req) => {
       avgCountByPos[pos] = perSeason.length
         ? Math.round((sumCount / perSeason.length) * 10) / 10
         : 0;
+      avgPerPlayerByPos[pos] = sumCount > 0 ? Math.round(sumSpend / sumCount) : 0;
+
+      // Median of individual bid amounts at this position across all seasons
+      const bids = recent
+        .filter((r) => (r.position ?? "").toUpperCase() === pos)
+        .map((r) => r.bid_amount ?? 0)
+        .sort((a, b) => a - b);
+      if (bids.length) {
+        const mid = Math.floor(bids.length / 2);
+        medianPerPlayerByPos[pos] = bids.length % 2
+          ? bids[mid]
+          : Math.round((bids[mid - 1] + bids[mid]) / 2);
+      } else {
+        medianPerPlayerByPos[pos] = 0;
+      }
+
+      // Spread = per-season total spend at the position (for low/avg/high chart)
+      seasonSpreadByPos[pos] = perSeason.map((ps) => ({
+        season: ps.season,
+        spend: ps.byPos[pos]?.spend ?? 0,
+      }));
     }
     const avgTotal = perSeason.length
       ? Math.round(perSeason.reduce((s, ps) => s + ps.total, 0) / perSeason.length)
@@ -138,6 +162,9 @@ Deno.serve(async (req) => {
         trends: {
           avgByPos,
           avgCountByPos,
+          avgPerPlayerByPos,
+          medianPerPlayerByPos,
+          seasonSpreadByPos,
           avgTotal,
           avgTop3Pct,
           avgTopBid,
