@@ -683,12 +683,12 @@ export default function DraftRoom() {
         className="mt-8 border-t border-border/40 px-4 py-4 text-center"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
       >
-        <p className="inline-flex items-center justify-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+        <p className="inline-flex items-center justify-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
           <span>Built by A.</span>
           <img
             src={wuWOutline}
             alt="W"
-            className="inline-block h-3.5 w-4 object-contain align-[-2px]"
+            className="inline-block h-7 w-8 object-contain align-[-4px]"
           />
           <span>eingarten</span>
         </p>
