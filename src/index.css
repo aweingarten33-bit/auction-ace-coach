@@ -1,112 +1,121 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Crimson+Pro:ital,wght@0,400;0,500;0,600;1,400&family=Cinzel:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Anton&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   ACADEMIA / CLASSICAL — The Library at Night
+   FRANK MILLER NEWSPRINT BRUTALISM — Year One × War Room
    ---------------------------------------------------------------------
-   Mahogany walls. Brass lamps. Crimson leather. Aged parchment.
-   Cormorant Garamond for headlines, Crimson Pro for body, Cinzel for
-   labels. Brass (#C9A962) is the only interactive language.
-   Crimson (#8B2635) is the wax seal — used sparingly, with intent.
+   The city is watching the draft. Void black, ink black, bone parchment.
+   Blood red is danger. Dirty gold is earned. Yellow alarms.
+   Bebas/Oswald scream. Playfair whispers. JetBrains Mono reports.
+   Zero radius. Visible structure. Halftone, grain, rain, vignette.
    ===================================================================== */
 
 @layer base {
   :root {
-    /* Library at Night × Sin City — Miller pushes the ink darker, the
-       contrast crueler. Mahogany is almost black; parchment is almost bone. */
-    --background:        24 22% 5%;     /* near-black mahogany */
-    --background-alt:    24 18% 8%;     /* charred oak */
-    --foreground:        36 36% 90%;    /* bleached parchment */
-    --muted-bg:          25 14% 14%;    /* worn leather */
+    /* Surfaces — void to charcoal */
+    --background:        0 0% 2%;        /* VOID BLACK #050505 */
+    --background-alt:    0 0% 4%;        /* INK BLACK   #0B0B0B */
+    --foreground:        38 28% 86%;     /* NEWSPRINT BONE #E7DFCF */
+    --muted-bg:          0 0% 8%;        /* CHARCOAL #151515 */
 
-    --card:              25 16% 12%;
-    --card-foreground:   33 32% 87%;
+    --card:              0 0% 4%;
+    --card-foreground:   38 28% 86%;
 
-    --popover:           24 14% 9%;
-    --popover-foreground:33 32% 87%;
+    --popover:           0 0% 3%;
+    --popover-foreground:38 28% 86%;
 
-    /* Material accents — brass dimmed, crimson screaming */
-    --brass:             42 60% 52%;    /* tarnished brass */
-    --brass-light:       42 64% 64%;
-    --brass-dark:        42 60% 38%;
-    --crimson:           356 78% 42%;   /* Miller blood — wetter, louder */
-    --crimson-spatter:   356 90% 50%;   /* arterial */
-    --parchment:         36 36% 90%;
-    --ink-faded:         28 10% 48%;    /* faded ink, cooler */
-    --wood-grain:        24 14% 18%;    /* tight, dark grain */
+    /* Tokens — semantic noir vocabulary */
+    --bone:              38 28% 86%;     /* #E7DFCF */
+    --paper:             36 28% 73%;     /* AGED PAPER #CBBFA9 */
+    --void:              0 0% 2%;
+    --ink:               0 0% 4%;
+    --charcoal:          0 0% 8%;
+    --gunmetal:          0 0% 13%;       /* #222222 */
+    --steel-blue:        207 32% 21%;    /* COLD STEEL #243746 */
+
+    --blood:             357 81% 36%;    /* BLOOD RED #A31218 */
+    --signal-red:        0 75% 48%;      /* SIGNAL RED #D61E1E */
+    --dirty-gold:        41 53% 43%;     /* DIRTY GOLD #A88734 */
+    --warning-yellow:    47 65% 53%;     /* WARNING #D7B33B */
 
     /* shadcn mapping */
-    --primary:           42 51% 59%;
-    --primary-foreground:24 14% 9%;
-    --primary-glow:      42 53% 70%;
+    --primary:           38 28% 86%;     /* bone — primary action is light on dark */
+    --primary-foreground:0 0% 2%;
+    --primary-glow:      36 28% 73%;
 
-    --secondary:         25 16% 19%;
-    --secondary-foreground: 33 32% 87%;
+    --secondary:         0 0% 13%;
+    --secondary-foreground: 38 28% 86%;
 
-    --muted:             25 16% 19%;
-    --muted-foreground:  28 14% 55%;
+    --muted:             0 0% 13%;
+    --muted-foreground:  36 12% 58%;
 
-    --accent:            42 51% 59%;
-    --accent-foreground: 24 14% 9%;
+    --accent:            41 53% 43%;     /* dirty gold */
+    --accent-foreground: 0 0% 2%;
 
-    --destructive:       351 58% 35%;
-    --destructive-foreground: 33 32% 92%;
+    --destructive:       357 81% 36%;
+    --destructive-foreground: 38 28% 86%;
 
-    --warning:           42 51% 59%;
-    --warning-foreground:24 14% 9%;
+    --warning:           47 65% 53%;
+    --warning-foreground:0 0% 2%;
 
-    --success:           42 51% 47%;
-    --success-foreground:24 14% 9%;
+    --success:           41 53% 43%;
+    --success-foreground:0 0% 2%;
 
-    --border:            28 16% 25%;
-    --input:             25 16% 12%;
-    --ring:              42 51% 59%;
+    --border:            0 0% 18%;
+    --input:             0 0% 6%;
+    --ring:              38 28% 86%;
 
-    --radius: 4px;
+    --radius: 0px;
 
-    /* Back-compat tokens (older components reference these) */
-    --signal: 42 51% 59%;               /* re-routed → brass */
-    --blood:  351 58% 35%;              /* re-routed → crimson */
-    --steel:  28 14% 55%;
-    --ink:    24 18% 5%;
-    --bone:   33 32% 87%;
-    --sungold: 42 51% 59%;
-    --sungold-2: 42 53% 70%;
-    --krypton: 24 14% 9%;
-    --bloodred: 351 58% 35%;
-    --kryptonite: 42 51% 59%;
+    /* Back-compat aliases (older components) — re-routed to Miller palette */
+    --signal:    41 53% 43%;
+    --brass:     41 53% 43%;
+    --brass-light: 41 55% 56%;
+    --brass-dark:  41 53% 32%;
+    --crimson:   357 81% 36%;
+    --crimson-spatter: 0 75% 48%;
+    --parchment: 38 28% 86%;
+    --ink-faded: 36 12% 58%;
+    --wood-grain:0 0% 13%;
+    --bloodred:  357 81% 36%;
+    --steel:     36 12% 58%;
+    --sungold:   41 53% 43%;
+    --sungold-2: 41 55% 56%;
+    --krypton:   0 0% 2%;
+    --kryptonite:41 53% 43%;
+    --background-alt: 0 0% 4%;
 
-    /* Shadows — Miller's ink slabs. No soft falloff. Stamps. */
-    --shadow-card:      0 1px 0 0 hsl(0 0% 100% / 0.05), 6px 6px 0 0 hsl(var(--ink) / 0.85), 0 18px 36px -10px hsl(var(--ink));
-    --shadow-floating:  0 1px 0 0 hsl(0 0% 100% / 0.06), 12px 12px 0 0 hsl(var(--ink) / 0.9), 0 30px 60px -16px hsl(var(--ink));
-    --shadow-pressed:   inset 0 3px 6px hsl(var(--ink) / 0.8);
+    /* Shadows — ink slabs, no soft falloff. Stamps. */
+    --shadow-card:      6px 6px 0 0 hsl(0 0% 0%), 0 0 0 1px hsl(var(--border));
+    --shadow-floating:  12px 12px 0 0 hsl(0 0% 0%), 0 0 0 1px hsl(var(--border));
+    --shadow-pressed:   inset 0 3px 6px hsl(0 0% 0% / 0.9);
     --shadow-recessed:  inset 0 0 0 1px hsl(var(--border));
-    --shadow-sharp:     6px 6px 0 0 hsl(var(--ink));
-    --shadow-glow:      0 0 0 1px hsl(var(--brass) / 0.6), 4px 4px 0 0 hsl(var(--ink) / 0.85), 0 6px 18px hsl(var(--brass) / 0.3);
-    --shadow-primary:   0 0 0 1px hsl(var(--brass)), 6px 6px 0 0 hsl(var(--ink)), 0 10px 28px -8px hsl(var(--brass) / 0.4);
-    --shadow-led-green: 0 0 14px hsl(var(--brass) / 0.6);
-    --shadow-engraved:  inset 0 1px 0 hsl(0 0% 100% / 0.22), inset 0 -2px 0 hsl(var(--ink) / 0.7), 3px 3px 0 0 hsl(var(--ink) / 0.85);
-    --shadow-wax-seal:  inset 0 2px 4px hsl(0 0% 100% / 0.22), inset 0 -2px 4px hsl(var(--ink) / 0.5), 4px 4px 0 0 hsl(var(--ink) / 0.85), 0 6px 16px hsl(var(--crimson) / 0.5);
+    --shadow-sharp:     6px 6px 0 0 hsl(0 0% 0%);
+    --shadow-glow:      0 0 0 2px hsl(var(--bone)), 6px 6px 0 0 hsl(0 0% 0%);
+    --shadow-primary:   0 0 0 2px hsl(var(--bone)), 6px 6px 0 0 hsl(0 0% 0%);
+    --shadow-led-green: 0 0 14px hsl(var(--dirty-gold) / 0.5);
+    --shadow-engraved:  inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -2px 0 hsl(0 0% 0% / 0.7), 4px 4px 0 0 hsl(0 0% 0%);
+    --shadow-wax-seal:  4px 4px 0 0 hsl(0 0% 0%), 0 6px 16px hsl(var(--blood) / 0.5);
 
-    --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
-    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
-    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
-    --shadow-brut-xl:   16px 16px 0 0 hsl(var(--ink));
+    --shadow-brut-sm:   3px 3px 0 0 hsl(0 0% 0%);
+    --shadow-brut:      6px 6px 0 0 hsl(0 0% 0%);
+    --shadow-brut-lg:   10px 10px 0 0 hsl(0 0% 0%);
+    --shadow-brut-xl:   16px 16px 0 0 hsl(0 0% 0%);
 
-    --sidebar-background: 24 16% 8%;
-    --sidebar-foreground: 33 32% 87%;
-    --sidebar-primary: 42 51% 59%;
-    --sidebar-primary-foreground: 24 14% 9%;
-    --sidebar-accent: 25 16% 14%;
-    --sidebar-accent-foreground: 33 32% 87%;
-    --sidebar-border: 28 16% 25%;
-    --sidebar-ring: 42 51% 59%;
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 38 28% 86%;
+    --sidebar-primary: 38 28% 86%;
+    --sidebar-primary-foreground: 0 0% 2%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 38 28% 86%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 38 28% 86%;
   }
 
-  .dark { /* the library is always at night */ }
+  .dark { /* always night, always raining */ }
 
   * { @apply border-border; }
 
@@ -120,546 +129,438 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "Crimson Pro", Georgia, serif;
+    font-family: "Playfair Display", Georgia, serif;
     font-weight: 400;
-    line-height: 1.625;
+    line-height: 1.55;
     background-color: hsl(var(--background));
-    /* A single bare bulb. A pool of blood by the door. The rest is shadow. */
+    /* A streetlight. A sodium-vapor smear. A pool of blood at the curb. */
     background-image:
-      radial-gradient(ellipse 55% 35% at 50% -5%, hsl(var(--brass) / 0.18), transparent 60%),
-      radial-gradient(ellipse 45% 30% at 8% 100%, hsl(var(--crimson) / 0.22), transparent 65%),
-      radial-gradient(ellipse 40% 28% at 100% 80%, hsl(var(--crimson-spatter) / 0.10), transparent 70%),
-      linear-gradient(180deg, hsl(24 22% 7%) 0%, hsl(var(--background)) 45%, hsl(24 24% 3%) 100%);
+      radial-gradient(ellipse 60% 40% at 18% -8%, hsl(47 65% 53% / 0.08), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 92% 10%, hsl(207 32% 21% / 0.22), transparent 65%),
+      radial-gradient(ellipse 40% 30% at 8% 100%, hsl(var(--blood) / 0.18), transparent 65%),
+      linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(var(--background)) 50%, hsl(0 0% 1%) 100%);
     background-attachment: fixed;
   }
 
-  /* Halftone Ben-Day dots — Miller's printer ghost, loud and lopsided */
+  /* Halftone Ben-Day + grain — printer ghost over wet pavement */
   body::before {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none; z-index: 1;
     background-image:
-      radial-gradient(hsl(var(--ink) / 0.55) 0.9px, transparent 1.2px),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0.78  0 0 0 0 0.66  0 0 0 0 0.51  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size: 5px 5px, 240px 240px;
+      radial-gradient(hsl(0 0% 0% / 0.7) 0.9px, transparent 1.2px),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 4px 4px, 280px 280px;
     mix-blend-mode: multiply;
-    opacity: 0.32;
+    opacity: 0.55;
   }
 
-  /* Heavy vignette — the lamp barely reaches the edges */
+  /* Heavy vignette + rain streaks — the lamp barely reaches the gutter */
   body::after {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none; z-index: 1;
     background:
-      radial-gradient(ellipse at center, transparent 0%, transparent 35%, hsl(24 30% 2% / 0.85) 100%),
-      linear-gradient(180deg, hsl(24 30% 2% / 0.4) 0%, transparent 12%, transparent 85%, hsl(24 30% 2% / 0.5) 100%);
+      repeating-linear-gradient(180deg, transparent 0 6px, hsl(0 0% 0% / 0.04) 6px 7px),
+      radial-gradient(ellipse at center, transparent 0%, transparent 30%, hsl(0 0% 0% / 0.92) 100%),
+      linear-gradient(180deg, hsl(0 0% 0% / 0.5) 0%, transparent 14%, transparent 84%, hsl(0 0% 0% / 0.6) 100%);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 700;
-    letter-spacing: -0.015em;
+    font-family: "Bebas Neue", "Oswald", "Anton", Impact, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
     color: hsl(var(--foreground));
-    line-height: 1.05;
-    text-shadow: 0 2px 0 hsl(var(--ink) / 0.6), 0 8px 24px hsl(var(--ink) / 0.7);
+    line-height: 0.92;
+    text-transform: uppercase;
+    text-shadow: 0 2px 0 hsl(0 0% 0% / 0.9), 4px 4px 0 hsl(0 0% 0% / 0.4);
   }
-  h1 { font-weight: 700; letter-spacing: -0.025em; line-height: 0.98; }
+  h1 { letter-spacing: 0.005em; line-height: 0.86; }
 
-  ::selection { background: hsl(var(--brass) / 0.5); color: hsl(var(--foreground)); }
+  ::selection { background: hsl(var(--blood)); color: hsl(var(--bone)); }
 }
 
 @layer utilities {
-  /* Font utilities — three distinct serifs, each with a job */
-  .font-display { font-family: "Cinzel", Georgia, serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; }
-  .font-heading { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; letter-spacing: -0.01em; }
-  .font-body    { font-family: "Crimson Pro", Georgia, serif; font-weight: 400; }
-  .font-mono    { font-family: "Cinzel", Georgia, serif; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; }
-  .font-serif   { font-family: "Cormorant Garamond", Georgia, serif; }
+  /* ================= TYPOGRAPHY UTILITIES ================= */
+  .font-display { font-family: "Anton", "Bebas Neue", Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.01em; line-height: 0.86; }
+  .font-headline,
+  .font-heading { font-family: "Bebas Neue", "Oswald", Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.02em; line-height: 0.92; }
+  .font-condensed { font-family: "Oswald", "Bebas Neue", sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+  .font-editorial,
+  .font-serif,
+  .font-body  { font-family: "Playfair Display", Georgia, serif; font-weight: 400; letter-spacing: 0; }
+  .font-mono  { font-family: "JetBrains Mono", ui-monospace, "IBM Plex Mono", monospace; font-feature-settings: "tnum"; letter-spacing: 0.02em; }
+  .font-data  { font-family: "JetBrains Mono", ui-monospace, monospace; font-feature-settings: "tnum"; text-transform: uppercase; letter-spacing: 0.08em; }
 
-  /* Semantic color utilities */
-  .text-signal, .text-sungold, .text-brass { color: hsl(var(--brass)); }
-  .text-blood, .text-crimson { color: hsl(var(--crimson)); }
-  .text-steel, .text-ink-faded { color: hsl(var(--ink-faded)); }
-  .text-parchment { color: hsl(var(--parchment)); }
-  .text-krypton { color: hsl(var(--background)); }
-  .text-kryptonite { color: hsl(var(--brass)); }
+  /* Headline scales — newspaper-front-page violence */
+  .headline-mega   { font-family: "Anton", Impact, sans-serif; font-size: clamp(3.5rem, 12vw, 9rem); line-height: 0.82; text-transform: uppercase; letter-spacing: -0.005em; }
+  .headline-xl     { font-family: "Bebas Neue", Impact, sans-serif; font-size: clamp(2.5rem, 8vw, 6rem); line-height: 0.86; text-transform: uppercase; }
+  .headline-lg     { font-family: "Bebas Neue", Impact, sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; text-transform: uppercase; }
 
-  .bg-signal, .bg-sungold, .bg-brass { background-color: hsl(var(--brass)); }
-  .bg-blood, .bg-crimson { background-color: hsl(var(--crimson)); }
-  .bg-ink, .bg-krypton { background-color: hsl(var(--background)); }
-  .bg-bone, .bg-parchment { background-color: hsl(var(--parchment)); }
-  .bg-panel { background-color: hsl(var(--card)); }
-  .bg-aged-oak { background-color: hsl(var(--background-alt)); }
+  /* Editorial pull quote */
+  .pull-quote { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-weight: 400; font-size: 1.5rem; line-height: 1.4; color: hsl(var(--paper)); border-left: 3px solid hsl(var(--dirty-gold)); padding-left: 1.25rem; }
 
-  .border-signal, .border-sungold, .border-brass { border-color: hsl(var(--brass)); }
-  .border-blood, .border-crimson { border-color: hsl(var(--crimson)); }
-  .border-krypton { border-color: hsl(var(--wood-grain)); }
+  /* ================= COLOR UTILITIES ================= */
+  .text-bone, .text-parchment { color: hsl(var(--bone)); }
+  .text-paper                 { color: hsl(var(--paper)); }
+  .text-blood, .text-crimson  { color: hsl(var(--blood)); }
+  .text-signal                { color: hsl(var(--signal-red)); }
+  .text-gold, .text-brass, .text-sungold, .text-kryptonite { color: hsl(var(--dirty-gold)); }
+  .text-warning, .text-yellow { color: hsl(var(--warning-yellow)); }
+  .text-steel, .text-ink-faded { color: hsl(var(--muted-foreground)); }
+  .text-void, .text-ink, .text-krypton { color: hsl(var(--void)); }
+  .text-max-1, .text-max-5    { color: hsl(var(--blood)); }
+  .text-max-2                 { color: hsl(var(--muted-foreground)); }
+  .text-max-3, .text-max-4    { color: hsl(var(--dirty-gold)); }
 
-  /* Brass gradient — for buttons, metallic surfaces */
+  .bg-bone, .bg-parchment     { background-color: hsl(var(--bone)); }
+  .bg-paper                   { background-color: hsl(var(--paper)); }
+  .bg-blood, .bg-crimson      { background-color: hsl(var(--blood)); }
+  .bg-signal                  { background-color: hsl(var(--signal-red)); }
+  .bg-gold, .bg-brass, .bg-sungold { background-color: hsl(var(--dirty-gold)); }
+  .bg-warning                 { background-color: hsl(var(--warning-yellow)); }
+  .bg-void, .bg-ink, .bg-krypton { background-color: hsl(var(--void)); }
+  .bg-charcoal, .bg-panel     { background-color: hsl(var(--charcoal)); }
+  .bg-gunmetal                { background-color: hsl(var(--gunmetal)); }
+  .bg-aged-oak                { background-color: hsl(var(--background-alt)); }
+  .bg-max-1, .bg-max-5        { background-color: hsl(var(--blood)); }
+  .bg-max-2                   { background-color: hsl(var(--gunmetal)); }
+  .bg-max-3, .bg-max-4        { background-color: hsl(var(--dirty-gold)); }
+  .bg-max-muted               { background-color: hsl(var(--charcoal)); }
+
+  .border-bone, .border-parchment { border-color: hsl(var(--bone)); }
+  .border-blood, .border-crimson  { border-color: hsl(var(--blood)); }
+  .border-gold, .border-brass, .border-sungold { border-color: hsl(var(--dirty-gold)); }
+  .border-warning             { border-color: hsl(var(--warning-yellow)); }
+  .border-void, .border-krypton { border-color: hsl(var(--void)); }
+  .border-max-1, .border-max-5 { border-color: hsl(var(--blood)); }
+  .border-max-2               { border-color: hsl(var(--border)); }
+  .border-max-3, .border-max-4 { border-color: hsl(var(--dirty-gold)); }
+
+  /* Brass-gold gradient (legacy hook) — kept flat & matte */
   .bg-brass-gradient {
-    background: linear-gradient(180deg, hsl(var(--brass-light)) 0%, hsl(var(--brass)) 50%, hsl(var(--brass-dark)) 100%);
+    background: linear-gradient(180deg, hsl(var(--dirty-gold)) 0%, hsl(41 53% 32%) 100%);
   }
 
-  /* Back-compat for prior maximalist tokens */
-  .text-max-1, .text-max-5 { color: hsl(var(--crimson)); }
-  .text-max-2 { color: hsl(var(--ink-faded)); }
-  .text-max-3, .text-max-4 { color: hsl(var(--brass)); }
-  .bg-max-1, .bg-max-5 { background-color: hsl(var(--crimson)); }
-  .bg-max-2 { background-color: hsl(var(--ink-faded)); }
-  .bg-max-3, .bg-max-4 { background-color: hsl(var(--brass)); }
-  .bg-max-muted { background-color: hsl(var(--muted-bg)); }
-  .border-max-1, .border-max-5 { border-color: hsl(var(--crimson)); }
-  .border-max-2 { border-color: hsl(var(--border)); }
-  .border-max-3, .border-max-4 { border-color: hsl(var(--brass)); }
-
-  /* Lamplight gradient over text */
+  /* Sodium-vapor lamplight gradient on text */
   .text-gradient,
   .text-gradient-sun {
-    background: linear-gradient(180deg, hsl(var(--brass-light)) 0%, hsl(var(--brass)) 60%, hsl(var(--brass-dark)) 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+    background: linear-gradient(180deg, hsl(var(--bone)) 0%, hsl(var(--paper)) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .text-gradient-blood {
+    background: linear-gradient(180deg, hsl(var(--signal-red)) 0%, hsl(var(--blood)) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
   }
 
-  /* Engraved text — pressed into metal */
+  /* Engraved / inked text */
   .text-engraved,
   .text-shadow-1, .text-shadow-2, .text-shadow-3 {
-    text-shadow: 1px 1px 1px hsl(var(--ink) / 0.5), -1px -1px 1px hsl(0 0% 100% / 0.08);
+    text-shadow: 2px 2px 0 hsl(0 0% 0%), 0 0 1px hsl(0 0% 0% / 0.9);
   }
   .text-shadow-mega {
-    text-shadow: 1px 1px 1px hsl(var(--ink) / 0.5), -1px -1px 1px hsl(0 0% 100% / 0.1), 0 12px 32px hsl(var(--ink) / 0.6);
+    text-shadow: 3px 3px 0 hsl(0 0% 0%), 6px 6px 0 hsl(var(--blood) / 0.6);
   }
-  .text-emboss { text-shadow: 0 1px 0 hsl(0 0% 100% / 0.08), 0 -1px 0 hsl(var(--ink) / 0.5); }
+  .text-emboss { text-shadow: 0 1px 0 hsl(0 0% 100% / 0.04), 0 -1px 0 hsl(0 0% 0% / 0.9); }
 
-  /* Cinzel uppercase label — engraved into brass */
+  /* Mono uppercase data label — terminal print */
   .label-stamped,
-  .broadcast-label {
-    font-family: "Cinzel", Georgia, serif;
+  .broadcast-label,
+  .label-mono {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
     text-transform: uppercase;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     font-weight: 600;
     font-size: 0.66rem;
-    color: hsl(var(--background));
-    background: linear-gradient(180deg, hsl(var(--brass-light)) 0%, hsl(var(--brass)) 50%, hsl(var(--brass-dark)) 100%);
-    padding: 4px 12px;
-    border-radius: 2px;
+    color: hsl(var(--bone));
+    background: hsl(var(--void));
+    border: 1px solid hsl(var(--bone) / 0.4);
+    padding: 4px 10px;
+    border-radius: 0;
     display: inline-block;
-    box-shadow: var(--shadow-engraved);
-    text-shadow: 0 1px 0 hsl(0 0% 100% / 0.2);
+  }
+  .label-blood { background: hsl(var(--blood)); border-color: hsl(var(--blood)); color: hsl(var(--bone)); }
+  .label-gold  { background: hsl(var(--dirty-gold)); border-color: hsl(var(--dirty-gold)); color: hsl(var(--void)); }
+  .label-warning { background: hsl(var(--warning-yellow)); border-color: hsl(var(--warning-yellow)); color: hsl(var(--void)); }
+
+  /* Edition metadata — masthead-style date/issue line */
+  .edition-meta {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.625rem;
+    color: hsl(var(--paper));
+    border-top: 1px solid hsl(var(--bone) / 0.3);
+    border-bottom: 1px solid hsl(var(--bone) / 0.3);
+    padding: 4px 0;
   }
 
-  /* Arch-top — cathedral window border-radius */
-  .arch-top { border-radius: 40% 40% 0 0 / 20% 20% 0 0; }
-
-  /* Ornate divider — gradient line with central glyph */
+  /* Hard rules — newspaper dividers */
+  .rule-thin   { height: 1px; background: hsl(var(--bone) / 0.4); }
+  .rule-thick  { height: 3px; background: hsl(var(--bone)); border-bottom: 1px solid hsl(var(--bone)); margin-top: 2px; }
+  .rule-blood  { height: 4px; background: hsl(var(--blood)); }
   .rule-gold,
-  .ornate-divider {
-    position: relative;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, hsl(var(--wood-grain)) 20%, hsl(var(--brass)) 50%, hsl(var(--wood-grain)) 80%, transparent 100%);
-    margin: 1.5rem 0;
-  }
-  .ornate-divider::before {
-    content: "✶";
-    position: absolute; left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    color: hsl(var(--brass));
-    font-size: 12px;
-    background: hsl(var(--background));
-    padding: 0 12px;
-  }
+  .ornate-divider { height: 2px; background: hsl(var(--dirty-gold)); margin: 1.5rem 0; position: relative; }
+  .ornate-divider::before { content: none; }
 
-  /* Corner flourish — brass brackets framing major content */
-  .ornate-frame { position: relative; }
-  .ornate-frame::before,
-  .ornate-frame::after {
+  /* Dossier corner brackets — surveillance crosshairs */
+  .ornate-frame,
+  .corner-flourish { position: relative; }
+  .ornate-frame::before, .ornate-frame::after,
+  .corner-flourish::before, .corner-flourish::after {
     content: "";
     position: absolute;
-    width: 40px; height: 40px;
-    border: 2px solid hsl(var(--brass));
+    width: 18px; height: 18px;
+    border: 2px solid hsl(var(--bone));
     pointer-events: none;
   }
   .ornate-frame::before { top: -1px; left: -1px;  border-right: none; border-bottom: none; }
   .ornate-frame::after  { bottom: -1px; right: -1px; border-left: none;  border-top: none; }
+  .corner-flourish::before { top: 6px;    left: 6px;    border-right: none; border-bottom: none; border-color: hsl(var(--dirty-gold)); }
+  .corner-flourish::after  { bottom: 6px; right: 6px;   border-left: none;  border-top: none;    border-color: hsl(var(--dirty-gold)); }
 
-  .corner-flourish { position: relative; }
-  .corner-flourish::before,
-  .corner-flourish::after {
-    content: "";
-    position: absolute;
-    width: 24px; height: 24px;
-    border: 1px solid hsl(var(--brass) / 0.6);
-    transition: border-color 300ms ease-out;
-    pointer-events: none;
+  /* Stamp — BUY / PASS / TARGET overlays */
+  .stamp {
+    display: inline-block;
+    font-family: "Anton", Impact, sans-serif;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    padding: 6px 18px;
+    border: 4px solid currentColor;
+    background: transparent;
+    transform: rotate(-4deg);
+    text-shadow: 2px 2px 0 hsl(0 0% 0%);
   }
-  .corner-flourish::before { top: 8px; left: 8px;  border-right: none; border-bottom: none; }
-  .corner-flourish::after  { bottom: 8px; right: 8px; border-left: none;  border-top: none; }
-  .corner-flourish:hover::before,
-  .corner-flourish:hover::after { border-color: hsl(var(--brass)); }
+  .stamp-buy  { color: hsl(var(--dirty-gold)); }
+  .stamp-pass { color: hsl(var(--blood)); }
+  .stamp-target { color: hsl(var(--bone)); }
 
-  /* Wax seal — featured-item badge */
+  /* Wax seal — legacy hook, repurposed as a stamp dot */
   .wax-seal {
     width: 48px; height: 48px;
-    border-radius: 9999px;
-    background: radial-gradient(circle at 30% 30%, hsl(351 58% 50%) 0%, hsl(var(--crimson)) 50%, hsl(351 58% 22%) 100%);
+    border-radius: 0;
+    background: hsl(var(--blood));
     box-shadow: var(--shadow-wax-seal);
     display: inline-flex; align-items: center; justify-content: center;
-    color: hsl(var(--brass-light));
+    color: hsl(var(--bone));
+    font-family: "Anton", Impact, sans-serif; text-transform: uppercase;
   }
 
-  /* Drop cap — illuminated capital */
+  /* Drop cap — newspaper opener */
   .drop-cap::first-letter,
   .drop-cap-target {
-    font-family: "Cinzel", Georgia, serif;
-    font-size: 4.5rem;
-    line-height: 0.8;
+    font-family: "Anton", Impact, sans-serif;
+    font-size: 5rem;
+    line-height: 0.78;
     float: left;
-    margin: 0.25rem 0.75rem 0 0;
-    color: hsl(var(--brass));
-    text-shadow: 2px 2px 4px hsl(var(--ink) / 0.5);
+    margin: 0.35rem 0.6rem 0 0;
+    color: hsl(var(--bone));
+    text-shadow: 3px 3px 0 hsl(0 0% 0%);
   }
 
-  /* Sepia images — aged photographs that revive on hover */
+  /* Imagery — monochrome surveillance */
   .sepia-image,
-  img.sepia { filter: sepia(0.6) contrast(0.95) brightness(0.9); transition: filter 700ms ease-out; }
-  .sepia-image:hover,
-  img.sepia:hover,
-  .group:hover .sepia-image,
-  .group:hover img.sepia { filter: sepia(0) contrast(1) brightness(1); }
+  img.sepia { filter: grayscale(1) contrast(1.1) brightness(0.85); transition: filter 500ms ease-out; }
+  .sepia-image:hover, img.sepia:hover,
+  .group:hover .sepia-image, .group:hover img.sepia { filter: grayscale(0.5) contrast(1.05) brightness(0.95) sepia(0.15); }
+  .img-noir { filter: grayscale(1) contrast(1.2) brightness(0.8); }
 
-  /* Shadow utilities */
+  /* Arch-top legacy hook — flatten to dossier rectangle */
+  .arch-top { border-radius: 0; }
+
+  /* ================= SHADOWS ================= */
   .shadow-multi    { box-shadow: var(--shadow-card); }
   .shadow-multi-lg { box-shadow: var(--shadow-floating); }
-  .shadow-glow-accent    { box-shadow: 0 0 0 1px hsl(var(--brass) / 0.4), 0 4px 12px hsl(var(--brass) / 0.3); }
-  .shadow-glow-accent-lg { box-shadow: 0 0 0 1px hsl(var(--brass) / 0.6), 0 8px 28px hsl(var(--brass) / 0.4); }
+  .shadow-glow-accent    { box-shadow: 0 0 0 1px hsl(var(--dirty-gold) / 0.6); }
+  .shadow-glow-accent-lg { box-shadow: 0 0 0 2px hsl(var(--dirty-gold)); }
   .shadow-mixed    { box-shadow: var(--shadow-engraved); }
   .shadow-engraved { box-shadow: var(--shadow-engraved); }
   .shadow-wax-seal { box-shadow: var(--shadow-wax-seal); }
-
-  .shadow-brut-sm   { box-shadow: var(--shadow-brut-sm); }
-  .shadow-brut      { box-shadow: var(--shadow-brut); }
-  .shadow-brut-lg   { box-shadow: var(--shadow-brut-lg); }
-  .shadow-brut-xl   { box-shadow: var(--shadow-brut-xl); }
-  .shadow-card      { box-shadow: var(--shadow-card); }
-  .shadow-floating  { box-shadow: var(--shadow-floating); }
-  .shadow-pressed   { box-shadow: var(--shadow-pressed); }
-  .shadow-recessed  { box-shadow: var(--shadow-recessed); }
-  .shadow-sharp     { box-shadow: var(--shadow-sharp); }
-  .shadow-glow      { box-shadow: var(--shadow-glow); }
+  .shadow-brut-sm  { box-shadow: var(--shadow-brut-sm); }
+  .shadow-brut     { box-shadow: var(--shadow-brut); }
+  .shadow-brut-lg  { box-shadow: var(--shadow-brut-lg); }
+  .shadow-brut-xl  { box-shadow: var(--shadow-brut-xl); }
+  .shadow-card     { box-shadow: var(--shadow-card); }
+  .shadow-floating { box-shadow: var(--shadow-floating); }
+  .shadow-pressed  { box-shadow: var(--shadow-pressed); }
+  .shadow-recessed { box-shadow: var(--shadow-recessed); }
+  .shadow-sharp    { box-shadow: var(--shadow-sharp); }
+  .shadow-glow     { box-shadow: var(--shadow-glow); }
   .shadow-primary-key { box-shadow: var(--shadow-primary); }
 
-  /* Patterns — wood grain, library mesh */
+  /* ================= PATTERNS ================= */
   .pattern-dots {
-    background-image: radial-gradient(circle, hsl(var(--brass) / 0.15) 0.7px, transparent 1px);
-    background-size: 16px 16px;
+    background-image: radial-gradient(circle, hsl(0 0% 0% / 0.5) 0.7px, transparent 1px);
+    background-size: 6px 6px;
   }
   .pattern-stripes {
-    background-image: repeating-linear-gradient(0deg, transparent 0 3px, hsl(var(--ink) / 0.35) 3px 4px);
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, hsl(0 0% 0% / 0.5) 3px 4px);
   }
   .pattern-checker {
     background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
                       linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
-    background-size: 48px 48px;
+    background-size: 32px 32px;
   }
   .pattern-mesh {
     background:
-      radial-gradient(ellipse at 50% 0%, hsl(var(--brass) / 0.07) 0%, transparent 55%),
-      radial-gradient(ellipse at 100% 100%, hsl(var(--crimson) / 0.08) 0%, transparent 60%);
+      radial-gradient(ellipse at 50% 0%, hsl(var(--dirty-gold) / 0.05) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, hsl(var(--blood) / 0.08) 0%, transparent 60%);
   }
   .bg-grid {
     background-image:
-      linear-gradient(to right, hsl(var(--border) / 0.6) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.6) 1px, transparent 1px);
+      linear-gradient(to right, hsl(var(--border) / 0.7) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.7) 1px, transparent 1px);
     background-size: 56px 56px;
   }
   .bg-halftone {
-    background-image: radial-gradient(hsl(var(--brass) / 0.18) 0.7px, transparent 1px);
-    background-size: 8px 8px;
+    background-image: radial-gradient(hsl(var(--bone) / 0.18) 0.7px, transparent 1px);
+    background-size: 6px 6px;
   }
   .bg-halftone-red {
-    background-image: radial-gradient(hsl(var(--crimson) / 0.4) 0.8px, transparent 1px);
-    background-size: 6px 6px;
+    background-image: radial-gradient(hsl(var(--blood) / 0.55) 0.8px, transparent 1px);
+    background-size: 5px 5px;
+  }
+  .bg-newsprint {
+    background-color: hsl(var(--bone));
+    color: hsl(var(--void));
+    background-image:
+      radial-gradient(hsl(0 0% 0% / 0.08) 0.6px, transparent 0.9px),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 4px 4px, 180px 180px;
+  }
+
+  /* Surveillance scanlines (legacy hook) */
+  .scanlines {
+    background-image: linear-gradient(hsl(0 0% 0% / 0) 50%, hsl(0 0% 0% / 0.25) 50%);
+    background-size: 100% 3px;
   }
 
   .tilt-l, .tilt-r { transform: none; }
 
-  .led { width: 0.5rem; height: 0.5rem; border-radius: 9999px; display: inline-block; background: hsl(var(--brass)); box-shadow: 0 0 8px hsl(var(--brass) / 0.7); }
-  .led-green { background: hsl(var(--brass)); }
+  .led { width: 0.5rem; height: 0.5rem; border-radius: 0; display: inline-block; background: hsl(var(--signal-red)); box-shadow: 0 0 8px hsl(var(--signal-red) / 0.7); }
+  .led-green { background: hsl(var(--dirty-gold)); box-shadow: 0 0 8px hsl(var(--dirty-gold) / 0.6); }
 
   .screws::before, .screws::after,
   .screws > .screws-bottom::before, .screws > .screws-bottom::after { content: none; }
   .vent-slot { display: none; }
 
-  .scanlines {
-    background-image: linear-gradient(hsl(var(--ink) / 0) 50%, hsl(var(--ink) / 0.18) 50%);
-    background-size: 100% 3px;
-  }
+  .ease-mech { transition-timing-function: cubic-bezier(0.2, 0, 0.1, 1); }
 
-  .ease-mech { transition-timing-function: ease-out; }
-
-  /* Motion — dignified, deliberate */
+  /* ================= MOTION — mechanical, surveillance ================= */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-6px); }
+    50%      { transform: translateY(-4px); }
   }
-  .animate-float { animation: float 7s ease-in-out infinite; will-change: transform; }
+  .animate-float { animation: float 6s ease-in-out infinite; will-change: transform; }
 
   @keyframes float-reverse {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(6px); }
+    50%      { transform: translateY(4px); }
   }
-  .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; will-change: transform; }
+  .animate-float-reverse { animation: float-reverse 6s ease-in-out infinite; will-change: transform; }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 1px hsl(var(--brass) / 0.3), 0 0 16px -4px hsl(var(--brass) / 0.3); }
-    50%      { box-shadow: 0 0 0 1px hsl(var(--brass) / 0.6), 0 0 36px -4px hsl(var(--brass) / 0.55); }
+    0%, 100% { box-shadow: 0 0 0 1px hsl(var(--bone) / 0.3); }
+    50%      { box-shadow: 0 0 0 2px hsl(var(--bone) / 0.7); }
   }
-  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+
+  @keyframes pulse-blood {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--blood) / 0.7); }
+    50%      { box-shadow: 0 0 0 6px hsl(var(--blood) / 0); }
+  }
+  .animate-pulse-blood { animation: pulse-blood 1.6s ease-out infinite; }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-ticker { animation: ticker 40s linear infinite; }
+
+  @keyframes wipe-in {
+    0%   { clip-path: inset(0 100% 0 0); }
+    100% { clip-path: inset(0 0 0 0); }
+  }
+  .animate-wipe { animation: wipe-in 360ms cubic-bezier(0.2, 0, 0.1, 1) both; }
 
   @keyframes gradient-shift {
     0%, 100% { background-position: 0% 50%; }
     50%      { background-position: 100% 50%; }
   }
-  .animate-gradient-shift { animation: gradient-shift 8s ease infinite; }
-
-  @keyframes spin-slow { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-  .animate-spin-slow { animation: spin-slow 30s linear infinite; }
-
-  @keyframes wiggle { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(0); } }
-  .animate-wiggle { animation: none; }
-
-  @keyframes bounce-subtle {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-4px); }
-  }
-  .animate-bounce-subtle { animation: bounce-subtle 3s ease-in-out infinite; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .animate-float, .animate-float-reverse, .animate-pulse-glow,
-    .animate-gradient-shift, .animate-spin-slow, .animate-bounce-subtle {
-      animation: none !important;
-    }
-    *, *::before, *::after { transition-duration: 0.15s !important; animation-duration: 0.15s !important; }
-  }
+  .animate-gradient { animation: gradient-shift 8s ease-in-out infinite; background-size: 200% 200%; }
 }
 
 /* =====================================================================
-   AUTO-PROMOTION LAYER — ambient component patterns → Academia
+   COMPONENT LAYER — global overrides for shadcn primitives
    ===================================================================== */
 @layer components {
-  /* Sticky header — the masthead of an old gazette */
-  header.sticky,
-  .sticky.top-0 {
-    background-color: hsl(var(--background) / 0.88) !important;
-    border-bottom: 1px solid hsl(var(--brass) / 0.4) !important;
-    box-shadow: 0 1px 0 0 hsl(var(--brass) / 0.2), 0 12px 32px -16px hsl(var(--ink) / 0.7) !important;
-    backdrop-filter: blur(16px) saturate(120%);
-    -webkit-backdrop-filter: blur(16px) saturate(120%);
-    font-family: "Cormorant Garamond", Georgia, serif;
-  }
-
-  /* Surfaces — slabs of black leather, stamped into the page */
-  .rounded-md.border,
-  .rounded-lg.border,
-  .rounded-xl.border,
-  .rounded-2xl.border,
-  [class*="bg-secondary/30"],
-  [class*="bg-secondary/40"],
-  [class*="bg-secondary/60"],
-  [class*="bg-card"] {
-    background-color: hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--ink)) !important;
-    box-shadow:
-      0 0 0 1px hsl(var(--brass) / 0.18),
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.04),
-      4px 4px 0 0 hsl(var(--ink) / 0.85),
-      0 14px 32px -10px hsl(var(--ink)) !important;
-    border-radius: 3px !important;
-    transition: border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out;
-  }
-  .rounded-md.border:hover,
-  .rounded-lg.border:hover,
-  .rounded-xl.border:hover,
-  .rounded-2xl.border:hover {
-    border-color: hsl(var(--brass)) !important;
-    box-shadow:
-      0 0 0 1px hsl(var(--brass) / 0.45),
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.06),
-      6px 6px 0 0 hsl(var(--ink)),
-      0 18px 40px -10px hsl(var(--ink)) !important;
-  }
-
-  /* Featured panel — wax-dipped folio, brass clasp, blood at the edge */
-  .border-2.border-primary {
-    background:
-      radial-gradient(ellipse at top, hsl(var(--brass) / 0.12), transparent 60%),
-      radial-gradient(ellipse at bottom left, hsl(var(--crimson) / 0.10), transparent 65%),
-      hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--brass)) !important;
-    box-shadow:
-      0 0 0 1px hsl(var(--brass) / 0.4),
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.08),
-      6px 6px 0 0 hsl(var(--ink)),
-      0 24px 60px -18px hsl(var(--crimson) / 0.4),
-      0 30px 80px -22px hsl(var(--ink)) !important;
-    border-radius: 3px !important;
-  }
-  .rounded-full.border {
-    background-color: hsl(var(--background-alt)) !important;
-    border: 1px solid hsl(var(--brass) / 0.4) !important;
-    box-shadow: none !important;
-    color: hsl(var(--brass));
-    text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-family: "Cinzel", Georgia, serif;
-    font-weight: 500;
-    font-size: 0.66rem;
-    padding: 4px 12px;
-  }
-
-  /* Inputs — parchment on aged oak, brass focus ring */
-  input[type="text"],
-  input[type="number"],
-  input[type="email"],
-  input[type="password"],
-  input:not([type]),
-  textarea,
-  select {
-    background-color: hsl(var(--input)) !important;
-    border: 1px solid hsl(var(--wood-grain)) !important;
-    border-radius: 4px !important;
-    font-family: "Crimson Pro", Georgia, serif !important;
-    font-weight: 400;
-    color: hsl(var(--foreground));
-    box-shadow: inset 0 1px 2px hsl(var(--ink) / 0.4) !important;
-    padding: 0.7rem 1rem;
-    transition: all 200ms ease-out;
-  }
-  textarea { padding: 0.875rem 1rem; }
-  input::placeholder, textarea::placeholder {
-    color: hsl(var(--muted-foreground) / 0.7);
-    font-style: italic;
-    font-family: "Crimson Pro", Georgia, serif;
-  }
-  input:focus, textarea:focus, select:focus {
-    outline: none !important;
-    border-color: hsl(var(--brass)) !important;
-    background-color: hsl(var(--input)) !important;
-    box-shadow:
-      inset 0 1px 2px hsl(var(--ink) / 0.4),
-      0 0 0 3px hsl(var(--brass) / 0.25) !important;
-  }
-
-  /* Floating coach orb — brass medallion */
-  .fixed.bottom-5.right-5 {
-    background: linear-gradient(180deg, hsl(var(--brass-light)) 0%, hsl(var(--brass)) 50%, hsl(var(--brass-dark)) 100%) !important;
-    color: hsl(var(--background)) !important;
-    border: 1px solid hsl(var(--brass-dark)) !important;
-    border-radius: 9999px;
-    box-shadow:
-      inset 0 1px 0 hsl(0 0% 100% / 0.3),
-      inset 0 -1px 0 hsl(var(--ink) / 0.3),
-      0 0 0 2px hsl(var(--background)),
-      0 0 0 3px hsl(var(--brass) / 0.5),
-      0 14px 32px -10px hsl(var(--brass) / 0.5),
-      0 24px 48px -16px hsl(var(--ink) / 0.7) !important;
-    transition: all 300ms ease-out;
-  }
-  .fixed.bottom-5.right-5:hover {
-    filter: brightness(1.1);
-    box-shadow:
-      inset 0 1px 0 hsl(0 0% 100% / 0.3),
-      inset 0 -1px 0 hsl(var(--ink) / 0.3),
-      0 0 0 2px hsl(var(--background)),
-      0 0 0 3px hsl(var(--brass)),
-      0 18px 40px -10px hsl(var(--brass) / 0.6),
-      0 30px 60px -16px hsl(var(--ink) / 0.7) !important;
-  }
-
-  /* Destructive callout — wax-seal crimson */
-  .rounded.bg-destructive\/10 {
-    border-radius: 4px !important;
-    background-color: hsl(var(--crimson) / 0.12) !important;
-    border: 1px solid hsl(var(--crimson) / 0.5) !important;
-    border-left: 3px solid hsl(var(--crimson)) !important;
-    box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.04) !important;
-    color: hsl(var(--parchment));
-    font-family: "Crimson Pro", Georgia, serif;
-  }
-
-  /* Scoreboard — brass numerals on mahogany */
-  .scoreboard-tile {
-    background: hsl(var(--background)) !important;
-    border: 1px solid hsl(var(--brass) / 0.4) !important;
-    border-radius: 3px !important;
-    box-shadow: inset 0 2px 4px hsl(var(--ink) / 0.5), 0 0 0 1px hsl(var(--brass) / 0.15) !important;
-    padding: 0.5rem 0.875rem;
-    font-family: "Cinzel", Georgia, serif !important;
-    font-weight: 600;
-    color: hsl(var(--brass));
-    text-shadow: 0 0 12px hsl(var(--brass) / 0.4);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .scoreboard-plinth {
-    background-color: hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--border)) !important;
-    border-top: 2px solid hsl(var(--brass) / 0.6) !important;
-    border-radius: 4px !important;
-    box-shadow:
-      0 1px 0 0 hsl(0 0% 100% / 0.04),
-      0 22px 60px -22px hsl(var(--ink) / 0.7) !important;
-    padding: 1.5rem 2rem;
+  /* Surfaces / Cards — dossiers cut from inked stock */
+  .bg-card,
+  [data-slot="card"],
+  .surface,
+  .panel {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-top: 3px solid hsl(var(--bone));
+    border-radius: 0;
+    box-shadow: var(--shadow-brut);
     position: relative;
   }
-  .font-score   { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-  .score-digit  { color: hsl(var(--brass)); text-shadow: 1px 1px 1px hsl(var(--ink) / 0.5); }
-
-  .accent-flare { position: relative; }
-  .accent-flare::after {
-    content: "";
-    position: absolute; inset: -8px;
-    background: radial-gradient(ellipse at center, hsl(var(--brass) / 0.18), transparent 70%);
-    z-index: -1; pointer-events: none; filter: blur(16px);
-  }
-  .whistle-focus:focus-visible {
-    outline: none !important;
-    box-shadow: 0 0 0 2px hsl(var(--brass)), 0 0 0 4px hsl(var(--background)) !important;
+  .bg-card:hover,
+  [data-slot="card"]:hover {
+    border-top-color: hsl(var(--dirty-gold));
   }
 
-  /* Universal focus ring — brass with offset */
-  *:focus-visible {
-    outline: 2px solid hsl(var(--brass));
-    outline-offset: 2px;
+  /* Featured / urgent panel — wax-stamped, blood-leaking */
+  .border-2.border-primary,
+  [data-featured="true"] {
+    border: 2px solid hsl(var(--bone)) !important;
+    border-top: 4px solid hsl(var(--blood)) !important;
+    box-shadow: var(--shadow-brut-lg), inset 0 0 0 1px hsl(0 0% 0%);
   }
-}
 
-/* Markdown styles for AI coach output — book-style serif */
-.coach-md p { @apply mb-2 leading-relaxed; font-family: "Crimson Pro", Georgia, serif; color: hsl(var(--foreground)); }
-.coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
-.coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply font-semibold; color: hsl(var(--brass)); }
-.coach-md em { font-style: italic; color: hsl(var(--parchment)); }
-.coach-md h1, .coach-md h2, .coach-md h3 {
-  @apply mt-3 mb-1;
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-weight: 600; letter-spacing: -0.01em;
-  color: hsl(var(--foreground));
-}
-.coach-md code {
-  @apply px-1.5 py-0.5 text-xs;
-  font-family: "Cinzel", Georgia, serif;
-  background: hsl(var(--muted-bg));
-  color: hsl(var(--brass));
-  border: 1px solid hsl(var(--border));
-  border-radius: 3px;
-}
-.coach-md blockquote {
-  border-left: 2px solid hsl(var(--brass));
-  padding-left: 1rem;
-  font-style: italic;
-  color: hsl(var(--parchment));
-  margin: 0.75rem 0;
+  /* Inputs — terminal field / betting slip */
+  input, textarea, select {
+    background-color: hsl(var(--input));
+    border: 1px solid hsl(var(--border));
+    border-bottom: 2px solid hsl(var(--bone) / 0.4);
+    border-radius: 0;
+    color: hsl(var(--bone));
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: hsl(var(--bone));
+    border-bottom-color: hsl(var(--dirty-gold));
+    box-shadow: inset 0 -3px 0 hsl(var(--dirty-gold) / 0.5);
+  }
+  input::placeholder, textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.85em;
+  }
+
+  /* Header / masthead — newspaper banner */
+  header, .site-header {
+    background-color: hsl(var(--void) / 0.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 3px solid hsl(var(--bone));
+    box-shadow: 0 2px 0 hsl(var(--blood)), 0 8px 24px hsl(0 0% 0% / 0.6);
+  }
+
+  /* Badges / pills — stamped tags, never round */
+  .badge,
+  [data-slot="badge"] {
+    border-radius: 0 !important;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    border: 1px solid currentColor;
+  }
 }

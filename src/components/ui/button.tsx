@@ -5,64 +5,71 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Maximalism Button — pill-shaped, gradient or clashing-border, multi-shadow.
- * Bouncy hover, scales + shifts, never restrained.
+ * FRANK MILLER NEWSPRINT BRUTALISM — Button.
+ * Industrial. Authoritative. Sharp corners, hard borders, mono labels.
+ * Hover inverts ink. Active presses into the page.
  */
 const buttonVariants = cva(
   [
-    "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-heading uppercase tracking-widest font-black",
-    "rounded-full border-4",
-    "transition-all duration-300 [transition-timing-function:cubic-bezier(0.68,-0.55,0.265,1.55)]",
-    "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[hsl(var(--max-3))] focus-visible:ring-offset-4 focus-visible:ring-offset-[hsl(var(--max-1))]",
-    "disabled:pointer-events-none disabled:opacity-50",
-    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[2.5]",
-    "active:scale-95",
+    "relative inline-flex items-center justify-center gap-2 whitespace-nowrap select-none",
+    "font-mono uppercase tracking-[0.14em] font-semibold",
+    "rounded-none border-2",
+    "transition-[transform,background-color,color,border-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0.1,1)]",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--bone))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--background))]",
+    "disabled:pointer-events-none disabled:opacity-40",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[2.25]",
+    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
   ].join(" "),
   {
     variants: {
       variant: {
+        // Primary — bone on void. The headline action.
         default: [
-          "text-white border-[hsl(var(--max-3))]",
-          "bg-gradient-to-r from-[hsl(var(--max-1))] via-[hsl(var(--max-5))] to-[hsl(var(--max-2))] bg-[length:200%_200%]",
-          "shadow-[0_0_24px_hsl(var(--max-1)/0.5),6px_6px_0_hsl(var(--max-3)),12px_12px_0_hsl(var(--max-2))]",
-          "hover:scale-110 hover:bg-[position:100%_50%]",
-          "hover:shadow-[0_0_40px_hsl(var(--max-3)/0.8),8px_8px_0_hsl(var(--max-1)),16px_16px_0_hsl(var(--max-5))]",
+          "bg-[hsl(var(--bone))] text-[hsl(var(--void))] border-[hsl(var(--bone))]",
+          "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
+          "hover:bg-[hsl(var(--void))] hover:text-[hsl(var(--bone))]",
         ].join(" "),
+        // Secondary — ghost steel
         secondary: [
-          "bg-transparent text-[hsl(var(--max-3))] border-dashed border-[hsl(var(--max-3))]",
-          "hover:bg-[hsl(var(--max-3))] hover:text-[hsl(var(--background))] hover:border-solid hover:scale-105",
-          "hover:shadow-[0_0_24px_hsl(var(--max-3)/0.6)]",
+          "bg-transparent text-[hsl(var(--bone))] border-[hsl(var(--bone))]",
+          "shadow-[4px_4px_0_0_hsl(0_0%_0%)]",
+          "hover:bg-[hsl(var(--bone))] hover:text-[hsl(var(--void))]",
         ].join(" "),
+        // Outline — gunmetal frame
         outline: [
-          "bg-[hsl(var(--muted-bg)/0.5)] text-white border-[hsl(var(--max-1))] backdrop-blur-sm",
-          "shadow-[6px_6px_0_hsl(var(--max-3)),12px_12px_0_hsl(var(--max-2))]",
-          "hover:-translate-x-1 hover:-translate-y-1",
-          "hover:shadow-[10px_10px_0_hsl(var(--max-3)),20px_20px_0_hsl(var(--max-2))]",
-          "active:translate-x-0 active:translate-y-0 active:shadow-none",
+          "bg-[hsl(var(--charcoal))] text-[hsl(var(--bone))] border-[hsl(var(--border))]",
+          "shadow-[4px_4px_0_0_hsl(0_0%_0%)]",
+          "hover:border-[hsl(var(--bone))]",
         ].join(" "),
+        // Destructive — blood stamp
         destructive: [
-          "text-white border-[hsl(var(--max-3))]",
-          "bg-gradient-to-r from-[hsl(var(--max-1))] to-[hsl(var(--max-4))]",
-          "shadow-[0_0_24px_hsl(var(--max-1)/0.6),6px_6px_0_hsl(var(--max-3))]",
-          "hover:scale-110 hover:shadow-[0_0_40px_hsl(var(--max-1)/0.9),8px_8px_0_hsl(var(--max-3))]",
+          "bg-[hsl(var(--blood))] text-[hsl(var(--bone))] border-[hsl(var(--blood))]",
+          "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
+          "hover:bg-[hsl(var(--signal-red))] hover:border-[hsl(var(--signal-red))]",
         ].join(" "),
+        // Gold — earned, dirty
+        gold: [
+          "bg-[hsl(var(--dirty-gold))] text-[hsl(var(--void))] border-[hsl(var(--dirty-gold))]",
+          "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
+          "hover:bg-[hsl(var(--warning-yellow))] hover:border-[hsl(var(--warning-yellow))]",
+        ].join(" "),
+        // Ghost — invisible until touched
         ghost: [
-          "bg-transparent text-white border-transparent",
-          "hover:bg-[hsl(var(--max-5)/0.25)] hover:text-[hsl(var(--max-3))] hover:scale-105",
-          "hover:shadow-[0_0_18px_hsl(var(--max-5)/0.5)]",
+          "bg-transparent text-[hsl(var(--bone))] border-transparent",
+          "hover:bg-[hsl(var(--charcoal))] hover:border-[hsl(var(--border))]",
         ].join(" "),
+        // Link — newsprint underline
         link: [
-          "bg-transparent text-[hsl(var(--max-3))] border-transparent",
-          "underline underline-offset-4 decoration-2 decoration-[hsl(var(--max-1))]",
-          "hover:decoration-[hsl(var(--max-3))] hover:scale-105",
+          "bg-transparent text-[hsl(var(--bone))] border-transparent shadow-none",
+          "underline underline-offset-4 decoration-2 decoration-[hsl(var(--dirty-gold))]",
+          "hover:decoration-[hsl(var(--blood))] active:translate-x-0 active:translate-y-0",
         ].join(" "),
       },
       size: {
-        default: "h-14 px-10 text-sm",
-        sm:      "h-11 px-6 text-xs",
-        lg:      "h-16 px-12 text-base",
-        icon:    "h-14 w-14",
+        default: "h-12 px-6 text-xs",
+        sm:      "h-10 px-4 text-[0.65rem]",
+        lg:      "h-14 px-9 text-sm",
+        icon:    "h-12 w-12",
       },
     },
     defaultVariants: { variant: "default", size: "default" },
