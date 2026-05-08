@@ -194,8 +194,11 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
             else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
           }
+          const preInjury = Math.max(1, Math.round(final));
+          const inj = injuryFactor(k);
+          const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
           out[k] = {
-            price: Math.max(1, Math.round(final)),
+            price: finalPrice,
             source: "league",
             leaguePrice: Math.max(1, Math.round(leaguePrice)),
             marketPrice: mv ? Math.max(1, Math.round(mv.val)) : undefined,
@@ -203,6 +206,9 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
             },
+            injuryDiscount: inj.reason
+              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
+              : undefined,
           };
         }
 
