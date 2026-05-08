@@ -1,11 +1,9 @@
 // Position Budget Bar
-// "Are you spending the right % of your budget on each position?"
-// Pulls from VORP-derived dollar pool: each position's "fair share" of your
-// total budget = sum of VORP $ at that position / sum of all VORP $.
-// Compares actual % spent vs fair %. Red flag if you're >25 pts over budget.
+// Fair-share target = sum of top-N prices at that position (from your price
+// sheet) ÷ number of teams. N = roster slots needed across the league.
+// If no prices loaded, falls back to a league-type heuristic.
 import { Card } from "@/components/ui/card";
 import { useDraftStore } from "@/lib/draft-store";
-import { useVorpMap } from "@/lib/use-vorp-map";
 import { spendByPosition, computeBudget } from "@/lib/draft-math";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -17,7 +15,8 @@ export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
   const keepers = useDraftStore((s) => s.keepers);
   const events = useDraftStore((s) => s.events);
-  const { map: vorpMap } = useVorpMap(settings);
+
+  const prices = useDraftStore((s) => s.prices);
 
   const data = useMemo(() => {
     const budget = computeBudget(settings, keepers, events);
@@ -28,26 +27,63 @@ export default function PositionBudgetBar() {
       spent[p] = (spent[p] ?? 0) + k.cost;
     }
 
-    // Heuristic fair-% by league type:
     const isSF = settings.leagueType !== "Standard" && settings.roster.SUPERFLEX > 0;
-    const fairPct: Record<Position, number> = isSF
+    const r = settings.roster;
+    const teams = Math.max(1, settings.numTeams);
+
+    // Approx starters needed per team per position (FLEX split RB/WR/TE)
+    const startersPerTeam: Record<Position, number> = {
+      QB: r.QB + (isSF ? r.SUPERFLEX : 0),
+      RB: r.RB + r.FLEX * 0.5,
+      WR: r.WR + r.FLEX * 0.4,
+      TE: r.TE + r.FLEX * 0.1,
+      K: r.K,
+      DST: r.DST,
+    };
+    // Bench depth split (RB/WR heavy)
+    const benchSplit: Record<Position, number> = {
+      QB: 0.1, RB: 0.4, WR: 0.4, TE: 0.1, K: 0, DST: 0,
+    };
+    const rosterableByPos: Record<Position, number> = {
+      QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0,
+    };
+    for (const p of POSITIONS) {
+      rosterableByPos[p] = Math.round((startersPerTeam[p] + r.BENCH * benchSplit[p]) * teams);
+    }
+
+    // Sum top-N prices per position from user's price sheet
+    const pricesByPos: Record<Position, number[]> = { QB: [], RB: [], WR: [], TE: [], K: [], DST: [] };
+    for (const p of prices) {
+      if (p.position && p.position in pricesByPos) pricesByPos[p.position].push(p.price);
+    }
+    for (const p of POSITIONS) pricesByPos[p].sort((a, b) => b - a);
+
+    // Heuristic fallback if no prices uploaded
+    const fallbackPct: Record<Position, number> = isSF
       ? { QB: 0.22, RB: 0.34, WR: 0.30, TE: 0.10, K: 0.02, DST: 0.02 }
       : { QB: 0.07, RB: 0.42, WR: 0.36, TE: 0.11, K: 0.02, DST: 0.02 };
 
     return POSITIONS.map((pos) => {
       const dollars = spent[pos] ?? 0;
-      const actualPct = budget.totalBudget > 0 ? dollars / budget.totalBudget : 0;
-      const targetPct = fairPct[pos];
-      const targetDollars = Math.round(budget.totalBudget * targetPct);
-      const overBy = Math.round((actualPct - targetPct) * budget.totalBudget);
+      const need = rosterableByPos[pos];
+      const topN = pricesByPos[pos].slice(0, need);
+      const sumTopN = topN.reduce((s, v) => s + v, 0);
+      const fromPrices = need > 0 && topN.length >= Math.min(need, 3)
+        ? Math.round(sumTopN / teams)
+        : 0;
+      const targetDollars = fromPrices > 0 ? fromPrices : Math.round(budget.totalBudget * fallbackPct[pos]);
+      const overBy = dollars - targetDollars;
       const status: "under" | "ok" | "over" =
         overBy >= 25 ? "over" : overBy <= -targetDollars * 0.5 && spent[pos] != null ? "under" : "ok";
-      return { pos, dollars, actualPct, targetPct, targetDollars, overBy, status };
+      return { pos, dollars, targetDollars, overBy, status };
     });
-  }, [settings, keepers, events, vorpMap]);
+  }, [settings, keepers, events, prices]);
 
+
+  const hasPrices = useDraftStore((s) => s.prices.length > 0);
+  // Hide if user hasn't loaded prices AND hasn't started drafting — heuristic alone is misleading
   const totalSpent = data.reduce((s, d) => s + d.dollars, 0);
-  if (totalSpent === 0 && events.length === 0 && keepers.length === 0) return null;
+  if (totalSpent === 0 && !hasPrices) return null;
 
   return (
     <Card className="space-y-2 p-3">
@@ -92,7 +128,7 @@ export default function PositionBudgetBar() {
         })}
       </div>
       <p className="text-[10px] text-muted-foreground">
-        Bar past the line = over fair share. Red = blew it by $25+.
+        Target = sum of top players' prices at that position ÷ {settings.numTeams} teams. Bar past the line = over fair share.
       </p>
     </Card>
   );
