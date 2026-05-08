@@ -2,11 +2,12 @@
 // over the last 3 seasons. Pulled from league_auction_history via the
 // team-trends edge function.
 import { useEffect, useState } from "react";
-import { TrendingUp, Crown, Target, Banknote } from "lucide-react";
+import { TrendingUp, Crown, Target, Banknote, ChevronDown } from "lucide-react";
 import { POS_COLORS } from "@/lib/positions";
 
 interface Trends {
   avgByPos: Record<string, number>;
+  avgCountByPos?: Record<string, number>;
   avgTotal: number;
   avgTop3Pct: number;
   avgTopBid: number;
