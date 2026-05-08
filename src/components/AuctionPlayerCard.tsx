@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   byeWeekForTeam, findPlayerByName, loadSleeperPlayers,
 } from "@/lib/sleeper";
+import { tierForPosRank } from "@/lib/league-tier-prices";
 
 type ProjStats = Partial<Record<
   "passYds"|"passTD"|"int"|"rushAtt"|"rushYds"|"rushTD"|"rec"|"recYds"|"recTD"|"targets"|"games",
