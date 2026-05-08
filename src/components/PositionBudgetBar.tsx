@@ -42,9 +42,12 @@ export default function PositionBudgetBar() {
   return (
     <Card className="space-y-2 p-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">Spending by position</h3>
-        <span className="font-mono text-[10px] text-muted-foreground">vs fair share</span>
+        <h3 className="text-sm font-semibold">Budget planner</h3>
+        <span className="font-mono text-[10px] text-muted-foreground">spent / suggested</span>
       </div>
+      <p className="text-[11px] text-muted-foreground">
+        Roughly how much of your ${settings.totalBudget} you should spend at each position.
+      </p>
       <div className="space-y-1.5">
         {data.map((d) => {
           const pctOfTarget = d.targetDollars > 0 ? Math.min(1.5, d.dollars / d.targetDollars) : 0;
@@ -82,7 +85,7 @@ export default function PositionBudgetBar() {
         })}
       </div>
       <p className="text-[10px] text-muted-foreground">
-        Target = league position share × ${settings.totalBudget} budget, adjusted for {settings.scoring} + {settings.leagueType}.
+        Suggestions based on your league size, scoring ({settings.scoring}), and roster type ({settings.leagueType}).
       </p>
     </Card>
   );

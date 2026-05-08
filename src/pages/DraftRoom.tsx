@@ -200,7 +200,7 @@ export default function DraftRoom() {
           style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
         >
           <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
-            {leagueName ? `The ${leagueName}` : "\u00a0"}
+            {leagueName || "\u00a0"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {selectedTeam ? (
