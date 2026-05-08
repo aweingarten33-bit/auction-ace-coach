@@ -111,14 +111,16 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
   if (out.length === 0) pushAll(reC, null, 3);
 
   // Pattern D (FantasyLife player-card embeds, document order):
-  //   POSTEAM![...](.../players/ID/First-Last)
-  if (out.length === 0) {
-    const reD = new RegExp(`(${POS})(${TEAM})\\b[^\\n]*?/players/\\d+/([A-Za-z'.%\\-]+(?:[\\-%][A-Za-z'.%\\-]+){0,4})`, "g");
-    let rank = 0;
+  //   POSTEAM![...](.../players/ID/Slug-With%20Encoded)
+  {
+    const reD = new RegExp(`(${POS})(${TEAM})\\b[^\\n]*?/players/\\d+/([A-Za-z0-9%.'\\-]+)`, "g");
+    let rank = out.length;
     for (const m of clean.matchAll(reD)) {
       const pos = m[1] === "DST" ? "D/ST" : m[1];
       const team = m[2];
-      const name = decodeURIComponent(m[3]).replace(/-/g, " ").replace(/\s+/g, " ").trim();
+      let name = m[3];
+      try { name = decodeURIComponent(name); } catch { /* ignore */ }
+      name = name.replace(/-/g, " ").replace(/\s+/g, " ").trim();
       const k = name.toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
