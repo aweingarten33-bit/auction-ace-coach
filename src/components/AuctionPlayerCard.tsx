@@ -43,6 +43,10 @@ export default function AuctionPlayerCard({
   anchor,
   posRank,
   totalAtPos,
+  remaining,
+  maxBid,
+  slotsLeft,
+  gaps,
 }: Props) {
   const [meta, setMeta] = useState<{
     playerId: string | null;
