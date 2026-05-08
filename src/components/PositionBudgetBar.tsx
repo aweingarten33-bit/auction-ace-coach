@@ -5,34 +5,12 @@
 import { Card } from "@/components/ui/card";
 import { useDraftStore } from "@/lib/draft-store";
 import { spendByPosition } from "@/lib/draft-math";
+import { positionShare } from "@/lib/vetri-tiers";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import type { Position } from "@/lib/draft-types";
 
 const POSITIONS: Position[] = ["QB", "RB", "WR", "TE"];
-
-// Mirrors positionShare() in vetri-tiers.ts but inlined to avoid coupling.
-function shareByPosition(settings: ReturnType<typeof useDraftStore.getState>["settings"]): Record<Position, number> {
-  const base: Record<Position, number> = {
-    RB: 0.42, WR: 0.34, QB: 0.08, TE: 0.10, DST: 0.03, K: 0.03,
-  };
-  if (settings.scoring === "PPR") {
-    base.WR += 0.04; base.TE += 0.02; base.RB -= 0.06;
-  } else if (settings.scoring === "Standard") {
-    base.RB += 0.04; base.WR -= 0.03; base.TE -= 0.01;
-  }
-  if (settings.leagueType === "Superflex" || settings.leagueType === "2QB") {
-    const qbBoost = 0.16;
-    base.QB += qbBoost;
-    base.RB -= qbBoost * 0.6;
-    base.WR -= qbBoost * 0.4;
-  }
-  if (settings.roster.K === 0) { base.WR += base.K * 0.5; base.RB += base.K * 0.5; base.K = 0; }
-  if (settings.roster.DST === 0) { base.WR += base.DST * 0.5; base.RB += base.DST * 0.5; base.DST = 0; }
-  const total = Object.values(base).reduce((s, v) => s + v, 0);
-  if (total > 0) for (const k of Object.keys(base) as Position[]) base[k] = base[k] / total;
-  return base;
-}
 
 export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
@@ -46,7 +24,7 @@ export default function PositionBudgetBar() {
       const p = k.position ?? "UNK";
       spent[p] = (spent[p] ?? 0) + k.cost;
     }
-    const share = shareByPosition(settings);
+    const share = positionShare(settings);
     return POSITIONS.map((pos) => {
       const dollars = spent[pos] ?? 0;
       const targetDollars = Math.max(1, Math.round(settings.totalBudget * share[pos]));
