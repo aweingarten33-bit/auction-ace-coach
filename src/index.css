@@ -107,8 +107,8 @@
     pointer-events: none;
     z-index: 1;
     background-image:
-      linear-gradient(0deg, transparent 98%, rgba(0,0,0,0.04) 100%),
-      linear-gradient(90deg, transparent 98%, rgba(0,0,0,0.04) 100%);
+      linear-gradient(0deg, transparent 98%, rgba(240,230,204,0.05) 100%),
+      linear-gradient(90deg, transparent 98%, rgba(240,230,204,0.05) 100%);
     background-size: 3px 3px;
     opacity: 0.6;
   }
@@ -185,8 +185,8 @@
   /* Backgrounds */
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgba(17,17,17,0.08) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(17,17,17,0.08) 1px, transparent 1px);
+      linear-gradient(to right, rgba(240,230,204,0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(240,230,204,0.08) 1px, transparent 1px);
     background-size: 40px 40px;
   }
   .bg-halftone {
@@ -199,8 +199,8 @@
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(0deg, transparent 98%, rgba(0,0,0,0.025) 100%),
-      linear-gradient(90deg, transparent 98%, rgba(0,0,0,0.025) 100%);
+      linear-gradient(0deg, transparent 98%, rgba(240,230,204,0.04) 100%),
+      linear-gradient(90deg, transparent 98%, rgba(240,230,204,0.04) 100%);
     background-size: 3px 3px;
     pointer-events: none;
     opacity: 0.6;
@@ -241,7 +241,7 @@
   .vent-slot { display: none; }
 
   .scanlines {
-    background-image: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.04) 50%);
+    background-image: linear-gradient(rgba(0,0,0,0) 50%, rgba(240,230,204,0.05) 50%);
     background-size: 100% 3px;
   }
 
