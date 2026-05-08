@@ -372,6 +372,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
+              berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
@@ -393,6 +394,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
+              berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: v.price }
@@ -419,6 +421,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
+              berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: adj }
