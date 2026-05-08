@@ -110,10 +110,31 @@ export default function DraftRoom() {
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
   const [highlight, setHighlight] = useState<number>(0);
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
+  const [leagueName, setLeagueName] = useState<string>("");
   const searchWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadSleeperPlayers().then(setSleeper).catch(() => {});
+  }, []);
+
+  // Pull league name from the most recent live_draft_event raw payload
+  useEffect(() => {
+    (async () => {
+      const cached = localStorage.getItem("league_name_cache");
+      if (cached) setLeagueName(cached);
+      const { data } = await supabase
+        .from("live_draft_events")
+        .select("raw")
+        .order("created_at", { ascending: false })
+        .limit(25);
+      const found = (data ?? []).find((r: any) => r?.raw?.league?.name)?.raw?.league?.name as
+        | string
+        | undefined;
+      if (found) {
+        setLeagueName(found);
+        try { localStorage.setItem("league_name_cache", found); } catch { /* ignore */ }
+      }
+    })();
   }, []);
 
   // Anchor price map: league 3yr avg + ESPN 2026 auction value, used by
