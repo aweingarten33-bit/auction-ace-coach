@@ -274,6 +274,9 @@ export default function DraftRoom() {
             />
           )}
 
+          {/* Budget planner — spending by position vs fair share */}
+          <PositionBudgetBar />
+
           {/* Personalized 3-year drafting trends */}
           {selectedTeam && (
             <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
