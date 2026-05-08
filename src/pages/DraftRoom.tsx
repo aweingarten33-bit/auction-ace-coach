@@ -80,7 +80,7 @@ import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
 
 import FootballShieldIcon from "@/components/FootballShieldIcon";
-import superFootballLogo from "@/assets/logo-wu-football.png";
+import superFootballLogo from "@/assets/logo-wu-tang.png";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
