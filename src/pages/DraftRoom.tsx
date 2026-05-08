@@ -1242,18 +1242,18 @@ function Top100List({
                 : "bg-secondary/20 hover:bg-secondary/60 active:bg-secondary/80",
             )}
           >
-            <span className="w-6 text-right font-mono text-[11px] tabular-nums text-muted-foreground">
+            <span className="w-5 text-right font-mono text-[11px] tabular-nums text-muted-foreground shrink-0">
               {i + 1}
             </span>
-            <span className="w-9">
+            <span className="w-8 shrink-0">
               {p.position && (
                 <Badge variant="outline" className={cn(posTint, "text-[9px] px-1 py-0")}>
                   {p.position}
                 </Badge>
               )}
             </span>
-            <span className="flex-1 truncate text-[12px] font-medium">{p.name}</span>
-            <span className="w-12 text-right font-mono text-[12px] tabular-nums text-primary">
+            <span className="flex-1 min-w-0 truncate text-[12px] font-medium">{p.name}</span>
+            <span className="w-10 text-right font-mono text-[12px] tabular-nums text-primary shrink-0">
               ${p.price}
             </span>
           </button>

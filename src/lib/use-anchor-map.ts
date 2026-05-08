@@ -286,9 +286,24 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
             else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
           }
+          // Market-crash override: if BOTH ESPN and Sleeper have dropped this player
+          // to < $5 but our league history says > $20, the market knows something
+          // (season-ender, suspension, retirement). Trust the market — 75% off league.
+          const eRaw = espnMap.get(k)?.val ?? null;
+          const sRaw = sleeperMap.get(k)?.val ?? null;
+          const bothCrashed = eRaw !== null && sRaw !== null && eRaw < 5 && sRaw < 5;
+          let crashReason: string | null = null;
+          if (bothCrashed && leaguePrice >= 20) {
+            final = Math.max(1, leaguePrice * 0.25);
+            crashReason = "Market collapse";
+          }
           const preInjury = Math.max(1, Math.round(final));
           const inj = combinedFactor(k, llmMap.get(k));
-          const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
+          // If market crash already gutted the price, take whichever is harsher
+          const effectiveFactor = crashReason && !inj.reason
+            ? { factor: 1, reason: crashReason }
+            : inj;
+          const finalPrice = Math.max(1, Math.round(preInjury * effectiveFactor.factor));
           out[k] = {
             price: finalPrice,
             source: "league",
@@ -300,7 +315,9 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
-              : undefined,
+              : crashReason
+                ? { factor: 1, reason: crashReason, preInjuryPrice: Math.round(leaguePrice) }
+                : undefined,
           };
         }
 
