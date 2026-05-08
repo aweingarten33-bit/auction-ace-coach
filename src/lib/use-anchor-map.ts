@@ -58,15 +58,26 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           leagueAgg.set(k, cur);
         }
 
+        // Decline detection: if a player's most recent bid dropped >15% YoY,
+        // the league is signaling a fade. Weight the most recent year heavily
+        // (80%) so we capture the trajectory instead of smoothing it away
+        // (e.g. CMC: $58 → $65 → $48 should land near $50, not $55).
         const weightedLeague = (bySeason: Map<number, number>): number => {
           const seasons = Array.from(bySeason.entries()).sort((a, b) => b[0] - a[0]);
           if (seasons.length === 0) return 0;
           if (seasons.length === 1) return seasons[0][1];
-          if (seasons.length === 2) return seasons[0][1] * 0.65 + seasons[1][1] * 0.35;
           const last = seasons[0][1];
           const prev = seasons[1][1];
+          const declined = prev > 0 && last < prev * 0.85;
+          if (seasons.length === 2) {
+            return declined
+              ? last * 0.8 + prev * 0.2
+              : last * 0.65 + prev * 0.35;
+          }
           const olderAvg = seasons.slice(2).reduce((s, [, v]) => s + v, 0) / (seasons.length - 2);
-          return last * 0.5 + prev * 0.3 + olderAvg * 0.2;
+          return declined
+            ? last * 0.8 + prev * 0.15 + olderAvg * 0.05
+            : last * 0.5 + prev * 0.3 + olderAvg * 0.2;
         };
 
         // 2) ESPN map
