@@ -12,10 +12,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
-        sans:    ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
-        body:    ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ['"Orbitron"', '"Share Tech Mono"', "ui-monospace", "monospace"],
+        sans:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
+        body:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
         mono:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
+        tech:    ['"Share Tech Mono"', "ui-monospace", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -74,12 +75,12 @@ export default {
         },
       },
       borderRadius: {
-        // Industrial scale — soft injection-molded curves
-        sm:   "0.25rem",   // 4px
-        md:   "0.5rem",    // 8px
-        lg:   "1rem",      // 16px
-        xl:   "1.5rem",    // 24px
-        "2xl":"1.875rem",  // 30px
+        // Cyberpunk — sharp by default; chamfering done via clip-path utilities
+        sm:   "2px",
+        md:   "2px",
+        lg:   "2px",
+        xl:   "4px",
+        "2xl":"4px",
       },
       keyframes: {
         "accordion-down": {

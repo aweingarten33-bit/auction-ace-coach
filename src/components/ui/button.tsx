@@ -5,40 +5,39 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Industrial Button — physical key. Press translates Y + inverts shadow.
+ * Cyberpunk Button — chamfered neon panel. Hover fills with neon + glow.
  */
 const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-display font-bold uppercase tracking-[0.05em]",
-    "rounded-lg",
+    "font-mono uppercase tracking-[0.18em] font-semibold",
+    "cyber-chamfer-sm",
     "transition-all duration-150 ease-mech",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "disabled:pointer-events-none disabled:opacity-50",
-    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-    "active:translate-y-[2px]",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[1.5]",
   ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-[var(--shadow-primary)] hover:brightness-110 active:shadow-[var(--shadow-pressed)]",
+          "bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-[var(--glow-primary)] active:shadow-[var(--shadow-pressed)]",
         secondary:
-          "bg-background text-foreground shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-floating)] active:shadow-[var(--shadow-pressed)]",
+          "bg-transparent text-accent border-2 border-accent hover:bg-accent hover:text-accent-foreground hover:shadow-[var(--glow-accent)]",
         outline:
-          "bg-background text-foreground shadow-[var(--shadow-card)] hover:text-primary hover:shadow-[var(--shadow-floating)] active:shadow-[var(--shadow-pressed)]",
+          "bg-transparent text-foreground border border-border hover:border-primary hover:text-primary hover:shadow-[var(--glow-primary-sm)]",
         destructive:
-          "bg-primary text-primary-foreground shadow-[var(--shadow-primary)] hover:brightness-110 active:shadow-[var(--shadow-pressed)]",
+          "bg-destructive text-destructive-foreground border-2 border-destructive hover:brightness-110 hover:shadow-[0_0_18px_hsl(var(--destructive)/0.6)]",
         ghost:
-          "bg-transparent text-muted-foreground hover:bg-background hover:text-foreground hover:shadow-[var(--shadow-recessed)] active:shadow-[var(--shadow-pressed)]",
+          "bg-transparent text-muted-foreground hover:text-primary hover:bg-primary/10",
         link:
-          "bg-transparent text-primary underline-offset-4 hover:underline active:translate-y-0",
+          "bg-transparent text-primary underline-offset-4 hover:underline hover:text-glow",
       },
       size: {
-        default: "h-12 px-6 text-sm",
-        sm:      "h-10 px-4 text-xs rounded-md",
-        lg:      "h-14 px-8 text-base rounded-xl",
-        icon:    "h-12 w-12 rounded-lg",
+        default: "h-12 px-6 text-xs",
+        sm:      "h-10 px-4 text-[11px]",
+        lg:      "h-14 px-8 text-sm",
+        icon:    "h-12 w-12",
       },
     },
     defaultVariants: { variant: "default", size: "default" },
