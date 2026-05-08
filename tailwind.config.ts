@@ -12,10 +12,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Anton"', '"Bebas Neue"', '"Impact"', "ui-sans-serif", "system-ui", "sans-serif"],
-        sans:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
-        body:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
-        mono:    ['"Courier New"', "ui-monospace", "SFMono-Regular", "monospace"],
+        display: ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        sans:    ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        body:    ['"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -74,12 +74,12 @@ export default {
         },
       },
       borderRadius: {
-        // Sharp by default — stencil/poster aesthetic
-        sm:   "0",
-        md:   "0",
-        lg:   "0",
-        xl:   "0",
-        "2xl":"0",
+        // Industrial scale — soft injection-molded curves
+        sm:   "0.25rem",   // 4px
+        md:   "0.5rem",    // 8px
+        lg:   "1rem",      // 16px
+        xl:   "1.5rem",    // 24px
+        "2xl":"1.875rem",  // 30px
       },
       keyframes: {
         "accordion-down": {
