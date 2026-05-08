@@ -1,6 +1,6 @@
 // LastPickImpact — read-only snapshot of how the most recently imported pick
 // shifted YOUR budget/roster. No bidding, no recommendations — pure delta.
-import { ArrowDown, ArrowRight, Clock } from "lucide-react";
+import { ArrowDown, ArrowRight, Clock, AlertTriangle } from "lucide-react";
 import type { DraftEvent, Keeper, LeagueSettings, Position } from "@/lib/draft-types";
 import { computeBudget, countByPosition, spendByPosition } from "@/lib/draft-math";
 import { positionShare } from "@/lib/vetri-tiers";
@@ -17,16 +17,25 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
   const last = events[events.length - 1];
   if (!last) return null;
 
+  // Guardrails — flag missing fields before computing deltas
+  const warnings: string[] = [];
+  const hasPrice = typeof last.price === "number" && Number.isFinite(last.price) && last.price > 0;
+  const pos = last.position;
+  const isTrackedPos = !!pos && POS.includes(pos);
+  if (!pos) warnings.push("Position missing on import — roster impact can't be computed.");
+  else if (!isTrackedPos) warnings.push(`Position "${pos}" isn't tracked (QB/RB/WR/TE).`);
+  if (!hasPrice) warnings.push("Price missing or invalid — budget impact can't be computed.");
+  if (!last.player || last.player.trim().length < 2) warnings.push("Player name missing on import.");
+
   const prevEvents = events.slice(0, -1);
   const before = computeBudget(settings, keepers, prevEvents);
   const after = computeBudget(settings, keepers, events);
 
   const isMine = last.drafter === "me";
-  const pos = last.position;
-  const isTrackedPos = !!pos && POS.includes(pos);
+  const canShowDeltas = isMine && hasPrice;
 
   // Position-specific deltas (only meaningful when YOU made the pick at a tracked pos)
-  const posBefore = isMine && isTrackedPos
+  const posBefore = canShowDeltas && isTrackedPos
     ? {
         count: countByPosition([
           ...keepers.map((k) => ({ player: k.player, position: k.position, price: k.cost, source: "keeper" as const })),
@@ -35,7 +44,7 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
         spend: spendByPosition(prevEvents.filter((e) => e.drafter === "me"))[pos!] ?? 0,
       }
     : null;
-  const posAfter = isMine && isTrackedPos
+  const posAfter = canShowDeltas && isTrackedPos
     ? {
         count: countByPosition([
           ...keepers.map((k) => ({ player: k.player, position: k.position, price: k.cost, source: "keeper" as const })),
@@ -80,14 +89,26 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
 
       <div className="mb-3">
         <p className="text-base font-semibold text-foreground">
-          {last.player}
+          {last.player || <span className="text-muted-foreground italic">Unknown player</span>}
           <span className="ml-2 text-[11px] font-normal text-muted-foreground">
-            {pos ?? ""} · ${last.price}
+            {pos ?? "—"} · {hasPrice ? `$${last.price}` : "$?"}
           </span>
         </p>
       </div>
 
-      {isMine && (
+      {warnings.length > 0 && (
+        <div className="mb-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-200">
+          <div className="flex items-center gap-1 font-semibold">
+            <AlertTriangle className="h-3 w-3" />
+            Import incomplete
+          </div>
+          <ul className="mt-0.5 list-disc pl-4 text-amber-200/90">
+            {warnings.map((w, i) => <li key={i}>{w}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {canShowDeltas && (
         <div className="mb-3 grid grid-cols-3 gap-2">
           <Delta label="Remaining" before={`$${before.remaining}`} after={`$${after.remaining}`} />
           <Delta label="Max bid" before={`$${before.maxBid}`} after={`$${after.maxBid}`} />
