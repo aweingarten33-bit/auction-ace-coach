@@ -5,19 +5,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Landing from "./pages/Landing.tsx";
-import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
-import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
-import CardPreview from "./pages/CardPreview.tsx";
 import LogoPicker from "./pages/LogoPicker.tsx";
-import ClaimTeam from "./pages/ClaimTeam.tsx";
 import Zine from "./pages/Zine.tsx";
-import Studio from "./pages/Studio.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 
@@ -52,47 +47,34 @@ function PublicGate({ children }: { children: JSX.Element }) {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      
       <Toaster />
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
           <LockProvider>
-            
             <Routes>
-              {/* Index = router that picks Draft Room or Setup based on setupComplete */}
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
-
-              {/* New home page when setup is complete */}
               <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
-
-              {/* Setup wizard — accessible from drawer */}
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
-
-              {/* Planner kept for now — can be deleted later */}
-              <Route path="/planner" element={<Protected><Planner /></Protected>} />
-
-              {/* ESPN connection settings */}
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
-
-              {/* Admin always reachable so you can unlock */}
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
 
-              {/* Legacy redirects — old /draft, /draft-v2 etc all go to the new home */}
+              {/* Legacy redirects → research view */}
               <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
               <Route path="/draft-v2" element={<Navigate to="/draft-room" replace />} />
               <Route path="/draft-os" element={<Navigate to="/draft-room" replace />} />
               <Route path="/dashboard" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/planner" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/studio" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/card-preview" element={<Navigate to="/draft-room" replace />} />
               <Route path="/m" element={<Navigate to="/draft-room" replace />} />
               <Route path="/mobile" element={<Navigate to="/draft-room" replace />} />
-
               <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/card-preview" element={<CardPreview />} />
+
               <Route path="/logos" element={<LogoPicker />} />
               <Route path="/zine" element={<Zine />} />
-              <Route path="/studio" element={<Studio />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </LockProvider>
