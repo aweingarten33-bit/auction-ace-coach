@@ -126,6 +126,8 @@
     line-height: 0.95;
     text-shadow: 2px 2px 0 hsl(var(--ink));
   }
+
+  ::selection { background: hsl(var(--primary)); color: hsl(var(--ink)); }
 }
 
 @layer utilities {
