@@ -11,57 +11,57 @@
 
 @layer base {
   :root {
-    --background: 48 100% 98%;           /* #FFFDF5 cream */
-    --foreground: 0 0% 0%;               /* #000000 */
+    --background: 0 0% 6%;               /* near-black */
+    --foreground: 0 0% 96%;              /* bone white */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 0 100% 71%;               /* #FF6B6B hot red */
-    --primary-foreground: 0 0% 0%;
-    --primary-glow: 0 100% 71%;
+    --primary: 0 90% 50%;                /* blood red */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 95% 55%;
 
-    --secondary: 50 100% 62%;            /* #FFD93D vivid yellow */
-    --secondary-foreground: 0 0% 0%;
+    --secondary: 0 0% 96%;               /* bone white block */
+    --secondary-foreground: 0 0% 6%;
 
-    --muted: 252 96% 85%;                /* #C4B5FD soft violet */
-    --muted-foreground: 0 0% 0%;
+    --muted: 0 0% 18%;                   /* charcoal */
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 0 100% 71%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 0 90% 50%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 100% 71%;
-    --destructive-foreground: 0 0% 0%;
+    --destructive: 0 90% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 50 100% 62%;
-    --warning-foreground: 0 0% 0%;
+    --warning: 0 0% 96%;
+    --warning-foreground: 0 0% 6%;
 
-    --success: 142 71% 45%;
-    --success-foreground: 0 0% 0%;
+    --success: 0 0% 96%;
+    --success-foreground: 0 0% 6%;
 
-    --border: 0 0% 0%;
-    --input: 0 0% 100%;
-    --ring: 0 0% 0%;
+    --border: 0 0% 96%;
+    --input: 0 0% 10%;
+    --ring: 0 0% 96%;
 
     --radius: 0px;
 
     /* Hard offset ink shadows */
-    --shadow-card:      4px 4px 0 0 #000;
-    --shadow-floating:  8px 8px 0 0 #000;
-    --shadow-pressed:   0 0 0 0 #000;
-    --shadow-recessed:  inset 0 0 0 4px #000;
-    --shadow-sharp:     4px 4px 0 0 #000;
-    --shadow-glow:      6px 6px 0 0 #000;
-    --shadow-primary:   6px 6px 0 0 #000;
-    --shadow-led-green: 4px 4px 0 0 #000;
+    --shadow-card:      4px 4px 0 0 hsl(var(--foreground));
+    --shadow-floating:  8px 8px 0 0 hsl(var(--foreground));
+    --shadow-pressed:   0 0 0 0 hsl(var(--foreground));
+    --shadow-recessed:  inset 0 0 0 4px hsl(var(--foreground));
+    --shadow-sharp:     4px 4px 0 0 hsl(var(--foreground));
+    --shadow-glow:      6px 6px 0 0 hsl(var(--foreground));
+    --shadow-primary:   6px 6px 0 0 hsl(var(--foreground));
+    --shadow-led-green: 4px 4px 0 0 hsl(var(--foreground));
 
-    --shadow-brut-sm:   4px 4px 0 0 #000;
-    --shadow-brut:      8px 8px 0 0 #000;
-    --shadow-brut-lg:   12px 12px 0 0 #000;
-    --shadow-brut-xl:   16px 16px 0 0 #000;
+    --shadow-brut-sm:   4px 4px 0 0 hsl(var(--foreground));
+    --shadow-brut:      8px 8px 0 0 hsl(var(--foreground));
+    --shadow-brut-lg:   12px 12px 0 0 hsl(var(--foreground));
+    --shadow-brut-xl:   16px 16px 0 0 hsl(var(--foreground));
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 0%;
@@ -91,7 +91,7 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(#000 1.2px, transparent 1.4px);
+      radial-gradient(hsl(var(--foreground)) 1.2px, transparent 1.4px);
     background-size: 24px 24px;
   }
 
@@ -104,7 +104,7 @@
     line-height: 0.95;
   }
 
-  ::selection { background: hsl(var(--secondary)); color: #000; }
+  ::selection { background: hsl(var(--secondary)); color: hsl(var(--foreground)); }
 }
 
 @layer utilities {
@@ -118,15 +118,15 @@
     letter-spacing: 0.2em;
     font-weight: 900;
     font-size: 0.75rem;
-    color: #000;
+    color: hsl(var(--foreground));
     background: hsl(var(--secondary));
     padding: 4px 8px;
-    border: 2px solid #000;
+    border: 2px solid hsl(var(--foreground));
     display: inline-block;
   }
 
   .text-stroke {
-    -webkit-text-stroke: 2px #000;
+    -webkit-text-stroke: 2px hsl(var(--foreground));
     color: transparent;
   }
 
@@ -143,7 +143,7 @@
   .shadow-glow      { box-shadow: var(--shadow-glow); }
   .shadow-primary-key { box-shadow: var(--shadow-primary); }
 
-  .text-emboss      { text-shadow: 3px 3px 0 #000; }
+  .text-emboss      { text-shadow: 3px 3px 0 hsl(var(--foreground)); }
 
   /* Backgrounds */
   .bg-grid {
@@ -153,7 +153,7 @@
     background-size: 40px 40px;
   }
   .bg-halftone {
-    background-image: radial-gradient(#000 1.5px, transparent 1.5px);
+    background-image: radial-gradient(hsl(var(--foreground)) 1.5px, transparent 1.5px);
     background-size: 20px 20px;
   }
 
@@ -162,7 +162,7 @@
   .tilt-r { transform: rotate(2deg); }
 
   /* LED indicator (re-purposed as pill dot) */
-  .led { width: 0.7rem; height: 0.7rem; border-radius: 9999px; display: inline-block; background: hsl(var(--primary)); border: 2px solid #000; }
+  .led { width: 0.7rem; height: 0.7rem; border-radius: 9999px; display: inline-block; background: hsl(var(--primary)); border: 2px solid hsl(var(--foreground)); }
   .led-green { background: #22c55e; }
 
   /* Legacy industrial hooks neutralized */
@@ -193,8 +193,8 @@
   header.sticky,
   .sticky.top-0 {
     background-color: hsl(var(--background)) !important;
-    border-bottom: 4px solid #000 !important;
-    box-shadow: 0 4px 0 0 #000 !important;
+    border-bottom: 4px solid hsl(var(--foreground)) !important;
+    box-shadow: 0 4px 0 0 hsl(var(--foreground)) !important;
     backdrop-filter: none !important;
   }
 
@@ -207,8 +207,8 @@
   [class*="bg-secondary/40"],
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
-    background-color: #ffffff !important;
-    border: 4px solid #000 !important;
+    background-color: hsl(var(--card)) !important;
+    border: 4px solid hsl(var(--foreground)) !important;
     box-shadow: var(--shadow-brut-sm) !important;
     border-radius: 0 !important;
   }
@@ -216,7 +216,7 @@
   /* Active/hero card — yellow sticker with deep shadow */
   .border-2.border-primary {
     background-color: hsl(var(--secondary)) !important;
-    border: 4px solid #000 !important;
+    border: 4px solid hsl(var(--foreground)) !important;
     box-shadow: var(--shadow-brut-lg) !important;
     border-radius: 0 !important;
   }
@@ -224,9 +224,9 @@
   /* Pills / chips — bordered tags */
   .rounded-full.border {
     background-color: hsl(var(--muted)) !important;
-    border: 3px solid #000 !important;
-    box-shadow: 3px 3px 0 0 #000 !important;
-    color: #000;
+    border: 3px solid hsl(var(--foreground)) !important;
+    box-shadow: 3px 3px 0 0 hsl(var(--foreground)) !important;
+    color: hsl(var(--foreground));
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-family: "Space Grotesk", sans-serif;
@@ -241,12 +241,12 @@
   input:not([type]),
   textarea,
   select {
-    background-color: #ffffff !important;
-    border: 4px solid #000 !important;
+    background-color: hsl(var(--card)) !important;
+    border: 4px solid hsl(var(--foreground)) !important;
     border-radius: 0 !important;
     font-family: "Space Grotesk", sans-serif !important;
     font-weight: 700;
-    color: #000;
+    color: hsl(var(--foreground));
     box-shadow: var(--shadow-brut-sm) !important;
     transition: all 100ms linear;
   }
@@ -260,7 +260,7 @@
   /* Floating coach orb — sticker button */
   .fixed.bottom-5.right-5 {
     background-color: hsl(var(--primary)) !important;
-    border: 4px solid #000 !important;
+    border: 4px solid hsl(var(--foreground)) !important;
     border-radius: 9999px;
     box-shadow: var(--shadow-brut) !important;
     transition: all 100ms linear;
@@ -272,42 +272,42 @@
   .rounded.bg-destructive\/10 {
     border-radius: 0 !important;
     background-color: hsl(var(--primary)) !important;
-    border: 4px solid #000 !important;
+    border: 4px solid hsl(var(--foreground)) !important;
     box-shadow: var(--shadow-brut-sm) !important;
-    color: #000;
+    color: hsl(var(--foreground));
     font-weight: 900;
   }
 
   /* DraftRoom helpers retargeted to neo-brutalism */
   .scoreboard-tile {
     background-color: hsl(var(--secondary)) !important;
-    border: 3px solid #000 !important;
+    border: 3px solid hsl(var(--foreground)) !important;
     border-radius: 0 !important;
-    box-shadow: 3px 3px 0 0 #000 !important;
+    box-shadow: 3px 3px 0 0 hsl(var(--foreground)) !important;
     padding: 0.5rem 0.75rem;
     font-family: "Space Grotesk", sans-serif !important;
     font-weight: 900;
-    color: #000;
+    color: hsl(var(--foreground));
   }
   .scoreboard-plinth {
     background-color: hsl(var(--muted)) !important;
-    border: 4px solid #000 !important;
+    border: 4px solid hsl(var(--foreground)) !important;
     border-radius: 0 !important;
     box-shadow: var(--shadow-brut-lg) !important;
     padding: 1.5rem 2rem;
   }
   .font-score   { font-family: "Space Grotesk", sans-serif; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-  .score-digit  { color: #000; }
+  .score-digit  { color: hsl(var(--foreground)); }
   .broadcast-label {
     font-family: "Space Grotesk", sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.2em;
     font-weight: 900;
     font-size: 0.7rem;
-    color: #000;
+    color: hsl(var(--foreground));
     background: hsl(var(--secondary));
     padding: 2px 6px;
-    border: 2px solid #000;
+    border: 2px solid hsl(var(--foreground));
     display: inline-block;
   }
   .accent-flare { position: relative; }
@@ -329,4 +329,4 @@
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
 .coach-md strong { @apply text-foreground font-black; }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground font-display; }
-.coach-md code { @apply px-1 py-0.5 bg-secondary text-foreground text-xs font-mono border-2 border-black; }
+.coach-md code { @apply px-1 py-0.5 bg-secondary text-foreground text-xs font-mono border-2 border-foreground; }
