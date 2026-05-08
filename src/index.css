@@ -320,39 +320,39 @@
    ===================================================================== */
 @layer base {
   :root {
-    /* Apple-grade neutral palette — near-black canvas, single restrained accent */
-    --background: 0 0% 4%;               /* #0a0a0a */
-    --foreground: 0 0% 98%;
-    --card: 0 0% 7%;                     /* #121212 */
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 211 100% 50%;             /* Apple system blue #007aff */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 211 100% 60%;
-    --secondary: 0 0% 11%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 9%;
-    --muted-foreground: 0 0% 60%;
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 4 90% 58%;
-    --destructive-foreground: 0 0% 100%;
-    --warning: 38 95% 55%;
-    --warning-foreground: 0 0% 6%;
-    --success: 142 70% 45%;
-    --success-foreground: 0 0% 100%;
-    --border: 0 0% 14%;                  /* hairline */
-    --input: 0 0% 9%;
-    --ring: 211 100% 50%;
-    --grid-line: hsl(0 0% 9%);
-    --grid-line-strong: hsl(0 0% 12%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 6%));
-    --gradient-primary: linear-gradient(180deg, hsl(211 100% 54%), hsl(211 100% 46%));
-    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.03) inset, 0 1px 2px hsl(0 0% 0% / 0.4);
-    --shadow-glow: 0 0 0 3px hsl(211 100% 50% / 0.25);
+    /* Editorial — uncoated paper, ink black, single cinnabar spot color */
+    --background: 38 30% 94%;            /* warm cream paper */
+    --foreground: 30 12% 12%;            /* ink */
+    --card: 36 28% 97%;                  /* lighter stock */
+    --card-foreground: 30 12% 12%;
+    --popover: 36 28% 97%;
+    --popover-foreground: 30 12% 12%;
+    --primary: 8 78% 46%;                /* cinnabar spot color */
+    --primary-foreground: 38 30% 96%;
+    --primary-glow: 8 78% 54%;
+    --secondary: 36 22% 88%;
+    --secondary-foreground: 30 12% 12%;
+    --muted: 36 20% 90%;
+    --muted-foreground: 30 10% 38%;
+    --accent: 8 78% 46%;
+    --accent-foreground: 38 30% 96%;
+    --destructive: 0 70% 42%;
+    --destructive-foreground: 38 30% 96%;
+    --warning: 35 85% 45%;
+    --warning-foreground: 38 30% 96%;
+    --success: 145 40% 32%;
+    --success-foreground: 38 30% 96%;
+    --border: 30 14% 78%;                /* soft hairline rule */
+    --input: 36 24% 93%;
+    --ring: 8 78% 46%;
+    --grid-line: hsl(36 22% 88%);
+    --grid-line-strong: hsl(30 14% 78%);
+    --gradient-card: linear-gradient(180deg, hsl(36 28% 97%), hsl(36 26% 95%));
+    --gradient-primary: linear-gradient(180deg, hsl(8 78% 48%), hsl(8 78% 42%));
+    --shadow-card: 0 1px 0 hsl(30 12% 12% / 0.04);
+    --shadow-glow: 0 0 0 2px hsl(8 78% 46% / 0.25);
   }
-  .dark { --background: 0 0% 4%; }
+  .dark { --background: 38 30% 94%; }
 }
 
 html, body, #root { background: hsl(var(--background)); }
@@ -361,33 +361,44 @@ body {
   color: hsl(var(--foreground));
   background: hsl(var(--background));
   background-attachment: fixed;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", sans-serif;
+  font-family: "Source Serif Pro", "Charter", "Iowan Old Style", Georgia, serif;
+  font-size: 17px;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "ss01", "cv11";
 }
 
-/* No grain, no vignette — Apple-clean */
-body::before, body::after { content: none !important; }
+/* Subtle paper tooth — barely-there grain */
+body::before {
+  content: "";
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(hsl(30 12% 12% / 0.025) 1px, transparent 1px);
+  background-size: 2px 2px;
+  opacity: 0.5;
+}
+body::after { content: none !important; }
 
 #root > * { position: relative; z-index: 1; }
 
-/* Typography — strict hierarchy, neutral sans, tight tracking on display sizes */
+/* Typography — high-contrast display serif, literary and self-assured */
 h1, h2, h3, h4, h5, h6 {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Helvetica Neue", sans-serif !important;
+  font-family: "Playfair Display", "Bodoni Moda", "Didot", "Times New Roman", serif !important;
   color: hsl(var(--foreground)) !important;
   text-transform: none !important;
   text-shadow: none !important;
+  font-style: normal !important;
 }
-h1 { font-weight: 700 !important; letter-spacing: -0.025em !important; line-height: 1.05 !important; }
-h2 { font-weight: 600 !important; letter-spacing: -0.02em !important; line-height: 1.15 !important; }
-h3 { font-weight: 600 !important; letter-spacing: -0.015em !important; line-height: 1.25 !important; }
-h4 { font-weight: 600 !important; letter-spacing: -0.01em !important; }
+h1 { font-weight: 900 !important; letter-spacing: -0.03em !important; line-height: 1.02 !important; }
+h2 { font-weight: 800 !important; letter-spacing: -0.025em !important; line-height: 1.1 !important; }
+h3 { font-weight: 700 !important; letter-spacing: -0.02em !important; line-height: 1.2 !important; }
+h4 { font-weight: 700 !important; letter-spacing: -0.015em !important; }
 
-/* Cards — quiet surface, hairline border, no glossy gradients */
+p, li { line-height: 1.7 !important; }
+
+/* Cards — laid paper, hairline rule above, no glossy effects */
 .rounded-lg.border, .rounded-md.border, .rounded-xl.border,
 [class*="rounded"][class*="border"] {
-  border-radius: 0.75rem !important;
+  border-radius: 0.25rem !important;
   border: 1px solid hsl(var(--border)) !important;
   background: hsl(var(--card)) !important;
   color: hsl(var(--card-foreground)) !important;
@@ -402,34 +413,40 @@ h4 { font-weight: 600 !important; letter-spacing: -0.01em !important; }
   content: none !important;
 }
 
-/* Buttons — flat, precise, no shadows */
+/* Buttons — engraved invitation, never plastic */
 button, .btn, [role="button"] {
-  border-radius: 0.5rem !important;
-  font-family: inherit !important;
-  font-weight: 500 !important;
-  text-transform: none !important;
-  letter-spacing: -0.005em !important;
+  border-radius: 0.125rem !important;
+  font-family: "Source Sans Pro", "Inter", -apple-system, sans-serif !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  font-size: 0.78em !important;
   box-shadow: none !important;
-  transition: background-color 120ms ease, opacity 120ms ease, transform 120ms ease !important;
+  transition: background-color 320ms ease, color 320ms ease, opacity 320ms ease !important;
 }
-button:active, .btn:active, [role="button"]:active { transform: scale(0.98); }
 
-/* Inputs — quiet, hairline, blue focus ring */
+/* Inputs — quiet, ruled, ink on paper */
 input, textarea, select {
-  border-radius: 0.5rem !important;
+  border-radius: 0.125rem !important;
   border: 1px solid hsl(var(--border)) !important;
   background: hsl(var(--input)) !important;
   color: hsl(var(--foreground)) !important;
-  font-family: inherit !important;
+  font-family: "Source Serif Pro", Georgia, serif !important;
   box-shadow: none !important;
-  transition: border-color 120ms ease, box-shadow 120ms ease !important;
+  transition: border-color 280ms ease, box-shadow 280ms ease !important;
 }
 input:focus, textarea:focus, select:focus {
   border-color: hsl(var(--ring)) !important;
   box-shadow: var(--shadow-glow) !important;
   outline: none !important;
 }
-input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground)) !important; }
+input::placeholder, textarea::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+  font-style: italic !important;
+}
+
+/* Slow, intentional global transitions */
+* { transition-duration: 280ms !important; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important; }
 
 @keyframes fade-out {
   0% { opacity: 1; transform: translateY(0); }
