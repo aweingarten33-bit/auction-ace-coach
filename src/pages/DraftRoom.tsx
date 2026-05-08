@@ -281,7 +281,8 @@ export default function DraftRoom() {
               gaps={gaps}
               spend={spend}
               remaining={budget.remaining}
-              anchorMap={anchorMap}
+              prices={prices}
+              events={events}
               pulse={pulse}
             />
           )}
