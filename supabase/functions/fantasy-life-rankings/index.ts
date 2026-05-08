@@ -89,30 +89,26 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
 
   // Pattern A: "1. Name, POS, TEAM"
   const reA = new RegExp(`\\b(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*,\\s*(${POS})\\s*,\\s*(${TEAM})\\b`, "g");
-  // Pattern B: "1. Name | TEAM"  (position from default)
-  const reB = new RegExp(`\\b(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${TEAM})\\b`, "g");
+  // Pattern B: "1. Name | POS | TEAM"
+  const reB = new RegExp(`\\b(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${POS})\\s*\\|\\s*(${TEAM})\\b`, "g");
+  // Pattern C: "1. Name | TEAM"  (position from default)
+  const reC = new RegExp(`\\b(\\d{1,3})\\.\\s+([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${TEAM})\\b`, "g");
 
-  for (const m of clean.matchAll(reA)) {
-    const rank = parseInt(m[1], 10);
-    const name = m[2].trim();
-    const position = m[3] === "DST" ? "D/ST" : m[3];
-    const team = m[4];
-    const k = name.toLowerCase();
-    if (seen.has(k)) continue;
-    seen.add(k);
-    out.push({ rank, name, position, team });
-  }
-  if (out.length === 0) {
-    for (const m of clean.matchAll(reB)) {
+  const pushAll = (re: RegExp, posIdx: number | null, teamIdx: number) => {
+    for (const m of clean.matchAll(re)) {
       const rank = parseInt(m[1], 10);
       const name = m[2].trim();
-      const team = m[3];
+      const pos = posIdx ? (m[posIdx] === "DST" ? "D/ST" : m[posIdx]) : (defaultPos === "ALL" ? "" : defaultPos);
+      const team = m[teamIdx];
       const k = name.toLowerCase();
       if (seen.has(k)) continue;
       seen.add(k);
-      out.push({ rank, name, position: defaultPos === "ALL" ? "" : defaultPos, team });
+      out.push({ rank, name, position: pos, team });
     }
-  }
+  };
+  pushAll(reA, 3, 4);
+  pushAll(reB, 3, 4);
+  if (out.length === 0) pushAll(reC, null, 3);
   out.sort((a, b) => a.rank - b.rank);
   return out.slice(0, 60);
 }
