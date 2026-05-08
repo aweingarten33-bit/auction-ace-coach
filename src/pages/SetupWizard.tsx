@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
-import PricingMathExplainer from "@/components/PricingMathExplainer";
+
 
 const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 
@@ -114,9 +114,6 @@ export default function SetupWizard() {
           </div>
         </header>
 
-        <div className="mb-6">
-          <PricingMathExplainer />
-        </div>
 
         <Progress value={progress} className="mb-6 h-1.5" />
 

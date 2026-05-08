@@ -78,7 +78,7 @@ import AffordabilityChecker from "@/components/AffordabilityChecker";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
-import PricingMathExplainer from "@/components/PricingMathExplainer";
+
 import FootballShieldIcon from "@/components/FootballShieldIcon";
 import superFootballLogo from "@/assets/logo-super-football.png";
 
@@ -493,7 +493,6 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
-        <PricingMathExplainer />
         {/* Find (player or $) lives in the hamburger drawer now. */}
 
         {/* DECISION CARD — rendered INLINE (no Dialog/Portal/Overlay).
