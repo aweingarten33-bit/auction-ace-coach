@@ -28,14 +28,15 @@
     --popover:           24 14% 9%;
     --popover-foreground:33 32% 87%;
 
-    /* Material accents */
-    --brass:             42 51% 59%;    /* #C9A962 polished brass */
-    --brass-light:       42 53% 70%;    /* #D4B872 highlight */
-    --brass-dark:        42 51% 47%;    /* #B8953F shadow */
-    --crimson:           351 58% 35%;   /* #8B2635 library crimson */
-    --parchment:         33 32% 87%;
-    --ink-faded:         28 14% 55%;    /* #9C8B7A faded ink */
-    --wood-grain:        28 16% 25%;    /* #4A3F35 */
+    /* Material accents — brass dimmed, crimson screaming */
+    --brass:             42 60% 52%;    /* tarnished brass */
+    --brass-light:       42 64% 64%;
+    --brass-dark:        42 60% 38%;
+    --crimson:           356 78% 42%;   /* Miller blood — wetter, louder */
+    --crimson-spatter:   356 90% 50%;   /* arterial */
+    --parchment:         36 36% 90%;
+    --ink-faded:         28 10% 48%;    /* faded ink, cooler */
+    --wood-grain:        24 14% 18%;    /* tight, dark grain */
 
     /* shadcn mapping */
     --primary:           42 51% 59%;
