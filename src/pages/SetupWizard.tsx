@@ -17,7 +17,7 @@ import { useDraftStore } from "@/lib/draft-store";
 import { parsePriceSheet, totalRosterSize } from "@/lib/draft-math";
 import { Position } from "@/lib/draft-types";
 import { POSITIONS } from "@/lib/positions";
-import { Trash2, Plus, ChevronLeft, ChevronRight, Trophy } from "lucide-react";
+import { Trash2, Plus, ChevronLeft, ChevronRight, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
@@ -55,6 +55,7 @@ export default function SetupWizard() {
   const [pricesText, setPricesText] = useState(
     prices.map((p) => `${p.name} - ${p.price}`).join("\n")
   );
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const next = () => setStep((s) => Math.min(STEPS.length - 1, s + 1));
   const back = () => setStep((s) => Math.max(0, s - 1));
@@ -120,6 +121,18 @@ export default function SetupWizard() {
         <Progress value={progress} className="mb-6 h-1.5" />
 
         <Card className="p-5 md:p-6">
+          <button
+            onClick={() => setSettingsOpen((o) => !o)}
+            className="flex w-full items-center justify-between gap-3 text-left mb-2"
+          >
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">Draft Settings</h2>
+              <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
+            </div>
+            {settingsOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+          </button>
+
+          {settingsOpen && (<>
           {step === 0 && (
             <div className="space-y-6">
               <EspnImportButton />
@@ -331,6 +344,7 @@ export default function SetupWizard() {
               </Button>
             )}
           </div>
+          </>)}
         </Card>
       </div>
     </div>
