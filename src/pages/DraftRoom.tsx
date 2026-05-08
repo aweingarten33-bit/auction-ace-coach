@@ -457,13 +457,14 @@ export default function DraftRoom() {
         className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
       >
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <Sheet open={drawerOpen} onOpenChange={(o) => { setDrawerOpen(o); if (!o) setDrawerInitial("menu"); }}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 className="-ml-2 h-12 w-12 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
                 aria-label="Open menu"
+                onClick={() => setDrawerInitial("menu")}
               >
                 <Menu className="h-7 w-7" strokeWidth={2.5} />
               </Button>
