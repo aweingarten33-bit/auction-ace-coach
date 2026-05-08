@@ -50,10 +50,19 @@ export default function PricingMathExplainer() {
 
           <section>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
-              👀 What it watches
+              📜 Your league's receipts
             </h3>
             <p className="text-muted-foreground">
-              Your league's spending DNA, the expert consensus, and live news. It weighs all three based on which one is most trustworthy <span className="text-foreground">for that specific player</span>.
+              We pull <span className="text-foreground font-medium">3 years of your actual auction results</span> and learn your league's personality — who overpays at WR, who hoards RBs, who always sleeps on TE. Recent years count more than older ones, so last year's habits matter most. That's your league's fingerprint, and no other tool has it.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
+              👀 What else it watches
+            </h3>
+            <p className="text-muted-foreground">
+              Expert consensus and live news layer on top. It weighs all three based on which one is most trustworthy <span className="text-foreground">for that specific player</span>.
             </p>
           </section>
 
