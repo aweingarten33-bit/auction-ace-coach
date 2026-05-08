@@ -52,6 +52,7 @@ import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import TeamTrends from "@/components/TeamTrends";
 import NextTargetCard from "@/components/NextTargetCard";
+import LastPickImpact from "@/components/LastPickImpact";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -285,6 +286,11 @@ export default function DraftRoom() {
               events={events}
               pulse={pulse}
             />
+          )}
+
+          {/* Last imported pick — before/after delta */}
+          {events.length > 0 && (
+            <LastPickImpact settings={settings} keepers={keepers} events={events} />
           )}
 
           {/* Personalized 3-year drafting trends */}
