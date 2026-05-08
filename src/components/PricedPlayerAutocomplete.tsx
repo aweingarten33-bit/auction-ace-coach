@@ -78,6 +78,7 @@ export default function PricedPlayerAutocomplete({
     // 1) Price sheet matches first (have $ values)
     const priceMatches = prices
       .filter((p) => !excluded.has(norm(p.name)) && norm(p.name).includes(qn))
+      .map((p) => ({ ...p, price: effectivePrice(p.name, p.price) ?? p.price }))
       .sort((a, b) => {
         const aStarts = norm(a.name).startsWith(qn) ? 0 : 1;
         const bStarts = norm(b.name).startsWith(qn) ? 0 : 1;
