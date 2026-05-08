@@ -100,7 +100,7 @@ export default function DraftRoom() {
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [aiOpen, setAiOpen] = useState<boolean>(false);
-  const [top100Open, setTop100Open] = useState<boolean>(false);
+  
   const [query, setQuery] = useState<string>("");
   const [activeName, setActiveName] = useState<string>("");
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
