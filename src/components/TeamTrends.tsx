@@ -88,7 +88,7 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
       {/* Top-line stats */}
       <div className="grid grid-cols-3 gap-2">
         <Stat icon={<Banknote className="h-3.5 w-3.5" />} label="Top bid avg" value={`$${trends.avgTopBid}`} />
-        <Stat icon={<Crown className="h-3.5 w-3.5" />} label="Top-3 share" value={`${Math.round(trends.avgTop3Pct * 100)}%`} />
+        <Stat icon={<Crown className="h-3.5 w-3.5" />} label="Stud spend" value={`${Math.round(trends.avgTop3Pct * 100)}%`} hint="Share of total budget spent on their 3 priciest players" />
         <Stat icon={<Target className="h-3.5 w-3.5" />} label="Loves" value={trends.topPos} />
       </div>
 
@@ -153,9 +153,9 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
   );
 }
 
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function Stat({ icon, label, value, hint }: { icon: React.ReactNode; label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-lg border border-border/40 bg-foreground/5 px-2 py-1.5">
+    <div className="rounded-lg border border-border/40 bg-foreground/5 px-2 py-1.5" title={hint}>
       <div className="flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground">
         {icon} {label}
       </div>
