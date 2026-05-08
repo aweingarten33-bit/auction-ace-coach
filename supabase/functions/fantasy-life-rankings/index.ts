@@ -4,45 +4,62 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface Player { rank: number; name: string; position: string; team: string; }
-interface RankList { source: string; label: string; position: string; url: string; players: Player[]; }
+interface Player { rank: number; name: string; position: string; team: string; note?: string; }
+interface RankList { source: string; label: string; position: string; url: string; players: Player[]; kind: "ranking" | "sleeper"; }
 
-const SOURCES: { source: string; label: string; position: string; url: string }[] = [
+const SOURCES: { source: string; label: string; position: string; url: string; kind: "ranking" | "sleeper" }[] = [
   {
-    source: "qb",
-    label: "QB",
-    position: "QB",
+    source: "qb", label: "QB", position: "QB", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-qb",
   },
   {
-    source: "rb",
-    label: "RB",
-    position: "RB",
+    source: "rb", label: "RB", position: "RB", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-bijan-robinson-leads-the-top-20",
   },
   {
-    source: "wr",
-    label: "WR",
-    position: "WR",
+    source: "wr", label: "WR", position: "WR", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-wr",
   },
   {
-    source: "te",
-    label: "TE",
-    position: "TE",
+    source: "te", label: "TE", position: "TE", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-tight-end-tiers-for-fantasy-football-harold-fannin",
   },
   {
-    source: "k",
-    label: "K",
-    position: "K",
+    source: "k", label: "K", position: "K", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-kicker-rankings-2025",
   },
   {
-    source: "dst",
-    label: "DEF",
-    position: "D/ST",
+    source: "dst", label: "DEF", position: "D/ST", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-defense-rankings-and-tiers-broncos-eagles-and-more",
+  },
+  // — Sleepers / breakouts (under-the-radar league winners) —
+  {
+    source: "sleepers-all", label: "💤 Sleepers", position: "ALL", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-sleepers",
+  },
+  {
+    source: "sleepers-qb", label: "💤 QB", position: "QB", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/quarterback-sleepers-for-fantasy-football-2025",
+  },
+  {
+    source: "sleepers-rb", label: "💤 RB", position: "RB", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/running-back-sleepers-for-fantasy-football-2025",
+  },
+  {
+    source: "sleepers-wr", label: "💤 WR", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/wide-receiver-sleepers-for-2025-fantasy-football-keon-coleman-ra",
+  },
+  {
+    source: "breakouts", label: "🚀 Breakouts", position: "ALL", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-breakouts-marvin-mims-sean-tucker-and-more",
+  },
+  {
+    source: "breakouts-wr", label: "🚀 WR Y2-3", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/year-2-3-wide-receiver-breakouts-for-fantasy-football",
+  },
+  {
+    source: "breakouts-wr-late", label: "🚀 WR Late", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/late-breakout-wide-receiver-candidates-for-2025-fantasy-football",
   },
 ];
 
