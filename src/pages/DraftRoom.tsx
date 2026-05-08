@@ -454,7 +454,7 @@ export default function DraftRoom() {
               </button>
               <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight">
                 {toolPage === "lookup" && "Find"}
-                {toolPage === "top100" && "Top 100"}
+                {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 100` : "Top 100")}
                 {toolPage === "market" && "Market"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
