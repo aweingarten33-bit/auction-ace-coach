@@ -12,40 +12,48 @@
 
 @layer base {
   :root {
-    --background: 0 0% 10%;             /* #1A1A1A wet concrete */
-    --foreground: 0 0% 91%;             /* #E8E8E8 stadium light */
+    --background: 0 0% 5%;              /* #0D0D0D locker room void */
+    --foreground: 60 11% 95%;           /* #F5F5F0 chalk line, dirty white */
 
-    --card: 0 0% 14%;                   /* #242424 lighter slab */
-    --card-foreground: 0 0% 91%;
+    --card: 0 0% 8%;                    /* #141414 wheat-paste poster */
+    --card-foreground: 60 11% 95%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 91%;
+    --popover: 0 0% 5%;
+    --popover-foreground: 60 11% 95%;
 
-    --primary: 127 65% 49%;             /* #2ECC40 turf green */
-    --primary-foreground: 0 0% 4%;
-    --primary-glow: 127 65% 60%;
+    --primary: 111 100% 54%;            /* #39FF14 RADIOACTIVE turf — pushed two stops */
+    --primary-foreground: 0 0% 5%;
+    --primary-glow: 111 100% 65%;
 
-    --secondary: 27 100% 55%;           /* #FF851B penalty orange */
-    --secondary-foreground: 0 0% 4%;
+    --secondary: 16 100% 50%;           /* #FF4500 penalty flag — hot, immediate */
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 29%;                  /* #4A4A4A weathered concrete */
-    --muted-foreground: 0 0% 63%;       /* #A0A0A0 faded graffiti */
+    --muted: 0 0% 33%;                  /* #555555 old tape, washed jersey */
+    --muted-foreground: 0 0% 60%;
 
-    --accent: 3 100% 60%;               /* #FF4136 challenge flag red */
-    --accent-foreground: 0 0% 100%;
+    --accent: 348 83% 47%;              /* #DC143C BLOOD — fresh, wet */
+    --accent-foreground: 60 11% 95%;
 
-    --destructive: 3 100% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 348 83% 47%;
+    --destructive-foreground: 60 11% 95%;
 
-    --warning: 27 100% 55%;
-    --warning-foreground: 0 0% 4%;
+    --warning: 16 100% 50%;
+    --warning-foreground: 0 0% 5%;
 
-    --success: 127 65% 49%;
-    --success-foreground: 0 0% 4%;
+    --success: 111 100% 54%;
+    --success-foreground: 0 0% 5%;
 
-    --border: 0 0% 20%;                 /* #333333 sidewalk crack */
-    --input: 0 0% 14%;
-    --ring: 127 65% 49%;
+    /* extended palette — sweat (championship gold), bruise (IR purple), rust (chain-link) */
+    --sweat: 46 65% 52%;                /* #D4AF37 dirty championship gold */
+    --sweat-foreground: 0 0% 5%;
+    --bruise: 275 100% 25%;             /* #4B0082 IR / concussion protocol */
+    --bruise-foreground: 60 11% 95%;
+    --rust: 25 60% 31%;                 /* #8B4513 chain-link decay */
+    --concrete: 0 0% 11%;               /* #1C1C1C the tunnel */
+
+    --border: 0 0% 13%;                 /* #222222 hairline separation */
+    --input: 0 0% 8%;
+    --ring: 111 100% 54%;
 
     --radius: 0px;                      /* sharp. cut. torn. */
 
