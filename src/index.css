@@ -15,52 +15,56 @@
 @layer base {
   :root {
     /* ---------- CORE SURFACE ---------- */
-    --background:        218 23% 90%;        /* #E0E5EC cool clay */
-    --background-alt:    218 23% 90%;
-    --foreground:        212 16% 28%;        /* #3D4852 */
-    --muted-bg:          218 23% 90%;
+    /* ---------- CORE SURFACE — "Returns" suit, light mode ----------
+       Cool clay base subtly tinted toward suit-navy. Foreground = the
+       deep midnight-blue of the bodysuit. Accent = muted shield ochre.
+       Maroon = trunks/cape lining. */
+    --background:        220 24% 89%;
+    --background-alt:    220 24% 89%;
+    --foreground:        222 44% 18%;        /* suit midnight navy */
+    --muted-bg:          220 24% 89%;
 
-    --card:              218 23% 90%;
-    --card-foreground:   212 16% 28%;
+    --card:              220 24% 89%;
+    --card-foreground:   222 44% 18%;
 
-    --popover:           218 23% 90%;
-    --popover-foreground:212 16% 28%;
+    --popover:           220 24% 89%;
+    --popover-foreground:222 44% 18%;
 
     /* ---------- ACCENTS ---------- */
-    --primary:           245 100% 69%;       /* #6C63FF */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow:      243 100% 76%;       /* #8B84FF */
+    --primary:           222 44% 26%;        /* suit navy */
+    --primary-foreground: 40 35% 92%;
+    --primary-glow:      222 38% 38%;
 
-    --secondary:         218 23% 90%;
-    --secondary-foreground: 212 16% 28%;
+    --secondary:         220 24% 89%;
+    --secondary-foreground: 222 44% 18%;
 
-    --accent:            245 100% 69%;
-    --accent-foreground: 0 0% 100%;
-    --accent-secondary:  176 51% 46%;        /* #38B2AC teal */
+    --accent:            36 50% 42%;         /* shield ochre / belt buckle */
+    --accent-foreground: 40 35% 92%;
+    --accent-secondary:  350 48% 30%;        /* maroon — trunks / cape lining */
 
-    --muted:             218 23% 90%;
-    --muted-foreground:  220 9% 46%;         /* #6B7280 */
+    --muted:             220 24% 89%;
+    --muted-foreground:  220 14% 38%;
 
-    --destructive:       0 72% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive:       350 48% 30%;        /* maroon */
+    --destructive-foreground: 40 35% 92%;
 
-    --warning:           38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning:           36 65% 48%;
+    --warning-foreground: 222 44% 12%;
 
-    --success:           176 51% 46%;
-    --success-foreground: 0 0% 100%;
+    --success:           36 50% 42%;
+    --success-foreground: 40 35% 92%;
 
     --border:            transparent;
-    --input:             218 23% 90%;
-    --ring:              245 100% 69%;
+    --input:             220 24% 89%;
+    --ring:              222 44% 26%;
 
     --radius: 1rem;
 
     /* ---------- NEUMORPHIC TOKENS ---------- */
-    --surface:           218 23% 90%;
-    --surface-2:         218 23% 90%;
+    --surface:           220 24% 89%;
+    --surface-2:         220 24% 89%;
     --shadow-light-rgb:  255, 255, 255;
-    --shadow-dark-rgb:   163, 177, 198;
+    --shadow-dark-rgb:   150, 162, 188;       /* cool blue-grey, suit-tinted */
 
     /* Shadow recipes — composed from RGBA pairs */
     --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.6),
