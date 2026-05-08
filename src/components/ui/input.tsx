@@ -3,33 +3,25 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Cyberpunk Input — terminal slot with ">" prefix, chamfered, neon focus.
+ * Neo-brutalist Input — thick-bordered paper slot. Turns yellow on focus.
  */
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
     return (
-      <div className="relative w-full">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-primary text-glow text-sm select-none"
-        >
-          {">"}
-        </span>
-        <input
-          type={type}
-          className={cn(
-            "flex h-12 w-full bg-input pl-8 pr-4 py-2 text-base font-mono text-primary",
-            "border border-border cyber-chamfer-sm",
-            "transition-all duration-200",
-            "placeholder:text-muted-foreground placeholder:italic",
-            "focus-visible:outline-none focus-visible:border-primary focus-visible:shadow-[var(--glow-primary)]",
-            "disabled:cursor-not-allowed disabled:opacity-50",
-            className,
-          )}
-          ref={ref}
-          {...props}
-        />
-      </div>
+      <input
+        type={type}
+        className={cn(
+          "flex h-14 w-full rounded-none bg-white px-4 py-2 text-base font-bold text-black",
+          "border-4 border-black shadow-[4px_4px_0_0_#000]",
+          "transition-all duration-100 ease-linear",
+          "placeholder:text-black/40 placeholder:font-bold",
+          "focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-[hsl(var(--secondary))] focus-visible:shadow-[6px_6px_0_0_#000]",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
     );
   },
 );

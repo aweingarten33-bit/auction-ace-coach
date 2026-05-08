@@ -12,11 +12,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Orbitron"', '"Share Tech Mono"', "ui-monospace", "monospace"],
-        sans:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
-        body:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
-        mono:    ['"JetBrains Mono"', "ui-monospace", "SFMono-Regular", "monospace"],
-        tech:    ['"Share Tech Mono"', "ui-monospace", "monospace"],
+        display: ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        sans:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        body:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono:    ['"Space Grotesk"', "ui-monospace", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -75,12 +74,12 @@ export default {
         },
       },
       borderRadius: {
-        // Cyberpunk — sharp by default; chamfering done via clip-path utilities
-        sm:   "2px",
-        md:   "2px",
-        lg:   "2px",
-        xl:   "4px",
-        "2xl":"4px",
+        // Neo-brutalism — sharp corners only (or fully round via rounded-full)
+        sm:   "0px",
+        md:   "0px",
+        lg:   "0px",
+        xl:   "0px",
+        "2xl":"0px",
       },
       keyframes: {
         "accordion-down": {
