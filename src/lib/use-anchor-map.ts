@@ -112,11 +112,11 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const pos = sv!.pos || ev!.pos;
           const ratio = Math.max(eVal, sVal) / Math.max(1, Math.min(eVal, sVal));
           if (ratio <= 1.5) {
-            // close enough → average, slight Sleeper lean
-            return { val: sVal * 0.6 + eVal * 0.4, pos };
+            // close enough → 80/20 Sleeper-lean
+            return { val: sVal * 0.8 + eVal * 0.2, pos };
           }
-          // big disagreement: Sleeper wins, ESPN softens by 30%
-          return { val: sVal * 0.7 + eVal * 0.3, pos };
+          // big disagreement: Sleeper wins harder, ESPN brakes lightly
+          return { val: sVal * 0.8 + eVal * 0.2, pos };
         };
 
         // 3) Per-position scaling — uses market consensus instead of just ESPN
