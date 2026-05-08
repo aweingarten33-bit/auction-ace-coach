@@ -8,26 +8,47 @@ import { Loader2, RefreshCw } from "lucide-react";
 interface Player { rank: number; name: string; position: string; team: string; }
 interface RankList { source: string; label: string; position: string; url: string; players: Player[]; }
 
+const CACHE_KEY = "fl_rankings_cache_v2";
+
+function readCache(): { lists: RankList[]; at: number } | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
 export default function FantasyLifeFeed() {
-  const [lists, setLists] = useState<RankList[]>([]);
-  const [active, setActive] = useState<string>("top50");
-  const [loading, setLoading] = useState(true);
+  const cached = typeof window !== "undefined" ? readCache() : null;
+  const [lists, setLists] = useState<RankList[]>(cached?.lists ?? []);
+  const [active, setActive] = useState<string>(cached?.lists?.[0]?.source ?? "qb");
+  const [loading, setLoading] = useState(!cached);
+  const [refreshing, setRefreshing] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
-  const load = async () => {
-    setLoading(true);
+  const load = async (force = false) => {
+    if (force) setRefreshing(true); else if (lists.length === 0) setLoading(true);
     setErr(null);
-    const { data, error } = await supabase.functions.invoke("fantasy-life-rankings", {});
+    const { data, error } = await supabase.functions.invoke(
+      `fantasy-life-rankings${force ? "?refresh=1" : ""}`,
+      {},
+    );
     if (error || (data as any)?.error) {
       setErr((data as any)?.error ?? error?.message ?? "Failed to load");
-      setLoading(false);
-      return;
+    } else {
+      const newLists = ((data as any)?.lists ?? []) as RankList[];
+      setLists(newLists);
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ lists: newLists, at: Date.now() })); } catch { /* ignore */ }
     }
-    setLists((data as any)?.lists ?? []);
     setLoading(false);
+    setRefreshing(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    // Serve cache instantly; only fetch if cache is empty or stale (>6h)
+    const stale = !cached || Date.now() - cached.at > 6 * 60 * 60 * 1000;
+    if (stale) load(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const list = lists.find((l) => l.source === active) ?? lists[0];
   const players = list?.players ?? [];
@@ -36,8 +57,8 @@ export default function FantasyLifeFeed() {
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[11px] text-muted-foreground">FantasyLife rankings</p>
-        <Button variant="ghost" size="sm" onClick={load} disabled={loading} className="h-7 px-2">
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+        <Button variant="ghost" size="sm" onClick={() => load(true)} disabled={refreshing} className="h-7 px-2">
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
         </Button>
       </div>
 
@@ -51,9 +72,7 @@ export default function FantasyLifeFeed() {
               onClick={() => setActive(l.source)}
               className="h-7 px-2 text-[11px]"
             >
-              {l.label} {l.players.length > 0 && (
-                <span className="ml-1 opacity-60">{l.players.length}</span>
-              )}
+              {l.label}
             </Button>
           ))}
         </div>
@@ -85,17 +104,6 @@ export default function FantasyLifeFeed() {
           <p className="py-6 text-center text-xs text-muted-foreground">No players found in this list.</p>
         )}
       </div>
-
-      {list?.url && (
-        <a
-          href={list.url}
-          target="_blank"
-          rel="noreferrer"
-          className="block text-center text-[10px] text-muted-foreground underline-offset-2 hover:underline"
-        >
-          source: fantasylife.com
-        </a>
-      )}
     </div>
   );
 }
