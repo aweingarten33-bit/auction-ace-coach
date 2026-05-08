@@ -160,7 +160,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
         // Stack injury + availability — take the SINGLE LARGEST discount (don't multiply).
         const combinedFactor = (k: string, llm?: { factor: number; reason: string } | null) => {
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const avail = regexAvailability(k);
           const candidates: Array<{ factor: number; reason: string | null }> = [inj, avail];
           if (llm) candidates.push(llm);
@@ -287,7 +287,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
           }
           const preInjury = Math.max(1, Math.round(final));
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
           out[k] = {
             price: finalPrice,
@@ -307,7 +307,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         // 5) VORP — #2 priority for any projected player without league history.
         for (const [k, v] of Object.entries(vorpMap)) {
           if (out[k]) continue;
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(v.price * inj.factor));
           out[k] = {
             price: finalPrice,
@@ -333,7 +333,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
           const effScale = 1 + (rawScale - 1) * fade;
           const adj = Math.max(1, Math.round(mv.val * effScale));
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(adj * inj.factor));
           out[k] = {
             price: finalPrice,
