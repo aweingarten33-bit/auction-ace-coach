@@ -320,38 +320,39 @@
    ===================================================================== */
 @layer base {
   :root {
-    --background: 222 65% 12%;           /* rich navy blue */
+    /* #0d1117 deep navy/near-black */
+    --background: 215 21% 7%;
     --foreground: 210 30% 95%;
-    --card: 222 50% 7%;                  /* near-black */
+    --card: 222 45% 11%;
     --card-foreground: 210 30% 95%;
-    --popover: 222 50% 6%;
+    --popover: 222 45% 9%;
     --popover-foreground: 210 30% 95%;
-    --primary: 45 95% 58%;               /* gold */
+    --primary: 43 74% 56%;               /* gold hsl(43,74%,56%) */
     --primary-foreground: 222 65% 8%;
-    --primary-glow: 45 100% 65%;
-    --secondary: 222 45% 9%;             /* dark navy / black */
+    --primary-glow: 43 80% 64%;
+    --secondary: 222 30% 12%;
     --secondary-foreground: 210 30% 95%;
-    --muted: 222 40% 8%;
-    --muted-foreground: 215 25% 72%;
-    --accent: 45 95% 58%;                /* gold */
+    --muted: 222 25% 11%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 43 74% 56%;
     --accent-foreground: 222 65% 8%;
     --destructive: 0 75% 58%;
     --destructive-foreground: 0 0% 98%;
-    --warning: 45 95% 58%;
+    --warning: 43 74% 56%;
     --warning-foreground: 222 65% 8%;
     --success: 150 45% 52%;
     --success-foreground: 0 0% 98%;
-    --border: 222 50% 22%;
-    --input: 222 45% 9%;
-    --ring: 45 95% 58%;
-    --grid-line: hsl(222 55% 14%);
-    --grid-line-strong: hsl(222 50% 20%);
-    --gradient-card: linear-gradient(180deg, hsl(222 50% 8%), hsl(222 55% 5%));
-    --gradient-primary: linear-gradient(180deg, hsl(45 95% 60%), hsl(42 90% 48%));
-    --shadow-card: 0 1px 0 hsl(45 95% 58% / 0.06) inset, 0 8px 28px -16px hsl(222 80% 2% / 0.85);
-    --shadow-glow: 0 0 0 1px hsl(45 95% 58% / 0.4);
+    --border: 222 30% 18%;
+    --input: 222 30% 11%;
+    --ring: 43 74% 56%;
+    --grid-line: hsl(222 30% 11%);
+    --grid-line-strong: hsl(222 30% 16%);
+    --gradient-card: linear-gradient(135deg, hsl(222 45% 12%), hsl(222 45% 10%));
+    --gradient-primary: linear-gradient(180deg, hsl(43 80% 60%), hsl(43 74% 50%));
+    --shadow-card: 0 1px 0 hsl(43 74% 56% / 0.05) inset, 0 8px 28px -16px hsl(0 0% 0% / 0.9);
+    --shadow-glow: 0 0 0 1px hsl(43 74% 56% / 0.4);
   }
-  .dark { --background: 222 65% 12%; }
+  .dark { --background: 215 21% 7%; }
 }
 
 html, body, #root { background: hsl(var(--background)); }
@@ -359,10 +360,16 @@ body {
   position: relative;
   color: hsl(var(--foreground));
   background:
-    radial-gradient(1200px 800px at 75% -10%, hsl(222 70% 22% / 0.7), transparent 65%),
-    radial-gradient(900px 700px at -10% 110%, hsl(222 75% 18% / 0.6), transparent 65%),
-    linear-gradient(180deg, hsl(222 65% 14%), hsl(222 70% 9%));
+    radial-gradient(1200px 800px at 75% -10%, hsl(222 50% 14% / 0.6), transparent 65%),
+    radial-gradient(900px 700px at -10% 110%, hsl(222 55% 12% / 0.5), transparent 65%),
+    linear-gradient(180deg, hsl(215 21% 8%), hsl(215 25% 5%));
   background-attachment: fixed;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Playfair Display", "Inter", Georgia, serif !important;
+  letter-spacing: -0.01em !important;
 }
 
 /* Fine film grain — subtle, never busy */
