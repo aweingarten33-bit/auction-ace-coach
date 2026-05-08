@@ -228,7 +228,7 @@ export default function DraftRoom() {
 
         {/* ── ICON RAIL ─────────────────────────────────────────── */}
         <div className="relative px-5 pb-4">
-          <div className="-mx-5 px-5 flex gap-7 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          <div className="-mx-5 px-5 flex gap-6 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             {[
               { id: "lookup" as const,      icon: Search,       label: "Find" },
               { id: "top100" as const,      icon: ListOrdered,  label: leagueName ? `${leagueName} Top 50` : "Top 50" },
@@ -239,10 +239,10 @@ export default function DraftRoom() {
                 key={id}
                 type="button"
                 onClick={() => setToolPage(id)}
-                className="flex flex-col items-center gap-2 shrink-0 text-foreground active:opacity-70 transition"
+                className="flex w-[88px] shrink-0 flex-col items-center gap-2 text-foreground active:opacity-70 transition"
               >
                 <Icon strokeWidth={1.25} className="size-9" />
-                <span className="text-[13px] font-normal whitespace-nowrap">{label}</span>
+                <span className="text-center text-[12px] font-normal leading-tight break-words">{label}</span>
               </button>
             ))}
           </div>
