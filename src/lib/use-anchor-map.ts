@@ -315,7 +315,9 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             },
             injuryDiscount: inj.reason
               ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
-              : undefined,
+              : crashReason
+                ? { factor: 1, reason: crashReason, preInjuryPrice: Math.round(leaguePrice) }
+                : undefined,
           };
         }
 
