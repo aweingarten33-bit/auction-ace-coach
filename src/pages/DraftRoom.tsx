@@ -416,29 +416,15 @@ export default function DraftRoom() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ── LEAGUE TITLE BAR — Frank Miller masthead ─────────────── */}
+      {/* ── LEAGUE TITLE ─────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden px-4 py-5 text-center"
-        style={{
-          paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
-          background:
-            "linear-gradient(180deg, hsl(354 72% 18% / 0.55) 0%, hsl(354 72% 10% / 0.25) 60%, transparent 100%)",
-          boxShadow:
-            "inset 0 -1px 0 hsl(38 78% 48% / 0.6), inset 0 -3px 0 hsl(354 72% 36% / 0.5), 0 8px 24px -12px hsl(354 80% 6% / 0.9)",
-        }}
+        className="relative px-5 pt-10 pb-6 text-left"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background:
-              "radial-gradient(60% 80% at 50% 0%, hsl(38 78% 48% / 0.35) 0%, transparent 70%)",
-          }}
-        />
-        <h1 className="relative text-3xl sm:text-4xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
           {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
         </h1>
-        <p className="relative mt-1 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-muted-foreground">
           Auction Draft Assistant
         </p>
       </div>
