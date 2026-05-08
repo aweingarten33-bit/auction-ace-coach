@@ -1,7 +1,8 @@
 // NextTargetCard — research-only suggestion of which position to attack next.
 // Pure derivation from existing engines (gaps, budget shares, prices, market
 // pulse). No bid amounts, no nominate buttons, no per-player advice.
-import { Target } from "lucide-react";
+import { useState } from "react";
+import { Target, ChevronDown, ChevronRight } from "lucide-react";
 import type { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { positionShare } from "@/lib/vetri-tiers";
 import type { MarketPulse } from "@/lib/value";
