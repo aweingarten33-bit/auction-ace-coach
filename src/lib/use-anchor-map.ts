@@ -53,7 +53,8 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         const berryMap = new Map<string, { val: number; pos: string | null }>();
         const blendedMap = new Map<string, { val: number; pos: string | null }>();
         if (blendedRes?.values) {
-          for (const [k, v] of Object.entries(blendedRes.values)) {
+          const entries = Object.entries(blendedRes.values) as Array<[string, { berry: number | null; sleeper: number | null; blended: number; position: string }]>;
+          for (const [k, v] of entries) {
             if (v.berry != null && v.berry > 0) berryMap.set(k, { val: v.berry, pos: v.position });
             if (v.blended > 0) blendedMap.set(k, { val: v.blended, pos: v.position });
           }
