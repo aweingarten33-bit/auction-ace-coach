@@ -702,79 +702,91 @@ export default function DraftRoom() {
         </SheetContent>
       </Sheet>
 
-      {/* ── DICE-style FULLSCREEN TOOL PAGE ─────────────────────────── */}
+      {/* ── DICE-style SLIDE-IN TOOL PANEL (50/50 on desktop, full on mobile) ── */}
       {toolPage && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-background text-foreground">
+        <>
+          {/* backdrop — fades in, click to dismiss */}
           <div
-            className="px-5"
-            style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
+            onClick={() => setToolPage(null)}
+            aria-hidden
+          />
+          {/* panel — slides in from right */}
+          <div
+            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[0_0_60px_rgba(0,0,0,0.6)] overflow-y-auto animate-slide-in-right"
+            style={{ animationDuration: "0.35s", animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
           >
-            <button
-              type="button"
-              onClick={() => setToolPage(null)}
-              aria-label="Back"
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1c1c1c] text-foreground active:scale-95 transition"
+            <div
+              className="px-5"
+              style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}
             >
-              <ChevronLeft className="h-6 w-6" strokeWidth={2} />
-            </button>
-            <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight">
-              {toolPage === "lookup" && "Find"}
-              {toolPage === "top100" && "Top 100"}
-              {toolPage === "afford" && "Afford"}
-              {toolPage === "market" && "Market"}
-              {toolPage === "fantasylife" && "News"}
-            </h1>
-            <p className="mb-6 text-sm text-muted-foreground">
-              {toolPage === "lookup" && "Search any player or dollar amount."}
-              {toolPage === "top100" && "Best-value board, math-backed."}
-              {toolPage === "afford" && "Pressure-test a plan before spending."}
-              {toolPage === "market" && "Room pulse plus opponent scan."}
-              {toolPage === "fantasylife" && "Latest from fantasylife.com."}
-            </p>
-          </div>
+              <button
+                type="button"
+                onClick={() => setToolPage(null)}
+                aria-label="Back"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1c1c1c] text-foreground active:scale-95 hover:bg-[#262626] transition"
+              >
+                <ChevronLeft className="h-6 w-6" strokeWidth={2} />
+              </button>
+              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in">
+                {toolPage === "lookup" && "Find"}
+                {toolPage === "top100" && "Top 100"}
+                {toolPage === "afford" && "Afford"}
+                {toolPage === "market" && "Market"}
+                {toolPage === "fantasylife" && "News"}
+              </h1>
+              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "60ms", animationFillMode: "both" }}>
+                {toolPage === "lookup" && "Search any player or dollar amount."}
+                {toolPage === "top100" && "Best-value board, math-backed."}
+                {toolPage === "afford" && "Pressure-test a plan before spending."}
+                {toolPage === "market" && "Room pulse plus opponent scan."}
+                {toolPage === "fantasylife" && "Latest from fantasylife.com."}
+              </p>
+            </div>
 
-          <div className="px-3 pb-24">
-            {toolPage === "lookup" && (
-              <LookupSection
-                prices={prices}
-                anchorMap={anchorMap}
-                events={events}
-                maxBid={budget.maxBid}
-                onPick={(name) => {
-                  lockToPlayer(name);
-                  setToolPage(null);
-                }}
-              />
-            )}
-            {toolPage === "top100" && (
-              <Top100List
-                prices={prices}
-                anchorMap={anchorMap}
-                events={events}
-                onPick={(name) => {
-                  lockToPlayer(name);
-                  setToolPage(null);
-                }}
-              />
-            )}
-            {toolPage === "afford" && <AffordabilityChecker />}
-            {toolPage === "market" && (
-              <div className="space-y-3">
-                <StealReachCounter events={events} />
-                <MarketHeat
-                  events={events}
+            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "120ms", animationFillMode: "both" }}>
+              {toolPage === "lookup" && (
+                <LookupSection
                   prices={prices}
-                  gaps={gaps}
+                  anchorMap={anchorMap}
+                  events={events}
                   maxBid={budget.maxBid}
-                  remaining={budget.remaining}
-                  pulseMultiplier={pulse.multiplier}
+                  onPick={(name) => {
+                    lockToPlayer(name);
+                    setToolPage(null);
+                  }}
                 />
-                <OpponentHeatmap settings={settings} />
-              </div>
-            )}
-            {toolPage === "fantasylife" && <FantasyLifeFeed />}
+              )}
+              {toolPage === "top100" && (
+                <Top100List
+                  prices={prices}
+                  anchorMap={anchorMap}
+                  events={events}
+                  onPick={(name) => {
+                    lockToPlayer(name);
+                    setToolPage(null);
+                  }}
+                />
+              )}
+              {toolPage === "afford" && <AffordabilityChecker />}
+              {toolPage === "market" && (
+                <div className="space-y-3">
+                  <StealReachCounter events={events} />
+                  <MarketHeat
+                    events={events}
+                    prices={prices}
+                    gaps={gaps}
+                    maxBid={budget.maxBid}
+                    remaining={budget.remaining}
+                    pulseMultiplier={pulse.multiplier}
+                  />
+                  <OpponentHeatmap settings={settings} />
+                </div>
+              )}
+              {toolPage === "fantasylife" && <FantasyLifeFeed />}
+            </div>
           </div>
-        </div>
+        </>
       )}
 
     </div>
