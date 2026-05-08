@@ -40,7 +40,16 @@ export default function ClaimTeam() {
       }
       // Pull live league teams from ESPN via the existing sync function.
       const { data, error } = await supabase.functions.invoke("espn-sync");
-      if (error) {
+      const errMsg =
+        (data && typeof data === "object" && "error" in data ? (data as any).error : null) ||
+        error?.message ||
+        null;
+      if (errMsg) {
+        if (String(errMsg).toLowerCase().includes("no league configured")) {
+          toast.message("Connect ESPN to continue.");
+          nav("/espn", { replace: true });
+          return;
+        }
         toast.error("Couldn't load league teams. Ask the league admin to connect ESPN.");
         setLoading(false);
         return;
