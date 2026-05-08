@@ -288,6 +288,11 @@ export default function DraftRoom() {
             />
           )}
 
+          {/* Last imported pick — before/after delta */}
+          {events.length > 0 && (
+            <LastPickImpact settings={settings} keepers={keepers} events={events} />
+          )}
+
           {/* Personalized 3-year drafting trends */}
           {selectedTeam && (
             <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
