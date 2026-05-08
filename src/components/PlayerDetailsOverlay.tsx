@@ -20,6 +20,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   name: string;
   position?: Position;
+  leagueName?: string;
   // Auction research data
   sheetPrice?: number;        // user's price sheet
   anchor?: AnchorEntry;       // blended league/ESPN anchor
