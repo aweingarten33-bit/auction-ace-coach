@@ -793,6 +793,15 @@ function DrawerContents({
 
       {section === "menu" && (
         <div className="flex-1 overflow-y-auto">
+          <div className="border-b border-border/40 px-4 py-3">
+            <MoneyHero
+              remaining={budget.remaining}
+              total={budget.totalBudget}
+              showMax={budget.maxBid > 0}
+              maxBid={budget.maxBid}
+              slotsLeft={budget.slotsLeft}
+            />
+          </div>
           <div className="space-y-1 p-3">
             {sections.map((s) => (
               <button
