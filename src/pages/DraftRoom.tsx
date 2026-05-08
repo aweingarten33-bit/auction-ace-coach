@@ -72,7 +72,7 @@ import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
-import RedditBuzz from "@/components/RedditBuzz";
+
 import AffordabilityChecker from "@/components/AffordabilityChecker";
 import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
@@ -700,7 +700,7 @@ function DrawerContents({
   onUnpin,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "top100" | "afford" | "market" | "reddit"
+    "menu" | "lookup" | "top100" | "afford" | "market"
   >("menu");
 
   void activeName;
@@ -712,7 +712,6 @@ function DrawerContents({
     { id: "top100" as const, label: "Top 100 · math-backed $", icon: ListOrdered, hint: "Best-value board, blended anchors." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
-    { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live r/fantasyfootball threads." },
   ];
 
   return (
@@ -731,7 +730,7 @@ function DrawerContents({
             </Button>
           )}
           <span className="capitalize">
-            {section === "menu" ? "Menu" : section === "reddit" ? "Reddit buzz" : section}
+            {section === "menu" ? "Menu" : section}
           </span>
         </SheetTitle>
       </SheetHeader>
@@ -850,11 +849,6 @@ function DrawerContents({
         </div>
       )}
 
-      {section === "reddit" && (
-        <div className="flex-1 overflow-y-auto p-3">
-          <RedditBuzz />
-        </div>
-      )}
 
     </SheetContent>
   );
