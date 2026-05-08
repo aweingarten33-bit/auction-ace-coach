@@ -138,22 +138,40 @@ export function useVorpMap(settings: LeagueSettings): {
       WR: { dollars: 0, vorp: 0, n: 0 }, TE: { dollars: 0, vorp: 0, n: 0 },
       K:  { dollars: 0, vorp: 0, n: 0 }, DST:{ dollars: 0, vorp: 0, n: 0 },
     };
-    // average $ across seasons per player first
-    const playerSeasons = new Map<string, { bids: number[]; pos: Position | null }>();
+    // Recency-weighted bid per player with decline detection.
+    // Mirrors useAnchorMap's weightedLeague: if last year's bid dropped >15%
+    // vs prior year, weight the most recent year at 80% so fades (e.g. CMC)
+    // are captured rather than smoothed away.
+    const playerSeasons = new Map<string, { bids: Map<number, number>; pos: Position | null }>();
     for (const h of hist) {
       const k = norm(h.name);
-      const cur = playerSeasons.get(k) ?? { bids: [], pos: h.position };
-      cur.bids.push(h.bid);
+      const cur = playerSeasons.get(k) ?? { bids: new Map<number, number>(), pos: h.position };
+      cur.bids.set(h.season, h.bid);
       if (!cur.pos) cur.pos = h.position;
       playerSeasons.set(k, cur);
     }
+    const weightedBid = (bySeason: Map<number, number>): number => {
+      const seasons = Array.from(bySeason.entries()).sort((a, b) => b[0] - a[0]);
+      if (seasons.length === 0) return 0;
+      if (seasons.length === 1) return seasons[0][1];
+      const last = seasons[0][1];
+      const prev = seasons[1][1];
+      const declined = prev > 0 && last < prev * 0.85;
+      if (seasons.length === 2) {
+        return declined ? last * 0.8 + prev * 0.2 : last * 0.65 + prev * 0.35;
+      }
+      const olderAvg = seasons.slice(2).reduce((s, [, v]) => s + v, 0) / (seasons.length - 2);
+      return declined
+        ? last * 0.8 + prev * 0.15 + olderAvg * 0.05
+        : last * 0.5 + prev * 0.3 + olderAvg * 0.2;
+    };
     for (const [k, v] of playerSeasons) {
       const proj = projByName.get(k);
       if (!proj || proj.vorp <= 0) continue;
-      const avgBid = v.bids.reduce((s, b) => s + b, 0) / v.bids.length;
-      if (avgBid < 2) continue; // ignore $1 endgame
+      const wBid = weightedBid(v.bids);
+      if (wBid < 2) continue; // ignore $1 endgame
       const pos = proj.pos;
-      posAgg[pos].dollars += avgBid - 1; // surplus over min
+      posAgg[pos].dollars += wBid - 1; // surplus over min
       posAgg[pos].vorp += proj.vorp;
       posAgg[pos].n += 1;
     }
