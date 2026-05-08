@@ -60,6 +60,7 @@ import EspnSyncStatus from "@/components/EspnSyncStatus";
 import LiveBidStrip from "@/components/LiveBidStrip";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import RosterHero, { SlotRow, BestTarget } from "@/components/RosterHero";
+import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { useLeagueBenchPrices } from "@/lib/league-bench-prices";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { computeMarketPulse, valueFor as computeValueFor, whatIfPick } from "@/lib/value";
@@ -804,6 +805,7 @@ Keep it tight. No fluff, no closing line.`;
               toast(`${name} loaded — best next target`);
             }}
           />
+          <PositionBudgetBar />
           <NominationCard
             drain={computeDrain({ settings, keepers, events, prices })}
             get={computeGet({ settings, keepers, events, prices })}
