@@ -317,12 +317,36 @@ export default function AuctionPlayerCard({
         </div>
       </div>
 
-      {/* ── CONTENT SECTIONS — placeholders to design together ── */}
+      {/* ── CONTENT SECTIONS — personalized to your roster ── */}
       <div className="space-y-2 p-3">
-        <Section label={`Why draft ${firstName}`} placeholder />
-        <Section label="Path to smash" placeholder />
-        <Section label="Risk factors" placeholder />
-        <Section label="Bottom line" placeholder />
+        {myGap && (
+          <div className="flex items-center justify-between rounded bg-[#1b2238] px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#f5efe4]">
+            <span>Your need</span>
+            <span className={
+              need === "critical" ? "text-[#ff7a59]" :
+              need === "need" ? "text-[#f5b339]" :
+              need === "depth" ? "text-[#f5efe4]" : "text-[#f5efe4]/60"
+            }>{needLabel[need]}</span>
+          </div>
+        )}
+        {valueVerdict && (
+          <div className="flex items-center justify-between rounded border-2 border-[#1b2238] bg-[#f5efe4] px-2.5 py-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#1b2238]/70">
+              Price vs market
+            </span>
+            <span className={
+              "font-mono text-sm font-black " +
+              (valueVerdict === "VALUE" ? "text-emerald-700" :
+               valueVerdict === "OVERPAY" ? "text-rose-700" : "text-[#1b2238]")
+            }>
+              {valueVerdict} ({delta! >= 0 ? "+" : ""}${delta})
+            </span>
+          </div>
+        )}
+        <Section label={`Why draft ${firstName}`} body={whyParts} />
+        <Section label="Path to smash" body={pathParts} />
+        <Section label="Risk factors" body={riskParts} tone="warning" />
+        <Section label="Bottom line" body={bottomParts} tone="bold" />
       </div>
 
       {/* ── FOOTER ─────────────────────────────────────── */}
