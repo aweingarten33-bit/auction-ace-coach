@@ -128,91 +128,92 @@
     --shadow-brut-xl:    var(--neu-extruded-hover);
 
     /* Sidebar */
-    --sidebar-background: 218 23% 90%;
-    --sidebar-foreground: 212 16% 28%;
-    --sidebar-primary: 245 100% 69%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 218 23% 90%;
-    --sidebar-accent-foreground: 212 16% 28%;
+    --sidebar-background: 220 24% 89%;
+    --sidebar-foreground: 222 44% 18%;
+    --sidebar-primary: 222 44% 26%;
+    --sidebar-primary-foreground: 40 35% 92%;
+    --sidebar-accent: 220 24% 89%;
+    --sidebar-accent-foreground: 222 44% 18%;
     --sidebar-border: transparent;
-    --sidebar-ring: 245 100% 69%;
+    --sidebar-ring: 222 44% 26%;
   }
 
   .dark {
-    /* Dark neumorphism — same physics, inverted lighting (still TL light, BR dark, but tuned for dark surface) */
-    --background:        220 13% 14%;        /* #1F2329 */
-    --background-alt:    220 13% 14%;
-    --foreground:        218 27% 88%;
-    --muted-bg:          220 13% 14%;
+    /* DARK — "Returns" night sky. Deep midnight-navy clay,
+       warm bone foreground, ochre + maroon accents. */
+    --background:        222 40% 11%;        /* deep midnight navy */
+    --background-alt:    222 40% 11%;
+    --foreground:        40 35% 88%;         /* warm bone */
+    --muted-bg:          222 40% 11%;
 
-    --card:              220 13% 14%;
-    --card-foreground:   218 27% 88%;
-    --popover:           220 13% 14%;
-    --popover-foreground:218 27% 88%;
+    --card:              222 40% 11%;
+    --card-foreground:   40 35% 88%;
+    --popover:           222 40% 11%;
+    --popover-foreground:40 35% 88%;
 
-    --primary:           245 100% 74%;
-    --primary-foreground: 220 13% 10%;
-    --primary-glow:      243 100% 80%;
+    --primary:           36 60% 58%;         /* lifted ochre */
+    --primary-foreground: 222 40% 8%;
+    --primary-glow:      36 70% 68%;
 
-    --secondary:         220 13% 14%;
-    --secondary-foreground: 218 27% 88%;
-    --muted:             220 13% 14%;
-    --muted-foreground:  218 12% 62%;
+    --secondary:         222 40% 11%;
+    --secondary-foreground: 40 35% 88%;
+    --muted:             222 40% 11%;
+    --muted-foreground:  220 15% 62%;
 
-    --accent:            245 100% 74%;
-    --accent-foreground: 220 13% 10%;
-    --accent-secondary:  176 56% 56%;
+    --accent:            36 60% 58%;
+    --accent-foreground: 222 40% 8%;
+    --accent-secondary:  350 55% 52%;        /* lifted maroon */
 
-    --destructive:       0 75% 65%;
-    --destructive-foreground: 0 0% 100%;
-    --warning:           38 92% 60%;
-    --success:           176 56% 56%;
+    --destructive:       350 55% 52%;
+    --destructive-foreground: 40 35% 92%;
+    --warning:           36 80% 60%;
+    --success:           36 60% 58%;
 
     --border:            transparent;
-    --input:             220 13% 14%;
-    --ring:              245 100% 74%;
+    --input:             222 40% 11%;
+    --ring:              36 60% 58%;
 
-    --surface:           220 13% 14%;
-    --surface-2:         220 13% 14%;
-    --shadow-light-rgb:  62, 70, 84;          /* lifted highlight (cool) */
-    --shadow-dark-rgb:   8, 10, 14;           /* deep cast shadow */
+    --surface:           222 40% 11%;
+    --surface-2:         222 40% 11%;
+    /* Highlight = a touch of cool steel-navy lift. Shadow = ink. */
+    --shadow-light-rgb:  56, 70, 100;
+    --shadow-dark-rgb:   4, 6, 12;
 
-    /* Recompose recipes for dark */
-    --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.7),
-                         -9px -9px 16px rgba(var(--shadow-light-rgb), 0.55);
-    --neu-extruded-hover: 12px 12px 20px rgba(var(--shadow-dark-rgb), 0.8),
-                          -12px -12px 20px rgba(var(--shadow-light-rgb), 0.65);
-    --neu-extruded-sm:   5px 5px 10px rgba(var(--shadow-dark-rgb), 0.7),
-                         -5px -5px 10px rgba(var(--shadow-light-rgb), 0.5);
-    --neu-inset:         inset 6px 6px 10px rgba(var(--shadow-dark-rgb), 0.7),
-                         inset -6px -6px 10px rgba(var(--shadow-light-rgb), 0.5);
-    --neu-inset-deep:    inset 10px 10px 20px rgba(var(--shadow-dark-rgb), 0.85),
-                         inset -10px -10px 20px rgba(var(--shadow-light-rgb), 0.55);
-    --neu-inset-sm:      inset 3px 3px 6px rgba(var(--shadow-dark-rgb), 0.7),
-                         inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.75),
+                         -9px -9px 16px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-extruded-hover: 12px 12px 20px rgba(var(--shadow-dark-rgb), 0.85),
+                          -12px -12px 20px rgba(var(--shadow-light-rgb), 0.6);
+    --neu-extruded-sm:   5px 5px 10px rgba(var(--shadow-dark-rgb), 0.75),
+                         -5px -5px 10px rgba(var(--shadow-light-rgb), 0.45);
+    --neu-inset:         inset 6px 6px 10px rgba(var(--shadow-dark-rgb), 0.75),
+                         inset -6px -6px 10px rgba(var(--shadow-light-rgb), 0.45);
+    --neu-inset-deep:    inset 10px 10px 20px rgba(var(--shadow-dark-rgb), 0.9),
+                         inset -10px -10px 20px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-inset-sm:      inset 3px 3px 6px rgba(var(--shadow-dark-rgb), 0.75),
+                         inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.45);
 
-    /* Legacy aliases re-mapped for dark */
-    --bone:              218 27% 88%;
-    --paper:             218 12% 62%;
-    --void:              220 13% 14%;
-    --ink:               220 13% 14%;
-    --charcoal:          220 13% 14%;
-    --gunmetal:          220 13% 14%;
-    --blood:             0 75% 65%;
-    --signal-red:        0 75% 65%;
-    --dirty-gold:        245 100% 74%;
-    --warning-yellow:    38 92% 60%;
-    --parchment:         218 27% 88%;
-    --ink-faded:         218 12% 62%;
-    --steel:             218 12% 62%;
+    /* Legacy aliases re-mapped for dark suit */
+    --bone:              40 35% 88%;
+    --paper:             220 15% 62%;
+    --void:              222 40% 11%;
+    --ink:               222 40% 11%;
+    --charcoal:          222 40% 11%;
+    --gunmetal:          222 40% 11%;
+    --blood:             350 55% 52%;
+    --signal-red:        350 55% 52%;
+    --dirty-gold:        36 60% 58%;
+    --warning-yellow:    36 80% 60%;
+    --parchment:         40 35% 88%;
+    --ink-faded:         220 15% 62%;
+    --steel:             220 15% 62%;
 
-    --sidebar-background: 220 13% 14%;
-    --sidebar-foreground: 218 27% 88%;
-    --sidebar-primary: 245 100% 74%;
-    --sidebar-primary-foreground: 220 13% 10%;
-    --sidebar-accent: 220 13% 14%;
-    --sidebar-accent-foreground: 218 27% 88%;
-    --sidebar-ring: 245 100% 74%;
+    --sidebar-background: 222 40% 11%;
+    --sidebar-foreground: 40 35% 88%;
+    --sidebar-primary: 36 60% 58%;
+    --sidebar-primary-foreground: 222 40% 8%;
+    --sidebar-accent: 222 40% 11%;
+    --sidebar-accent-foreground: 40 35% 88%;
+    --sidebar-ring: 36 60% 58%;
   }
 
   * { border-color: transparent; }
