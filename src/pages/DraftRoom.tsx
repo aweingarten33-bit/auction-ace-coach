@@ -529,6 +529,10 @@ export default function DraftRoom() {
             anchor={anchor}
             posRank={posRank}
             totalAtPos={totalAtPos}
+            remaining={budget.remaining}
+            maxBid={budget.maxBid}
+            slotsLeft={budget.slotsLeft}
+            gaps={gaps}
           />
         );
       })()}
