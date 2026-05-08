@@ -392,16 +392,16 @@ body::after {
 
 #root > * { position: relative; z-index: 1; }
 
-/* Typography — restrained serif/sans, no comic */
+/* Typography — Playfair Display headings, Inter body */
 h1, h2, h3, h4 {
-  font-family: "Inter", "Helvetica Neue", sans-serif !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.02em !important;
+  font-family: "Playfair Display", Georgia, serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
   text-transform: none !important;
   text-shadow: none !important;
   color: hsl(var(--foreground)) !important;
 }
-h1 { font-weight: 700 !important; letter-spacing: -0.03em !important; }
+h1 { font-weight: 900 !important; letter-spacing: -0.02em !important; }
 
 /* Cards — dark glass panels, thin hairline border */
 .rounded-lg.border, .rounded-md.border, .rounded-xl.border,
