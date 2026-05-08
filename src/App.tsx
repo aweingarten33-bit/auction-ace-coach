@@ -6,7 +6,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
-import WarRoom from "./pages/WarRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
 import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -50,17 +49,7 @@ function PublicGate({ children }: { children: JSX.Element }) {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      {/* Global SVG filter — spray-paint stencil edges via turbulence + displacement */}
-      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
-        <filter id="banksy-rough">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
-          <feDisplacementMap in="SourceGraphic" scale="1.4" />
-        </filter>
-        <filter id="banksy-rough-strong">
-          <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="7" />
-          <feDisplacementMap in="SourceGraphic" scale="2.5" />
-        </filter>
-      </svg>
+      
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -74,7 +63,6 @@ const App = () => (
 
               {/* New home page when setup is complete */}
               <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
-              <Route path="/war-room" element={<WarRoom />} />
 
               {/* Setup wizard — accessible from drawer */}
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />

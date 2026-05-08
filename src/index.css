@@ -1,93 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Anton&family=Stardos+Stencil:wght@400;700&family=Special+Elite&family=VT323&family=Roboto+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   BANKSY × FANTASY FOOTBALL
-   Stencil grit. Concrete walls. Spray paint at 2 AM.
-   Monochrome wet-asphalt base + turf green / penalty orange / flag red.
+   NEUMORPHISM — Soft UI
+   Cool clay surface. All depth lives in shadow play.
+   Single material, molded — never placed.
    ===================================================================== */
 
 @layer base {
   :root {
-    --background: 0 0% 5%;              /* #0D0D0D locker room void */
-    --foreground: 60 11% 95%;           /* #F5F5F0 chalk line, dirty white */
+    /* Cool monochromatic surface. HSL of #E0E5EC */
+    --background: 216 19% 90%;
+    --foreground: 213 14% 28%;          /* #3D4852 */
 
-    --card: 0 0% 8%;                    /* #141414 wheat-paste poster */
-    --card-foreground: 60 11% 95%;
+    --card: 216 19% 90%;                /* same as bg — molded, not placed */
+    --card-foreground: 213 14% 28%;
 
-    --popover: 0 0% 5%;
-    --popover-foreground: 60 11% 95%;
+    --popover: 216 19% 90%;
+    --popover-foreground: 213 14% 28%;
 
-    --primary: 111 100% 54%;            /* #39FF14 RADIOACTIVE turf — pushed two stops */
-    --primary-foreground: 0 0% 5%;
-    --primary-glow: 111 100% 65%;
+    --primary: 244 100% 70%;            /* #6C63FF soft violet */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 244 100% 76%;       /* #8B84FF */
 
-    --secondary: 16 100% 50%;           /* #FF4500 penalty flag — hot, immediate */
-    --secondary-foreground: 0 0% 5%;
+    --secondary: 216 19% 90%;           /* matches bg — neumorphic secondary */
+    --secondary-foreground: 213 14% 28%;
 
-    --muted: 0 0% 33%;                  /* #555555 old tape, washed jersey */
-    --muted-foreground: 0 0% 60%;
+    --muted: 216 19% 90%;
+    --muted-foreground: 220 9% 46%;     /* #6B7280 — WCAG AA */
 
-    --accent: 348 83% 47%;              /* #DC143C BLOOD — fresh, wet */
-    --accent-foreground: 60 11% 95%;
+    --accent: 175 51% 46%;              /* #38B2AC teal — success/positive */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 348 83% 47%;
-    --destructive-foreground: 60 11% 95%;
+    --destructive: 0 72% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 16 100% 50%;
-    --warning-foreground: 0 0% 5%;
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
 
-    --success: 111 100% 54%;
-    --success-foreground: 0 0% 5%;
+    --success: 175 51% 46%;
+    --success-foreground: 0 0% 100%;
 
-    /* extended palette — sweat (championship gold), bruise (IR purple), rust (chain-link) */
-    --sweat: 46 65% 52%;                /* #D4AF37 dirty championship gold */
-    --sweat-foreground: 0 0% 5%;
-    --bruise: 275 100% 25%;             /* #4B0082 IR / concussion protocol */
-    --bruise-foreground: 60 11% 95%;
-    --rust: 25 60% 31%;                 /* #8B4513 chain-link decay */
-    --concrete: 0 0% 11%;               /* #1C1C1C the tunnel */
+    --border: 216 19% 90%;              /* invisible — shadows define edges */
+    --input: 216 19% 90%;
+    --ring: 244 100% 70%;
 
-    --border: 0 0% 13%;                 /* #222222 hairline separation */
-    --input: 0 0% 8%;
-    --ring: 111 100% 54%;
+    --radius: 1rem;                     /* 16px base — soft pillows */
 
-    --radius: 0px;                      /* sharp. cut. torn. */
+    /* ── SHADOW SYSTEM — RGBA for smooth blending ─────────────────── */
+    --neu-light: 255, 255, 255;
+    --neu-dark:  163, 177, 198;
 
-    /* hard offset shadows — stadium light from upper-left, no blur */
-    --shadow-stencil: 6px 6px 0px hsl(111 100% 54% / 0.45);
-    --shadow-spray: 6px 6px 0px hsl(16 100% 50% / 0.4);
-    --shadow-depth: 8px 8px 0px hsl(0 0% 0% / 0.95);
-    --shadow-card: 6px 6px 0px hsl(0 0% 0% / 0.9);
-    --shadow-card-hover: 3px 3px 0px hsl(0 0% 0% / 0.9);
-    --shadow-glow: 8px 8px 0px hsl(0 0% 0% / 0.9), 0 0 30px hsl(111 100% 54% / 0.18);
-    --shadow-flag: 6px 6px 0px hsl(348 83% 47% / 0.5);
-    --shadow-blood: 8px 8px 0px hsl(0 0% 0% / 0.9), 0 0 30px hsl(348 83% 47% / 0.2);
+    --shadow-extruded:       9px 9px 16px rgba(var(--neu-dark), 0.6),  -9px -9px 16px rgba(var(--neu-light), 0.5);
+    --shadow-extruded-hover: 12px 12px 20px rgba(var(--neu-dark), 0.7), -12px -12px 20px rgba(var(--neu-light), 0.6);
+    --shadow-extruded-sm:    5px 5px 10px rgba(var(--neu-dark), 0.6),  -5px -5px 10px rgba(var(--neu-light), 0.5);
+    --shadow-inset:          inset 6px 6px 10px rgba(var(--neu-dark), 0.6),  inset -6px -6px 10px rgba(var(--neu-light), 0.5);
+    --shadow-inset-deep:     inset 10px 10px 20px rgba(var(--neu-dark), 0.7), inset -10px -10px 20px rgba(var(--neu-light), 0.6);
+    --shadow-inset-sm:       inset 3px 3px 6px rgba(var(--neu-dark), 0.6),   inset -3px -3px 6px rgba(var(--neu-light), 0.5);
 
-    --gradient-primary: linear-gradient(135deg, hsl(111 100% 54%), hsl(111 100% 42%));
-
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 60 11% 95%;
-    --sidebar-primary: 111 100% 54%;
-    --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 8%;
-    --sidebar-accent-foreground: 60 11% 95%;
-    --sidebar-border: 0 0% 13%;
-    --sidebar-ring: 111 100% 54%;
+    --sidebar-background: 216 19% 90%;
+    --sidebar-foreground: 213 14% 28%;
+    --sidebar-primary: 244 100% 70%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 216 19% 90%;
+    --sidebar-accent-foreground: 213 14% 28%;
+    --sidebar-border: 216 19% 90%;
+    --sidebar-ring: 244 100% 70%;
   }
 
-  .dark { /* same — only dark exists */ }
+  .dark { /* Neumorphism is a single-mode system; alias dark to light. */ }
 
-  * { @apply border-border; }
+  * {
+    @apply border-border;
+    border-color: transparent; /* shadows do the work */
+  }
 
   html {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
     font-size: 16px;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -95,372 +91,44 @@
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
-    position: relative;
   }
 
-  /* ── GLOBAL TEXTURE STACK ────────────────────────────────────────────
-     1. concrete grain (multiply)
-     2. spray-paint splatter
-     3. CCTV scan lines
-     4. yard-line vertical markers
-  ────────────────────────────────────────────────────────────────────── */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9998;
-    mix-blend-mode: multiply;
-    opacity: 0.7;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    background-size: 240px 240px;
-  }
-
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.22;
-    background-image:
-      /* CCTV scan lines — every 3px */
-      repeating-linear-gradient(
-        to bottom,
-        transparent 0px,
-        transparent 2px,
-        hsl(0 0% 0% / 0.55) 3px,
-        transparent 4px
-      ),
-      /* yard-line markers — every 10vw */
-      repeating-linear-gradient(
-        to right,
-        transparent 0,
-        transparent calc(10vw - 1px),
-        hsl(60 11% 95% / 0.05) calc(10vw - 1px),
-        hsl(60 11% 95% / 0.05) 10vw
-      ),
-      /* spray splatter — turf, penalty, blood, bruise, sweat */
-      radial-gradient(circle at 8% 14%, hsl(111 100% 54% / 0.14) 0, transparent 70px),
-      radial-gradient(circle at 88% 22%, hsl(16 100% 50% / 0.12) 0, transparent 90px),
-      radial-gradient(circle at 24% 72%, hsl(348 83% 47% / 0.11) 0, transparent 100px),
-      radial-gradient(circle at 72% 56%, hsl(275 100% 25% / 0.10) 0, transparent 110px),
-      radial-gradient(circle at 94% 90%, hsl(46 65% 52% / 0.09) 0, transparent 80px),
-      radial-gradient(circle at 4% 92%, hsl(111 100% 54% / 0.10) 0, transparent 70px),
-      /* heavy corner vignette — disappearing into the tunnel */
-      radial-gradient(ellipse at center, transparent 45%, hsl(0 0% 5% / 0.85) 100%);
-  }
-
-  h1, h2, h3, h4 {
-    font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
-    line-height: 0.9;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Plus Jakarta Sans", "DM Sans", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     color: hsl(var(--foreground));
   }
-  h1 {
-    letter-spacing: -0.02em;
-    text-shadow:
-      2px 0 0 hsl(111 100% 54% / 0.25),
-      -2px 0 0 hsl(111 100% 54% / 0.25),
-      0 0 14px hsl(111 100% 54% / 0.35);
-  }
-  h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
-  h3 { font-size: clamp(1.25rem, 2.4vw, 1.75rem); }
-
-  /* numerics + scoreboard */
-  .font-mono, code, kbd, pre, samp, .tabular-nums, [class*="tabular"] {
-    font-family: "Roboto Mono", "VT323", ui-monospace, monospace;
-    font-feature-settings: "tnum";
-    letter-spacing: 0;
-  }
+  h1 { font-weight: 800; }
 
   ::selection {
-    background: hsl(111 100% 54% / 0.85);
-    color: hsl(0 0% 5%);
+    background: hsl(244 100% 70% / 0.25);
+    color: hsl(213 14% 20%);
   }
 }
 
 @layer utilities {
+  /* ── Neumorphic shadow utilities ──────────────────────────────── */
+  .shadow-neu             { box-shadow: var(--shadow-extruded); }
+  .shadow-neu-hover       { box-shadow: var(--shadow-extruded-hover); }
+  .shadow-neu-sm          { box-shadow: var(--shadow-extruded-sm); }
+  .shadow-neu-inset       { box-shadow: var(--shadow-inset); }
+  .shadow-neu-inset-deep  { box-shadow: var(--shadow-inset-deep); }
+  .shadow-neu-inset-sm    { box-shadow: var(--shadow-inset-sm); }
 
-  /* ── STENCIL TYPE: spray-paint bleed via SVG turbulence ───────────── */
-  .stencil {
-    font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    filter: url(#banksy-rough);
-  }
-  .stencil-stardos {
-    font-family: "Stardos Stencil", "Special Elite", monospace;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    filter: url(#banksy-rough);
-  }
+  .font-display { font-family: "Plus Jakarta Sans", "DM Sans", sans-serif; }
+  .font-body    { font-family: "DM Sans", sans-serif; }
 
-  /* overspray halo — fresh paint still wet, pushed two stops */
-  .overspray-green {
-    text-shadow:
-      2px 0 0 hsl(111 100% 54% / 0.35),
-      -2px 0 0 hsl(111 100% 54% / 0.35),
-      0 0 10px hsl(111 100% 54% / 0.55),
-      0 0 22px hsl(111 100% 54% / 0.3);
+  /* Floating ambient motion */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
   }
-  .overspray-orange {
-    text-shadow:
-      2px 0 0 hsl(16 100% 50% / 0.35),
-      -2px 0 0 hsl(16 100% 50% / 0.35),
-      0 0 10px hsl(16 100% 50% / 0.55),
-      0 0 22px hsl(16 100% 50% / 0.3);
-  }
-  .overspray-red {
-    text-shadow:
-      2px 0 0 hsl(348 83% 47% / 0.35),
-      -2px 0 0 hsl(348 83% 47% / 0.35),
-      0 0 10px hsl(348 83% 47% / 0.55),
-      0 0 22px hsl(348 83% 47% / 0.3);
-  }
-  .overspray-sweat {
-    text-shadow:
-      0 0 10px hsl(46 65% 52% / 0.55),
-      0 0 22px hsl(46 65% 52% / 0.3);
-  }
-  .overspray-bruise {
-    text-shadow:
-      0 0 10px hsl(275 100% 25% / 0.7),
-      0 0 22px hsl(275 100% 25% / 0.4);
-  }
-
-  /* color utilities for extended palette */
-  .text-blood    { color: hsl(348 83% 47%); }
-  .text-sweat    { color: hsl(46 65% 52%); }
-  .text-bruise   { color: hsl(275 100% 25%); }
-  .text-rust     { color: hsl(25 60% 31%); }
-  .text-chalk    { color: hsl(60 11% 95%); }
-  .text-turf     { color: hsl(111 100% 54%); }
-  .text-penalty  { color: hsl(16 100% 50%); }
-  .bg-blood      { background-color: hsl(348 83% 47%); }
-  .bg-sweat      { background-color: hsl(46 65% 52%); }
-  .bg-bruise     { background-color: hsl(275 100% 25%); }
-  .bg-locker     { background-color: hsl(0 0% 5%); }
-  .bg-concrete   { background-color: hsl(0 0% 11%); }
-  .border-blood   { border-color: hsl(348 83% 47%); }
-  .border-sweat   { border-color: hsl(46 65% 52%); }
-  .border-bruise  { border-color: hsl(275 100% 25%); }
-  .border-rust    { border-color: hsl(25 60% 31%); }
-  .border-turf    { border-color: hsl(111 100% 54%); }
-  .border-penalty { border-color: hsl(16 100% 50%); }
-
-  /* hard offset shadows */
-  .shadow-stencil   { box-shadow: var(--shadow-stencil); }
-  .shadow-spray     { box-shadow: var(--shadow-spray); }
-  .shadow-depth     { box-shadow: var(--shadow-depth); }
-  .shadow-card      { box-shadow: var(--shadow-card); }
-  .shadow-flag      { box-shadow: var(--shadow-flag); }
-  .shadow-glow      { box-shadow: var(--shadow-glow); }
-  .shadow-blood     { box-shadow: var(--shadow-blood); }
-
-  /* press-down stencil interaction */
-  .press-stencil {
-    transition: transform 75ms steps(2), box-shadow 75ms steps(2);
-  }
-  .press-stencil:hover {
-    transform: translate(2px, 2px);
-    box-shadow: var(--shadow-card-hover);
-  }
-  .press-stencil:active {
-    transform: translate(4px, 4px);
-    box-shadow: 0 0 0 hsl(0 0% 0% / 0);
-  }
-
-  /* torn paper edges */
-  .torn-edge {
-    clip-path: polygon(
-      0 4%, 4% 0, 22% 3%, 38% 0, 56% 2%, 74% 0, 92% 3%, 100% 0,
-      98% 22%, 100% 44%, 97% 66%, 100% 88%, 98% 100%,
-      80% 97%, 60% 100%, 40% 98%, 22% 100%, 4% 97%, 0 100%,
-      2% 78%, 0 56%, 3% 34%, 0 12%
-    );
-  }
-  .torn-corner {
-    clip-path: polygon(0 0, 100% 4%, 98% 100%, 2% 96%);
-  }
-  .torn-top {
-    clip-path: polygon(0 6%, 6% 0, 16% 4%, 28% 1%, 42% 5%, 58% 0, 72% 4%, 86% 1%, 100% 5%, 100% 100%, 0 100%);
-  }
-
-  /* paint drip — apply to ::after with content drip */
-  .paint-drip-green::after {
-    content: "";
-    position: absolute;
-    left: 30%;
-    top: 100%;
-    width: 2px;
-    height: 14px;
-    background: hsl(127 65% 49%);
-    opacity: 0.85;
-  }
-
-  /* concrete subtle on cards */
-  .concrete-grain {
-    position: relative;
-  }
-  .concrete-grain::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.35;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.4 0'/></filter><rect width='100%25' height='100%25' filter='url(%23c)'/></svg>");
-  }
-
-  /* "PROPERTY OF" / barcode strips */
-  .property-stamp {
-    display: inline-block;
-    padding: 2px 6px;
-    font-family: "Stardos Stencil", "Special Elite", monospace;
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: hsl(3 100% 60%);
-    border: 1.5px solid hsl(3 100% 60%);
-    transform: rotate(-3deg);
-    opacity: 0.85;
-  }
-  .barcode {
-    background-image: repeating-linear-gradient(
-      to right,
-      hsl(0 0% 91%) 0, hsl(0 0% 91%) 1px,
-      transparent 1px, transparent 3px,
-      hsl(0 0% 91%) 3px, hsl(0 0% 91%) 5px,
-      transparent 5px, transparent 6px,
-      hsl(0 0% 91%) 6px, hsl(0 0% 91%) 9px,
-      transparent 9px, transparent 11px
-    );
-  }
-
-  /* CCTV blink */
-  @keyframes cctv-blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
-  }
-  .cctv-blink::before {
-    content: "● ";
-    color: hsl(3 100% 60%);
-    animation: cctv-blink 1s steps(2) infinite;
-  }
-
-  /* SLAM IN — hard cut entrance */
-  @keyframes slam-in-left {
-    0% { transform: translateX(-30px); opacity: 0; }
-    60% { transform: translateX(-30px); opacity: 0; }
-    61% { transform: translateX(0); opacity: 1; }
-    100% { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes slam-in-right {
-    0% { transform: translateX(30px); opacity: 0; }
-    60% { transform: translateX(30px); opacity: 0; }
-    61% { transform: translateX(0); opacity: 1; }
-    100% { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes flag-drop {
-    0% { transform: translateY(-40px) rotate(-8deg); opacity: 0; }
-    70% { transform: translateY(-40px) rotate(-8deg); opacity: 0; }
-    71% { transform: translateY(0) rotate(-2deg); opacity: 1; }
-    100% { transform: translateY(0) rotate(-2deg); opacity: 1; }
-  }
-  @keyframes flicker {
-    0%, 100% { opacity: 1; }
-    18% { opacity: 0.4; }
-    20% { opacity: 1; }
-    52% { opacity: 0.7; }
-    54% { opacity: 1; }
-  }
-  .animate-slam-left  { animation: slam-in-left 0.32s steps(2) both; }
-  .animate-slam-right { animation: slam-in-right 0.32s steps(2) both; }
-  .animate-flag-drop  { animation: flag-drop 0.4s steps(3) both; }
-  .animate-flicker    { animation: flicker 4s steps(1) infinite; }
-
-  /* SHAKE — last 10 seconds on the clock, the stadium tilts */
-  @keyframes shake-violent {
-    0%, 100% { transform: translate(0, 0) rotate(0); }
-    20% { transform: translate(-3px, 2px) rotate(-0.6deg); }
-    40% { transform: translate(3px, -2px) rotate(0.6deg); }
-    60% { transform: translate(-2px, 3px) rotate(-0.3deg); }
-    80% { transform: translate(2px, -3px) rotate(0.3deg); }
-  }
-  .animate-shake { animation: shake-violent 0.3s steps(3) infinite; }
-
-  /* FLASHBULB — touchdown / draft pick made / siren */
-  @keyframes flashbulb {
-    0% { background: hsl(60 11% 95% / 0); }
-    8% { background: hsl(60 11% 95% / 0.85); }
-    20% { background: hsl(60 11% 95% / 0); }
-    100% { background: hsl(60 11% 95% / 0); }
-  }
-  .flashbulb-once::after {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 10000;
-    animation: flashbulb 220ms steps(2) 1;
-  }
-
-  /* GLITCH — score updates, ##.# before reveal */
-  @keyframes glitch {
-    0%, 100% { transform: translate(0); text-shadow: 0 0 0 transparent; }
-    20% { transform: translate(-2px, 1px); text-shadow: 2px 0 hsl(348 83% 47%), -2px 0 hsl(111 100% 54%); }
-    40% { transform: translate(2px, -1px); text-shadow: -2px 0 hsl(348 83% 47%), 2px 0 hsl(111 100% 54%); }
-    60% { transform: translate(-1px, 2px); text-shadow: 1px 0 hsl(16 100% 50%), -1px 0 hsl(111 100% 54%); }
-    80% { transform: translate(1px, -2px); text-shadow: 0 0 0 transparent; }
-  }
-  .animate-glitch { animation: glitch 200ms steps(2) 1; }
-
-  /* BRUISE PULSE — questionable / IR */
-  @keyframes bruise-pulse {
-    0%, 100% { box-shadow: inset 4px 0 0 hsl(275 100% 25%); }
-    50% { box-shadow: inset 4px 0 0 hsl(275 100% 25% / 0.35); }
-  }
-  .animate-bruise { animation: bruise-pulse 2s steps(4) infinite; }
-
-  /* SCORE FLASH — turf hit / blood loss */
-  @keyframes score-hit {
-    0% { color: hsl(60 11% 95%); transform: scale(1); }
-    20% { color: hsl(111 100% 54%); transform: scale(1.15); text-shadow: 0 0 18px hsl(111 100% 54% / 0.7); }
-    100% { color: hsl(60 11% 95%); transform: scale(1); text-shadow: 0 0 0 transparent; }
-  }
-  .animate-score-hit { animation: score-hit 0.6s steps(3) 1; }
-  @keyframes score-loss {
-    0% { color: hsl(60 11% 95%); }
-    20% { color: hsl(348 83% 47%); transform: translateX(-2px); }
-    40% { color: hsl(348 83% 47%); transform: translateX(2px); }
-    100% { color: hsl(60 11% 95%); transform: translateX(0); }
-  }
-  .animate-score-loss { animation: score-loss 0.6s steps(3) 1; }
-
-  /* respect reduced motion — kill the violence */
-  @media (prefers-reduced-motion: reduce) {
-    .animate-shake, .animate-glitch, .animate-bruise, .animate-flicker,
-    .animate-score-hit, .animate-score-loss,
-    .flashbulb-once::after { animation: none !important; }
-  }
-
-  /* slight asymmetric tilt */
-  .tilt-slight   { transform: rotate(-0.6deg); }
-  .tilt-back     { transform: rotate(0.5deg); }
-
-  .neon-text { color: hsl(var(--primary)); }
-
-  /* legacy compat — keep old utilities pointing at new system */
-  .bg-gradient-primary { background: var(--gradient-primary); }
-  .bg-gradient-card    { background: hsl(var(--card)); }
-  .scoreboard          { background: hsl(var(--card)); border: 2px solid hsl(var(--border)); }
-  .lower-third         { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); padding: 0.35rem 0.75rem; font-family: "Bebas Neue", sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+  .animate-float { animation: float 3s ease-in-out infinite; }
 }
 
 /* Markdown styles for AI coach output */
@@ -468,5 +136,5 @@
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
 .coach-md strong { @apply text-foreground font-semibold; }
-.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground; }
-.coach-md code { @apply px-1 py-0.5 bg-muted text-foreground text-xs; }
+.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground font-display; }
+.coach-md code { @apply px-1 py-0.5 rounded-xl bg-background text-foreground text-xs shadow-neu-inset-sm; }
