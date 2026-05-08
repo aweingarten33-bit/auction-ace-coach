@@ -523,6 +523,7 @@ export default function DraftRoom() {
             open={!!detailFor}
             onOpenChange={(o) => !o && setDetailFor(null)}
             name={detailFor?.name ?? ""}
+            leagueName={leagueName}
             position={detailFor?.position}
             sheetPrice={sheet?.price}
             anchor={anchor}

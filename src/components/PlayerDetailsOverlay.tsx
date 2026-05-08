@@ -11,6 +11,7 @@ import {
 } from "@/lib/sleeper";
 import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube, DollarSign, TrendingUp, History, Target } from "lucide-react";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "@/lib/decision-engine";
 
@@ -19,6 +20,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   name: string;
   position?: Position;
+  leagueName?: string;
   // Auction research data
   sheetPrice?: number;        // user's price sheet
   anchor?: AnchorEntry;       // blended league/ESPN anchor
@@ -55,6 +57,7 @@ export default function PlayerDetailsOverlay({
   onOpenChange,
   name,
   position,
+  leagueName,
   sheetPrice,
   anchor,
   posRank,
@@ -118,82 +121,21 @@ export default function PlayerDetailsOverlay({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base">
-            {pos && (
-              <Badge variant="outline" className={`${POS_COLORS[pos]} text-[10px] px-1.5 py-0`}>
-                {pos}
-              </Badge>
-            )}
-            <span className="truncate">{name}</span>
-            {team && <span className="font-mono text-xs text-muted-foreground">{team}</span>}
-          </DialogTitle>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0 bg-[#f5efe4] border-none">
+        {/* Visually-hidden title for a11y; real header is inside the card */}
+        <DialogHeader className="sr-only">
+          <DialogTitle>{name}</DialogTitle>
         </DialogHeader>
 
-        {/* AUCTION VALUE — the headline reason this card exists */}
-        <div className="rounded-md border border-primary/40 bg-primary/5 p-3">
-          <p className="mb-2 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-primary">
-            <DollarSign className="h-3 w-3" /> Auction value
-          </p>
-          {suggested != null ? (
-            <div className="mb-2 flex items-baseline gap-2">
-              <span className="font-mono text-2xl font-bold text-foreground">${suggested}</span>
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                suggested bid
-              </span>
-              {pos && posRank != null && (
-                <span className="ml-auto rounded border border-border bg-secondary/40 px-1.5 py-0.5 font-mono text-[10px]">
-                  {pos}{posRank}{totalAtPos ? ` of ${totalAtPos}` : ""}
-                </span>
-              )}
-            </div>
-          ) : (
-            <p className="mb-2 text-[11px] italic text-muted-foreground">
-              No auction value loaded yet — load your price sheet on the setup screen.
-            </p>
-          )}
-
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            {leagueVal != null && (
-              <Stat icon={History} label="Your league 3yr avg" value={`$${Math.round(leagueVal)}`} />
-            )}
-            {espnVal != null && (
-              <Stat icon={TrendingUp} label="ESPN value" value={`$${Math.round(espnVal)}`} />
-            )}
-            {sheetPrice != null && (
-              <Stat icon={Target} label="Your sheet" value={`$${sheetPrice}`} />
-            )}
-            {history.length > 0 && (
-              <Stat
-                icon={History}
-                label="Last sold"
-                value={`$${history[0].bid} (${history[0].season})`}
-              />
-            )}
-          </div>
-
-          {anchor?.injuryDiscount && (
-            <p className="mt-2 flex items-start gap-1 text-[10px] text-warning">
-              <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
-              <span>
-                Discounted from ${anchor.injuryDiscount.preInjuryPrice} — {anchor.injuryDiscount.reason}
-              </span>
-            </p>
-          )}
-
-          {history.length > 1 && (
-            <p className="mt-2 text-[10px] text-muted-foreground">
-              History:{" "}
-              {history.map((h, i) => (
-                <span key={`${h.season}-${i}`} className="font-mono">
-                  {i > 0 && " · "}
-                  {h.season} ${h.bid}
-                </span>
-              ))}
-            </p>
-          )}
-        </div>
+        <AuctionPlayerCard
+          name={name}
+          position={pos}
+          leagueName={leagueName}
+          sheetPrice={sheetPrice}
+          anchor={anchor}
+          posRank={posRank}
+          totalAtPos={totalAtPos}
+        />
 
         {/* Sleeper meta grid */}
         <div className="rounded-md border border-border/60 bg-secondary/30 p-3">
