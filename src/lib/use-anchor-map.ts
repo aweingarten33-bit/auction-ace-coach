@@ -368,6 +368,127 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
         setMap(out);
         setPosScale(scales);
+
+        // === 5% AI safety net ===
+        // Trigger conditions (only flag players where math has a known blind spot):
+        //   T1: ESPN/Sleeper disagree by >2x
+        //   T2: League history >= $25 but market < $10 (or vice versa) AND no injury flag
+        //   T3: High-value (>= $25 anchor) with NO injury flag — suspect stale feed
+        // Cached 24hr per player in localStorage. AI can only SUBTRACT value.
+        const NEWS_CACHE_KEY = "ai-news-cache-v1";
+        const TTL = 24 * 60 * 60 * 1000;
+        type CacheRow = { factor: number; reason: string; source_url: string; ts: number };
+        const cache: Record<string, CacheRow> = (() => {
+          try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || "{}"); } catch { return {}; }
+        })();
+        const now = Date.now();
+
+        // Helper: position lookup from any of the maps
+        const lookupPos = (k: string): string | null =>
+          espnMap.get(k)?.pos || sleeperMap.get(k)?.pos || leagueAgg.get(k)?.pos || null;
+
+        const flagged: Array<{ id: string; name: string; position: string | null; team: string | null; trigger: string }> = [];
+        for (const [k, entry] of Object.entries(out)) {
+          if (entry.injuryDiscount) continue; // already discounted by injury/availability layer
+          const espn = entry.marketSources?.espn ?? null;
+          const sleeper = entry.marketSources?.sleeper ?? null;
+          const league = entry.leaguePrice ?? null;
+          const market = entry.marketPrice ?? null;
+          let trigger: string | null = null;
+
+          if (espn && sleeper && espn > 0 && sleeper > 0) {
+            const r = Math.max(espn, sleeper) / Math.min(espn, sleeper);
+            if (r >= 2) trigger = `ESPN $${espn} vs Sleeper $${sleeper} disagree`;
+          }
+          if (!trigger && league && market) {
+            if (league >= 25 && market < 10) trigger = `League $${league} but market $${market}`;
+            else if (market >= 25 && league < 10) trigger = `Market $${market} but league $${league}`;
+          }
+          if (!trigger && entry.price >= 25) trigger = `High-value, no injury flag (verify)`;
+
+          if (!trigger) continue;
+
+          // Use cached result if fresh
+          const cached = cache[k];
+          if (cached && now - cached.ts < TTL) {
+            if (cached.factor < 1) {
+              const newPrice = Math.max(1, Math.round(entry.price * cached.factor));
+              out[k] = {
+                ...entry,
+                price: newPrice,
+                injuryDiscount: {
+                  factor: cached.factor,
+                  reason: `${cached.reason} (AI)`,
+                  preInjuryPrice: entry.price,
+                },
+              };
+            }
+            continue;
+          }
+
+          flagged.push({
+            id: k,
+            name: leagueAgg.get(k)?.pos ? k : k, // norm key — fine for prompt
+            position: lookupPos(k),
+            team: null,
+            trigger,
+          });
+        }
+
+        // Cap to 30 to keep cost predictable. Higher-anchor players first.
+        flagged.sort((a, b) => (out[b.id]?.price ?? 0) - (out[a.id]?.price ?? 0));
+        const toCheck = flagged.slice(0, 30);
+
+        if (toCheck.length === 0 || cancelled) return;
+
+        try {
+          // Build a name lookup so the AI sees real names, not normalized keys.
+          const nameByKey = new Map<string, string>();
+          for (const r of (hist as Array<{ player_name: string | null }>)) {
+            if (r.player_name) nameByKey.set(norm(r.player_name), r.player_name);
+          }
+          for (const r of (espn as Array<{ player_name_norm: string | null }>)) {
+            if (r.player_name_norm && !nameByKey.has(norm(r.player_name_norm))) {
+              nameByKey.set(norm(r.player_name_norm), r.player_name_norm);
+            }
+          }
+          for (const r of (sleeper as Array<{ player_name_norm: string | null }>)) {
+            if (r.player_name_norm && !nameByKey.has(norm(r.player_name_norm))) {
+              nameByKey.set(norm(r.player_name_norm), r.player_name_norm);
+            }
+          }
+          const payload = toCheck.map((p) => ({ ...p, name: nameByKey.get(p.id) || p.id }));
+
+          const { data, error } = await supabase.functions.invoke("check-player-news", {
+            body: { players: payload },
+          });
+          if (error || !data?.results) {
+            console.warn("[useAnchorMap] news-check unavailable", error);
+            return;
+          }
+
+          const updated = { ...out };
+          for (const r of data.results as Array<{ id: string; factor: number; reason: string; source_url: string }>) {
+            // Always cache (even no-op results) so we don't re-call for 24hr
+            cache[r.id] = { factor: r.factor, reason: r.reason, source_url: r.source_url, ts: now };
+            const cur = updated[r.id];
+            if (!cur || r.factor >= 1) continue;
+            const newPrice = Math.max(1, Math.round(cur.price * r.factor));
+            updated[r.id] = {
+              ...cur,
+              price: newPrice,
+              injuryDiscount: {
+                factor: r.factor,
+                reason: `${r.reason} (AI)`,
+                preInjuryPrice: cur.price,
+              },
+            };
+          }
+          try { localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(cache)); } catch { /* quota */ }
+          if (!cancelled) setMap(updated);
+        } catch (e) {
+          console.warn("[useAnchorMap] news-check failed (non-fatal)", e);
+        }
       } catch (e) {
         console.warn("[useAnchorMap] load failed", e);
       }
