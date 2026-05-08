@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
+import WarRoom from "./pages/WarRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
 import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
@@ -73,6 +74,7 @@ const App = () => (
 
               {/* New home page when setup is complete */}
               <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
+              <Route path="/war-room" element={<WarRoom />} />
 
               {/* Setup wizard — accessible from drawer */}
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
