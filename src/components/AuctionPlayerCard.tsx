@@ -239,10 +239,14 @@ export default function AuctionPlayerCard({ d }: Props) {
             ★ {LEAGUE_NAME}
           </div>
           <div style={{
+            display: "flex", alignItems: "center", gap: 6,
             border: `2px solid ${recColor}`, borderRadius: 4, padding: "2px 10px",
             fontFamily: "Impact, sans-serif", fontSize: 16, color: recColor,
-            letterSpacing: 2,
-          }}>{recBig}</div>
+            letterSpacing: 1,
+          }}>
+            <span style={{ fontSize: 18 }}>{recBig === "PASS" ? "👎" : "👍"}</span>
+            <span>${Math.min(copy.vitals.find(v => v.label === "Pay up to")?.value.replace("$","") as any || 1, 999)}</span>
+          </div>
           <div style={{ fontSize: 8, color: C.muted, letterSpacing: 1.5, textAlign: "right", fontFamily: "Georgia,serif" }}>
             CARD No. {cardNo}
           </div>
