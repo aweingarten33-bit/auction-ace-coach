@@ -780,3 +780,108 @@ function Top100List({
     </div>
   );
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BudgetSnapshot — read-only personalization. Shows what the selected team has
+// left in the budget, max bid headroom, slots remaining, and position gaps.
+// This is RESEARCH (planning), not bidding. No "what to bid" verdicts.
+// ─────────────────────────────────────────────────────────────────────────────
+function BudgetSnapshot({
+  teamName,
+  remaining,
+  total,
+  maxBid,
+  slotsLeft,
+  gaps,
+}: {
+  teamName: string;
+  remaining: number;
+  total: number;
+  maxBid: number;
+  slotsLeft: number;
+  gaps: { pos: Position; severity: "critical" | "need" | "depth" | "done"; starterShort: number }[];
+}) {
+  const spent = Math.max(0, total - remaining);
+  const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0;
+
+  const SEV_LABEL: Record<string, string> = {
+    critical: "CRITICAL",
+    need: "NEED",
+    depth: "DEPTH",
+    done: "DONE",
+  };
+  const SEV_TONE: Record<string, string> = {
+    critical: "border-destructive/50 bg-destructive/10 text-destructive",
+    need: "border-warning/50 bg-warning/10 text-warning",
+    depth: "border-border bg-secondary/40 text-muted-foreground",
+    done: "border-success/40 bg-success/10 text-success",
+  };
+
+  return (
+    <section className="rounded-lg border border-border bg-secondary/20 p-4">
+      <div className="mb-3 flex items-baseline justify-between gap-2">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {teamName}
+        </p>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          Snapshot
+        </p>
+      </div>
+
+      {/* Big number row */}
+      <div className="mb-3 grid grid-cols-3 gap-2">
+        <Stat label="Remaining" value={`$${remaining}`} hero />
+        <Stat label="Max bid" value={`$${maxBid}`} />
+        <Stat label="Slots left" value={String(slotsLeft)} />
+      </div>
+
+      {/* Spend bar */}
+      <div className="mb-3">
+        <div className="mb-1 flex items-center justify-between text-[10px] text-muted-foreground">
+          <span>Spent ${spent} of ${total}</span>
+          <span className="font-mono">{pct}%</span>
+        </div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
+          <div
+            className="h-full bg-primary transition-all"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Position gaps */}
+      {gaps.length > 0 && (
+        <div>
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Roster gaps
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {gaps.map((g) => (
+              <span
+                key={g.pos}
+                className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] font-medium ${SEV_TONE[g.severity]}`}
+              >
+                <span className="font-semibold">{g.pos}</span>
+                <span className="opacity-80">{SEV_LABEL[g.severity]}</span>
+                {g.starterShort > 0 && (
+                  <span className="font-mono opacity-70">−{g.starterShort}</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Stat({ label, value, hero = false }: { label: string; value: string; hero?: boolean }) {
+  return (
+    <div className="rounded-md border border-border/40 bg-background/60 p-2 text-center">
+      <p className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className={`font-mono tabular-nums ${hero ? "text-xl font-semibold text-foreground" : "text-base font-medium text-foreground/90"}`}>
+        {value}
+      </p>
+    </div>
+  );
+}
