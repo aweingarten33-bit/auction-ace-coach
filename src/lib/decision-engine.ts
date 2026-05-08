@@ -99,19 +99,16 @@ export function decide(input: EngineInput): DecisionResult {
   const pulse = computeMarketPulse(events, prices);
   const mult = pulse.multiplier || 1;
 
-  // Anchor cascade: LEAGUE 3yr avg (true league-specific) → sheet (Vetri) → ESPN → none
+  // Anchor cascade: LEAGUE 3yr avg (true league-specific, blended w/ VORP)
+  //   → VORP (projection-based replacement value)
+  //   → market consensus (ESPN+Sleeper, scaled)
+  //   → none
+  // Vetri sheet is no longer part of the cascade — it was overriding real data.
   const key = norm(player);
-  const sheet = prices.find((p) => norm(p.name) === key);
   const mapEntry = anchorMap?.[key];
   let anchorPrice = 0;
   let anchorSource: PriceSource = "none";
-  if (mapEntry && mapEntry.source === "league" && mapEntry.price > 0) {
-    anchorPrice = mapEntry.price;
-    anchorSource = "league";
-  } else if (sheet?.price && sheet.price > 0) {
-    anchorPrice = sheet.price;
-    anchorSource = "sheet";
-  } else if (mapEntry && mapEntry.price > 0) {
+  if (mapEntry && mapEntry.price > 0) {
     anchorPrice = mapEntry.price;
     anchorSource = mapEntry.source;
   }
@@ -296,7 +293,7 @@ export function decide(input: EngineInput): DecisionResult {
 
   // Confidence — high if we have a real anchor + confident market, medium if anchor only, low otherwise
   const confidence: DecisionResult["confidence"] =
-    anchorSource === "sheet" && pulse.confident ? "high" :
+    anchorSource === "league" && pulse.confident ? "high" :
     anchorPrice > 0 ? "medium" : "low";
 
   return {

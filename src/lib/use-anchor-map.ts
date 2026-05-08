@@ -140,20 +140,27 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         console.info("[useAnchorMap] league→market position scaling", scales);
 
         // 4) Build the anchor map
+        //    Cascade: LEAGUE history (blended w/ VORP) → VORP → market consensus → none
         const out: Record<string, AnchorEntry> = {};
         for (const [k, v] of leagueAgg) {
           if (v.bySeason.size === 0) continue;
           const leaguePrice = weightedLeague(v.bySeason);
           const mv = marketConsensus(k);
+          const vv = vorpMap[k];
+
+          // Blend league w/ VORP first (projection-based reality check on stale prices),
+          // then nudge with market consensus if it strongly disagrees.
           let final = leaguePrice;
-          if (mv && mv.val > 0) {
-            const ratio = mv.val / Math.max(1, leaguePrice);
+          if (vv && vv.price > 0) {
             const seasonsCount = v.bySeason.size;
-            if (ratio >= 1.4) {
-              final = leaguePrice * 0.4 + mv.val * 0.6;
-            } else if (ratio <= 0.6 && seasonsCount >= 2) {
-              final = leaguePrice * 0.7 + mv.val * 0.3;
-            }
+            // Trust last-3-draft history more if we have 3+ seasons; lean on VORP if thin.
+            const leagueWeight = seasonsCount >= 3 ? 0.65 : seasonsCount === 2 ? 0.55 : 0.4;
+            final = leaguePrice * leagueWeight + vv.price * (1 - leagueWeight);
+          }
+          if (mv && mv.val > 0) {
+            const ratio = mv.val / Math.max(1, final);
+            if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
+            else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
           }
           out[k] = {
             price: Math.max(1, Math.round(final)),
@@ -166,6 +173,22 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             },
           };
         }
+
+        // 5) VORP — #2 priority for any projected player without league history.
+        for (const [k, v] of Object.entries(vorpMap)) {
+          if (out[k]) continue;
+          out[k] = {
+            price: v.price,
+            source: "espn",
+            marketPrice: v.price,
+            marketSources: {
+              espn: espnMap.get(k)?.val,
+              sleeper: sleeperMap.get(k)?.val,
+            },
+          };
+        }
+
+        // 6) Market consensus — last fallback for non-projected players (K, DST, etc.)
         const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys()]);
         for (const k of allMarketKeys) {
           if (out[k]) continue;
@@ -183,21 +206,6 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
             },
-          };
-        }
-
-
-
-        // 5) VORP fallback — for projected players without league or market data,
-        //    use computed VORP $ as the anchor. This is the "no anchor ever again"
-        //    safety net for rookies/sleepers ESPN/Sleeper haven't priced.
-        for (const [k, v] of Object.entries(vorpMap)) {
-          if (out[k]) continue;
-          out[k] = {
-            price: v.price,
-            source: "espn", // closest existing tier; engine treats as "market"
-            marketPrice: v.price,
-            marketSources: {},
           };
         }
 
