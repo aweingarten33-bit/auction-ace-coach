@@ -51,6 +51,7 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import TeamTrends from "@/components/TeamTrends";
+import NextTargetCard from "@/components/NextTargetCard";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -270,6 +271,19 @@ export default function DraftRoom() {
               maxBid={budget.maxBid}
               slotsLeft={budget.slotsLeft}
               gaps={gaps}
+            />
+          )}
+
+          {/* Next-target suggestion (read-only) */}
+          {selectedTeam && (
+            <NextTargetCard
+              settings={settings}
+              gaps={gaps}
+              spend={spend}
+              remaining={budget.remaining}
+              prices={prices}
+              events={events}
+              pulse={pulse}
             />
           )}
 
