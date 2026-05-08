@@ -438,15 +438,15 @@ export default function DraftRoom() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="-ml-2 h-12 w-12 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30 group"
+                className="-ml-2 h-16 w-16 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30 group"
                 aria-label="Open menu"
               >
                 <img
                   src={superFootballLogo}
                   alt="Menu"
-                  className={`h-10 w-10 object-contain block transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_0_6px_rgba(255,180,80,0.5)] group-hover:drop-shadow-[0_0_12px_rgba(255,180,80,0.9)] group-active:scale-90 ${
+                  className={`h-14 w-14 object-contain block transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_0_8px_rgba(255,180,80,0.55)] group-hover:drop-shadow-[0_0_14px_rgba(255,180,80,0.95)] group-active:scale-90 ${
                     drawerOpen
-                      ? "rotate-[200deg] scale-110 drop-shadow-[0_0_14px_rgba(255,180,80,1)]"
+                      ? "rotate-[200deg] scale-110 drop-shadow-[0_0_16px_rgba(255,180,80,1)]"
                       : "rotate-0 scale-100"
                   }`}
                 />
