@@ -128,7 +128,7 @@ export default function PositionBudgetBar() {
         })}
       </div>
       <p className="text-[10px] text-muted-foreground">
-        Bar past the line = over fair share. Red = blew it by $25+.
+        Target = sum of top players' prices at that position ÷ {settings.numTeams} teams. Bar past the line = over fair share.
       </p>
     </Card>
   );
