@@ -260,6 +260,18 @@ export default function DraftRoom() {
 
         {/* ── MAIN ─────────────────────────────────────────── */}
         <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
+          {/* Budget snapshot — read-only, personalized to selected team */}
+          {selectedTeam && (
+            <BudgetSnapshot
+              teamName={selectedTeam.name}
+              remaining={budget.remaining}
+              total={budget.totalBudget}
+              maxBid={budget.maxBid}
+              slotsLeft={budget.slotsLeft}
+              gaps={gaps}
+            />
+          )}
+
           {/* Recent picks (read-only live ticker) */}
           {events.length > 0 && (
             <section>
