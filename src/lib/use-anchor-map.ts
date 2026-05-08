@@ -275,16 +275,25 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           // Blend league w/ VORP first (projection-based reality check on stale prices),
           // then nudge with market consensus if it strongly disagrees.
           let final = leaguePrice;
+          const seasonsCount = v.bySeason.size;
           if (vv && vv.price > 0) {
-            const seasonsCount = v.bySeason.size;
-            // Trust last-3-draft history more if we have 3+ seasons; lean on VORP if thin.
-            const leagueWeight = seasonsCount >= 3 ? 0.65 : seasonsCount === 2 ? 0.55 : 0.4;
+            // 3+ seasons of YOUR money is gospel — heavy lean on league.
+            // 2 seasons: trust league but let VORP nudge.
+            // 1 season: VORP gets real say (small sample).
+            const leagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
             final = leaguePrice * leagueWeight + vv.price * (1 - leagueWeight);
           }
           if (mv && mv.val > 0) {
             const ratio = mv.val / Math.max(1, final);
-            if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
-            else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
+            // With 3+ seasons of league data, only let market UP-revise (catches
+            // ascending players). Never let market drag down a proven league price.
+            if (seasonsCount >= 3) {
+              if (ratio >= 1.5) final = final * 0.7 + mv.val * 0.3;
+              // ratio <= 0.5 path intentionally removed for veteran data
+            } else {
+              if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
+              else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
+            }
           }
           // Market-crash override: if BOTH ESPN and Sleeper have dropped this player
           // to < $5 but our league history says > $20, the market knows something
