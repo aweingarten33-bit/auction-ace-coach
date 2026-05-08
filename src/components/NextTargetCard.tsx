@@ -1,9 +1,10 @@
 // NextTargetCard — research-only suggestion of which position to attack next.
-// Pure derivation from existing engines (gaps, budget shares, anchor prices,
-// market pulse). No bid amounts, no nominate buttons, no per-player advice.
+// Pure derivation from existing engines (gaps, budget shares, prices, market
+// pulse). No bid amounts, no nominate buttons, no per-player advice.
 import { Target } from "lucide-react";
-import type { Position, PriceEstimate } from "@/lib/draft-types";
+import type { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
 import { positionShare } from "@/lib/vetri-tiers";
+import type { MarketPulse } from "@/lib/value";
 import type { useDraftStore } from "@/lib/draft-store";
 
 type Settings = ReturnType<typeof useDraftStore.getState>["settings"];
@@ -14,29 +15,26 @@ interface Gap {
   severity: "critical" | "need" | "depth" | "done";
 }
 
-interface PulseEntry {
-  position: Position;
-  hot: boolean;
-  multiplier: number; // >1 means inflated, <1 means deflating
-}
-
 interface Props {
   settings: Settings;
   gaps: Gap[];
   spend: Partial<Record<Position, number>>;
   remaining: number;
-  anchorMap: Map<string, PriceEstimate>;
-  pulse: PulseEntry[];
+  prices: PriceEstimate[];
+  events: DraftEvent[];
+  pulse: MarketPulse;
 }
 
 const POS: Position[] = ["QB", "RB", "WR", "TE"];
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 export default function NextTargetCard({
   settings,
   gaps,
   spend,
   remaining,
-  anchorMap,
+  prices,
+  events,
   pulse,
 }: Props) {
   const share = positionShare(settings);
@@ -44,15 +42,16 @@ export default function NextTargetCard({
     POS.map((p) => [p, Math.round(settings.totalBudget * share[p])]),
   ) as Record<Position, number>;
 
-  // Top remaining anchor price by position (proxy for "best player available $")
-  const topAvailByPos: Record<Position, number> = { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0 };
-  for (const est of anchorMap.values()) {
-    const p = est.position as Position;
-    if (!POS.includes(p)) continue;
-    if ((est.price ?? 0) > (topAvailByPos[p] ?? 0)) topAvailByPos[p] = est.price ?? 0;
+  // Top remaining price by position from the user's price sheet (excluding drafted).
+  const drafted = new Set(events.map((e) => norm(e.player)));
+  const topAvailByPos: Record<Position, number> = {
+    QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0,
+  };
+  for (const p of prices) {
+    if (!p.position || !POS.includes(p.position)) continue;
+    if (drafted.has(norm(p.name))) continue;
+    if ((p.price ?? 0) > topAvailByPos[p.position]) topAvailByPos[p.position] = p.price ?? 0;
   }
-
-  const pulseByPos = new Map(pulse.map((p) => [p.position, p]));
 
   const scored = POS.map((pos) => {
     const gap = gaps.find((g) => g.pos === pos);
@@ -61,29 +60,24 @@ export default function NextTargetCard({
 
     const target = targetByPos[pos] ?? 0;
     const spent = spend[pos] ?? 0;
-    const underBy = Math.max(0, target - spent); // $ left vs fair share
+    const underBy = Math.max(0, target - spent);
     const sharePct = target > 0 ? underBy / target : 0;
 
     const top = topAvailByPos[pos] ?? 0;
-    const heat = pulseByPos.get(pos);
-    const mult = heat?.multiplier ?? 1;
-    const hot = heat?.hot ?? false;
 
-    // Score: shortage dominates, then under-share, top player on board, cooled market.
     const sevWeight = sev === "critical" ? 100 : sev === "need" ? 60 : sev === "depth" ? 15 : 0;
     const shareWeight = sharePct * 40;
-    const valueWeight = top > 0 && remaining > 0 ? Math.min(20, (top / Math.max(1, remaining)) * 60) : 0;
-    const heatPenalty = hot ? 25 : Math.max(0, (1 - mult) * 30); // cooled = bonus
+    const valueWeight = top > 0 && remaining > 0
+      ? Math.min(20, (top / Math.max(1, remaining)) * 60)
+      : 0;
 
-    const score = sevWeight + shareWeight + valueWeight + heatPenalty;
-
-    return { pos, score, short, sev, target, spent, underBy, top, mult, hot };
+    const score = sevWeight + shareWeight + valueWeight;
+    return { pos, score, short, sev, target, spent, underBy, top };
   }).sort((a, b) => b.score - a.score);
 
   const top = scored[0];
   if (!top || top.score < 5) return null;
 
-  // Build human-readable reasons
   const reasons: string[] = [];
   if (top.short > 0) {
     reasons.push(
@@ -96,12 +90,12 @@ export default function NextTargetCard({
     );
   }
   if (top.top > 0) {
-    reasons.push(`Board: top ${top.pos} left anchors at ~$${top.top}.`);
+    reasons.push(`Board: top ${top.pos} left priced at ~$${top.top}.`);
   }
-  if (top.hot) {
-    reasons.push(`⚠ Market is hot at ${top.pos} (×${top.mult.toFixed(2)}); expect overpays.`);
-  } else if (top.mult < 0.95) {
-    reasons.push(`Market: ${top.pos} cooling (×${top.mult.toFixed(2)}) — value window.`);
+  if (pulse.confident && pulse.multiplier > 1.05) {
+    reasons.push(`⚠ Room is hot overall (×${pulse.multiplier.toFixed(2)}); expect overpays.`);
+  } else if (pulse.confident && pulse.multiplier < 0.95) {
+    reasons.push(`Market is cooling (×${pulse.multiplier.toFixed(2)}) — value window open.`);
   }
 
   const runnerUp = scored[1];
