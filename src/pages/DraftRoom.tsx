@@ -752,14 +752,14 @@ export default function DraftRoom() {
               >
                 <ChevronLeft className="h-6 w-6" strokeWidth={2} />
               </button>
-              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in">
+              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in" style={{ animationDelay: "180ms", animationDuration: "500ms", animationFillMode: "both" }}>
                 {toolPage === "lookup" && "Find"}
                 {toolPage === "top100" && "Top 100"}
                 {toolPage === "afford" && "Afford"}
                 {toolPage === "market" && "Market"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
-              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "60ms", animationFillMode: "both" }}>
+              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "280ms", animationDuration: "500ms", animationFillMode: "both" }}>
                 {toolPage === "lookup" && "Search any player or dollar amount."}
                 {toolPage === "top100" && "Best-value board, math-backed."}
                 {toolPage === "afford" && "Pressure-test a plan before spending."}
@@ -768,7 +768,7 @@ export default function DraftRoom() {
               </p>
             </div>
 
-            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "120ms", animationFillMode: "both" }}>
+            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "380ms", animationDuration: "500ms", animationFillMode: "both" }}>
               {toolPage === "lookup" && (
                 <LookupSection
                   prices={prices}
