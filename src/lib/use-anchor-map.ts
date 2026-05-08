@@ -215,14 +215,19 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         // 5) VORP — #2 priority for any projected player without league history.
         for (const [k, v] of Object.entries(vorpMap)) {
           if (out[k]) continue;
+          const inj = injuryFactor(k);
+          const finalPrice = Math.max(1, Math.round(v.price * inj.factor));
           out[k] = {
-            price: v.price,
+            price: finalPrice,
             source: "espn",
             marketPrice: v.price,
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
             },
+            injuryDiscount: inj.reason
+              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: v.price }
+              : undefined,
           };
         }
 
