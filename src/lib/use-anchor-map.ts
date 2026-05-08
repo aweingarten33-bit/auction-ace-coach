@@ -123,6 +123,53 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           return { factor: 1, reason: null };
         };
 
+        // Availability discount — non-injury risks (suspensions, holdouts, PUP/NFI,
+        // legal, personal). Tight phrases only + negation guard to avoid false hits
+        // like "signed extension" or "no legal issues".
+        const NEG = /\b(no|not|never|cleared|returned|avoided|signed|extension|restructure|resolved|dropped)\b/i;
+        const PHRASES: Array<{ re: RegExp; reason: string; factor: number }> = [
+          { re: /\b(suspended for|game suspension|suspension|will miss \d+ game|banned)\b/i, reason: "Suspended", factor: 0.6 },
+          { re: /\b(holding out|holdout|hold-?in|did not report|contract dispute)\b/i, reason: "Holdout", factor: 0.8 },
+          { re: /\b(active\/pup|on pup|pup list|placed on pup)\b/i, reason: "PUP", factor: 0.75 },
+          { re: /\b(nfi list|non[- ]football injury)\b/i, reason: "NFI", factor: 0.7 },
+          { re: /\b(arrested|facing charges|charged with|legal trouble|domestic violence|dui)\b/i, reason: "Legal", factor: 0.8 },
+          { re: /\b(personal reasons|away from team|left the team|stepped away)\b/i, reason: "Personal", factor: 0.85 },
+          { re: /\b(missed (training )?camp|did not practice|hasn['’]t practiced)\b/i, reason: "Missed camp", factor: 0.9 },
+        ];
+        // Words that are dangerous alone (need LLM tiebreaker even if regex didn't fire)
+        const AMBIG = /\b(contract|legal|investigation|sign|status update|away)\b/i;
+
+        const regexAvailability = (k: string): { factor: number; reason: string | null; ambiguous: boolean } => {
+          const inj = injuryMap.get(k);
+          if (!inj) return { factor: 1, reason: null, ambiguous: false };
+          const blob = `${inj.status || ""} ${inj.note || ""}`;
+          if (!blob.trim()) return { factor: 1, reason: null, ambiguous: false };
+          let best: { factor: number; reason: string } | null = null;
+          for (const p of PHRASES) {
+            const m = blob.match(p.re);
+            if (!m) continue;
+            // negation guard: check 30 chars before the match
+            const idx = m.index ?? 0;
+            const window = blob.slice(Math.max(0, idx - 30), idx);
+            if (NEG.test(window)) continue;
+            if (!best || p.factor < best.factor) best = { factor: p.factor, reason: p.reason };
+          }
+          const ambiguous = !best && AMBIG.test(blob);
+          return best ? { ...best, ambiguous: false } : { factor: 1, reason: null, ambiguous };
+        };
+
+        // Stack injury + availability — take the SINGLE LARGEST discount (don't multiply).
+        const combinedFactor = (k: string, llm?: { factor: number; reason: string } | null) => {
+          const inj = injuryFactor(k);
+          const avail = regexAvailability(k);
+          const candidates: Array<{ factor: number; reason: string | null }> = [inj, avail];
+          if (llm) candidates.push(llm);
+          let winner = candidates[0];
+          for (const c of candidates) if (c.factor < winner.factor) winner = c;
+          return winner;
+        };
+
+
 
         // Market consensus = blend of ESPN and Sleeper. When they agree, high
         // confidence. When they disagree wildly, take the higher one IF the
