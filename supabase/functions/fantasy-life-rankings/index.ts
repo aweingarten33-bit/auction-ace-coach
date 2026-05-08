@@ -9,34 +9,40 @@ interface RankList { source: string; label: string; position: string; url: strin
 
 const SOURCES: { source: string; label: string; position: string; url: string }[] = [
   {
-    source: "top50",
-    label: "Top 50 Overall (Kendall)",
-    position: "ALL",
-    url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-2026-top-50-rankings-bijan-robinson-or-jahmyr-gibbs-at-101",
-  },
-  {
     source: "qb",
-    label: "Top QBs",
+    label: "QB",
     position: "QB",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-qb",
   },
   {
     source: "rb",
-    label: "Top RBs",
+    label: "RB",
     position: "RB",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-bijan-robinson-leads-the-top-20",
   },
   {
     source: "wr",
-    label: "Top WRs",
+    label: "WR",
     position: "WR",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-wr",
   },
   {
     source: "te",
-    label: "Top TEs",
+    label: "TE",
     position: "TE",
     url: "https://www.fantasylife.com/articles/fantasy/2026-tight-end-tiers-for-fantasy-football-harold-fannin",
+  },
+  {
+    source: "k",
+    label: "K",
+    position: "K",
+    url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-kicker-rankings-2025",
+  },
+  {
+    source: "dst",
+    label: "DEF",
+    position: "D/ST",
+    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-defense-rankings-and-tiers-broncos-eagles-and-more",
   },
 ];
 
