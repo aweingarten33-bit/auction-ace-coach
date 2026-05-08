@@ -3,15 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
+/**
+ * Neumorphic Badge — small inset pill, "carved" into the surface.
+ * Variants tint the inset shadow + text color, never use hard borders.
+ */
 const badgeVariants = cva(
-  "inline-flex items-center rounded-none border-2 px-2 py-0.5 text-xs font-stencil uppercase tracking-widest transition-colors focus:outline-none",
+  "inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-display font-semibold tracking-tight transition-shadow duration-300",
   {
     variants: {
       variant: {
-        default: "border-black bg-primary text-primary-foreground",
-        secondary: "border-black bg-secondary text-secondary-foreground",
-        destructive: "border-black bg-destructive text-destructive-foreground",
-        outline: "border-foreground text-foreground bg-transparent",
+        default:     "bg-background text-foreground shadow-[var(--shadow-inset-sm)]",
+        secondary:   "bg-background text-muted-foreground shadow-[var(--shadow-inset-sm)]",
+        outline:     "bg-background text-foreground shadow-[var(--shadow-extruded-sm)]",
+        destructive: "bg-background text-destructive shadow-[var(--shadow-inset-sm)]",
+        success:     "bg-background text-accent shadow-[var(--shadow-inset-sm)]",
+        primary:     "bg-background text-primary shadow-[var(--shadow-inset-sm)]",
       },
     },
     defaultVariants: { variant: "default" },
