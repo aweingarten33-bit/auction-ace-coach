@@ -15,6 +15,12 @@ import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "@/lib/decision-engine";
 
+interface RosterGap {
+  pos: string;
+  starterShort: number;
+  severity: "critical" | "need" | "depth" | "done";
+}
+
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -22,13 +28,17 @@ interface Props {
   position?: Position;
   leagueName?: string;
   // Auction research data
-  sheetPrice?: number;        // user's price sheet
-  anchor?: AnchorEntry;       // blended league/ESPN anchor
-  posRank?: number;           // rank within position by price
-  totalAtPos?: number;        // how many ranked players at this pos
+  sheetPrice?: number;
+  anchor?: AnchorEntry;
+  posRank?: number;
+  totalAtPos?: number;
+  // Roster context — drives personalized card copy
+  remaining?: number;
+  maxBid?: number;
+  slotsLeft?: number;
+  gaps?: RosterGap[];
   // AI-derived enrichment we already have
   matchPct?: number;
-  maxBid?: number;
   reason?: string;
   dossier?: string;
   worstCase?: string;
@@ -62,8 +72,11 @@ export default function PlayerDetailsOverlay({
   anchor,
   posRank,
   totalAtPos,
-  matchPct,
+  remaining,
   maxBid,
+  slotsLeft,
+  gaps,
+  matchPct,
   reason,
   dossier,
   worstCase,
@@ -135,6 +148,10 @@ export default function PlayerDetailsOverlay({
           anchor={anchor}
           posRank={posRank}
           totalAtPos={totalAtPos}
+          remaining={remaining}
+          maxBid={maxBid}
+          slotsLeft={slotsLeft}
+          gaps={gaps}
         />
 
         {/* Sleeper meta grid */}
