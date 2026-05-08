@@ -92,11 +92,13 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 2) Sleeper projected_auction_value
+    // 2) Sleeper projected_auction_value (raise limit beyond 1000 default)
     const { data: sleeperRows, error } = await sb
       .from("sleeper_players")
       .select("player_name, player_name_norm, position, projected_auction_value")
-      .gt("projected_auction_value", 0);
+      .gt("projected_auction_value", 0)
+      .order("projected_auction_value", { ascending: false })
+      .limit(5000);
     if (error) throw error;
 
     for (const r of (sleeperRows ?? []) as Array<{ player_name: string; player_name_norm: string; position: string | null; projected_auction_value: number | null }>) {
