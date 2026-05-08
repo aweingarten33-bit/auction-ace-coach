@@ -15,11 +15,12 @@
 
 @layer base {
   :root {
-    /* Library at Night palette — HSL */
-    --background:        24 14% 9%;     /* #1C1714 deep mahogany */
-    --background-alt:    25 16% 12%;    /* #251E19 aged oak */
-    --foreground:        33 32% 87%;    /* #E8DFD4 antique parchment */
-    --muted-bg:          25 16% 19%;    /* #3D332B worn leather */
+    /* Library at Night × Sin City — Miller pushes the ink darker, the
+       contrast crueler. Mahogany is almost black; parchment is almost bone. */
+    --background:        24 22% 5%;     /* near-black mahogany */
+    --background-alt:    24 18% 8%;     /* charred oak */
+    --foreground:        36 36% 90%;    /* bleached parchment */
+    --muted-bg:          25 14% 14%;    /* worn leather */
 
     --card:              25 16% 12%;
     --card-foreground:   33 32% 87%;
