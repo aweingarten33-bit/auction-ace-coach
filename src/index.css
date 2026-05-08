@@ -91,8 +91,11 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(hsl(var(--foreground)) 1.2px, transparent 1.4px);
-    background-size: 24px 24px;
+      radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1.2px),
+      radial-gradient(hsl(var(--primary) / 0.04) 1px, transparent 1.4px),
+      linear-gradient(180deg, hsl(220 30% 4%) 0%, hsl(var(--background)) 40%, hsl(220 25% 6%) 100%);
+    background-size: 18px 18px, 32px 32px, 100% 100%;
+    background-position: 0 0, 9px 9px, 0 0;
   }
 
   h1, h2, h3, h4, h5, h6 {
