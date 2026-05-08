@@ -130,9 +130,9 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
   }
 
   // Pattern E (heading style): "Name | TEAM" with default position
-  if (out.length === 0 && defaultPos !== "ALL") {
+  if (defaultPos !== "ALL") {
     const reE = new RegExp(`([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${TEAM}|Rookie)\\b`, "g");
-    let rank = 0;
+    let rank = out.length;
     for (const m of clean.matchAll(reE)) {
       const name = m[1].trim();
       const team = m[2];
@@ -141,6 +141,20 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
       seen.add(k);
       rank += 1;
       out.push({ rank, name, position: defaultPos, team });
+    }
+  }
+
+  // Pattern F (plain numbered text list, often after the embedded cards):
+  //   "16. Tetairoa McMillan"   "23. DK Metcalf"
+  if (defaultPos !== "ALL") {
+    const reF = /(?:^|\n)\s{0,4}(\d{1,3})\.\s+([A-Z][A-Za-z'.]+(?:\s+(?:Jr\.|Sr\.|II|III|IV|[A-Z][A-Za-z'.]+)){1,3})\s*$/gm;
+    for (const m of clean.matchAll(reF)) {
+      const rank = parseInt(m[1], 10);
+      const name = m[2].trim();
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push({ rank, name, position: defaultPos, team: "" });
     }
   }
 
