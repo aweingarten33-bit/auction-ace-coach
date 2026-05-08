@@ -680,23 +680,16 @@ export default function DraftRoom() {
 
       {/* ── FOOTER CREDIT ────────────────────────────────────────────── */}
       <footer
-        className="mt-10 border-t border-border/40 px-4 py-8 text-center"
-        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.5rem)" }}
+        className="mt-8 border-t border-border/40 px-4 py-6 text-center"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)" }}
       >
         <p
-          className="inline-block text-2xl uppercase tracking-[0.22em]"
+          className="inline-block text-xl uppercase tracking-[0.18em] text-foreground/85"
           style={{
             fontFamily: '"Special Elite", "Courier New", monospace',
-            transform: "rotate(-4deg) skewX(-3deg)",
-            color: "hsl(var(--foreground))",
-            textShadow: [
-              "0 0 1px hsl(var(--foreground) / 0.9)",
-              "1px 1px 0 hsl(var(--foreground) / 0.4)",
-              "2px 3px 6px hsl(var(--foreground) / 0.25)",
-              "-1px 0 0 hsl(var(--background))",
-            ].join(", "),
-            filter: "contrast(1.1) blur(0.3px)",
-            opacity: 0.92,
+            transform: "rotate(-3deg)",
+            textShadow: "1px 1px 0 hsl(var(--background)), 2px 2px 0 hsl(var(--foreground) / 0.15)",
+            filter: "contrast(1.05)",
           }}
         >
           Built by Andrew Weingarten
