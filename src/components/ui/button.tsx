@@ -11,7 +11,7 @@ const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
     "font-display font-black uppercase tracking-wide",
-    "rounded-none border-4 border-black",
+    "rounded-none border-4 border-foreground",
     "shadow-[4px_4px_0_0_hsl(var(--foreground))]",
     "transition-all duration-100 ease-linear",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-background",
@@ -24,17 +24,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-[hsl(var(--primary))] text-black",
+          "bg-[hsl(var(--primary))] text-foreground",
         secondary:
-          "bg-[hsl(var(--secondary))] text-black",
+          "bg-[hsl(var(--secondary))] text-foreground",
         outline:
-          "bg-white text-black",
+          "bg-card text-foreground",
         destructive:
-          "bg-[hsl(var(--primary))] text-black",
+          "bg-[hsl(var(--primary))] text-foreground",
         ghost:
-          "bg-transparent text-black border-transparent shadow-none hover:bg-[hsl(var(--secondary))] hover:border-black hover:shadow-[4px_4px_0_0_hsl(var(--foreground))]",
+          "bg-transparent text-foreground border-transparent shadow-none hover:bg-[hsl(var(--secondary))] hover:border-foreground hover:shadow-[4px_4px_0_0_hsl(var(--foreground))]",
         link:
-          "bg-transparent text-black border-transparent shadow-none underline-offset-4 hover:underline hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0",
+          "bg-transparent text-foreground border-transparent shadow-none underline-offset-4 hover:underline hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0",
       },
       size: {
         default: "h-12 px-5 text-sm",
