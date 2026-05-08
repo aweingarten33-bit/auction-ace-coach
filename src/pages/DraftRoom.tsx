@@ -51,6 +51,7 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import TeamTrends from "@/components/TeamTrends";
+import PositionBudgetBar from "@/components/PositionBudgetBar";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
