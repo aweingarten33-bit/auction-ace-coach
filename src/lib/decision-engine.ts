@@ -68,11 +68,12 @@ export interface DecisionResult {
 }
 
 export interface AnchorEntry {
-  price: number;                  // final blended anchor we use
+  price: number;                  // final blended anchor we use (post-injury discount)
   source: "league" | "espn";
   leaguePrice?: number;           // raw weighted league history (if any)
   marketPrice?: number;           // raw market consensus (Sleeper/ESPN blend)
   marketSources?: { espn?: number; sleeper?: number };
+  injuryDiscount?: { factor: number; reason: string; preInjuryPrice: number };
 }
 
 interface EngineInput {
