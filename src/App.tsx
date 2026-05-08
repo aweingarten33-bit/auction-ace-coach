@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
+import Landing from "./pages/Landing.tsx";
 import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
@@ -60,6 +61,7 @@ const App = () => (
             <Routes>
               {/* Index = router that picks Draft Room or Setup based on setupComplete */}
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
+              <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
 
               {/* New home page when setup is complete */}
