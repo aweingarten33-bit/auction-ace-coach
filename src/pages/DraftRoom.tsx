@@ -855,28 +855,6 @@ function BudgetSnapshot({
         </div>
       </div>
 
-      {/* Position gaps */}
-      {gaps.length > 0 && (
-        <div>
-          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Roster gaps
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {gaps.map((g) => (
-              <span
-                key={g.pos}
-                className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] font-medium ${SEV_TONE[g.severity]}`}
-              >
-                <span className="font-semibold">{g.pos}</span>
-                <span className="opacity-80">{SEV_LABEL[g.severity]}</span>
-                {g.starterShort > 0 && (
-                  <span className="font-mono opacity-70">−{g.starterShort}</span>
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
     </section>
   );
 }
