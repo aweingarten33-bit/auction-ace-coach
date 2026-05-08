@@ -96,26 +96,27 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         // Market consensus = blend of ESPN and Sleeper. When they agree, high
         // confidence. When they disagree wildly, take the higher one IF the
         // player is a confirmed starter (catches ascending players ESPN lags on).
+        // Market consensus — SLEEPER FIRST (more current, picks up depth-chart shifts).
+        // ESPN is fallback when Sleeper is silent. When both exist and disagree by
+        // >50%, Sleeper still wins (it's the more recent signal); we just blend
+        // 70/30 toward Sleeper instead of pure replacement, so ESPN acts as a
+        // stabilizer if Sleeper is way out of pocket.
         const marketConsensus = (k: string): { val: number; pos: string | null } | null => {
           const ev = espnMap.get(k);
           const sv = sleeperMap.get(k);
           if (!ev && !sv) return null;
-          if (ev && !sv) return { val: ev.val, pos: ev.pos };
           if (sv && !ev) return { val: sv.val, pos: sv.pos };
-          // both present
+          if (ev && !sv) return { val: ev.val, pos: ev.pos };
           const eVal = ev!.val;
           const sVal = sv!.val;
-          const pos = ev!.pos || sv!.pos;
+          const pos = sv!.pos || ev!.pos;
           const ratio = Math.max(eVal, sVal) / Math.max(1, Math.min(eVal, sVal));
           if (ratio <= 1.5) {
-            // close enough → average
-            return { val: (eVal + sVal) / 2, pos };
+            // close enough → average, slight Sleeper lean
+            return { val: sVal * 0.6 + eVal * 0.4, pos };
           }
-          // disagreement: if the higher source is Sleeper AND player is a starter,
-          // trust Sleeper (ESPN is lagging on an ascending player).
-          if (sVal > eVal && sv!.isStarter) return { val: sVal, pos };
-          // otherwise meet in the middle, leaning toward the lower (more conservative)
-          return { val: Math.min(eVal, sVal) * 0.4 + Math.max(eVal, sVal) * 0.6, pos };
+          // big disagreement: Sleeper wins, ESPN softens by 30%
+          return { val: sVal * 0.7 + eVal * 0.3, pos };
         };
 
         // 3) Per-position scaling — uses market consensus instead of just ESPN
