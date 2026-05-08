@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import Draft from "./pages/Draft.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
+import WarRoom from "./pages/WarRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
 import Planner from "./pages/Planner.tsx";
 import NotFound from "./pages/NotFound.tsx";
