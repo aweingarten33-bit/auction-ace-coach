@@ -710,6 +710,8 @@ export default function DraftRoom() {
           />
         </SheetContent>
       </Sheet>
+      </div>
+      {/* /PAGE CONTENT wrapper */}
 
       {/* ── DICE-style SLIDE-IN TOOL PANEL (50/50 on desktop, full on mobile) ── */}
       {toolPage && (
