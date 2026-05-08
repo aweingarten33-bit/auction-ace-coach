@@ -46,8 +46,8 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             .select("player_name_norm, position, projected_auction_value, depth_chart_order, search_rank, injury_status, injury_notes")
             .then((r) => r.data ?? []),
           supabase.functions.invoke("blended-values", {
-            body: { superflex: isSF, teams: settings.teams, budget: settings.budget },
-          }).then((r) => r.data as { values?: Record<string, { berry: number | null; sleeper: number | null; blended: number; position: string }> } | null).catch(() => null),
+            body: { superflex: isSF, teams: settings.numTeams, budget: settings.totalBudget },
+          }).then((r) => (r.data ?? null) as { values?: Record<string, { berry: number | null; sleeper: number | null; blended: number; position: string }> } | null).catch(() => null),
         ]);
         if (cancelled) return;
         const berryMap = new Map<string, { val: number; pos: string | null }>();
