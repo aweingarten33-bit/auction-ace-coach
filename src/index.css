@@ -115,9 +115,9 @@
     pointer-events: none;
     z-index: 9998;
     mix-blend-mode: multiply;
-    opacity: 0.55;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0 0.05  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    background-size: 220px 220px;
+    opacity: 0.7;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch' seed='5'/><feColorMatrix values='0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0 0.04  0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-size: 240px 240px;
   }
 
   body::after {
@@ -126,14 +126,14 @@
     inset: 0;
     pointer-events: none;
     z-index: 9999;
-    opacity: 0.18;
+    opacity: 0.22;
     background-image:
-      /* CCTV scan lines */
+      /* CCTV scan lines — every 3px */
       repeating-linear-gradient(
         to bottom,
         transparent 0px,
         transparent 2px,
-        hsl(0 0% 0% / 0.45) 3px,
+        hsl(0 0% 0% / 0.55) 3px,
         transparent 4px
       ),
       /* yard-line markers — every 10vw */
@@ -141,14 +141,18 @@
         to right,
         transparent 0,
         transparent calc(10vw - 1px),
-        hsl(0 0% 91% / 0.06) calc(10vw - 1px),
-        hsl(0 0% 91% / 0.06) 10vw
+        hsl(60 11% 95% / 0.05) calc(10vw - 1px),
+        hsl(60 11% 95% / 0.05) 10vw
       ),
-      /* spray splatter blotches */
-      radial-gradient(circle at 12% 18%, hsl(127 65% 49% / 0.10) 0, transparent 60px),
-      radial-gradient(circle at 82% 28%, hsl(27 100% 55% / 0.08) 0, transparent 80px),
-      radial-gradient(circle at 28% 78%, hsl(3 100% 60% / 0.07) 0, transparent 90px),
-      radial-gradient(circle at 92% 88%, hsl(127 65% 49% / 0.08) 0, transparent 70px);
+      /* spray splatter — turf, penalty, blood, bruise, sweat */
+      radial-gradient(circle at 8% 14%, hsl(111 100% 54% / 0.14) 0, transparent 70px),
+      radial-gradient(circle at 88% 22%, hsl(16 100% 50% / 0.12) 0, transparent 90px),
+      radial-gradient(circle at 24% 72%, hsl(348 83% 47% / 0.11) 0, transparent 100px),
+      radial-gradient(circle at 72% 56%, hsl(275 100% 25% / 0.10) 0, transparent 110px),
+      radial-gradient(circle at 94% 90%, hsl(46 65% 52% / 0.09) 0, transparent 80px),
+      radial-gradient(circle at 4% 92%, hsl(111 100% 54% / 0.10) 0, transparent 70px),
+      /* heavy corner vignette — disappearing into the tunnel */
+      radial-gradient(ellipse at center, transparent 45%, hsl(0 0% 5% / 0.85) 100%);
   }
 
   h1, h2, h3, h4 {
