@@ -1,22 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import SetupWizard from "./SetupWizard";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { loading } = useAuth();
-  const editing = searchParams.has("step") || searchParams.get("edit") === "1";
-  const [routing, setRouting] = useState(true);
+  const { team } = useSelectedTeam();
 
   useEffect(() => {
-    if (loading || editing) { setRouting(false); return; }
-    navigate("/draft-room", { replace: true });
-  }, [editing, loading, navigate]);
+    navigate(team ? "/draft-room" : "/team", { replace: true });
+  }, [team, navigate]);
 
-  if (loading || routing) return null;
-  return <SetupWizard />;
+  return null;
 };
 
 export default Index;

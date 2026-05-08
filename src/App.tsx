@@ -13,6 +13,7 @@ import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import LogoPicker from "./pages/LogoPicker.tsx";
 import Zine from "./pages/Zine.tsx";
+import TeamPicker from "./pages/TeamPicker.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 
@@ -55,6 +56,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
+              <Route path="/team" element={<PublicGate><TeamPicker /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
               <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
