@@ -300,12 +300,7 @@ export default function DraftRoom() {
           )}
 
           {/* Spending vs target by position */}
-          <PositionBudgetBar
-            settings={settings}
-            keepers={keepers}
-            events={events}
-            myTeamId={myTeamId}
-          />
+          <PositionBudgetBar />
 
           {/* Recent picks (read-only live ticker) */}
           {events.length > 0 && (
