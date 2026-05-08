@@ -80,8 +80,10 @@ export default function PositionBudgetBar() {
   }, [settings, keepers, events, prices]);
 
 
+  const hasPrices = useDraftStore((s) => s.prices.length > 0);
+  // Hide if user hasn't loaded prices AND hasn't started drafting — heuristic alone is misleading
   const totalSpent = data.reduce((s, d) => s + d.dollars, 0);
-  if (totalSpent === 0 && events.length === 0 && keepers.length === 0) return null;
+  if (totalSpent === 0 && !hasPrices) return null;
 
   return (
     <Card className="space-y-2 p-3">
