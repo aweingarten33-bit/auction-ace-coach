@@ -12,9 +12,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Plus Jakarta Sans"', '"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
-        sans:    ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
-        body:    ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ['"Anton"', '"Bebas Neue"', '"Impact"', "ui-sans-serif", "system-ui", "sans-serif"],
+        sans:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        body:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono:    ['"Courier New"', "ui-monospace", "SFMono-Regular", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -71,12 +72,12 @@ export default {
         },
       },
       borderRadius: {
-        // Hyper-rounded scale — pillowed surfaces
-        sm:   "0.75rem",   // 12px
-        md:   "1rem",      // 16px
-        lg:   "1.5rem",    // 24px
-        xl:   "2rem",      // 32px
-        "2xl":"2rem",
+        // Sharp by default — stencil/poster aesthetic
+        sm:   "0",
+        md:   "0",
+        lg:   "0",
+        xl:   "0",
+        "2xl":"0",
       },
       keyframes: {
         "accordion-down": {
