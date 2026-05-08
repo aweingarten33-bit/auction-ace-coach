@@ -31,7 +31,8 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
     let cancelled = false;
     (async () => {
       try {
-        const [hist, espn, sleeper] = await Promise.all([
+        const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
+        const [hist, espn, sleeper, blendedRes] = await Promise.all([
           supabase
             .from("league_auction_history")
             .select("player_name, position, bid_amount, season")
@@ -44,8 +45,19 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             .from("sleeper_players")
             .select("player_name_norm, position, projected_auction_value, depth_chart_order, search_rank, injury_status, injury_notes")
             .then((r) => r.data ?? []),
+          supabase.functions.invoke("blended-values", {
+            body: { superflex: isSF, teams: settings.teams, budget: settings.budget },
+          }).then((r) => r.data as { values?: Record<string, { berry: number | null; sleeper: number | null; blended: number; position: string }> } | null).catch(() => null),
         ]);
         if (cancelled) return;
+        const berryMap = new Map<string, { val: number; pos: string | null }>();
+        const blendedMap = new Map<string, { val: number; pos: string | null }>();
+        if (blendedRes?.values) {
+          for (const [k, v] of Object.entries(blendedRes.values)) {
+            if (v.berry != null && v.berry > 0) berryMap.set(k, { val: v.berry, pos: v.position });
+            if (v.blended > 0) blendedMap.set(k, { val: v.blended, pos: v.position });
+          }
+        }
 
         // 1) League history per player — keep season-by-season for recency weighting.
         const leagueAgg = new Map<string, { bySeason: Map<number, number>; pos: string | null }>();
