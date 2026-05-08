@@ -91,11 +91,16 @@ Deno.serve(async (req) => {
       return { season: s, total, byPos, top3Spend, topPick };
     });
 
-    // Average position spend across seasons
+    // Average position spend + count across seasons
     const avgByPos: Record<string, number> = {};
+    const avgCountByPos: Record<string, number> = {};
     for (const pos of POS_GROUPS) {
-      const sum = perSeason.reduce((s, ps) => s + (ps.byPos[pos]?.spend ?? 0), 0);
-      avgByPos[pos] = perSeason.length ? Math.round(sum / perSeason.length) : 0;
+      const sumSpend = perSeason.reduce((s, ps) => s + (ps.byPos[pos]?.spend ?? 0), 0);
+      const sumCount = perSeason.reduce((s, ps) => s + (ps.byPos[pos]?.count ?? 0), 0);
+      avgByPos[pos] = perSeason.length ? Math.round(sumSpend / perSeason.length) : 0;
+      avgCountByPos[pos] = perSeason.length
+        ? Math.round((sumCount / perSeason.length) * 10) / 10
+        : 0;
     }
     const avgTotal = perSeason.length
       ? Math.round(perSeason.reduce((s, ps) => s + ps.total, 0) / perSeason.length)
@@ -132,6 +137,7 @@ Deno.serve(async (req) => {
         perSeason,
         trends: {
           avgByPos,
+          avgCountByPos,
           avgTotal,
           avgTop3Pct,
           avgTopBid,

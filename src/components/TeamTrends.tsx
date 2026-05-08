@@ -2,11 +2,12 @@
 // over the last 3 seasons. Pulled from league_auction_history via the
 // team-trends edge function.
 import { useEffect, useState } from "react";
-import { TrendingUp, Crown, Target, Banknote } from "lucide-react";
+import { TrendingUp, Crown, Target, Banknote, ChevronDown } from "lucide-react";
 import { POS_COLORS } from "@/lib/positions";
 
 interface Trends {
   avgByPos: Record<string, number>;
+  avgCountByPos?: Record<string, number>;
   avgTotal: number;
   avgTop3Pct: number;
   avgTopBid: number;
@@ -33,6 +34,7 @@ const POS_ORDER = ["QB", "RB", "WR", "TE", "K", "DST"] as const;
 export default function TeamTrends({ teamId, teamName }: { teamId: number; teamName: string }) {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -94,26 +96,48 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
 
       {/* Avg spend by position */}
       <div>
-        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Avg spend by position
+        <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          Typical $ by position
+        </p>
+        <p className="mb-1.5 text-[10px] text-muted-foreground">
+          Total they've historically spent at each spot per draft (last {seasons.length} yrs). Tap a row to break it down.
         </p>
         <div className="space-y-1">
           {POS_ORDER.map((pos) => {
             const v = trends.avgByPos[pos] ?? 0;
+            const count = trends.avgCountByPos?.[pos] ?? 0;
+            const perPlayer = count > 0 ? Math.round(v / count) : 0;
             const pct = (v / maxSpend) * 100;
             const color = (POS_COLORS as any)[pos] ?? "bg-foreground/40";
+            const isOpen = expanded === pos;
+            const hasData = v > 0 || count > 0;
             return (
-              <div key={pos} className="flex items-center gap-2">
-                <span className="w-8 text-[10px] font-semibold text-muted-foreground">{pos}</span>
-                <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-foreground/5">
-                  <div
-                    className={`h-full ${color}`}
-                    style={{ width: `${pct}%` }}
+              <div key={pos}>
+                <button
+                  type="button"
+                  onClick={() => hasData && setExpanded(isOpen ? null : pos)}
+                  className="flex w-full items-center gap-2 rounded-md px-1 py-0.5 text-left transition hover:bg-foreground/5 disabled:cursor-default disabled:hover:bg-transparent"
+                  disabled={!hasData}
+                >
+                  <ChevronDown
+                    className={`h-3 w-3 shrink-0 text-muted-foreground transition-transform ${
+                      isOpen ? "rotate-0" : "-rotate-90"
+                    } ${hasData ? "" : "opacity-30"}`}
                   />
-                </div>
-                <span className="w-10 text-right text-[10px] tabular-nums text-foreground/80">
-                  ${v}
-                </span>
+                  <span className="w-8 text-[10px] font-semibold text-muted-foreground">{pos}</span>
+                  <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-foreground/5">
+                    <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="w-10 text-right text-[10px] tabular-nums text-foreground/80">
+                    ${v}
+                  </span>
+                </button>
+                {isOpen && hasData && (
+                  <div className="ml-6 mt-0.5 mb-1 rounded-md bg-foreground/5 px-2 py-1 text-[11px] text-foreground/80">
+                    Drafts <strong>{count}</strong> {pos}{count === 1 ? "" : "s"} per year, averaging{" "}
+                    <strong>${perPlayer}</strong> each (${v} total).
+                  </div>
+                )}
               </div>
             );
           })}
