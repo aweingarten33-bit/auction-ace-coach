@@ -272,7 +272,7 @@ export function PlannerBody() {
             <div className="flex items-center gap-2">
               <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">2</span>
               <Calculator className="h-4 w-4 text-primary" />
-              <h2 className="text-sm font-semibold">$ per roster slot</h2>
+              <h2 className="broadcast-label text-foreground">$ per roster slot</h2>
             </div>
             <div className="flex items-center gap-1">
               <Button
@@ -288,8 +288,9 @@ export function PlannerBody() {
             </div>
           </div>
           <p className="mb-3 text-[11px] text-muted-foreground">
-            Edit any slot. Auto-suggest splits your <span className="font-mono">${settings.totalBudget}</span> using your{" "}
-            <span className="font-semibold text-foreground">{strategy.label}</span> shape.
+            Edit any slot. Auto-suggest splits your{" "}
+            <span className="scoreboard-tile font-score score-digit text-xs px-2 py-0.5 mx-0.5 align-middle">${settings.totalBudget}</span>{" "}
+            using your <span className="font-semibold text-foreground">{strategy.label}</span> shape.
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {slots.map((s) => (
@@ -300,7 +301,7 @@ export function PlannerBody() {
                   type="number" inputMode="numeric" min={1}
                   value={slotAllocations[s.id] ?? ""}
                   onChange={(e) => setSlotAllocation(s.id, Math.max(1, parseInt(e.target.value, 10) || 1))}
-                  className="h-7 w-full px-1.5 text-sm tabular-nums"
+                  className="h-7 w-full px-1.5 text-sm font-score score-digit whistle-focus"
                 />
               </div>
             ))}

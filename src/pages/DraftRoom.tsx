@@ -424,7 +424,7 @@ export default function DraftRoom() {
         <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
           {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
         </h1>
-        <p className="mt-0.5 text-xs text-muted-foreground">
+        <p className="mt-1 broadcast-label">
           Auction Draft Assistant
         </p>
       </div>
@@ -488,7 +488,7 @@ export default function DraftRoom() {
                 >
                   {espnSync.liveBid.player}
                 </button>
-                <span className="ml-auto font-mono tabular-nums text-foreground">
+                <span className="ml-auto scoreboard-tile font-score score-digit text-sm accent-flare">
                   ${espnSync.liveBid.price}
                 </span>
                 {espnSync.liveBid.bidder && (
