@@ -455,7 +455,16 @@ export default function DraftRoom() {
             <button
               key={id}
               type="button"
-              onClick={() => setToolPage(id)}
+              onClick={(e) => {
+                const el = e.currentTarget.querySelector("svg");
+                if (el) {
+                  el.classList.remove("icon-tap-pulse");
+                  // force reflow so animation restarts
+                  void (el as SVGElement).getBoundingClientRect();
+                  el.classList.add("icon-tap-pulse");
+                }
+                setToolPage(id);
+              }}
               className="flex flex-col items-center gap-2 shrink-0 text-foreground active:opacity-70 transition"
             >
               <Icon strokeWidth={1.25} className="size-9" />
