@@ -17,6 +17,8 @@ import {
   ListOrdered,
   TrendingUp,
   ExternalLink,
+  Calculator,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
@@ -51,7 +53,7 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import TeamTrends from "@/components/TeamTrends";
-import PositionBudgetBar from "@/components/PositionBudgetBar";
+import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
@@ -76,7 +78,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  type ToolId = "lookup" | "top100" | "market" | "fantasylife";
+  type ToolId = "lookup" | "top100" | "market" | "budget" | "strategy" | "fantasylife";
   const [toolPage, setToolPage] = useState<ToolId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
@@ -231,18 +233,20 @@ export default function DraftRoom() {
           <div className="-mx-5 px-5 flex gap-6 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             {[
               { id: "lookup" as const,      icon: Search,       label: "Find" },
-              { id: "top100" as const,      icon: ListOrdered,  label: leagueName ? `${leagueName} Top 50` : "Top 50" },
+              { id: "top100" as const,      icon: ListOrdered,  label: leagueName ? `${leagueName}'s Top 50` : "Top 50" },
               { id: "market" as const,      icon: TrendingUp,   label: "Market" },
+              { id: "budget" as const,      icon: Calculator,   label: "Budget planner" },
+              { id: "strategy" as const,    icon: Star,         label: "Draft strategy" },
               { id: "fantasylife" as const, icon: ExternalLink, label: "News" },
             ].map(({ id, icon: Icon, label }) => (
               <button
                 key={id}
                 type="button"
                 onClick={() => setToolPage(id)}
-                className="flex w-[88px] shrink-0 flex-col items-center gap-2 text-foreground active:opacity-70 transition"
+                className="flex w-[96px] shrink-0 flex-col items-center gap-2 text-foreground active:opacity-70 transition"
               >
                 <Icon strokeWidth={1.25} className="size-9" />
-                <span className="text-center text-[12px] font-normal leading-tight break-words">{label}</span>
+                <span className="max-w-[5.75rem] whitespace-normal text-center text-[12px] font-normal leading-tight [overflow-wrap:anywhere]">{label}</span>
               </button>
             ))}
           </div>
@@ -286,8 +290,6 @@ export default function DraftRoom() {
             />
           )}
 
-          {/* Budget planner — moved up so it's the second thing you see */}
-          <PositionBudgetBar />
 
           {/* Next-target suggestion (read-only) */}
           {selectedTeam && (
@@ -456,12 +458,16 @@ export default function DraftRoom() {
                 {toolPage === "lookup" && "Find"}
                 {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
                 {toolPage === "market" && "Market"}
+                {toolPage === "budget" && "Budget planner"}
+                {toolPage === "strategy" && "Draft strategy"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
               <p className="mb-6 text-sm text-muted-foreground">
                 {toolPage === "lookup" && "Search any player or dollar amount."}
                 {toolPage === "top100" && "Best-value board, math-backed."}
                 {toolPage === "market" && "Room pulse plus opponent scan."}
+                {toolPage === "budget" && "Full slot-by-slot budget plan for your roster build."}
+                {toolPage === "strategy" && "Your saved draft shape and spending rules."}
                 {toolPage === "fantasylife" && "Latest from fantasylife.com."}
               </p>
             </div>
@@ -496,6 +502,8 @@ export default function DraftRoom() {
                   <OpponentHeatmap settings={settings} />
                 </div>
               )}
+              {toolPage === "budget" && <PositionBudgetBar />}
+              {toolPage === "strategy" && <DraftStrategyPanel />}
               {toolPage === "fantasylife" && <FantasyLifeFeed />}
             </div>
           </div>
