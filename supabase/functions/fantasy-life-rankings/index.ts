@@ -32,34 +32,34 @@ const SOURCES: { source: string; label: string; position: string; url: string; k
     source: "dst", label: "DEF", position: "D/ST", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-defense-rankings-and-tiers-broncos-eagles-and-more",
   },
-  // — Sleepers / breakouts (under-the-radar league winners) —
-  {
-    source: "sleepers-all", label: "💤 Sleepers", position: "ALL", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-sleepers",
-  },
+  // — 2026 Sleepers / breakouts (under-the-radar league winners) —
   {
     source: "sleepers-qb", label: "💤 QB", position: "QB", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/quarterback-sleepers-for-fantasy-football-2025",
+    url: "https://www.fantasylife.com/articles/fantasy/early-qb-sleepers-for-2026-fantasy-football-can-you-feel-the-lov",
   },
   {
     source: "sleepers-rb", label: "💤 RB", position: "RB", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/running-back-sleepers-for-fantasy-football-2025",
+    url: "https://www.fantasylife.com/articles/fantasy/early-running-back-sleepers-for-2026-fantasy-football-the-return",
   },
   {
     source: "sleepers-wr", label: "💤 WR", position: "WR", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/wide-receiver-sleepers-for-2025-fantasy-football-keon-coleman-ra",
+    url: "https://www.fantasylife.com/articles/fantasy/early-wide-receiver-sleepers-for-2026-fantasy-football",
+  },
+  {
+    source: "sleepers-wr2", label: "💤 WR+", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/7-wr-sleepers-to-target-in-fantasy-football-2026-drafts",
+  },
+  {
+    source: "sleepers-te", label: "💤 TE", position: "TE", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/early-tight-end-sleepers-for-2026-fantasy-football",
   },
   {
     source: "breakouts", label: "🚀 Breakouts", position: "ALL", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-breakouts-marvin-mims-sean-tucker-and-more",
+    url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-2026-breakouts-luther-burden-cam-ward-and-more",
   },
   {
-    source: "breakouts-wr", label: "🚀 WR Y2-3", position: "WR", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/year-2-3-wide-receiver-breakouts-for-fantasy-football",
-  },
-  {
-    source: "breakouts-wr-late", label: "🚀 WR Late", position: "WR", kind: "sleeper",
-    url: "https://www.fantasylife.com/articles/fantasy/late-breakout-wide-receiver-candidates-for-2025-fantasy-football",
+    source: "my-guys", label: "⭐ My Guys", position: "ALL", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-2026-my-guys-targeting-joe-burrow-omarion-hampton-and-others-in-early-drafts",
   },
 ];
 
