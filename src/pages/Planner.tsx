@@ -283,15 +283,13 @@ export function PlannerBody() {
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <Button
-                variant="ghost" size="sm"
-                onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights, benchPrices))}
-                title="Auto-suggest from chosen strategy"
-                className="h-8 px-2 text-foreground hover:bg-white/10"
+                variant="ghost"
+                size="sm"
+                onClick={() => clearSlotAllocations()}
+                title="Reset all slot dollars to empty"
+                className="h-8 gap-1 px-2 text-foreground hover:bg-white/10"
               >
-                <RotateCcw className="mr-1 h-3.5 w-3.5" /> Suggest
-              </Button>
-              <Button variant="ghost" size="sm" onClick={() => clearSlotAllocations()} title="Clear" className="h-8 w-8 p-0 text-foreground hover:bg-white/10">
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-3.5 w-3.5" /> Clear
               </Button>
             </div>
           </div>
