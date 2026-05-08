@@ -403,7 +403,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
 
         // 6) Market consensus — last fallback for non-projected players (K, DST, etc.)
-        const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys()]);
+        const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys(), ...berryMap.keys(), ...blendedMap.keys()]);
         for (const k of allMarketKeys) {
           if (out[k]) continue;
           const mv = marketConsensus(k);
