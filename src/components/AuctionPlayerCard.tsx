@@ -97,7 +97,7 @@ export default function AuctionPlayerCard({ d }: Props) {
   }, [d.player]);
 
   const insights = computeCardInsights(d, settings, events, keepers);
-  const copy = useMemo(() => buildCopy(d, insights), [d, insights]);
+  const copy = useMemo(() => buildCopy(d, insights, proj.posRank), [d, insights, proj.posRank]);
 
   const cardNo = useMemo(() => {
     if (!d.player) return "001";
