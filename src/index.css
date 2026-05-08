@@ -564,3 +564,219 @@
     border: 1px solid currentColor;
   }
 }
+
+/* =====================================================================
+   FOOTBALL NOIR — Banksy stencil × Miller framing × surveillance intel
+   Additive layer. Tokens unchanged. Use sparingly, with intent.
+   ===================================================================== */
+@layer utilities {
+  /* ---------- STENCIL TYPOGRAPHY (Banksy, restrained) ---------- */
+  .font-stencil {
+    font-family: "Anton", "Bebas Neue", Impact, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    -webkit-text-stroke: 1px hsl(var(--bone));
+    color: transparent;
+    text-shadow: 3px 3px 0 hsl(0 0% 0% / 0.85);
+  }
+  .font-stencil-fill {
+    font-family: "Anton", "Bebas Neue", Impact, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: hsl(var(--bone));
+    text-shadow: 2px 2px 0 hsl(0 0% 0%), 4px 4px 0 hsl(var(--blood) / 0.7);
+  }
+  /* Spray-mist shadow — never literal graffiti */
+  .text-spray {
+    text-shadow:
+      0 0 6px hsl(var(--bone) / 0.3),
+      0 0 14px hsl(0 0% 0% / 0.6),
+      2px 2px 0 hsl(0 0% 0%);
+  }
+
+  /* ---------- CLASSIFIED / DOSSIER FRAMES ---------- */
+  .dossier {
+    position: relative;
+    background:
+      linear-gradient(180deg, hsl(var(--ink)) 0%, hsl(var(--charcoal)) 100%);
+    border: 1px solid hsl(var(--bone) / 0.55);
+    box-shadow: var(--shadow-brut), inset 0 0 0 1px hsl(0 0% 0%);
+    padding: 1.25rem;
+  }
+  .dossier::before {
+    content: "CLASSIFIED // EYES ONLY";
+    position: absolute; top: -10px; left: 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.6rem; letter-spacing: 0.32em;
+    background: hsl(var(--void)); color: hsl(var(--blood));
+    padding: 2px 8px; border: 1px solid hsl(var(--blood));
+  }
+  .dossier::after {
+    content: "FILE NO. ███-██";
+    position: absolute; bottom: -10px; right: 14px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.6rem; letter-spacing: 0.28em;
+    background: hsl(var(--void)); color: hsl(var(--paper));
+    padding: 2px 8px; border: 1px solid hsl(var(--bone) / 0.4);
+  }
+
+  /* Surveillance crosshairs (corner reticles) */
+  .reticle { position: relative; }
+  .reticle::before, .reticle::after {
+    content: ""; position: absolute; width: 14px; height: 14px;
+    border: 2px solid hsl(var(--dirty-gold)); pointer-events: none;
+  }
+  .reticle::before { top: 4px; left: 4px; border-right: 0; border-bottom: 0; }
+  .reticle::after  { bottom: 4px; right: 4px; border-left: 0; border-top: 0; }
+
+  /* Ripped / torn newsprint edge */
+  .torn-bottom {
+    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 10px), transparent 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='10'><path d='M0 0 L8 6 L16 2 L24 8 L34 1 L44 7 L56 3 L66 9 L78 2 L90 7 L102 1 L114 8 L126 2 L138 7 L150 1 L162 9 L174 3 L186 7 L200 2 L200 10 L0 10 Z' fill='black'/></svg>");
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(180deg, #000 calc(100% - 10px), transparent 100%);
+  }
+
+  /* ---------- TICKER RAIL ---------- */
+  .ticker-rail {
+    background: hsl(var(--void));
+    border-top: 1px solid hsl(var(--bone) / 0.4);
+    border-bottom: 1px solid hsl(var(--bone) / 0.4);
+    color: hsl(var(--bone));
+    font-family: "JetBrains Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.7rem;
+    overflow: hidden; white-space: nowrap;
+  }
+  .ticker-rail .ticker-track { display: inline-flex; gap: 2.5rem; padding: 6px 0; animation: ticker 40s linear infinite; }
+
+  /* ---------- FILE STAMPS (CLASSIFIED / URGENT / VOID) ---------- */
+  .file-stamp {
+    display: inline-block;
+    font-family: "Anton", Impact, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.95rem;
+    padding: 4px 12px;
+    border: 3px solid currentColor;
+    background: hsl(0 0% 0% / 0.4);
+    transform: rotate(-6deg);
+    text-shadow: 1px 1px 0 hsl(0 0% 0%);
+    opacity: 0.92;
+  }
+  .file-stamp-blood { color: hsl(var(--blood)); }
+  .file-stamp-gold  { color: hsl(var(--dirty-gold)); }
+  .file-stamp-bone  { color: hsl(var(--bone)); }
+
+  /* Redacted bar */
+  .redacted {
+    background: hsl(0 0% 0%); color: hsl(0 0% 0%);
+    padding: 0 0.4em; user-select: none;
+  }
+
+  /* ---------- INTEL VALUE — giant mono price block ---------- */
+  .intel-value {
+    font-family: "Anton", "Bebas Neue", Impact, sans-serif;
+    font-size: clamp(3rem, 9vw, 6.5rem);
+    line-height: 0.82;
+    letter-spacing: -0.01em;
+    color: hsl(var(--bone));
+    font-variant-numeric: tabular-nums;
+    text-shadow: 3px 3px 0 hsl(0 0% 0%), 6px 6px 0 hsl(var(--blood) / 0.55);
+  }
+  .intel-value-gold { color: hsl(var(--dirty-gold)); text-shadow: 3px 3px 0 hsl(0 0% 0%), 6px 6px 0 hsl(var(--blood) / 0.4); }
+
+  /* ---------- VERDICT BLOCKS — BUY / PASS / STEAL ---------- */
+  .verdict {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Anton", Impact, sans-serif;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    padding: 0.5rem 1.25rem;
+    border: 4px solid currentColor;
+    background: hsl(0 0% 0% / 0.55);
+    box-shadow: 6px 6px 0 0 hsl(0 0% 0%);
+  }
+  .verdict-buy   { color: hsl(var(--dirty-gold)); }
+  .verdict-pass  { color: hsl(var(--blood)); }
+  .verdict-steal { color: hsl(var(--bone)); border-color: hsl(var(--bone)); background: hsl(var(--blood) / 0.2); }
+
+  /* ---------- SODIUM-VAPOR LAMP / RAIN PANEL ---------- */
+  .lamp-glow {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% -10%, hsl(47 65% 53% / 0.16), transparent 70%),
+      hsl(var(--ink));
+  }
+  .rain-overlay { position: relative; }
+  .rain-overlay::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      repeating-linear-gradient(170deg, transparent 0 8px, hsl(var(--bone) / 0.04) 8px 9px),
+      repeating-linear-gradient(170deg, transparent 0 22px, hsl(var(--bone) / 0.025) 22px 23px);
+    mix-blend-mode: screen;
+  }
+
+  /* ---------- BANKSY-LIGHT TAPE STRIP ---------- */
+  .tape {
+    display: inline-block;
+    background:
+      repeating-linear-gradient(45deg, hsl(var(--warning-yellow)) 0 14px, hsl(0 0% 0%) 14px 28px);
+    color: hsl(var(--void));
+    font-family: "Anton", Impact, sans-serif;
+    text-transform: uppercase; letter-spacing: 0.18em;
+    padding: 4px 10px; font-size: 0.7rem;
+  }
+
+  /* ---------- COLUMN RULE (newspaper) ---------- */
+  .col-rule { border-left: 1px solid hsl(var(--bone) / 0.25); padding-left: 1rem; }
+  .col-rule-gold { border-left: 2px solid hsl(var(--dirty-gold)); padding-left: 1rem; }
+
+  /* ---------- THUMB-ZONE STICKY ACTION RAIL (mobile war-room) ---------- */
+  .thumb-rail {
+    position: sticky; bottom: 0; z-index: 30;
+    background: hsl(var(--void) / 0.96);
+    backdrop-filter: blur(8px);
+    border-top: 3px solid hsl(var(--bone));
+    box-shadow: 0 -2px 0 hsl(var(--blood)), 0 -10px 24px hsl(0 0% 0% / 0.7);
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+@layer components {
+  /* Strengthen masthead — newspaper banner with blood underline */
+  header, .site-header {
+    position: relative;
+  }
+  header::after, .site-header::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 3px;
+    background: repeating-linear-gradient(90deg, hsl(var(--blood)) 0 24px, transparent 24px 32px);
+    pointer-events: none;
+  }
+
+  /* Tabs — command terminal */
+  [role="tablist"] {
+    border-bottom: 2px solid hsl(var(--bone));
+    background: transparent;
+  }
+  [role="tab"] {
+    border-radius: 0 !important;
+    font-family: "JetBrains Mono", monospace;
+    text-transform: uppercase; letter-spacing: 0.16em;
+    font-size: 0.7rem;
+  }
+  [role="tab"][data-state="active"] {
+    background: hsl(var(--bone));
+    color: hsl(var(--void));
+    box-shadow: inset 0 -3px 0 hsl(var(--dirty-gold));
+  }
+
+  /* Dialogs — heavy noir, no glass */
+  [role="dialog"] {
+    border-radius: 0 !important;
+    border: 2px solid hsl(var(--bone)) !important;
+    box-shadow: var(--shadow-brut-xl), inset 0 0 0 1px hsl(0 0% 0%) !important;
+    background: hsl(var(--ink)) !important;
+  }
+}
+
