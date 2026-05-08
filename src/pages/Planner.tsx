@@ -267,46 +267,51 @@ export function PlannerBody() {
 
         {/* ---------- Step 2: Slot allocation ---------- */}
 
-        <Card className="p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">2</span>
-              <Calculator className="h-4 w-4 text-primary" />
-              <h2 className="broadcast-label text-foreground">$ per roster slot</h2>
+        <div className="rounded-2xl bg-[#141414] p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5">
+                <Calculator className="h-4 w-4 text-foreground" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Step 2</div>
+                <h2 className="truncate text-[15px] font-semibold text-foreground">$ per roster slot</h2>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <Button
                 variant="ghost" size="sm"
                 onClick={() => setSlotAllocations(suggestedAllocations(slots, settings.totalBudget, strategy.weights, benchPrices))}
                 title="Auto-suggest from chosen strategy"
+                className="h-8 px-2 text-foreground hover:bg-white/10"
               >
                 <RotateCcw className="mr-1 h-3.5 w-3.5" /> Suggest
               </Button>
-              <Button variant="ghost" size="sm" onClick={() => clearSlotAllocations()} title="Clear">
+              <Button variant="ghost" size="sm" onClick={() => clearSlotAllocations()} title="Clear" className="h-8 w-8 p-0 text-foreground hover:bg-white/10">
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
-          <p className="mb-3 text-[11px] text-muted-foreground">
+          <p className="mb-3 text-[12px] leading-snug text-muted-foreground">
             Edit any slot. Auto-suggest splits your{" "}
-            <span className="scoreboard-tile font-score score-digit text-xs px-2 py-0.5 mx-0.5 align-middle">${settings.totalBudget}</span>{" "}
+            <span className="font-semibold text-foreground">${settings.totalBudget}</span>{" "}
             using your <span className="font-semibold text-foreground">{strategy.label}</span> shape.
           </p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
             {slots.map((s) => (
-              <div key={s.id} className="flex items-center gap-2 rounded-md border bg-card/50 px-2 py-1.5">
-                <div className="w-14 shrink-0 text-xs font-medium">{s.label}</div>
-                <span className="text-muted-foreground">$</span>
+              <div key={s.id} className="flex items-center gap-2 rounded-xl bg-white/[0.04] px-2.5 py-2">
+                <div className="w-12 shrink-0 text-[12px] font-medium text-foreground">{s.label}</div>
+                <span className="text-xs text-muted-foreground">$</span>
                 <Input
                   type="number" inputMode="numeric" min={1}
                   value={slotAllocations[s.id] ?? ""}
                   onChange={(e) => setSlotAllocation(s.id, Math.max(1, parseInt(e.target.value, 10) || 1))}
-                  className="h-7 w-full px-1.5 text-sm font-score score-digit whistle-focus"
+                  className="h-7 w-full border-0 bg-transparent px-1 text-sm font-semibold tabular-nums text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             ))}
           </div>
-        </Card>
+        </div>
 
         {/* Affordability checker moved to the menu (Can I afford X+Y+Z?) */}
 
