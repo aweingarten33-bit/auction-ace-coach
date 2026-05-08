@@ -418,10 +418,19 @@ export default function DraftRoom() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* ── LEAGUE TITLE BAR ─────────────────────────────────────────── */}
+      <div
+        className="border-b border-border/40 bg-background/95 px-4 py-2 text-center"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
+      >
+        <h1 className="truncate text-sm font-semibold uppercase tracking-wider text-foreground">
+          {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}{" "}
+          <span className="text-muted-foreground">Auction Draft Assistant</span>
+        </h1>
+      </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
       <header
         className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
