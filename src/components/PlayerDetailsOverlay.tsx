@@ -148,6 +148,10 @@ export default function PlayerDetailsOverlay({
           anchor={anchor}
           posRank={posRank}
           totalAtPos={totalAtPos}
+          remaining={remaining}
+          maxBid={maxBid}
+          slotsLeft={slotsLeft}
+          gaps={gaps}
         />
 
         {/* Sleeper meta grid */}
