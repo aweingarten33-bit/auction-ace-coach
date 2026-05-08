@@ -110,10 +110,32 @@ export default function DraftRoom() {
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
   const [highlight, setHighlight] = useState<number>(0);
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
+  const [leagueName, setLeagueName] = useState<string>("");
   const searchWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadSleeperPlayers().then(setSleeper).catch(() => {});
+  }, []);
+
+  // Pull league name from the most recent live_draft_event raw payload
+  useEffect(() => {
+    (async () => {
+      const cached = localStorage.getItem("league_name_cache");
+      if (cached) setLeagueName(cached);
+      const { data } = await supabase
+        .from("live_draft_events")
+        .select("raw")
+        .order("created_at", { ascending: false })
+        .limit(25);
+      const rows = (data ?? []) as Array<{ raw: any }>;
+      const found = rows.find((r) => r?.raw?.league?.name)?.raw?.league?.name as
+        | string
+        | undefined;
+      if (found) {
+        setLeagueName(found);
+        try { localStorage.setItem("league_name_cache", found); } catch { /* ignore */ }
+      }
+    })();
   }, []);
 
   // Anchor price map: league 3yr avg + ESPN 2026 auction value, used by
@@ -396,10 +418,19 @@ export default function DraftRoom() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* ── LEAGUE TITLE BAR ─────────────────────────────────────────── */}
+      <div
+        className="border-b border-border/40 bg-background/95 px-4 py-2 text-center"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
+      >
+        <h1 className="truncate text-sm font-semibold uppercase tracking-wider text-foreground">
+          {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}{" "}
+          <span className="text-muted-foreground">Auction Draft Assistant</span>
+        </h1>
+      </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
       <header
         className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
       >
         <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
