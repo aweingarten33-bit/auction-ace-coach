@@ -74,6 +74,7 @@ import MoneyHero from "@/components/MoneyHero";
 import AiQuickPanel from "@/components/AiQuickPanel";
 
 import AffordabilityChecker from "@/components/AffordabilityChecker";
+import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
 import PricingMathExplainer from "@/components/PricingMathExplainer";
