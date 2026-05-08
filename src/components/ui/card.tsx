@@ -3,29 +3,26 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Industrial Card — bolted module. Includes corner screws + vent slots.
+ * Cyberpunk Card — chamfered tech panel with corner accents + neon hover glow.
  */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "screws relative bg-background text-card-foreground rounded-2xl",
-        "shadow-[var(--shadow-card)]",
+        "relative bg-card text-card-foreground cyber-chamfer",
+        "border border-border",
         "transition-all duration-300 ease-mech",
-        "hover:-translate-y-1 hover:shadow-[var(--shadow-floating)]",
+        "hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[var(--glow-primary-sm)]",
         className,
       )}
       {...props}
     >
-      {/* Vent slots (top-right) */}
-      <div className="pointer-events-none absolute right-4 top-3 flex gap-1">
-        <span className="vent-slot" />
-        <span className="vent-slot" />
-        <span className="vent-slot" />
-      </div>
-      {/* Bottom-corner screws */}
-      <div className="screws-bottom" />
+      {/* HUD corner accents */}
+      <span className="pointer-events-none absolute left-0 top-0 h-3 w-3 border-l border-t border-primary/70" />
+      <span className="pointer-events-none absolute right-0 top-0 h-3 w-3 border-r border-t border-primary/70" />
+      <span className="pointer-events-none absolute left-0 bottom-0 h-3 w-3 border-l border-b border-primary/70" />
+      <span className="pointer-events-none absolute right-0 bottom-0 h-3 w-3 border-r border-b border-primary/70" />
       {children}
     </div>
   ),
@@ -43,7 +40,10 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn("font-display text-2xl font-bold tracking-tight text-foreground text-emboss", className)}
+      className={cn(
+        "font-display text-xl font-bold tracking-[0.12em] uppercase text-primary text-glow",
+        className,
+      )}
       {...props}
     />
   ),
@@ -52,7 +52,11 @@ CardTitle.displayName = "CardTitle";
 
 const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-muted-foreground leading-relaxed", className)} {...props} />
+    <p
+      ref={ref}
+      className={cn("text-sm text-muted-foreground leading-relaxed font-mono", className)}
+      {...props}
+    />
   ),
 );
 CardDescription.displayName = "CardDescription";
