@@ -35,7 +35,7 @@ export default function PricingMathExplainer() {
         <div className="mt-4 space-y-4 text-sm text-foreground/90 leading-relaxed">
           <section>
             <p className="text-muted-foreground">
-              We built our own algorithm. It doesn't just copy ESPN or Sleeper — it watches <span className="text-foreground font-medium">your league</span> and learns how your money actually moves.
+              A custom algorithm was built for this. It doesn't just copy ESPN or Sleeper — it watches <span className="text-foreground font-medium">your league</span> and learns how the money actually moves.
             </p>
           </section>
 
@@ -44,7 +44,7 @@ export default function PricingMathExplainer() {
               🧠 The brain
             </h3>
             <p className="text-muted-foreground">
-              It uses <span className="text-foreground font-medium">Bayesian reasoning</span> — fancy way of saying it starts with what the market thinks, then updates that belief every time new info comes in. Same math NASA uses to land rovers. We use it to win your draft.
+              It runs on <span className="text-foreground font-medium">Bayesian reasoning</span> — fancy way of saying it starts with what the market thinks, then updates that belief every time new info comes in. Same math NASA uses to land rovers. Here it's used to win your draft.
             </p>
           </section>
 
@@ -53,7 +53,7 @@ export default function PricingMathExplainer() {
               📜 Your league's receipts
             </h3>
             <p className="text-muted-foreground">
-              We pull <span className="text-foreground font-medium">3 years of your actual auction results</span> and learn your league's personality — who overpays at WR, who hoards RBs, who always sleeps on TE. Recent years count more than older ones, so last year's habits matter most. That's your league's fingerprint, and no other tool has it.
+              <span className="text-foreground font-medium">3 years of your actual auction results</span> get pulled in to learn your league's personality — who overpays at WR, who hoards RBs, who always sleeps on TE. Recent years count more than older ones, so last year's habits matter most. That's your league's fingerprint, and no other tool has it.
             </p>
           </section>
 
@@ -62,7 +62,7 @@ export default function PricingMathExplainer() {
               👀 What else it watches
             </h3>
             <p className="text-muted-foreground">
-              Expert consensus and live news layer on top. It weighs all three based on which one is most trustworthy <span className="text-foreground">for that specific player</span>.
+              Expert consensus and live news layer on top. All three sources get weighted based on which one is most trustworthy <span className="text-foreground">for that specific player</span>.
             </p>
           </section>
 
@@ -71,12 +71,12 @@ export default function PricingMathExplainer() {
               🎯 At the table
             </h3>
             <p className="text-muted-foreground">
-              Every bid, it does the math on your wallet, your open spots, and how thin the position is — and tells you the most you should pay. Period. No bloat, no math you have to do in your head.
+              Every bid, it does the math on your wallet, your open spots, and how thin the position is — then tells you the most you should pay. Period. No bloat, no math you have to do in your head.
             </p>
           </section>
 
           <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground italic pt-2 border-t border-border/40">
-            <Lock className="h-3 w-3" /> The actual formulas are ours. We're not telling.
+            <Lock className="h-3 w-3" /> The actual formulas stay locked.
           </p>
         </div>
       )}
