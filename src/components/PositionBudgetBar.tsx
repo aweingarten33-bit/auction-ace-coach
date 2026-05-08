@@ -19,6 +19,8 @@ export default function PositionBudgetBar() {
   const events = useDraftStore((s) => s.events);
   const { map: vorpMap } = useVorpMap(settings);
 
+  const prices = useDraftStore((s) => s.prices);
+
   const data = useMemo(() => {
     const budget = computeBudget(settings, keepers, events);
     const myEvents = events.filter((e) => e.drafter === "me");
@@ -28,23 +30,58 @@ export default function PositionBudgetBar() {
       spent[p] = (spent[p] ?? 0) + k.cost;
     }
 
-    // Heuristic fair-% by league type:
     const isSF = settings.leagueType !== "Standard" && settings.roster.SUPERFLEX > 0;
-    const fairPct: Record<Position, number> = isSF
+    const r = settings.roster;
+    const teams = Math.max(1, settings.numTeams);
+
+    // Approx starters needed per team per position (FLEX split RB/WR/TE)
+    const startersPerTeam: Record<Position, number> = {
+      QB: r.QB + (isSF ? r.SUPERFLEX : 0),
+      RB: r.RB + r.FLEX * 0.5,
+      WR: r.WR + r.FLEX * 0.4,
+      TE: r.TE + r.FLEX * 0.1,
+      K: r.K,
+      DST: r.DST,
+    };
+    // Bench depth split (RB/WR heavy)
+    const benchSplit: Record<Position, number> = {
+      QB: 0.1, RB: 0.4, WR: 0.4, TE: 0.1, K: 0, DST: 0,
+    };
+    const rosterableByPos: Record<Position, number> = {
+      QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DST: 0,
+    };
+    for (const p of POSITIONS) {
+      rosterableByPos[p] = Math.round((startersPerTeam[p] + r.BENCH * benchSplit[p]) * teams);
+    }
+
+    // Sum top-N prices per position from user's price sheet
+    const pricesByPos: Record<Position, number[]> = { QB: [], RB: [], WR: [], TE: [], K: [], DST: [] };
+    for (const p of prices) {
+      if (p.position && p.position in pricesByPos) pricesByPos[p.position].push(p.price);
+    }
+    for (const p of POSITIONS) pricesByPos[p].sort((a, b) => b - a);
+
+    // Heuristic fallback if no prices uploaded
+    const fallbackPct: Record<Position, number> = isSF
       ? { QB: 0.22, RB: 0.34, WR: 0.30, TE: 0.10, K: 0.02, DST: 0.02 }
       : { QB: 0.07, RB: 0.42, WR: 0.36, TE: 0.11, K: 0.02, DST: 0.02 };
 
     return POSITIONS.map((pos) => {
       const dollars = spent[pos] ?? 0;
-      const actualPct = budget.totalBudget > 0 ? dollars / budget.totalBudget : 0;
-      const targetPct = fairPct[pos];
-      const targetDollars = Math.round(budget.totalBudget * targetPct);
-      const overBy = Math.round((actualPct - targetPct) * budget.totalBudget);
+      const need = rosterableByPos[pos];
+      const topN = pricesByPos[pos].slice(0, need);
+      const sumTopN = topN.reduce((s, v) => s + v, 0);
+      const fromPrices = need > 0 && topN.length >= Math.min(need, 3)
+        ? Math.round(sumTopN / teams)
+        : 0;
+      const targetDollars = fromPrices > 0 ? fromPrices : Math.round(budget.totalBudget * fallbackPct[pos]);
+      const overBy = dollars - targetDollars;
       const status: "under" | "ok" | "over" =
         overBy >= 25 ? "over" : overBy <= -targetDollars * 0.5 && spent[pos] != null ? "under" : "ok";
-      return { pos, dollars, actualPct, targetPct, targetDollars, overBy, status };
+      return { pos, dollars, targetDollars, overBy, status };
     });
-  }, [settings, keepers, events, vorpMap]);
+  }, [settings, keepers, events, prices]);
+
 
   const totalSpent = data.reduce((s, d) => s + d.dollars, 0);
   if (totalSpent === 0 && events.length === 0 && keepers.length === 0) return null;
