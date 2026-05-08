@@ -39,6 +39,7 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [showHelp, setShowHelp] = useState(false);
+  const [breakdownMode, setBreakdownMode] = useState<"total" | "perPlayer">("total");
 
   useEffect(() => {
     let cancelled = false;
