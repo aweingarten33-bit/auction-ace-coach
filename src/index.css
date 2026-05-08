@@ -1,81 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   NEUMORPHISM — Soft UI
-   Cool clay surface. All depth lives in shadow play.
-   Single material, molded — never placed.
+   BANKSY FOOTBALL — Street-art stencil system
+   Dark concrete, bleached-paper text, blood-red spray, hard offsets.
+   No soft shadows. No gradients. Edges are torn, not smoothed.
    ===================================================================== */
 
 @layer base {
   :root {
-    /* Cool monochromatic surface. HSL of #E0E5EC */
-    --background: 216 19% 90%;
-    --foreground: 213 14% 28%;          /* #3D4852 */
+    /* Concrete & paint */
+    --background: 0 0% 6%;              /* #0F0F0F asphalt */
+    --foreground: 45 16% 97%;           /* #FAF9F6 bleached paper */
 
-    --card: 216 19% 90%;                /* same as bg — molded, not placed */
-    --card-foreground: 213 14% 28%;
+    --surface: 0 0% 10%;                /* #1A1A1A wall surface */
+    --surface-2: 0 0% 14%;              /* slightly raised wall */
 
-    --popover: 216 19% 90%;
-    --popover-foreground: 213 14% 28%;
+    --card: 0 0% 10%;
+    --card-foreground: 45 16% 97%;
 
-    --primary: 244 100% 70%;            /* #6C63FF soft violet */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 244 100% 76%;       /* #8B84FF */
+    --popover: 0 0% 6%;
+    --popover-foreground: 45 16% 97%;
 
-    --secondary: 216 19% 90%;           /* matches bg — neumorphic secondary */
-    --secondary-foreground: 213 14% 28%;
+    --primary: 357 96% 46%;             /* #E30613 Banksy red */
+    --primary-foreground: 45 16% 97%;
+    --primary-glow: 357 96% 56%;
 
-    --muted: 216 19% 90%;
-    --muted-foreground: 220 9% 46%;     /* #6B7280 — WCAG AA */
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 45 16% 97%;
 
-    --accent: 175 51% 46%;              /* #38B2AC teal — success/positive */
-    --accent-foreground: 0 0% 100%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 60%;       /* #999 weathered grey, AA on dark */
 
-    --destructive: 0 72% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --accent: 51 100% 50%;              /* #FFD700 caution yellow */
+    --accent-foreground: 0 0% 6%;
 
-    --warning: 38 92% 55%;
-    --warning-foreground: 0 0% 100%;
+    --destructive: 357 96% 46%;
+    --destructive-foreground: 45 16% 97%;
 
-    --success: 175 51% 46%;
-    --success-foreground: 0 0% 100%;
+    --warning: 51 100% 50%;
+    --warning-foreground: 0 0% 6%;
 
-    --border: 216 19% 90%;              /* invisible — shadows define edges */
-    --input: 216 19% 90%;
-    --ring: 244 100% 70%;
+    --success: 152 71% 14%;             /* pitch green */
+    --success-foreground: 45 16% 97%;
 
-    --radius: 1rem;                     /* 16px base — soft pillows */
+    --border: 0 0% 18%;                 /* visible: stencil cuts */
+    --input: 0 0% 14%;
+    --ring: 357 96% 46%;
 
-    /* ── SHADOW SYSTEM — RGBA for smooth blending ─────────────────── */
-    --neu-light: 255, 255, 255;
-    --neu-dark:  163, 177, 198;
+    --radius: 0;                        /* sharp by default */
 
-    --shadow-extruded:       9px 9px 16px rgba(var(--neu-dark), 0.6),  -9px -9px 16px rgba(var(--neu-light), 0.5);
-    --shadow-extruded-hover: 12px 12px 20px rgba(var(--neu-dark), 0.7), -12px -12px 20px rgba(var(--neu-light), 0.6);
-    --shadow-extruded-sm:    5px 5px 10px rgba(var(--neu-dark), 0.6),  -5px -5px 10px rgba(var(--neu-light), 0.5);
-    --shadow-inset:          inset 6px 6px 10px rgba(var(--neu-dark), 0.6),  inset -6px -6px 10px rgba(var(--neu-light), 0.5);
-    --shadow-inset-deep:     inset 10px 10px 20px rgba(var(--neu-dark), 0.7), inset -10px -10px 20px rgba(var(--neu-light), 0.6);
-    --shadow-inset-sm:       inset 3px 3px 6px rgba(var(--neu-dark), 0.6),   inset -3px -3px 6px rgba(var(--neu-light), 0.5);
+    /* Stencil shadow system — hard, offset, no blur */
+    --shadow-stencil:    4px 4px 0 rgba(0, 0, 0, 0.95);
+    --shadow-stencil-lg: 6px 6px 0 rgba(0, 0, 0, 0.95);
+    --shadow-spray-red:  0 0 14px rgba(227, 6, 19, 0.55), 4px 4px 0 rgba(0, 0, 0, 0.95);
+    --shadow-spray-soft: 0 0 18px rgba(227, 6, 19, 0.35);
+    --shadow-cut:        2px 2px 0 rgba(227, 6, 19, 0.9), -2px -2px 0 rgba(0, 0, 0, 0.95);
 
-    --sidebar-background: 216 19% 90%;
-    --sidebar-foreground: 213 14% 28%;
-    --sidebar-primary: 244 100% 70%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 216 19% 90%;
-    --sidebar-accent-foreground: 213 14% 28%;
-    --sidebar-border: 216 19% 90%;
-    --sidebar-ring: 244 100% 70%;
+    /* Aged-paper / concrete grain (SVG noise) */
+    --noise-url: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 45 16% 97%;
+    --sidebar-primary: 357 96% 46%;
+    --sidebar-primary-foreground: 45 16% 97%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 45 16% 97%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 357 96% 46%;
   }
 
-  .dark { /* Neumorphism is a single-mode system; alias dark to light. */ }
+  .dark { /* single-mode system */ }
 
   * {
     @apply border-border;
-    border-color: transparent; /* shadows do the work */
   }
 
   html {
@@ -91,98 +92,160 @@
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-family: "Space Grotesk", "Courier New", ui-monospace, monospace;
+    font-weight: 500;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
+    background-image: var(--noise-url);
+    background-repeat: repeat;
+    background-size: 160px 160px;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Plus Jakarta Sans", "DM Sans", sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
+    font-weight: 400;            /* Anton is naturally heavy */
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: hsl(var(--foreground));
+    line-height: 0.95;
   }
-  h1 { font-weight: 800; }
+  h1 { letter-spacing: 0.02em; }
 
   ::selection {
-    background: hsl(244 100% 70% / 0.25);
-    color: hsl(213 14% 20%);
+    background: hsl(var(--primary));
+    color: hsl(var(--foreground));
   }
 }
 
 @layer utilities {
-  /* ── Neumorphic shadow utilities ──────────────────────────────── */
-  .shadow-neu             { box-shadow: var(--shadow-extruded); }
-  .shadow-neu-hover       { box-shadow: var(--shadow-extruded-hover); }
-  .shadow-neu-sm          { box-shadow: var(--shadow-extruded-sm); }
-  .shadow-neu-inset       { box-shadow: var(--shadow-inset); }
-  .shadow-neu-inset-deep  { box-shadow: var(--shadow-inset-deep); }
-  .shadow-neu-inset-sm    { box-shadow: var(--shadow-inset-sm); }
+  .font-display { font-family: "Anton", "Bebas Neue", "Impact", sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
+  .font-body    { font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif; }
+  .font-stencil { font-family: "Anton", "Bebas Neue", "Impact", sans-serif; text-transform: uppercase; letter-spacing: 0.06em; }
+  .font-mono-rough { font-family: "Courier New", ui-monospace, monospace; letter-spacing: 0.02em; }
 
-  .font-display { font-family: "Plus Jakarta Sans", "DM Sans", sans-serif; }
-  .font-body    { font-family: "DM Sans", sans-serif; }
+  .shadow-stencil    { box-shadow: var(--shadow-stencil); }
+  .shadow-stencil-lg { box-shadow: var(--shadow-stencil-lg); }
+  .shadow-spray-red  { box-shadow: var(--shadow-spray-red); }
+  .shadow-cut        { box-shadow: var(--shadow-cut); }
 
-  /* Floating ambient motion */
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-6px); }
+  /* Spray drop-shadow on text and icons */
+  .stencil-text {
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.95);
   }
-  .animate-float { animation: float 3s ease-in-out infinite; }
+  .stencil-text-red {
+    color: hsl(var(--primary));
+    text-shadow: 3px 3px 0 rgba(0,0,0,0.95), 0 0 12px rgba(227, 6, 19, 0.5);
+  }
+
+  /* Slight rebellious tilt */
+  .tilt-l { transform: rotate(-1.5deg); }
+  .tilt-r { transform: rotate(1.2deg); }
+
+  /* Torn-poster bottom edge */
+  .torn-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 14px), transparent 100%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%25' height='14' preserveAspectRatio='none'><path d='M0,14 L0,8 L6,12 L12,4 L20,11 L28,3 L36,12 L44,6 L52,13 L60,2 L70,11 L78,5 L86,12 L96,4 L104,13 L114,7 L122,12 L132,3 L140,12 L150,6 L160,13 L170,4 L180,12 L190,7 L200,13 L210,5 L220,12 L230,4 L240,13 L250,6 L260,12 L270,3 L280,12 L290,7 L300,13 L310,4 L320,13 L330,8 L340,12 L350,4 L360,13 L370,6 L380,12 L390,3 L400,13 L1000,13 L1000,14 Z' fill='black'/></svg>");
+    mask-composite: intersect;
+  }
+
+  /* Concrete grain overlay you can drop on hero blocks */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--noise-url);
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* Pitch lines decorative bg */
+  .pitch-lines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent 0 24px,
+      hsl(var(--foreground) / 0.04) 24px 25px
+    );
+  }
+
+  /* Quick spray reveal */
+  @keyframes spray-in {
+    0%   { opacity: 0; filter: blur(6px); transform: translateY(4px); }
+    60%  { opacity: 1; filter: blur(0); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .animate-spray { animation: spray-in 350ms ease-out both; }
+
+  /* Vibration on press */
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    25%     { transform: translate(-1px, 1px); }
+    50%     { transform: translate(1px, -1px); }
+    75%     { transform: translate(-1px, -1px); }
+  }
+  .active\:shake:active { animation: shake 120ms linear 1; }
+
+  /* Banksy red glow pulse */
+  @keyframes red-pulse {
+    0%,100% { box-shadow: var(--shadow-spray-soft); }
+    50%     { box-shadow: 0 0 28px rgba(227,6,19,0.7); }
+  }
+  .animate-red-pulse { animation: red-pulse 2.4s ease-in-out infinite; }
 }
 
 /* =====================================================================
    AUTO-PROMOTION LAYER
-   Maps existing DraftRoom utility patterns → neumorphic depth.
-   No JSX changes required. Every container becomes molded clay.
+   Convert the existing DraftRoom utility patterns to Banksy stencil
+   without touching JSX.
    ===================================================================== */
 @layer components {
-  /* Sticky header — molded ridge instead of border */
+  /* Sticky header: thick black bar with red underline */
   header.sticky,
   .sticky.top-0 {
-    border-color: transparent !important;
-    box-shadow: 0 6px 12px -8px rgba(163,177,198,0.55);
+    background-color: hsl(var(--background)) !important;
+    border-bottom: 2px solid hsl(var(--primary)) !important;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.9);
+    backdrop-filter: none !important;
   }
 
-  /* Generic raised surfaces: any rounded container sitting on bg */
+  /* Generic raised surfaces — stencilled wall posters */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
   .rounded-2xl.border,
   [class*="bg-secondary/30"],
   [class*="bg-secondary/40"],
-  [class*="bg-secondary/60"] {
-    border-color: transparent !important;
-    background-color: hsl(var(--background)) !important;
-    box-shadow: var(--shadow-extruded-sm);
-    border-radius: 1rem !important;
+  [class*="bg-secondary/60"],
+  [class*="bg-card"] {
+    background-color: hsl(var(--surface)) !important;
+    border: 1.5px solid hsl(var(--foreground) / 0.85) !important;
+    border-radius: 0 !important;
+    box-shadow: var(--shadow-stencil);
+    color: hsl(var(--foreground));
   }
 
-  /* Active player / "now bidding" hero card — extra lift + accent ring */
+  /* "Hero" / active card — red spray glow */
   .border-2.border-primary {
-    border-color: transparent !important;
-    box-shadow:
-      var(--shadow-extruded-hover),
-      0 0 0 2px hsl(var(--primary) / 0.35);
-    border-radius: 1.25rem !important;
+    background-color: hsl(var(--surface)) !important;
+    border: 2px solid hsl(var(--primary)) !important;
+    border-radius: 0 !important;
+    box-shadow: var(--shadow-spray-red);
   }
 
-  /* Pills / chips (rounded-full + border) — pressed wells */
+  /* Pills / chips — stencil tags */
   .rounded-full.border {
-    border-color: transparent !important;
-    background-color: hsl(var(--background)) !important;
-    box-shadow: var(--shadow-inset-sm);
+    background-color: hsl(var(--surface)) !important;
+    border: 1.5px solid hsl(var(--foreground) / 0.8) !important;
+    border-radius: 0 !important;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.9);
+    color: hsl(var(--foreground));
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
   }
 
-  /* Slot rows (small bench cells) — subtle inset tracks */
-  main [class*="grid"] > div > div:has(> input),
-  main label:has(+ input),
-  main .rounded-md:has(> input) {
-    box-shadow: var(--shadow-inset-sm);
-    border-radius: 0.75rem !important;
-  }
-
-  /* All inputs — carved wells */
+  /* Inputs — flat dark slates with red focus */
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -190,199 +253,85 @@
   input:not([type]),
   textarea,
   select {
-    background-color: hsl(var(--background)) !important;
-    border-color: transparent !important;
-    box-shadow: var(--shadow-inset) !important;
-    border-radius: 0.875rem !important;
-    transition: box-shadow 250ms ease-out;
+    background-color: hsl(var(--surface-2)) !important;
+    color: hsl(var(--foreground)) !important;
+    border: 1.5px solid hsl(var(--foreground) / 0.6) !important;
+    border-radius: 0 !important;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.9) !important;
+    font-family: "Courier New", ui-monospace, monospace !important;
+    transition: box-shadow 120ms steps(2), border-color 120ms steps(2);
   }
-  input:focus,
-  textarea:focus,
-  select:focus {
-    box-shadow: var(--shadow-inset-deep), 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.5) !important;
+  input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground)); }
+  input:focus, textarea:focus, select:focus {
     outline: none !important;
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.9), 0 0 0 2px hsl(var(--primary)), 0 0 14px rgba(227,6,19,0.55) !important;
   }
 
-  /* Coach / floating action button — pillowed orb */
+  /* Floating coach orb — red spray-can target */
   .fixed.bottom-5.right-5 {
-    background-color: hsl(var(--background)) !important;
+    background-color: hsl(var(--primary)) !important;
+    border: 2px solid hsl(var(--foreground)) !important;
     border-radius: 9999px;
-    box-shadow: var(--shadow-extruded);
-    transition: box-shadow 300ms ease-out, transform 300ms ease-out;
+    box-shadow: var(--shadow-spray-red);
+    transition: transform 120ms steps(2), box-shadow 120ms steps(2);
   }
-  .fixed.bottom-5.right-5:hover { box-shadow: var(--shadow-extruded-hover); transform: translateY(-2px); }
-  .fixed.bottom-5.right-5:active { box-shadow: var(--shadow-inset); transform: translateY(1px); }
+  .fixed.bottom-5.right-5:hover { transform: rotate(-3deg) scale(1.04); }
+  .fixed.bottom-5.right-5:active { transform: translate(2px, 2px) rotate(2deg); box-shadow: 2px 2px 0 rgba(0,0,0,0.95); }
 
-  /* Code/destructive callout — keep semantics, soften shape */
+  /* Code/destructive callout */
   .rounded.bg-destructive\/10 {
-    border-radius: 0.875rem !important;
-    box-shadow: var(--shadow-inset-sm);
-    background-color: hsl(var(--destructive) / 0.08) !important;
-  }
-
-  /* Strip glow effects from old design */
-  .shadow-glow { box-shadow: var(--shadow-extruded-hover) !important; }
-}
-
-/* =====================================================================
-   PRIMETIME LAYER — Monday Night Football mode
-   Rides on top of neumorphism. Use sparingly, for stakes moments only.
-   ===================================================================== */
-@layer utilities {
-  /* Broadcast numerals — scoreboard tiles */
-  .font-score {
-    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-variant-numeric: tabular-nums;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-
-  /* Engraved primetime digit (sits on a tile) */
-  .score-digit {
+    border-radius: 0 !important;
+    background-color: hsl(var(--primary) / 0.15) !important;
+    border-left: 4px solid hsl(var(--primary)) !important;
+    box-shadow: var(--shadow-stencil);
     color: hsl(var(--foreground));
-    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
   }
 
-  /* Scoreboard tile — tighter shadow than a card, "broadcast hardware" */
+  /* Strip soft glows */
+  .shadow-glow { box-shadow: var(--shadow-spray-red) !important; }
+
+  /* Old neumorphic primetime helpers, retargeted to stencil */
   .scoreboard-tile {
-    background-color: hsl(var(--background));
-    border-radius: 0.75rem;
-    box-shadow: var(--shadow-extruded-sm);
-    padding: 0.75rem 1rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    background-color: hsl(var(--background)) !important;
+    border: 2px solid hsl(var(--foreground)) !important;
+    border-radius: 0 !important;
+    box-shadow: var(--shadow-stencil) !important;
+    padding: 0.5rem 0.75rem;
+    color: hsl(var(--foreground));
   }
-
-  /* Trophy plinth — for hero score reveals */
   .scoreboard-plinth {
-    background-color: hsl(var(--background));
-    border-radius: 1.5rem;
-    box-shadow: var(--shadow-extruded-hover);
-    padding: 2rem 2.5rem;
-    position: relative;
+    background-color: hsl(var(--surface)) !important;
+    border: 2px solid hsl(var(--primary)) !important;
+    border-radius: 0 !important;
+    box-shadow: var(--shadow-spray-red) !important;
+    padding: 1.5rem 2rem;
   }
-  .scoreboard-plinth::before {
-    content: "";
-    position: absolute;
-    inset: -8%;
-    background: radial-gradient(closest-side, hsl(var(--primary) / 0.22), transparent 70%);
-    filter: blur(24px);
-    z-index: -1;
-    border-radius: inherit;
-    pointer-events: none;
-  }
-
-  /* Broadcast lower-third label */
+  .font-score   { font-family: "Anton", "Bebas Neue", "Impact", sans-serif; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .score-digit  { color: hsl(var(--foreground)); text-shadow: 3px 3px 0 rgba(0,0,0,0.95); }
   .broadcast-label {
-    font-family: "Plus Jakarta Sans", sans-serif;
-    font-weight: 700;
+    font-family: "Anton", "Bebas Neue", "Impact", sans-serif;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.25em;
     font-size: 0.75rem;
-    color: hsl(var(--muted-foreground));
+    color: hsl(var(--primary));
   }
-
-  /* Stadium-light flare — subtle radial glow behind an element */
-  .accent-flare { position: relative; isolation: isolate; }
+  .accent-flare { position: relative; }
   .accent-flare::after {
-    content: "";
-    position: absolute;
-    inset: -20%;
-    background: radial-gradient(closest-side, hsl(var(--primary) / 0.28), transparent 70%);
-    filter: blur(28px);
-    z-index: -1;
-    pointer-events: none;
-    border-radius: inherit;
+    content: ""; position: absolute; inset: -10%;
+    background: radial-gradient(closest-side, hsl(var(--primary) / 0.45), transparent 70%);
+    z-index: -1; pointer-events: none;
   }
-
-  /* Momentum: leading (teal accent bar inset on the left edge) */
-  .momentum-leading {
-    box-shadow:
-      inset 4px 0 8px hsl(var(--accent) / 0.35),
-      var(--shadow-extruded-sm);
-    border-radius: 1rem;
-  }
-
-  /* Momentum: trailing (calm — desaturate + soften shadow, never red) */
-  .momentum-trailing {
-    box-shadow:
-      4px 4px 8px rgba(var(--neu-dark), 0.45),
-      -4px -4px 8px rgba(var(--neu-light), 0.4);
-    filter: saturate(0.7);
-    opacity: 0.92;
-  }
-
-  /* Momentum: streak / hot — pulsing accent halo */
-  .momentum-streak {
-    position: relative;
-    isolation: isolate;
-    animation: streak-pulse 2s ease-in-out infinite;
-  }
-  .momentum-streak::after {
-    content: "";
-    position: absolute;
-    inset: -15%;
-    background: radial-gradient(closest-side, hsl(var(--primary) / 0.25), transparent 70%);
-    filter: blur(20px);
-    z-index: -1;
-    pointer-events: none;
-    border-radius: inherit;
-  }
-
-  /* Crowd-roar ambient pulse for the leading row */
-  .crowd-roar { animation: crowd-roar 3.5s ease-in-out infinite; }
-
-  /* Reaction one-shots */
-  .react-just-scored { animation: just-scored 600ms ease-out 1; }
-  .react-rank-up    { animation: rank-up 500ms ease-out 1; }
-  .react-thunk      { animation: thunk 400ms ease-out 1; }
-
-  /* Replay slow-mo — apply to a transitioning container */
-  .replay-slowmo { transition: all 700ms ease-in-out !important; }
-
-  /* Whistle: snappy focus ring (use on inputs in primetime contexts) */
   .whistle-focus:focus-visible {
     outline: none;
-    box-shadow:
-      var(--shadow-inset-deep),
-      0 0 0 2px hsl(var(--background)),
-      0 0 0 4px hsl(var(--primary));
-    transition: box-shadow 150ms ease-out;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.9), 0 0 0 2px hsl(var(--primary)) !important;
   }
 }
-
-@layer base {
-  @keyframes streak-pulse {
-    0%, 100% { transform: scale(1); }
-    50%      { transform: scale(1.01); }
-  }
-  @keyframes crowd-roar {
-    0%, 100% { box-shadow: var(--shadow-extruded-sm), inset 4px 0 8px hsl(var(--accent) / 0.35); }
-    50%      { box-shadow: var(--shadow-extruded),    inset 4px 0 10px hsl(var(--accent) / 0.5); }
-  }
-  @keyframes just-scored {
-    0%   { transform: scale(1);    box-shadow: var(--shadow-extruded); }
-    35%  { transform: scale(1.02); box-shadow: var(--shadow-extruded-hover), 0 0 40px hsl(var(--primary) / 0.45); }
-    100% { transform: scale(1);    box-shadow: var(--shadow-extruded); }
-  }
-  @keyframes rank-up {
-    0%   { box-shadow: var(--shadow-inset);          transform: translateY(2px); }
-    50%  { box-shadow: none;                          transform: translateY(0); }
-    100% { box-shadow: var(--shadow-extruded-hover); transform: translateY(-1px); }
-  }
-  @keyframes thunk {
-    0%   { box-shadow: var(--shadow-extruded); }
-    40%  { box-shadow: var(--shadow-inset-deep); transform: translateY(1px); }
-    100% { box-shadow: var(--shadow-extruded-hover); transform: translateY(0); }
-  }
-}
-
 
 /* Markdown styles for AI coach output */
 .coach-md p { @apply mb-2 leading-relaxed; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply text-foreground font-semibold; }
+.coach-md strong { @apply text-foreground font-bold; color: hsl(var(--primary)); }
 .coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground font-display; }
-.coach-md code { @apply px-1 py-0.5 rounded-xl bg-background text-foreground text-xs shadow-neu-inset-sm; }
+.coach-md code { @apply px-1 py-0.5 text-xs; background: hsl(var(--surface-2)); color: hsl(var(--primary)); font-family: "Courier New", monospace; }
