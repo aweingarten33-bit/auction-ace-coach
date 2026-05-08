@@ -27,9 +27,9 @@ const FEED = [
   },
   {
     tag: "LIST BY DRAFTROOM",
-    title: "Vetri tells it like it is",
+    title: "Analysts tell it like it is",
     when: "",
-    venue: "You can't fake auction reps. Vetri's calls are the real thing — the math, the reads, the tells.",
+    venue: "You can't fake auction reps. The analyst calls are the real thing — the math, the reads, the tells.",
     price: "",
     visual: "portrait" as const,
     badge: "New",

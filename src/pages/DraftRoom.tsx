@@ -231,7 +231,7 @@ export default function DraftRoom() {
           <div className="-mx-5 px-5 flex gap-7 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             {[
               { id: "lookup" as const,      icon: Search,       label: "Find" },
-              { id: "top100" as const,      icon: ListOrdered,  label: "Top 50" },
+              { id: "top100" as const,      icon: ListOrdered,  label: leagueName ? `${leagueName} Top 50` : "Top 50" },
               { id: "market" as const,      icon: TrendingUp,   label: "Market" },
               { id: "fantasylife" as const, icon: ExternalLink, label: "News" },
             ].map(({ id, icon: Icon, label }) => (
