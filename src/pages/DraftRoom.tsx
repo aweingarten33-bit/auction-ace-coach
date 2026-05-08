@@ -422,11 +422,11 @@ export default function DraftRoom() {
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* ── PAGE CONTENT (parallax pushes back when tool panel opens) ── */}
       <div
-        className="transition-transform duration-200 ease-out origin-center"
+        className="origin-center"
         style={{
-          transform: toolPage ? "scale(0.97) translateX(-12px)" : "none",
-          filter: toolPage ? "brightness(0.7)" : "none",
-          transitionProperty: "transform, filter",
+          transform: toolPage ? "scale(0.94) translateX(-18px)" : "none",
+          transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
+          willChange: "transform",
         }}
       >
       {/* ── LEAGUE TITLE ─────────────────────────────────────────── */}
