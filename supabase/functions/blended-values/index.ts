@@ -117,9 +117,13 @@ Deno.serve(async (req) => {
       // and DEFLATE every other position (~22% off) — total budget is fixed, so
       // RB/WR/TE money has to come from somewhere when QBs go up.
       if (superflex) {
-        if (pos === "QB") v = Math.min(50, Math.round(v * 1.35));
+        if (pos === "QB") v = Math.round(v * 1.35);
         else if (pos === "RB" || pos === "WR" || pos === "TE") v = Math.round(v * 0.78);
       }
+      // Scale to actual league budget (Sleeper's projected_auction_value is $200/12-team)
+      v = v * budgetScale;
+      // SF QB cap scales with budget too
+      if (superflex && pos === "QB") v = Math.min(50 * budgetScale, v);
       const cur = rows.get(k) ?? { name: r.player_name, key: k, position: pos, team: "" };
       cur.sleeper = Math.max(1, Math.round(v));
       if (!cur.position) cur.position = pos;
