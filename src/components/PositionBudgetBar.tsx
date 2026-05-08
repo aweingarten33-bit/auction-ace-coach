@@ -24,7 +24,7 @@ export default function PositionBudgetBar() {
       const p = k.position ?? "UNK";
       spent[p] = (spent[p] ?? 0) + k.cost;
     }
-    const share = shareByPosition(settings);
+    const share = positionShare(settings);
     return POSITIONS.map((pos) => {
       const dollars = spent[pos] ?? 0;
       const targetDollars = Math.max(1, Math.round(settings.totalBudget * share[pos]));
