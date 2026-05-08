@@ -67,7 +67,7 @@ import DecisionCard from "@/components/AuctionPlayerCard";
 import MarketHeat from "@/components/MarketHeat";
 import CounterAnchorDetector from "@/components/CounterAnchorDetector";
 import StealReachCounter from "@/components/StealReachCounter";
-import WalletRace from "@/components/WalletRace";
+
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import MoneyHero from "@/components/MoneyHero";
@@ -858,7 +858,7 @@ function DrawerContents({
       {section === "market" && (
         <div className="flex-1 space-y-3 overflow-y-auto p-3">
           <StealReachCounter events={events} />
-          <WalletRace totalBudget={settings.totalBudget} numTeams={settings.numTeams} />
+          
           <MarketHeat
             events={events}
             prices={prices}
