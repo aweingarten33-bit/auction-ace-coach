@@ -304,22 +304,22 @@ export default function AuctionPlayerCard({
             </p>
           </div>
 
-          {/* Compact price stack */}
+          {/* Compact price stack — every input that drives the headline */}
           <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px]">
-            {analystAvg != null && (
-              <PriceLine label="Berry/Sleeper avg" value={`$${analystAvg}`} />
+            {berryVal != null && (
+              <PriceLine label="Matthew Berry" value={`$${Math.round(berryVal)}`} />
             )}
             {sleeperVal != null && (
               <PriceLine label="Sleeper" value={`$${Math.round(sleeperVal)}`} />
             )}
+            {analystAvg != null && (
+              <PriceLine label="Berry/Sleeper avg" value={`$${analystAvg}`} />
+            )}
             {leagueVal != null && (
               <PriceLine label="League 3yr avg" value={`$${Math.round(leagueVal)}`} />
             )}
-            {espnVal != null && (
-              <PriceLine label="Market value" value={`$${Math.round(espnVal)}`} />
-            )}
-            {sheetPrice != null && (
-              <PriceLine label="Your sheet" value={`$${sheetPrice}`} />
+            {anchor?.price != null && (
+              <PriceLine label="League final blend" value={`$${Math.round(anchor.price)}`} />
             )}
             {lastSold && (
               <PriceLine
