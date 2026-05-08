@@ -1,12 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Special+Elite&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   NEO-BRUTALISM
-   Cream paper. Pure black ink. Hot accents. Hard offset shadows. No blur.
+   GOTHAM INK — Mazzucchelli graphic-novel palette
+   Flat dirty color. Sodium-lamp yellow. Dried-blood red. Heavy black ink.
+   Crosshatch grain. Cream-paper bleed. No gradients pretending to glow.
    ===================================================================== */
 
 @layer base {
