@@ -1,123 +1,217 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Anton&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   FRANK MILLER NEWSPRINT BRUTALISM — Year One × War Room
+   NEUMORPHISM — Soft UI (Cool Grey)
    ---------------------------------------------------------------------
-   The city is watching the draft. Void black, ink black, bone parchment.
-   Blood red is danger. Dirty gold is earned. Yellow alarms.
-   Bebas/Oswald scream. Playfair whispers. JetBrains Mono reports.
-   Zero radius. Visible structure. Halftone, grain, rain, vignette.
+   Single monochromatic surface. All depth from dual opposing shadows
+   (top-left light, bottom-right dark). No borders, no flat fills.
+   Light + dark variants. Same physics, inverted lighting.
    ===================================================================== */
 
 @layer base {
   :root {
-    /* Surfaces — void to charcoal */
-    --background:        0 0% 2%;        /* VOID BLACK #050505 */
-    --background-alt:    0 0% 4%;        /* INK BLACK   #0B0B0B */
-    --foreground:        38 28% 86%;     /* NEWSPRINT BONE #E7DFCF */
-    --muted-bg:          0 0% 8%;        /* CHARCOAL #151515 */
+    /* ---------- CORE SURFACE ---------- */
+    --background:        218 23% 90%;        /* #E0E5EC cool clay */
+    --background-alt:    218 23% 90%;
+    --foreground:        212 16% 28%;        /* #3D4852 */
+    --muted-bg:          218 23% 90%;
 
-    --card:              0 0% 4%;
-    --card-foreground:   38 28% 86%;
+    --card:              218 23% 90%;
+    --card-foreground:   212 16% 28%;
 
-    --popover:           0 0% 3%;
-    --popover-foreground:38 28% 86%;
+    --popover:           218 23% 90%;
+    --popover-foreground:212 16% 28%;
 
-    /* Tokens — semantic noir vocabulary */
-    --bone:              38 28% 86%;     /* #E7DFCF */
-    --paper:             36 28% 73%;     /* AGED PAPER #CBBFA9 */
-    --void:              0 0% 2%;
-    --ink:               0 0% 4%;
-    --charcoal:          0 0% 8%;
-    --gunmetal:          0 0% 13%;       /* #222222 */
-    --steel-blue:        207 32% 21%;    /* COLD STEEL #243746 */
+    /* ---------- ACCENTS ---------- */
+    --primary:           245 100% 69%;       /* #6C63FF */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow:      243 100% 76%;       /* #8B84FF */
 
-    --blood:             357 81% 36%;    /* BLOOD RED #A31218 */
-    --signal-red:        0 75% 48%;      /* SIGNAL RED #D61E1E */
-    --dirty-gold:        41 53% 43%;     /* DIRTY GOLD #A88734 */
-    --warning-yellow:    47 65% 53%;     /* WARNING #D7B33B */
+    --secondary:         218 23% 90%;
+    --secondary-foreground: 212 16% 28%;
 
-    /* shadcn mapping */
-    --primary:           38 28% 86%;     /* bone — primary action is light on dark */
-    --primary-foreground:0 0% 2%;
-    --primary-glow:      36 28% 73%;
+    --accent:            245 100% 69%;
+    --accent-foreground: 0 0% 100%;
+    --accent-secondary:  176 51% 46%;        /* #38B2AC teal */
 
-    --secondary:         0 0% 13%;
-    --secondary-foreground: 38 28% 86%;
+    --muted:             218 23% 90%;
+    --muted-foreground:  220 9% 46%;         /* #6B7280 */
 
-    --muted:             0 0% 13%;
-    --muted-foreground:  36 12% 58%;
+    --destructive:       0 72% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --accent:            41 53% 43%;     /* dirty gold */
-    --accent-foreground: 0 0% 2%;
+    --warning:           38 92% 50%;
+    --warning-foreground: 0 0% 100%;
 
-    --destructive:       357 81% 36%;
-    --destructive-foreground: 38 28% 86%;
+    --success:           176 51% 46%;
+    --success-foreground: 0 0% 100%;
 
-    --warning:           47 65% 53%;
-    --warning-foreground:0 0% 2%;
+    --border:            transparent;
+    --input:             218 23% 90%;
+    --ring:              245 100% 69%;
 
-    --success:           41 53% 43%;
-    --success-foreground:0 0% 2%;
+    --radius: 1rem;
 
-    --border:            0 0% 18%;
-    --input:             0 0% 6%;
-    --ring:              38 28% 86%;
+    /* ---------- NEUMORPHIC TOKENS ---------- */
+    --surface:           218 23% 90%;
+    --surface-2:         218 23% 90%;
+    --shadow-light-rgb:  255, 255, 255;
+    --shadow-dark-rgb:   163, 177, 198;
 
-    --radius: 0px;
+    /* Shadow recipes — composed from RGBA pairs */
+    --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.6),
+                         -9px -9px 16px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-extruded-hover: 12px 12px 20px rgba(var(--shadow-dark-rgb), 0.7),
+                          -12px -12px 20px rgba(var(--shadow-light-rgb), 0.6);
+    --neu-extruded-sm:   5px 5px 10px rgba(var(--shadow-dark-rgb), 0.6),
+                         -5px -5px 10px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-inset:         inset 6px 6px 10px rgba(var(--shadow-dark-rgb), 0.6),
+                         inset -6px -6px 10px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-inset-deep:    inset 10px 10px 20px rgba(var(--shadow-dark-rgb), 0.7),
+                         inset -10px -10px 20px rgba(var(--shadow-light-rgb), 0.6);
+    --neu-inset-sm:      inset 3px 3px 6px rgba(var(--shadow-dark-rgb), 0.6),
+                         inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.5);
 
-    /* Back-compat aliases (older components) — re-routed to Miller palette */
-    --signal:    41 53% 43%;
-    --brass:     41 53% 43%;
-    --brass-light: 41 55% 56%;
-    --brass-dark:  41 53% 32%;
-    --crimson:   357 81% 36%;
-    --crimson-spatter: 0 75% 48%;
-    --parchment: 38 28% 86%;
-    --ink-faded: 36 12% 58%;
-    --wood-grain:0 0% 13%;
-    --bloodred:  357 81% 36%;
-    --steel:     36 12% 58%;
-    --sungold:   41 53% 43%;
-    --sungold-2: 41 55% 56%;
-    --krypton:   0 0% 2%;
-    --kryptonite:41 53% 43%;
-    --background-alt: 0 0% 4%;
+    /* ---------- LEGACY ALIASES (re-routed to neutral neumorphic palette) ----------
+       The codebase contains many Frank-Miller era tokens. We keep the names
+       so old components don't crash, but route them all to the soft surface.
+    */
+    --bone:              212 16% 28%;
+    --paper:             220 9% 46%;
+    --void:              218 23% 90%;
+    --ink:               218 23% 90%;
+    --charcoal:          218 23% 90%;
+    --gunmetal:          218 23% 90%;
+    --steel-blue:        245 100% 69%;
+    --blood:             0 72% 60%;
+    --signal-red:        0 72% 60%;
+    --dirty-gold:        245 100% 69%;
+    --warning-yellow:    38 92% 50%;
+    --signal:            245 100% 69%;
+    --brass:             245 100% 69%;
+    --brass-light:       243 100% 76%;
+    --brass-dark:        245 80% 58%;
+    --crimson:           0 72% 60%;
+    --crimson-spatter:   0 72% 60%;
+    --parchment:         212 16% 28%;
+    --ink-faded:         220 9% 46%;
+    --wood-grain:        218 23% 90%;
+    --bloodred:          0 72% 60%;
+    --steel:             220 9% 46%;
+    --sungold:           245 100% 69%;
+    --sungold-2:         243 100% 76%;
+    --krypton:           218 23% 90%;
+    --kryptonite:        245 100% 69%;
 
-    /* Shadows — ink slabs, no soft falloff. Stamps. */
-    --shadow-card:      6px 6px 0 0 hsl(0 0% 0%), 0 0 0 1px hsl(var(--border));
-    --shadow-floating:  12px 12px 0 0 hsl(0 0% 0%), 0 0 0 1px hsl(var(--border));
-    --shadow-pressed:   inset 0 3px 6px hsl(0 0% 0% / 0.9);
-    --shadow-recessed:  inset 0 0 0 1px hsl(var(--border));
-    --shadow-sharp:     6px 6px 0 0 hsl(0 0% 0%);
-    --shadow-glow:      0 0 0 2px hsl(var(--bone)), 6px 6px 0 0 hsl(0 0% 0%);
-    --shadow-primary:   0 0 0 2px hsl(var(--bone)), 6px 6px 0 0 hsl(0 0% 0%);
-    --shadow-led-green: 0 0 14px hsl(var(--dirty-gold) / 0.5);
-    --shadow-engraved:  inset 0 1px 0 hsl(0 0% 100% / 0.06), inset 0 -2px 0 hsl(0 0% 0% / 0.7), 4px 4px 0 0 hsl(0 0% 0%);
-    --shadow-wax-seal:  4px 4px 0 0 hsl(0 0% 0%), 0 6px 16px hsl(var(--blood) / 0.5);
+    /* Legacy shadow aliases → neumorphic equivalents */
+    --shadow-card:       var(--neu-extruded);
+    --shadow-floating:   var(--neu-extruded-hover);
+    --shadow-pressed:    var(--neu-inset);
+    --shadow-recessed:   var(--neu-inset-sm);
+    --shadow-sharp:      var(--neu-extruded);
+    --shadow-glow:       0 0 0 2px hsl(var(--primary) / 0.4), var(--neu-extruded);
+    --shadow-primary:    var(--neu-extruded);
+    --shadow-led-green:  0 0 14px hsl(var(--accent-secondary) / 0.5);
+    --shadow-engraved:   var(--neu-inset);
+    --shadow-wax-seal:   var(--neu-extruded);
+    --shadow-brut-sm:    var(--neu-extruded-sm);
+    --shadow-brut:       var(--neu-extruded);
+    --shadow-brut-lg:    var(--neu-extruded-hover);
+    --shadow-brut-xl:    var(--neu-extruded-hover);
 
-    --shadow-brut-sm:   3px 3px 0 0 hsl(0 0% 0%);
-    --shadow-brut:      6px 6px 0 0 hsl(0 0% 0%);
-    --shadow-brut-lg:   10px 10px 0 0 hsl(0 0% 0%);
-    --shadow-brut-xl:   16px 16px 0 0 hsl(0 0% 0%);
-
-    --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 38 28% 86%;
-    --sidebar-primary: 38 28% 86%;
-    --sidebar-primary-foreground: 0 0% 2%;
-    --sidebar-accent: 0 0% 8%;
-    --sidebar-accent-foreground: 38 28% 86%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 38 28% 86%;
+    /* Sidebar */
+    --sidebar-background: 218 23% 90%;
+    --sidebar-foreground: 212 16% 28%;
+    --sidebar-primary: 245 100% 69%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 218 23% 90%;
+    --sidebar-accent-foreground: 212 16% 28%;
+    --sidebar-border: transparent;
+    --sidebar-ring: 245 100% 69%;
   }
 
-  .dark { /* always night, always raining */ }
+  .dark {
+    /* Dark neumorphism — same physics, inverted lighting (still TL light, BR dark, but tuned for dark surface) */
+    --background:        220 13% 14%;        /* #1F2329 */
+    --background-alt:    220 13% 14%;
+    --foreground:        218 27% 88%;
+    --muted-bg:          220 13% 14%;
 
-  * { @apply border-border; }
+    --card:              220 13% 14%;
+    --card-foreground:   218 27% 88%;
+    --popover:           220 13% 14%;
+    --popover-foreground:218 27% 88%;
+
+    --primary:           245 100% 74%;
+    --primary-foreground: 220 13% 10%;
+    --primary-glow:      243 100% 80%;
+
+    --secondary:         220 13% 14%;
+    --secondary-foreground: 218 27% 88%;
+    --muted:             220 13% 14%;
+    --muted-foreground:  218 12% 62%;
+
+    --accent:            245 100% 74%;
+    --accent-foreground: 220 13% 10%;
+    --accent-secondary:  176 56% 56%;
+
+    --destructive:       0 75% 65%;
+    --destructive-foreground: 0 0% 100%;
+    --warning:           38 92% 60%;
+    --success:           176 56% 56%;
+
+    --border:            transparent;
+    --input:             220 13% 14%;
+    --ring:              245 100% 74%;
+
+    --surface:           220 13% 14%;
+    --surface-2:         220 13% 14%;
+    --shadow-light-rgb:  62, 70, 84;          /* lifted highlight (cool) */
+    --shadow-dark-rgb:   8, 10, 14;           /* deep cast shadow */
+
+    /* Recompose recipes for dark */
+    --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.7),
+                         -9px -9px 16px rgba(var(--shadow-light-rgb), 0.55);
+    --neu-extruded-hover: 12px 12px 20px rgba(var(--shadow-dark-rgb), 0.8),
+                          -12px -12px 20px rgba(var(--shadow-light-rgb), 0.65);
+    --neu-extruded-sm:   5px 5px 10px rgba(var(--shadow-dark-rgb), 0.7),
+                         -5px -5px 10px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-inset:         inset 6px 6px 10px rgba(var(--shadow-dark-rgb), 0.7),
+                         inset -6px -6px 10px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-inset-deep:    inset 10px 10px 20px rgba(var(--shadow-dark-rgb), 0.85),
+                         inset -10px -10px 20px rgba(var(--shadow-light-rgb), 0.55);
+    --neu-inset-sm:      inset 3px 3px 6px rgba(var(--shadow-dark-rgb), 0.7),
+                         inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.5);
+
+    /* Legacy aliases re-mapped for dark */
+    --bone:              218 27% 88%;
+    --paper:             218 12% 62%;
+    --void:              220 13% 14%;
+    --ink:               220 13% 14%;
+    --charcoal:          220 13% 14%;
+    --gunmetal:          220 13% 14%;
+    --blood:             0 75% 65%;
+    --signal-red:        0 75% 65%;
+    --dirty-gold:        245 100% 74%;
+    --warning-yellow:    38 92% 60%;
+    --parchment:         218 27% 88%;
+    --ink-faded:         218 12% 62%;
+    --steel:             218 12% 62%;
+
+    --sidebar-background: 220 13% 14%;
+    --sidebar-foreground: 218 27% 88%;
+    --sidebar-primary: 245 100% 74%;
+    --sidebar-primary-foreground: 220 13% 10%;
+    --sidebar-accent: 220 13% 14%;
+    --sidebar-accent-foreground: 218 27% 88%;
+    --sidebar-ring: 245 100% 74%;
+  }
+
+  * { border-color: transparent; }
 
   html {
     width: 100%; max-width: 100%; overflow-x: hidden;
@@ -129,319 +223,239 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "Playfair Display", Georgia, serif;
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
-    line-height: 1.55;
+    line-height: 1.6;
     background-color: hsl(var(--background));
-    /* A streetlight. A sodium-vapor smear. A pool of blood at the curb. */
-    background-image:
-      radial-gradient(ellipse 60% 40% at 18% -8%, hsl(47 65% 53% / 0.08), transparent 60%),
-      radial-gradient(ellipse 50% 35% at 92% 10%, hsl(207 32% 21% / 0.22), transparent 65%),
-      radial-gradient(ellipse 40% 30% at 8% 100%, hsl(var(--blood) / 0.18), transparent 65%),
-      linear-gradient(180deg, hsl(0 0% 4%) 0%, hsl(var(--background)) 50%, hsl(0 0% 1%) 100%);
-    background-attachment: fixed;
-  }
-
-  /* Halftone Ben-Day + grain — printer ghost over wet pavement */
-  body::before {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 1;
-    background-image:
-      radial-gradient(hsl(0 0% 0% / 0.7) 0.9px, transparent 1.2px),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size: 4px 4px, 280px 280px;
-    mix-blend-mode: multiply;
-    opacity: 0.55;
-  }
-
-  /* Heavy vignette + rain streaks — the lamp barely reaches the gutter */
-  body::after {
-    content: "";
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 1;
-    background:
-      repeating-linear-gradient(180deg, transparent 0 6px, hsl(0 0% 0% / 0.04) 6px 7px),
-      radial-gradient(ellipse at center, transparent 0%, transparent 30%, hsl(0 0% 0% / 0.92) 100%),
-      linear-gradient(180deg, hsl(0 0% 0% / 0.5) 0%, transparent 14%, transparent 84%, hsl(0 0% 0% / 0.6) 100%);
+    background-image: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Bebas Neue", "Oswald", "Anton", Impact, sans-serif;
-    font-weight: 400;
-    letter-spacing: 0.01em;
+    font-family: "Plus Jakarta Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
     color: hsl(var(--foreground));
-    line-height: 0.92;
-    text-transform: uppercase;
-    text-shadow: 0 2px 0 hsl(0 0% 0% / 0.9), 4px 4px 0 hsl(0 0% 0% / 0.4);
+    text-transform: none;
+    text-shadow: none;
   }
-  h1 { letter-spacing: 0.005em; line-height: 0.86; }
+  h1 { font-weight: 800; letter-spacing: -0.03em; }
 
-  ::selection { background: hsl(var(--blood)); color: hsl(var(--bone)); }
+  ::selection { background: hsl(var(--primary) / 0.25); color: hsl(var(--foreground)); }
 }
 
+/* =====================================================================
+   UTILITIES
+   ===================================================================== */
 @layer utilities {
-  /* ================= TYPOGRAPHY UTILITIES ================= */
-  .font-display { font-family: "Anton", "Bebas Neue", Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.01em; line-height: 0.86; }
+  /* ---------- TYPOGRAPHY ---------- */
+  .font-display,
   .font-headline,
-  .font-heading { font-family: "Bebas Neue", "Oswald", Impact, sans-serif; text-transform: uppercase; letter-spacing: 0.02em; line-height: 0.92; }
-  .font-condensed { font-family: "Oswald", "Bebas Neue", sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+  .font-heading {
+    font-family: "Plus Jakarta Sans", "DM Sans", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    line-height: 1.05;
+  }
+  .font-condensed {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
   .font-editorial,
   .font-serif,
-  .font-body  { font-family: "Playfair Display", Georgia, serif; font-weight: 400; letter-spacing: 0; }
-  .font-mono  { font-family: "JetBrains Mono", ui-monospace, "IBM Plex Mono", monospace; font-feature-settings: "tnum"; letter-spacing: 0.02em; }
-  .font-data  { font-family: "JetBrains Mono", ui-monospace, monospace; font-feature-settings: "tnum"; text-transform: uppercase; letter-spacing: 0.08em; }
-
-  /* Headline scales — newspaper-front-page violence */
-  .headline-mega   { font-family: "Anton", Impact, sans-serif; font-size: clamp(3.5rem, 12vw, 9rem); line-height: 0.82; text-transform: uppercase; letter-spacing: -0.005em; }
-  .headline-xl     { font-family: "Bebas Neue", Impact, sans-serif; font-size: clamp(2.5rem, 8vw, 6rem); line-height: 0.86; text-transform: uppercase; }
-  .headline-lg     { font-family: "Bebas Neue", Impact, sans-serif; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 0.9; text-transform: uppercase; }
-
-  /* Editorial pull quote */
-  .pull-quote { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-weight: 400; font-size: 1.5rem; line-height: 1.4; color: hsl(var(--paper)); border-left: 3px solid hsl(var(--dirty-gold)); padding-left: 1.25rem; }
-
-  /* ================= COLOR UTILITIES ================= */
-  .text-bone, .text-parchment { color: hsl(var(--bone)); }
-  .text-paper                 { color: hsl(var(--paper)); }
-  .text-blood, .text-crimson  { color: hsl(var(--blood)); }
-  .text-signal                { color: hsl(var(--signal-red)); }
-  .text-gold, .text-brass, .text-sungold, .text-kryptonite { color: hsl(var(--dirty-gold)); }
-  .text-warning, .text-yellow { color: hsl(var(--warning-yellow)); }
-  .text-steel, .text-ink-faded { color: hsl(var(--muted-foreground)); }
-  .text-void, .text-ink, .text-krypton { color: hsl(var(--void)); }
-  .text-max-1, .text-max-5    { color: hsl(var(--blood)); }
-  .text-max-2                 { color: hsl(var(--muted-foreground)); }
-  .text-max-3, .text-max-4    { color: hsl(var(--dirty-gold)); }
-
-  .bg-bone, .bg-parchment     { background-color: hsl(var(--bone)); }
-  .bg-paper                   { background-color: hsl(var(--paper)); }
-  .bg-blood, .bg-crimson      { background-color: hsl(var(--blood)); }
-  .bg-signal                  { background-color: hsl(var(--signal-red)); }
-  .bg-gold, .bg-brass, .bg-sungold { background-color: hsl(var(--dirty-gold)); }
-  .bg-warning                 { background-color: hsl(var(--warning-yellow)); }
-  .bg-void, .bg-ink, .bg-krypton { background-color: hsl(var(--void)); }
-  .bg-charcoal, .bg-panel     { background-color: hsl(var(--charcoal)); }
-  .bg-gunmetal                { background-color: hsl(var(--gunmetal)); }
-  .bg-aged-oak                { background-color: hsl(var(--background-alt)); }
-  .bg-max-1, .bg-max-5        { background-color: hsl(var(--blood)); }
-  .bg-max-2                   { background-color: hsl(var(--gunmetal)); }
-  .bg-max-3, .bg-max-4        { background-color: hsl(var(--dirty-gold)); }
-  .bg-max-muted               { background-color: hsl(var(--charcoal)); }
-
-  .border-bone, .border-parchment { border-color: hsl(var(--bone)); }
-  .border-blood, .border-crimson  { border-color: hsl(var(--blood)); }
-  .border-gold, .border-brass, .border-sungold { border-color: hsl(var(--dirty-gold)); }
-  .border-warning             { border-color: hsl(var(--warning-yellow)); }
-  .border-void, .border-krypton { border-color: hsl(var(--void)); }
-  .border-max-1, .border-max-5 { border-color: hsl(var(--blood)); }
-  .border-max-2               { border-color: hsl(var(--border)); }
-  .border-max-3, .border-max-4 { border-color: hsl(var(--dirty-gold)); }
-
-  /* Brass-gold gradient (legacy hook) — kept flat & matte */
-  .bg-brass-gradient {
-    background: linear-gradient(180deg, hsl(var(--dirty-gold)) 0%, hsl(41 53% 32%) 100%);
+  .font-body {
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .font-mono,
+  .font-data {
+    font-family: ui-monospace, "JetBrains Mono", "IBM Plex Mono", monospace;
+    font-feature-settings: "tnum";
+    letter-spacing: 0;
+    text-transform: none;
   }
 
-  /* Sodium-vapor lamplight gradient on text */
+  .headline-mega { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: clamp(3rem, 9vw, 6rem); line-height: 1; letter-spacing: -0.035em; text-transform: none; }
+  .headline-xl   { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.03em; text-transform: none; }
+  .headline-lg   { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: clamp(1.75rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; text-transform: none; }
+
+  .pull-quote {
+    font-family: "DM Sans", sans-serif; font-style: italic; font-weight: 400;
+    font-size: 1.25rem; line-height: 1.5; color: hsl(var(--muted-foreground));
+    padding-left: 1.25rem; border-left: 3px solid hsl(var(--primary));
+  }
+
+  /* ---------- COLOR ALIAS UTILITIES (legacy hooks → neumorphic palette) ---------- */
+  .text-bone, .text-parchment        { color: hsl(var(--foreground)); }
+  .text-paper                         { color: hsl(var(--muted-foreground)); }
+  .text-blood, .text-crimson, .text-signal,
+  .text-max-1, .text-max-5            { color: hsl(var(--destructive)); }
+  .text-gold, .text-brass, .text-sungold, .text-kryptonite,
+  .text-max-3, .text-max-4            { color: hsl(var(--primary)); }
+  .text-warning, .text-yellow         { color: hsl(var(--warning)); }
+  .text-steel, .text-ink-faded,
+  .text-max-2                         { color: hsl(var(--muted-foreground)); }
+  .text-void, .text-ink, .text-krypton{ color: hsl(var(--foreground)); }
+
+  .bg-bone, .bg-parchment             { background-color: hsl(var(--foreground)); }
+  .bg-paper                           { background-color: hsl(var(--muted-foreground)); }
+  .bg-blood, .bg-crimson, .bg-signal,
+  .bg-max-1, .bg-max-5                { background-color: hsl(var(--destructive)); }
+  .bg-gold, .bg-brass, .bg-sungold,
+  .bg-max-3, .bg-max-4                { background-color: hsl(var(--primary)); }
+  .bg-warning                         { background-color: hsl(var(--warning)); }
+  .bg-void, .bg-ink, .bg-krypton,
+  .bg-charcoal, .bg-panel, .bg-gunmetal,
+  .bg-aged-oak, .bg-max-2, .bg-max-muted { background-color: hsl(var(--background)); }
+
+  .border-bone, .border-parchment,
+  .border-blood, .border-crimson,
+  .border-gold, .border-brass, .border-sungold,
+  .border-warning, .border-void, .border-krypton,
+  .border-max-1, .border-max-5,
+  .border-max-2,
+  .border-max-3, .border-max-4        { border-color: transparent; }
+
+  .bg-brass-gradient,
   .text-gradient,
   .text-gradient-sun {
-    background: linear-gradient(180deg, hsl(var(--bone)) 0%, hsl(var(--paper)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; color: transparent;
   }
   .text-gradient-blood {
-    background: linear-gradient(180deg, hsl(var(--signal-red)) 0%, hsl(var(--blood)) 100%);
+    background: linear-gradient(135deg, hsl(var(--destructive)) 0%, hsl(var(--primary)) 100%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; color: transparent;
   }
 
-  /* Engraved / inked text */
-  .text-engraved,
-  .text-shadow-1, .text-shadow-2, .text-shadow-3 {
-    text-shadow: 2px 2px 0 hsl(0 0% 0%), 0 0 1px hsl(0 0% 0% / 0.9);
-  }
-  .text-shadow-mega {
-    text-shadow: 3px 3px 0 hsl(0 0% 0%), 6px 6px 0 hsl(var(--blood) / 0.6);
-  }
-  .text-emboss { text-shadow: 0 1px 0 hsl(0 0% 100% / 0.04), 0 -1px 0 hsl(0 0% 0% / 0.9); }
+  /* Disable old text-shadows */
+  .text-engraved, .text-shadow-1, .text-shadow-2, .text-shadow-3,
+  .text-shadow-mega, .text-emboss, .text-spray { text-shadow: none; }
 
-  /* Mono uppercase data label — terminal print */
-  .label-stamped,
-  .broadcast-label,
-  .label-mono {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
+  /* ---------- NEUMORPHIC PRIMITIVE UTILITIES ---------- */
+  .neu-surface       { background: hsl(var(--surface)); border-radius: 2rem; box-shadow: var(--neu-extruded); }
+  .neu-raised        { box-shadow: var(--neu-extruded); }
+  .neu-raised-sm     { box-shadow: var(--neu-extruded-sm); }
+  .neu-raised-hover  { box-shadow: var(--neu-extruded-hover); }
+  .neu-inset         { box-shadow: var(--neu-inset); }
+  .neu-inset-deep    { box-shadow: var(--neu-inset-deep); }
+  .neu-inset-sm      { box-shadow: var(--neu-inset-sm); }
+  .neu-pressable     { transition: transform 300ms ease-out, box-shadow 300ms ease-out; }
+  .neu-pressable:hover { transform: translateY(-1px); box-shadow: var(--neu-extruded-hover); }
+  .neu-pressable:active { transform: translateY(0.5px); box-shadow: var(--neu-inset-sm); }
+  .neu-icon-well     { background: hsl(var(--surface)); border-radius: 1rem; box-shadow: var(--neu-inset-deep); display: inline-flex; align-items: center; justify-content: center; }
+
+  /* ---------- LEGACY MASTHEAD / EDITORIAL HOOKS (softened) ---------- */
+  .label-stamped, .broadcast-label, .label-mono {
+    font-family: ui-monospace, "JetBrains Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.12em;
     font-weight: 600;
     font-size: 0.66rem;
-    color: hsl(var(--bone));
-    background: hsl(var(--void));
-    border: 1px solid hsl(var(--bone) / 0.4);
-    padding: 4px 10px;
-    border-radius: 0;
+    color: hsl(var(--muted-foreground));
+    background: hsl(var(--surface));
+    border: none;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    box-shadow: var(--neu-inset-sm);
     display: inline-block;
   }
-  .label-blood { background: hsl(var(--blood)); border-color: hsl(var(--blood)); color: hsl(var(--bone)); }
-  .label-gold  { background: hsl(var(--dirty-gold)); border-color: hsl(var(--dirty-gold)); color: hsl(var(--void)); }
-  .label-warning { background: hsl(var(--warning-yellow)); border-color: hsl(var(--warning-yellow)); color: hsl(var(--void)); }
+  .label-blood   { color: hsl(var(--destructive)); }
+  .label-gold    { color: hsl(var(--primary)); }
+  .label-warning { color: hsl(var(--warning)); }
 
-  /* Edition metadata — masthead-style date/issue line */
   .edition-meta {
-    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-family: ui-monospace, "JetBrains Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.24em;
+    letter-spacing: 0.18em;
     font-size: 0.625rem;
-    color: hsl(var(--paper));
-    border-top: 1px solid hsl(var(--bone) / 0.3);
-    border-bottom: 1px solid hsl(var(--bone) / 0.3);
+    color: hsl(var(--muted-foreground));
+    border: none;
     padding: 4px 0;
   }
 
-  /* Hard rules — newspaper dividers */
-  .rule-thin   { height: 1px; background: hsl(var(--bone) / 0.4); }
-  .rule-thick  { height: 3px; background: hsl(var(--bone)); border-bottom: 1px solid hsl(var(--bone)); margin-top: 2px; }
-  .rule-blood  { height: 4px; background: hsl(var(--blood)); }
+  .rule-thin   { height: 1px; background: hsl(var(--muted-foreground) / 0.18); border: 0; }
+  .rule-thick  { height: 2px; background: hsl(var(--muted-foreground) / 0.25); border: 0; margin-top: 2px; }
+  .rule-blood  { height: 3px; background: hsl(var(--primary)); border-radius: 9999px; }
   .rule-gold,
-  .ornate-divider { height: 2px; background: hsl(var(--dirty-gold)); margin: 1.5rem 0; position: relative; }
+  .ornate-divider { height: 2px; background: hsl(var(--primary) / 0.6); margin: 1.5rem 0; border-radius: 9999px; }
   .ornate-divider::before { content: none; }
 
-  /* Dossier corner brackets — surveillance crosshairs */
-  .ornate-frame,
-  .corner-flourish { position: relative; }
+  .ornate-frame, .corner-flourish { position: relative; }
   .ornate-frame::before, .ornate-frame::after,
-  .corner-flourish::before, .corner-flourish::after {
-    content: "";
-    position: absolute;
-    width: 18px; height: 18px;
-    border: 2px solid hsl(var(--bone));
-    pointer-events: none;
-  }
-  .ornate-frame::before { top: -1px; left: -1px;  border-right: none; border-bottom: none; }
-  .ornate-frame::after  { bottom: -1px; right: -1px; border-left: none;  border-top: none; }
-  .corner-flourish::before { top: 6px;    left: 6px;    border-right: none; border-bottom: none; border-color: hsl(var(--dirty-gold)); }
-  .corner-flourish::after  { bottom: 6px; right: 6px;   border-left: none;  border-top: none;    border-color: hsl(var(--dirty-gold)); }
+  .corner-flourish::before, .corner-flourish::after { content: none; }
 
-  /* Stamp — BUY / PASS / TARGET overlays */
   .stamp {
     display: inline-block;
-    font-family: "Anton", Impact, sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     text-transform: uppercase;
-    font-size: 1.5rem;
-    letter-spacing: 0.05em;
-    padding: 6px 18px;
-    border: 4px solid currentColor;
-    background: transparent;
-    transform: rotate(-4deg);
-    text-shadow: 2px 2px 0 hsl(0 0% 0%);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded-sm);
+    transform: none;
+    text-shadow: none;
+    color: hsl(var(--foreground));
   }
-  .stamp-buy  { color: hsl(var(--dirty-gold)); }
-  .stamp-pass { color: hsl(var(--blood)); }
-  .stamp-target { color: hsl(var(--bone)); }
+  .stamp-buy   { color: hsl(var(--accent-secondary)); }
+  .stamp-pass  { color: hsl(var(--destructive)); }
+  .stamp-target{ color: hsl(var(--primary)); }
 
-  /* Wax seal — legacy hook, repurposed as a stamp dot */
   .wax-seal {
     width: 48px; height: 48px;
-    border-radius: 0;
-    background: hsl(var(--blood));
-    box-shadow: var(--shadow-wax-seal);
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded);
     display: inline-flex; align-items: center; justify-content: center;
-    color: hsl(var(--bone));
-    font-family: "Anton", Impact, sans-serif; text-transform: uppercase;
+    color: hsl(var(--primary));
   }
 
-  /* Drop cap — newspaper opener */
   .drop-cap::first-letter,
   .drop-cap-target {
-    font-family: "Anton", Impact, sans-serif;
-    font-size: 5rem;
-    line-height: 0.78;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 3.25rem;
+    line-height: 0.9;
     float: left;
-    margin: 0.35rem 0.6rem 0 0;
-    color: hsl(var(--bone));
-    text-shadow: 3px 3px 0 hsl(0 0% 0%);
+    margin: 0.25rem 0.6rem 0 0;
+    color: hsl(var(--primary));
+    font-weight: 800;
+    text-shadow: none;
   }
 
-  /* Imagery — monochrome surveillance */
-  .sepia-image,
-  img.sepia { filter: grayscale(1) contrast(1.1) brightness(0.85); transition: filter 500ms ease-out; }
+  .sepia-image, img.sepia { filter: none; transition: transform 500ms ease-out; }
   .sepia-image:hover, img.sepia:hover,
-  .group:hover .sepia-image, .group:hover img.sepia { filter: grayscale(0.5) contrast(1.05) brightness(0.95) sepia(0.15); }
-  .img-noir { filter: grayscale(1) contrast(1.2) brightness(0.8); }
+  .group:hover .sepia-image, .group:hover img.sepia { filter: none; transform: scale(1.02); }
+  .img-noir { filter: none; }
+  .arch-top { border-radius: 1rem; }
 
-  /* Arch-top legacy hook — flatten to dossier rectangle */
-  .arch-top { border-radius: 0; }
+  /* ---------- LEGACY SHADOW HOOKS → neumorphic ---------- */
+  .shadow-multi, .shadow-multi-lg, .shadow-mixed, .shadow-engraved,
+  .shadow-wax-seal, .shadow-card, .shadow-floating,
+  .shadow-sharp, .shadow-glow, .shadow-primary-key,
+  .shadow-brut, .shadow-brut-lg, .shadow-brut-xl { box-shadow: var(--neu-extruded); }
+  .shadow-brut-sm { box-shadow: var(--neu-extruded-sm); }
+  .shadow-pressed, .shadow-recessed { box-shadow: var(--neu-inset); }
+  .shadow-glow-accent    { box-shadow: 0 0 0 2px hsl(var(--primary) / 0.35); }
+  .shadow-glow-accent-lg { box-shadow: 0 0 0 3px hsl(var(--primary) / 0.55); }
 
-  /* ================= SHADOWS ================= */
-  .shadow-multi    { box-shadow: var(--shadow-card); }
-  .shadow-multi-lg { box-shadow: var(--shadow-floating); }
-  .shadow-glow-accent    { box-shadow: 0 0 0 1px hsl(var(--dirty-gold) / 0.6); }
-  .shadow-glow-accent-lg { box-shadow: 0 0 0 2px hsl(var(--dirty-gold)); }
-  .shadow-mixed    { box-shadow: var(--shadow-engraved); }
-  .shadow-engraved { box-shadow: var(--shadow-engraved); }
-  .shadow-wax-seal { box-shadow: var(--shadow-wax-seal); }
-  .shadow-brut-sm  { box-shadow: var(--shadow-brut-sm); }
-  .shadow-brut     { box-shadow: var(--shadow-brut); }
-  .shadow-brut-lg  { box-shadow: var(--shadow-brut-lg); }
-  .shadow-brut-xl  { box-shadow: var(--shadow-brut-xl); }
-  .shadow-card     { box-shadow: var(--shadow-card); }
-  .shadow-floating { box-shadow: var(--shadow-floating); }
-  .shadow-pressed  { box-shadow: var(--shadow-pressed); }
-  .shadow-recessed { box-shadow: var(--shadow-recessed); }
-  .shadow-sharp    { box-shadow: var(--shadow-sharp); }
-  .shadow-glow     { box-shadow: var(--shadow-glow); }
-  .shadow-primary-key { box-shadow: var(--shadow-primary); }
-
-  /* ================= PATTERNS ================= */
-  .pattern-dots {
-    background-image: radial-gradient(circle, hsl(0 0% 0% / 0.5) 0.7px, transparent 1px);
-    background-size: 6px 6px;
-  }
-  .pattern-stripes {
-    background-image: repeating-linear-gradient(0deg, transparent 0 3px, hsl(0 0% 0% / 0.5) 3px 4px);
-  }
-  .pattern-checker {
-    background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
-                      linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-  .pattern-mesh {
-    background:
-      radial-gradient(ellipse at 50% 0%, hsl(var(--dirty-gold) / 0.05) 0%, transparent 55%),
-      radial-gradient(ellipse at 100% 100%, hsl(var(--blood) / 0.08) 0%, transparent 60%);
-  }
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, hsl(var(--border) / 0.7) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.7) 1px, transparent 1px);
-    background-size: 56px 56px;
-  }
-  .bg-halftone {
-    background-image: radial-gradient(hsl(var(--bone) / 0.18) 0.7px, transparent 1px);
-    background-size: 6px 6px;
-  }
-  .bg-halftone-red {
-    background-image: radial-gradient(hsl(var(--blood) / 0.55) 0.8px, transparent 1px);
-    background-size: 5px 5px;
-  }
-  .bg-newsprint {
-    background-color: hsl(var(--bone));
-    color: hsl(var(--void));
-    background-image:
-      radial-gradient(hsl(0 0% 0% / 0.08) 0.6px, transparent 0.9px),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    background-size: 4px 4px, 180px 180px;
-  }
-
-  /* Surveillance scanlines (legacy hook) */
-  .scanlines {
-    background-image: linear-gradient(hsl(0 0% 0% / 0) 50%, hsl(0 0% 0% / 0.25) 50%);
-    background-size: 100% 3px;
-  }
+  /* ---------- PATTERNS (neutralized) ---------- */
+  .pattern-dots, .pattern-stripes, .pattern-checker, .pattern-mesh,
+  .bg-grid, .bg-halftone, .bg-halftone-red, .scanlines { background-image: none; }
+  .bg-newsprint { background-color: hsl(var(--surface)); color: hsl(var(--foreground)); background-image: none; box-shadow: var(--neu-extruded); border-radius: 2rem; }
 
   .tilt-l, .tilt-r { transform: none; }
 
-  .led { width: 0.5rem; height: 0.5rem; border-radius: 0; display: inline-block; background: hsl(var(--signal-red)); box-shadow: 0 0 8px hsl(var(--signal-red) / 0.7); }
-  .led-green { background: hsl(var(--dirty-gold)); box-shadow: 0 0 8px hsl(var(--dirty-gold) / 0.6); }
+  .led { width: 0.6rem; height: 0.6rem; border-radius: 9999px; display: inline-block; background: hsl(var(--destructive)); box-shadow: 0 0 8px hsl(var(--destructive) / 0.55); }
+  .led-green { background: hsl(var(--accent-secondary)); box-shadow: 0 0 8px hsl(var(--accent-secondary) / 0.55); }
 
   .screws::before, .screws::after,
   .screws > .screws-bottom::before, .screws > .screws-bottom::after { content: none; }
@@ -449,43 +463,37 @@
 
   .ease-mech { transition-timing-function: cubic-bezier(0.2, 0, 0.1, 1); }
 
-  /* ================= MOTION — mechanical, surveillance ================= */
+  /* ---------- MOTION ---------- */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-4px); }
+    50%      { transform: translateY(-6px); }
   }
-  .animate-float { animation: float 6s ease-in-out infinite; will-change: transform; }
-
+  .animate-float { animation: float 3s ease-in-out infinite; will-change: transform; }
   @keyframes float-reverse {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(4px); }
+    50%      { transform: translateY(6px); }
   }
-  .animate-float-reverse { animation: float-reverse 6s ease-in-out infinite; will-change: transform; }
-
+  .animate-float-reverse { animation: float-reverse 3s ease-in-out infinite; will-change: transform; }
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 1px hsl(var(--bone) / 0.3); }
-    50%      { box-shadow: 0 0 0 2px hsl(var(--bone) / 0.7); }
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.35); }
+    50%      { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
   }
   .animate-pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
-
   @keyframes pulse-blood {
-    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--blood) / 0.7); }
-    50%      { box-shadow: 0 0 0 6px hsl(var(--blood) / 0); }
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--destructive) / 0.5); }
+    50%      { box-shadow: 0 0 0 8px hsl(var(--destructive) / 0); }
   }
-  .animate-pulse-blood { animation: pulse-blood 1.6s ease-out infinite; }
-
+  .animate-pulse-blood { animation: pulse-blood 1.8s ease-out infinite; }
   @keyframes ticker {
-    0% { transform: translateX(0); }
+    0%   { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
   .animate-ticker { animation: ticker 40s linear infinite; }
-
   @keyframes wipe-in {
     0%   { clip-path: inset(0 100% 0 0); }
     100% { clip-path: inset(0 0 0 0); }
   }
   .animate-wipe { animation: wipe-in 360ms cubic-bezier(0.2, 0, 0.1, 1) both; }
-
   @keyframes gradient-shift {
     0%, 100% { background-position: 0% 50%; }
     50%      { background-position: 100% 50%; }
@@ -497,286 +505,236 @@
    COMPONENT LAYER — global overrides for shadcn primitives
    ===================================================================== */
 @layer components {
-  /* Surfaces / Cards — dossiers cut from inked stock */
+  /* Cards — soft pillow */
   .bg-card,
   [data-slot="card"],
   .surface,
   .panel {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-top: 3px solid hsl(var(--bone));
-    border-radius: 0;
-    box-shadow: var(--shadow-brut);
+    background-color: hsl(var(--surface));
+    border: none;
+    border-radius: 2rem;
+    box-shadow: var(--neu-extruded);
     position: relative;
+    transition: transform 300ms ease-out, box-shadow 300ms ease-out;
   }
   .bg-card:hover,
   [data-slot="card"]:hover {
-    border-top-color: hsl(var(--dirty-gold));
+    transform: translateY(-2px);
+    box-shadow: var(--neu-extruded-hover);
   }
 
-  /* Featured / urgent panel — wax-stamped, blood-leaking */
+  /* Featured / urgent panel — accent ring instead of slab */
   .border-2.border-primary,
   [data-featured="true"] {
-    border: 2px solid hsl(var(--bone)) !important;
-    border-top: 4px solid hsl(var(--blood)) !important;
-    box-shadow: var(--shadow-brut-lg), inset 0 0 0 1px hsl(0 0% 0%);
+    border: none !important;
+    border-radius: 2rem !important;
+    box-shadow: var(--neu-extruded), 0 0 0 2px hsl(var(--primary) / 0.5) inset !important;
   }
 
-  /* Inputs — terminal field / betting slip */
+  /* Inputs — pressed well */
   input, textarea, select {
-    background-color: hsl(var(--input));
-    border: 1px solid hsl(var(--border));
-    border-bottom: 2px solid hsl(var(--bone) / 0.4);
-    border-radius: 0;
-    color: hsl(var(--bone));
-    font-family: "JetBrains Mono", ui-monospace, monospace;
-    transition: border-color 160ms ease-out, box-shadow 160ms ease-out;
+    background-color: hsl(var(--surface));
+    border: none;
+    border-radius: 1rem;
+    color: hsl(var(--foreground));
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    box-shadow: var(--neu-inset);
+    transition: box-shadow 200ms ease-out;
   }
   input:focus, textarea:focus, select:focus {
     outline: none;
-    border-color: hsl(var(--bone));
-    border-bottom-color: hsl(var(--dirty-gold));
-    box-shadow: inset 0 -3px 0 hsl(var(--dirty-gold) / 0.5);
+    box-shadow: var(--neu-inset-deep), 0 0 0 2px hsl(var(--primary) / 0.5);
   }
   input::placeholder, textarea::placeholder {
-    color: hsl(var(--muted-foreground));
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.85em;
+    color: hsl(var(--muted-foreground) / 0.7);
+    text-transform: none;
+    letter-spacing: 0;
   }
 
-  /* Header / masthead — newspaper banner */
+  /* Header / masthead — flush surface, no underline */
   header, .site-header {
-    background-color: hsl(var(--void) / 0.92);
-    backdrop-filter: blur(6px);
-    border-bottom: 3px solid hsl(var(--bone));
-    box-shadow: 0 2px 0 hsl(var(--blood)), 0 8px 24px hsl(0 0% 0% / 0.6);
+    background-color: hsl(var(--background) / 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: none;
+    box-shadow: 0 1px 0 hsl(var(--muted-foreground) / 0.08);
+    position: relative;
   }
+  header::after, .site-header::after { content: none; }
 
-  /* Badges / pills — stamped tags, never round */
+  /* Badges — pillows */
   .badge,
   [data-slot="badge"] {
-    border-radius: 0 !important;
-    font-family: "JetBrains Mono", ui-monospace, monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
+    border-radius: 9999px !important;
+    font-family: "DM Sans", sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
     font-weight: 600;
-    border: 1px solid currentColor;
+    border: none;
+    box-shadow: var(--neu-extruded-sm);
+    background: hsl(var(--surface));
+  }
+
+  /* Tabs */
+  [role="tablist"] {
+    border-bottom: none;
+    background: hsl(var(--surface));
+    border-radius: 9999px;
+    padding: 4px;
+    box-shadow: var(--neu-inset);
+  }
+  [role="tab"] {
+    border-radius: 9999px !important;
+    font-family: "DM Sans", sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+  [role="tab"][data-state="active"] {
+    background: hsl(var(--surface));
+    color: hsl(var(--primary));
+    box-shadow: var(--neu-extruded-sm);
+  }
+
+  /* Dialogs */
+  [role="dialog"] {
+    border-radius: 2rem !important;
+    border: none !important;
+    box-shadow: var(--neu-extruded-hover) !important;
+    background: hsl(var(--surface)) !important;
   }
 }
 
 /* =====================================================================
-   FOOTBALL NOIR — Banksy stencil × Miller framing × surveillance intel
-   Additive layer. Tokens unchanged. Use sparingly, with intent.
+   LEGACY EDITORIAL HOOKS — softened to neumorphic equivalents
    ===================================================================== */
 @layer utilities {
-  /* ---------- STENCIL TYPOGRAPHY (Banksy, restrained) ---------- */
-  .font-stencil {
-    font-family: "Anton", "Bebas Neue", Impact, sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    -webkit-text-stroke: 1px hsl(var(--bone));
-    color: transparent;
-    text-shadow: 3px 3px 0 hsl(0 0% 0% / 0.85);
-  }
+  .font-stencil,
   .font-stencil-fill {
-    font-family: "Anton", "Bebas Neue", Impact, sans-serif;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: hsl(var(--bone));
-    text-shadow: 2px 2px 0 hsl(0 0% 0%), 4px 4px 0 hsl(var(--blood) / 0.7);
-  }
-  /* Spray-mist shadow — never literal graffiti */
-  .text-spray {
-    text-shadow:
-      0 0 6px hsl(var(--bone) / 0.3),
-      0 0 14px hsl(0 0% 0% / 0.6),
-      2px 2px 0 hsl(0 0% 0%);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: -0.02em;
+    -webkit-text-stroke: 0;
+    color: hsl(var(--foreground));
+    text-shadow: none;
   }
 
-  /* ---------- CLASSIFIED / DOSSIER FRAMES ---------- */
   .dossier {
     position: relative;
-    background:
-      linear-gradient(180deg, hsl(var(--ink)) 0%, hsl(var(--charcoal)) 100%);
-    border: 1px solid hsl(var(--bone) / 0.55);
-    box-shadow: var(--shadow-brut), inset 0 0 0 1px hsl(0 0% 0%);
-    padding: 1.25rem;
+    background: hsl(var(--surface));
+    border: none;
+    border-radius: 2rem;
+    box-shadow: var(--neu-extruded);
+    padding: 1.5rem;
   }
-  .dossier::before {
-    content: "CLASSIFIED // EYES ONLY";
-    position: absolute; top: -10px; left: 14px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.6rem; letter-spacing: 0.32em;
-    background: hsl(var(--void)); color: hsl(var(--blood));
-    padding: 2px 8px; border: 1px solid hsl(var(--blood));
-  }
-  .dossier::after {
-    content: "FILE NO. ███-██";
-    position: absolute; bottom: -10px; right: 14px;
-    font-family: "JetBrains Mono", monospace;
-    font-size: 0.6rem; letter-spacing: 0.28em;
-    background: hsl(var(--void)); color: hsl(var(--paper));
-    padding: 2px 8px; border: 1px solid hsl(var(--bone) / 0.4);
-  }
+  .dossier::before, .dossier::after { content: none; }
 
-  /* Surveillance crosshairs (corner reticles) */
   .reticle { position: relative; }
-  .reticle::before, .reticle::after {
-    content: ""; position: absolute; width: 14px; height: 14px;
-    border: 2px solid hsl(var(--dirty-gold)); pointer-events: none;
-  }
-  .reticle::before { top: 4px; left: 4px; border-right: 0; border-bottom: 0; }
-  .reticle::after  { bottom: 4px; right: 4px; border-left: 0; border-top: 0; }
+  .reticle::before, .reticle::after { content: none; }
 
-  /* Ripped / torn newsprint edge */
-  .torn-bottom {
-    -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 10px), transparent 100%),
-      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='10'><path d='M0 0 L8 6 L16 2 L24 8 L34 1 L44 7 L56 3 L66 9 L78 2 L90 7 L102 1 L114 8 L126 2 L138 7 L150 1 L162 9 L174 3 L186 7 L200 2 L200 10 L0 10 Z' fill='black'/></svg>");
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(180deg, #000 calc(100% - 10px), transparent 100%);
-  }
+  .torn-bottom { -webkit-mask-image: none; mask-image: none; }
 
-  /* ---------- TICKER RAIL ---------- */
   .ticker-rail {
-    background: hsl(var(--void));
-    border-top: 1px solid hsl(var(--bone) / 0.4);
-    border-bottom: 1px solid hsl(var(--bone) / 0.4);
-    color: hsl(var(--bone));
-    font-family: "JetBrains Mono", monospace;
+    background: hsl(var(--surface));
+    border: none;
+    border-radius: 9999px;
+    box-shadow: var(--neu-inset);
+    color: hsl(var(--muted-foreground));
+    font-family: ui-monospace, "JetBrains Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     font-size: 0.7rem;
     overflow: hidden; white-space: nowrap;
+    padding: 0 1rem;
   }
-  .ticker-rail .ticker-track { display: inline-flex; gap: 2.5rem; padding: 6px 0; animation: ticker 40s linear infinite; }
+  .ticker-rail .ticker-track { display: inline-flex; gap: 2.5rem; padding: 8px 0; animation: ticker 40s linear infinite; }
 
-  /* ---------- FILE STAMPS (CLASSIFIED / URGENT / VOID) ---------- */
   .file-stamp {
     display: inline-block;
-    font-family: "Anton", Impact, sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 0.95rem;
-    padding: 4px 12px;
-    border: 3px solid currentColor;
-    background: hsl(0 0% 0% / 0.4);
-    transform: rotate(-6deg);
-    text-shadow: 1px 1px 0 hsl(0 0% 0%);
-    opacity: 0.92;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded-sm);
+    transform: none;
+    text-shadow: none;
+    opacity: 1;
+    color: hsl(var(--foreground));
   }
-  .file-stamp-blood { color: hsl(var(--blood)); }
-  .file-stamp-gold  { color: hsl(var(--dirty-gold)); }
-  .file-stamp-bone  { color: hsl(var(--bone)); }
+  .file-stamp-blood { color: hsl(var(--destructive)); }
+  .file-stamp-gold  { color: hsl(var(--primary)); }
+  .file-stamp-bone  { color: hsl(var(--foreground)); }
 
-  /* Redacted bar */
   .redacted {
-    background: hsl(0 0% 0%); color: hsl(0 0% 0%);
-    padding: 0 0.4em; user-select: none;
+    background: hsl(var(--muted-foreground) / 0.25);
+    color: transparent;
+    border-radius: 4px;
+    padding: 0 0.4em;
+    user-select: none;
   }
 
-  /* ---------- INTEL VALUE — giant mono price block ---------- */
   .intel-value {
-    font-family: "Anton", "Bebas Neue", Impact, sans-serif;
-    font-size: clamp(3rem, 9vw, 6.5rem);
-    line-height: 0.82;
-    letter-spacing: -0.01em;
-    color: hsl(var(--bone));
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: hsl(var(--foreground));
     font-variant-numeric: tabular-nums;
-    text-shadow: 3px 3px 0 hsl(0 0% 0%), 6px 6px 0 hsl(var(--blood) / 0.55);
+    text-shadow: none;
   }
-  .intel-value-gold { color: hsl(var(--dirty-gold)); text-shadow: 3px 3px 0 hsl(0 0% 0%), 6px 6px 0 hsl(var(--blood) / 0.4); }
+  .intel-value-gold { color: hsl(var(--primary)); }
 
-  /* ---------- VERDICT BLOCKS — BUY / PASS / STEAL ---------- */
   .verdict {
     display: inline-flex; align-items: center; justify-content: center;
-    font-family: "Anton", Impact, sans-serif;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    font-size: clamp(1.5rem, 4vw, 2.5rem);
-    padding: 0.5rem 1.25rem;
-    border: 4px solid currentColor;
-    background: hsl(0 0% 0% / 0.55);
-    box-shadow: 6px 6px 0 0 hsl(0 0% 0%);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    padding: 0.65rem 1.5rem;
+    border: none;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded);
+    color: hsl(var(--foreground));
   }
-  .verdict-buy   { color: hsl(var(--dirty-gold)); }
-  .verdict-pass  { color: hsl(var(--blood)); }
-  .verdict-steal { color: hsl(var(--bone)); border-color: hsl(var(--bone)); background: hsl(var(--blood) / 0.2); }
+  .verdict-buy   { color: hsl(var(--accent-secondary)); }
+  .verdict-pass  { color: hsl(var(--destructive)); }
+  .verdict-steal { color: hsl(var(--primary)); }
 
-  /* ---------- SODIUM-VAPOR LAMP / RAIN PANEL ---------- */
-  .lamp-glow {
-    background:
-      radial-gradient(ellipse 80% 60% at 50% -10%, hsl(47 65% 53% / 0.16), transparent 70%),
-      hsl(var(--ink));
-  }
+  .lamp-glow { background: hsl(var(--surface)); }
   .rain-overlay { position: relative; }
-  .rain-overlay::after {
-    content: ""; position: absolute; inset: 0; pointer-events: none;
-    background:
-      repeating-linear-gradient(170deg, transparent 0 8px, hsl(var(--bone) / 0.04) 8px 9px),
-      repeating-linear-gradient(170deg, transparent 0 22px, hsl(var(--bone) / 0.025) 22px 23px);
-    mix-blend-mode: screen;
-  }
+  .rain-overlay::after { content: none; }
 
-  /* ---------- BANKSY-LIGHT TAPE STRIP ---------- */
   .tape {
     display: inline-block;
-    background:
-      repeating-linear-gradient(45deg, hsl(var(--warning-yellow)) 0 14px, hsl(0 0% 0%) 14px 28px);
-    color: hsl(var(--void));
-    font-family: "Anton", Impact, sans-serif;
-    text-transform: uppercase; letter-spacing: 0.18em;
-    padding: 4px 10px; font-size: 0.7rem;
+    background: hsl(var(--surface));
+    color: hsl(var(--primary));
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    padding: 6px 14px; font-size: 0.7rem;
+    border-radius: 9999px;
+    box-shadow: var(--neu-extruded-sm);
   }
 
-  /* ---------- COLUMN RULE (newspaper) ---------- */
-  .col-rule { border-left: 1px solid hsl(var(--bone) / 0.25); padding-left: 1rem; }
-  .col-rule-gold { border-left: 2px solid hsl(var(--dirty-gold)); padding-left: 1rem; }
+  .col-rule { border-left: 1px solid hsl(var(--muted-foreground) / 0.18); padding-left: 1rem; }
+  .col-rule-gold { border-left: 2px solid hsl(var(--primary) / 0.5); padding-left: 1rem; }
 
-  /* ---------- THUMB-ZONE STICKY ACTION RAIL (mobile war-room) ---------- */
   .thumb-rail {
     position: sticky; bottom: 0; z-index: 30;
-    background: hsl(var(--void) / 0.96);
+    background: hsl(var(--background));
     backdrop-filter: blur(8px);
-    border-top: 3px solid hsl(var(--bone));
-    box-shadow: 0 -2px 0 hsl(var(--blood)), 0 -10px 24px hsl(0 0% 0% / 0.7);
+    border-top: none;
+    border-radius: 2rem 2rem 0 0;
+    box-shadow: 0 -10px 30px hsl(var(--muted-foreground) / 0.18);
     padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
   }
 }
-
-@layer components {
-  /* Strengthen masthead — newspaper banner with blood underline */
-  header, .site-header {
-    position: relative;
-  }
-  header::after, .site-header::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 3px;
-    background: repeating-linear-gradient(90deg, hsl(var(--blood)) 0 24px, transparent 24px 32px);
-    pointer-events: none;
-  }
-
-  /* Tabs — command terminal */
-  [role="tablist"] {
-    border-bottom: 2px solid hsl(var(--bone));
-    background: transparent;
-  }
-  [role="tab"] {
-    border-radius: 0 !important;
-    font-family: "JetBrains Mono", monospace;
-    text-transform: uppercase; letter-spacing: 0.16em;
-    font-size: 0.7rem;
-  }
-  [role="tab"][data-state="active"] {
-    background: hsl(var(--bone));
-    color: hsl(var(--void));
-    box-shadow: inset 0 -3px 0 hsl(var(--dirty-gold));
-  }
-
-  /* Dialogs — heavy noir, no glass */
-  [role="dialog"] {
-    border-radius: 0 !important;
-    border: 2px solid hsl(var(--bone)) !important;
-    box-shadow: var(--shadow-brut-xl), inset 0 0 0 1px hsl(0 0% 0%) !important;
-    background: hsl(var(--ink)) !important;
-  }
-}
-
