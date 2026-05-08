@@ -195,22 +195,58 @@
     filter: url(#banksy-rough);
   }
 
-  /* overspray halo — fresh paint still wet */
+  /* overspray halo — fresh paint still wet, pushed two stops */
   .overspray-green {
     text-shadow:
-      0 0 8px hsl(127 65% 49% / 0.45),
-      0 0 18px hsl(127 65% 49% / 0.25);
+      2px 0 0 hsl(111 100% 54% / 0.35),
+      -2px 0 0 hsl(111 100% 54% / 0.35),
+      0 0 10px hsl(111 100% 54% / 0.55),
+      0 0 22px hsl(111 100% 54% / 0.3);
   }
   .overspray-orange {
     text-shadow:
-      0 0 8px hsl(27 100% 55% / 0.45),
-      0 0 18px hsl(27 100% 55% / 0.25);
+      2px 0 0 hsl(16 100% 50% / 0.35),
+      -2px 0 0 hsl(16 100% 50% / 0.35),
+      0 0 10px hsl(16 100% 50% / 0.55),
+      0 0 22px hsl(16 100% 50% / 0.3);
   }
   .overspray-red {
     text-shadow:
-      0 0 8px hsl(3 100% 60% / 0.45),
-      0 0 18px hsl(3 100% 60% / 0.25);
+      2px 0 0 hsl(348 83% 47% / 0.35),
+      -2px 0 0 hsl(348 83% 47% / 0.35),
+      0 0 10px hsl(348 83% 47% / 0.55),
+      0 0 22px hsl(348 83% 47% / 0.3);
   }
+  .overspray-sweat {
+    text-shadow:
+      0 0 10px hsl(46 65% 52% / 0.55),
+      0 0 22px hsl(46 65% 52% / 0.3);
+  }
+  .overspray-bruise {
+    text-shadow:
+      0 0 10px hsl(275 100% 25% / 0.7),
+      0 0 22px hsl(275 100% 25% / 0.4);
+  }
+
+  /* color utilities for extended palette */
+  .text-blood    { color: hsl(348 83% 47%); }
+  .text-sweat    { color: hsl(46 65% 52%); }
+  .text-bruise   { color: hsl(275 100% 25%); }
+  .text-rust     { color: hsl(25 60% 31%); }
+  .text-chalk    { color: hsl(60 11% 95%); }
+  .text-turf     { color: hsl(111 100% 54%); }
+  .text-penalty  { color: hsl(16 100% 50%); }
+  .bg-blood      { background-color: hsl(348 83% 47%); }
+  .bg-sweat      { background-color: hsl(46 65% 52%); }
+  .bg-bruise     { background-color: hsl(275 100% 25%); }
+  .bg-locker     { background-color: hsl(0 0% 5%); }
+  .bg-concrete   { background-color: hsl(0 0% 11%); }
+  .border-blood   { border-color: hsl(348 83% 47%); }
+  .border-sweat   { border-color: hsl(46 65% 52%); }
+  .border-bruise  { border-color: hsl(275 100% 25%); }
+  .border-rust    { border-color: hsl(25 60% 31%); }
+  .border-turf    { border-color: hsl(111 100% 54%); }
+  .border-penalty { border-color: hsl(16 100% 50%); }
 
   /* hard offset shadows */
   .shadow-stencil   { box-shadow: var(--shadow-stencil); }
@@ -219,6 +255,7 @@
   .shadow-card      { box-shadow: var(--shadow-card); }
   .shadow-flag      { box-shadow: var(--shadow-flag); }
   .shadow-glow      { box-shadow: var(--shadow-glow); }
+  .shadow-blood     { box-shadow: var(--shadow-blood); }
 
   /* press-down stencil interaction */
   .press-stencil {
