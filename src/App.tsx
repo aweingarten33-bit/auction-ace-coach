@@ -59,8 +59,7 @@ const App = () => (
             
             <Routes>
               {/* Index = router that picks Draft Room or Setup based on setupComplete */}
-              <Route path="/" element={<Zine />} />
-              <Route path="/app" element={<PublicGate><Index /></PublicGate>} />
+              <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
 
               {/* New home page when setup is complete */}
