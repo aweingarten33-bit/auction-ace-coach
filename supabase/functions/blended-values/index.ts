@@ -31,10 +31,17 @@ const STD_CURVES: Record<string, Curve> = {
   "D/ST": { top: 3, decay: 6 },
   DST:  { top: 3, decay: 6 },
 };
-// Superflex inflates QBs dramatically — top QBs become RB1-tier money.
+// Superflex shifts ~25-30% of league budget into QBs. Top QBs become RB1-tier
+// money AND every RB/WR/TE/K/DST top number drops accordingly. Don't just inflate
+// QBs — deflate everyone else, otherwise the budget doesn't add up.
 const SF_CURVES: Record<string, Curve> = {
-  ...STD_CURVES,
-  QB: { top: 45, decay: 12 },
+  QB:   { top: 45, decay: 12 },  // top QBs ~$45 (was $14 in 1QB)
+  RB:   { top: 48, decay: 9 },   // ~22% off standard
+  WR:   { top: 45, decay: 10 },  // ~22% off standard
+  TE:   { top: 18, decay: 5 },   // ~25% off standard
+  K:    { top: 1,  decay: 6 },
+  "D/ST": { top: 2, decay: 6 },
+  DST:  { top: 2, decay: 6 },
 };
 
 function curveValue(c: Curve, rank: number): number {
