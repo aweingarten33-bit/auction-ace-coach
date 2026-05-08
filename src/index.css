@@ -131,6 +131,100 @@
   .animate-float { animation: float 3s ease-in-out infinite; }
 }
 
+/* =====================================================================
+   AUTO-PROMOTION LAYER
+   Maps existing DraftRoom utility patterns → neumorphic depth.
+   No JSX changes required. Every container becomes molded clay.
+   ===================================================================== */
+@layer components {
+  /* Sticky header — molded ridge instead of border */
+  header.sticky,
+  .sticky.top-0 {
+    border-color: transparent !important;
+    box-shadow: 0 6px 12px -8px rgba(163,177,198,0.55);
+  }
+
+  /* Generic raised surfaces: any rounded container sitting on bg */
+  .rounded-md.border,
+  .rounded-lg.border,
+  .rounded-xl.border,
+  .rounded-2xl.border,
+  [class*="bg-secondary/30"],
+  [class*="bg-secondary/40"],
+  [class*="bg-secondary/60"] {
+    border-color: transparent !important;
+    background-color: hsl(var(--background)) !important;
+    box-shadow: var(--shadow-extruded-sm);
+    border-radius: 1rem !important;
+  }
+
+  /* Active player / "now bidding" hero card — extra lift + accent ring */
+  .border-2.border-primary {
+    border-color: transparent !important;
+    box-shadow:
+      var(--shadow-extruded-hover),
+      0 0 0 2px hsl(var(--primary) / 0.35);
+    border-radius: 1.25rem !important;
+  }
+
+  /* Pills / chips (rounded-full + border) — pressed wells */
+  .rounded-full.border {
+    border-color: transparent !important;
+    background-color: hsl(var(--background)) !important;
+    box-shadow: var(--shadow-inset-sm);
+  }
+
+  /* Slot rows (small bench cells) — subtle inset tracks */
+  main [class*="grid"] > div > div:has(> input),
+  main label:has(+ input),
+  main .rounded-md:has(> input) {
+    box-shadow: var(--shadow-inset-sm);
+    border-radius: 0.75rem !important;
+  }
+
+  /* All inputs — carved wells */
+  input[type="text"],
+  input[type="number"],
+  input[type="email"],
+  input[type="password"],
+  input:not([type]),
+  textarea,
+  select {
+    background-color: hsl(var(--background)) !important;
+    border-color: transparent !important;
+    box-shadow: var(--shadow-inset) !important;
+    border-radius: 0.875rem !important;
+    transition: box-shadow 250ms ease-out;
+  }
+  input:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow: var(--shadow-inset-deep), 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.5) !important;
+    outline: none !important;
+  }
+
+  /* Coach / floating action button — pillowed orb */
+  .fixed.bottom-5.right-5 {
+    background-color: hsl(var(--background)) !important;
+    border-radius: 9999px;
+    box-shadow: var(--shadow-extruded);
+    transition: box-shadow 300ms ease-out, transform 300ms ease-out;
+  }
+  .fixed.bottom-5.right-5:hover { box-shadow: var(--shadow-extruded-hover); transform: translateY(-2px); }
+  .fixed.bottom-5.right-5:active { box-shadow: var(--shadow-inset); transform: translateY(1px); }
+
+  /* Code/destructive callout — keep semantics, soften shape */
+  .rounded.bg-destructive\/10 {
+    border-radius: 0.875rem !important;
+    box-shadow: var(--shadow-inset-sm);
+    background-color: hsl(var(--destructive) / 0.08) !important;
+  }
+
+  /* Strip glow effects from old design */
+  .shadow-glow { box-shadow: var(--shadow-extruded-hover) !important; }
+}
+
+
 /* Markdown styles for AI coach output */
 .coach-md p { @apply mb-2 leading-relaxed; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
