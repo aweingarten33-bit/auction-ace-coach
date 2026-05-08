@@ -57,6 +57,7 @@ export default function PlayerDetailsOverlay({
   onOpenChange,
   name,
   position,
+  leagueName,
   sheetPrice,
   anchor,
   posRank,
