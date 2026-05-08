@@ -15,11 +15,12 @@
 
 @layer base {
   :root {
-    /* Library at Night palette — HSL */
-    --background:        24 14% 9%;     /* #1C1714 deep mahogany */
-    --background-alt:    25 16% 12%;    /* #251E19 aged oak */
-    --foreground:        33 32% 87%;    /* #E8DFD4 antique parchment */
-    --muted-bg:          25 16% 19%;    /* #3D332B worn leather */
+    /* Library at Night × Sin City — Miller pushes the ink darker, the
+       contrast crueler. Mahogany is almost black; parchment is almost bone. */
+    --background:        24 22% 5%;     /* near-black mahogany */
+    --background-alt:    24 18% 8%;     /* charred oak */
+    --foreground:        36 36% 90%;    /* bleached parchment */
+    --muted-bg:          25 14% 14%;    /* worn leather */
 
     --card:              25 16% 12%;
     --card-foreground:   33 32% 87%;
@@ -27,14 +28,15 @@
     --popover:           24 14% 9%;
     --popover-foreground:33 32% 87%;
 
-    /* Material accents */
-    --brass:             42 51% 59%;    /* #C9A962 polished brass */
-    --brass-light:       42 53% 70%;    /* #D4B872 highlight */
-    --brass-dark:        42 51% 47%;    /* #B8953F shadow */
-    --crimson:           351 58% 35%;   /* #8B2635 library crimson */
-    --parchment:         33 32% 87%;
-    --ink-faded:         28 14% 55%;    /* #9C8B7A faded ink */
-    --wood-grain:        28 16% 25%;    /* #4A3F35 */
+    /* Material accents — brass dimmed, crimson screaming */
+    --brass:             42 60% 52%;    /* tarnished brass */
+    --brass-light:       42 64% 64%;
+    --brass-dark:        42 60% 38%;
+    --crimson:           356 78% 42%;   /* Miller blood — wetter, louder */
+    --crimson-spatter:   356 90% 50%;   /* arterial */
+    --parchment:         36 36% 90%;
+    --ink-faded:         28 10% 48%;    /* faded ink, cooler */
+    --wood-grain:        24 14% 18%;    /* tight, dark grain */
 
     /* shadcn mapping */
     --primary:           42 51% 59%;
@@ -77,22 +79,22 @@
     --bloodred: 351 58% 35%;
     --kryptonite: 42 51% 59%;
 
-    /* Shadows — physical depth in dim library light */
-    --shadow-card:      0 1px 0 0 hsl(0 0% 100% / 0.04), 0 8px 24px -8px hsl(var(--ink) / 0.6);
-    --shadow-floating:  0 1px 0 0 hsl(0 0% 100% / 0.05), 0 24px 60px -16px hsl(var(--ink) / 0.7);
-    --shadow-pressed:   inset 0 2px 4px hsl(var(--ink) / 0.5);
+    /* Shadows — Miller's ink slabs. No soft falloff. Stamps. */
+    --shadow-card:      0 1px 0 0 hsl(0 0% 100% / 0.05), 6px 6px 0 0 hsl(var(--ink) / 0.85), 0 18px 36px -10px hsl(var(--ink));
+    --shadow-floating:  0 1px 0 0 hsl(0 0% 100% / 0.06), 12px 12px 0 0 hsl(var(--ink) / 0.9), 0 30px 60px -16px hsl(var(--ink));
+    --shadow-pressed:   inset 0 3px 6px hsl(var(--ink) / 0.8);
     --shadow-recessed:  inset 0 0 0 1px hsl(var(--border));
-    --shadow-sharp:     4px 4px 0 0 hsl(var(--ink) / 0.7);
-    --shadow-glow:      0 0 0 1px hsl(var(--brass) / 0.4), 0 4px 12px hsl(var(--brass) / 0.25);
-    --shadow-primary:   0 0 0 1px hsl(var(--brass) / 0.6), 0 8px 24px -6px hsl(var(--brass) / 0.35);
-    --shadow-led-green: 0 0 12px hsl(var(--brass) / 0.5);
-    --shadow-engraved:  inset 0 1px 0 hsl(0 0% 100% / 0.18), inset 0 -1px 0 hsl(var(--ink) / 0.5), 0 2px 8px hsl(var(--ink) / 0.5);
-    --shadow-wax-seal:  inset 0 2px 4px hsl(0 0% 100% / 0.18), inset 0 -2px 4px hsl(var(--ink) / 0.4), 0 4px 8px hsl(var(--ink) / 0.5);
+    --shadow-sharp:     6px 6px 0 0 hsl(var(--ink));
+    --shadow-glow:      0 0 0 1px hsl(var(--brass) / 0.6), 4px 4px 0 0 hsl(var(--ink) / 0.85), 0 6px 18px hsl(var(--brass) / 0.3);
+    --shadow-primary:   0 0 0 1px hsl(var(--brass)), 6px 6px 0 0 hsl(var(--ink)), 0 10px 28px -8px hsl(var(--brass) / 0.4);
+    --shadow-led-green: 0 0 14px hsl(var(--brass) / 0.6);
+    --shadow-engraved:  inset 0 1px 0 hsl(0 0% 100% / 0.22), inset 0 -2px 0 hsl(var(--ink) / 0.7), 3px 3px 0 0 hsl(var(--ink) / 0.85);
+    --shadow-wax-seal:  inset 0 2px 4px hsl(0 0% 100% / 0.22), inset 0 -2px 4px hsl(var(--ink) / 0.5), 4px 4px 0 0 hsl(var(--ink) / 0.85), 0 6px 16px hsl(var(--crimson) / 0.5);
 
-    --shadow-brut-sm:   2px 2px 0 0 hsl(var(--ink) / 0.7);
-    --shadow-brut:      4px 4px 0 0 hsl(var(--ink) / 0.7);
-    --shadow-brut-lg:   8px 8px 0 0 hsl(var(--ink) / 0.7);
-    --shadow-brut-xl:   12px 12px 0 0 hsl(var(--ink) / 0.7);
+    --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
+    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
+    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
+    --shadow-brut-xl:   16px 16px 0 0 hsl(var(--ink));
 
     --sidebar-background: 24 16% 8%;
     --sidebar-foreground: 33 32% 87%;
@@ -122,40 +124,47 @@
     font-weight: 400;
     line-height: 1.625;
     background-color: hsl(var(--background));
-    /* The lamp on the desk, the candle in the corner, the wood beneath. */
+    /* A single bare bulb. A pool of blood by the door. The rest is shadow. */
     background-image:
-      radial-gradient(ellipse 70% 50% at 50% 0%, hsl(var(--brass) / 0.06), transparent 65%),
-      radial-gradient(ellipse 50% 40% at 100% 100%, hsl(var(--crimson) / 0.07), transparent 70%),
-      linear-gradient(180deg, hsl(24 16% 11%) 0%, hsl(var(--background)) 50%, hsl(24 18% 7%) 100%);
+      radial-gradient(ellipse 55% 35% at 50% -5%, hsl(var(--brass) / 0.18), transparent 60%),
+      radial-gradient(ellipse 45% 30% at 8% 100%, hsl(var(--crimson) / 0.22), transparent 65%),
+      radial-gradient(ellipse 40% 28% at 100% 80%, hsl(var(--crimson-spatter) / 0.10), transparent 70%),
+      linear-gradient(180deg, hsl(24 22% 7%) 0%, hsl(var(--background)) 45%, hsl(24 24% 3%) 100%);
     background-attachment: fixed;
   }
 
-  /* Aged paper texture — fractal turbulence at 3% */
+  /* Halftone Ben-Day dots — Miller's printer ghost, loud and lopsided */
   body::before {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none; z-index: 1;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0.78  0 0 0 0 0.66  0 0 0 0 0.51  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-    mix-blend-mode: overlay;
-    opacity: 0.06;
+    background-image:
+      radial-gradient(hsl(var(--ink) / 0.55) 0.9px, transparent 1.2px),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='7'/><feColorMatrix values='0 0 0 0 0.78  0 0 0 0 0.66  0 0 0 0 0.51  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 5px 5px, 240px 240px;
+    mix-blend-mode: multiply;
+    opacity: 0.32;
   }
 
-  /* Vignette — library lamplight focuses the eye */
+  /* Heavy vignette — the lamp barely reaches the edges */
   body::after {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none; z-index: 1;
-    background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, hsl(var(--background) / 0.55) 100%);
+    background:
+      radial-gradient(ellipse at center, transparent 0%, transparent 35%, hsl(24 30% 2% / 0.85) 100%),
+      linear-gradient(180deg, hsl(24 30% 2% / 0.4) 0%, transparent 12%, transparent 85%, hsl(24 30% 2% / 0.5) 100%);
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: "Cormorant Garamond", Georgia, serif;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.015em;
     color: hsl(var(--foreground));
-    line-height: 1.15;
+    line-height: 1.05;
+    text-shadow: 0 2px 0 hsl(var(--ink) / 0.6), 0 8px 24px hsl(var(--ink) / 0.7);
   }
-  h1 { font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+  h1 { font-weight: 700; letter-spacing: -0.025em; line-height: 0.98; }
 
   ::selection { background: hsl(var(--brass) / 0.5); color: hsl(var(--foreground)); }
 }
@@ -451,7 +460,7 @@
     font-family: "Cormorant Garamond", Georgia, serif;
   }
 
-  /* Surfaces — leather-bound panels, aged oak */
+  /* Surfaces — slabs of black leather, stamped into the page */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
@@ -461,32 +470,42 @@
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
     background-color: hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--border)) !important;
-    box-shadow: 0 1px 0 0 hsl(0 0% 100% / 0.03), 0 8px 24px -10px hsl(var(--ink) / 0.6) !important;
-    border-radius: 4px !important;
-    transition: border-color 300ms ease-out, box-shadow 300ms ease-out;
+    border: 1px solid hsl(var(--ink)) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--brass) / 0.18),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.04),
+      4px 4px 0 0 hsl(var(--ink) / 0.85),
+      0 14px 32px -10px hsl(var(--ink)) !important;
+    border-radius: 3px !important;
+    transition: border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out;
   }
   .rounded-md.border:hover,
   .rounded-lg.border:hover,
   .rounded-xl.border:hover,
   .rounded-2xl.border:hover {
-    border-color: hsl(var(--brass) / 0.5) !important;
+    border-color: hsl(var(--brass)) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--brass) / 0.45),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.06),
+      6px 6px 0 0 hsl(var(--ink)),
+      0 18px 40px -10px hsl(var(--ink)) !important;
   }
 
-  /* Featured panel — gilt-edged folio */
+  /* Featured panel — wax-dipped folio, brass clasp, blood at the edge */
   .border-2.border-primary {
     background:
-      radial-gradient(ellipse at top, hsl(var(--brass) / 0.06), transparent 60%),
+      radial-gradient(ellipse at top, hsl(var(--brass) / 0.12), transparent 60%),
+      radial-gradient(ellipse at bottom left, hsl(var(--crimson) / 0.10), transparent 65%),
       hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--brass) / 0.7) !important;
+    border: 1px solid hsl(var(--brass)) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--brass) / 0.25),
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.06),
-      0 22px 60px -22px hsl(var(--ink) / 0.7) !important;
-    border-radius: 4px !important;
+      0 0 0 1px hsl(var(--brass) / 0.4),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.08),
+      6px 6px 0 0 hsl(var(--ink)),
+      0 24px 60px -18px hsl(var(--crimson) / 0.4),
+      0 30px 80px -22px hsl(var(--ink)) !important;
+    border-radius: 3px !important;
   }
-
-  /* Pills — Cinzel small caps */
   .rounded-full.border {
     background-color: hsl(var(--background-alt)) !important;
     border: 1px solid hsl(var(--brass) / 0.4) !important;
