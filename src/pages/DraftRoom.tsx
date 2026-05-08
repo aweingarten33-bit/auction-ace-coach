@@ -716,16 +716,20 @@ export default function DraftRoom() {
       {/* ── DICE-style SLIDE-IN TOOL PANEL (50/50 on desktop, full on mobile) ── */}
       {toolPage && (
         <>
-          {/* backdrop — fades in, click to dismiss */}
+          {/* backdrop — frosted glass, fades in, click to dismiss */}
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fade-in"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-md animate-fade-in"
+            style={{ animationDuration: "0.2s" }}
             onClick={() => setToolPage(null)}
             aria-hidden
           />
-          {/* panel — slides in from right */}
+          {/* panel — spring slide+scale from right */}
           <div
-            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[0_0_60px_rgba(0,0,0,0.6)] overflow-y-auto animate-slide-in-right"
-            style={{ animationDuration: "0.35s", animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)" }}
+            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[-20px_0_60px_rgba(0,0,0,0.7)] overflow-y-auto"
+            style={{
+              animation: "tool-panel-in 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both",
+              transformOrigin: "right center",
+            }}
           >
             <div
               className="px-5"
