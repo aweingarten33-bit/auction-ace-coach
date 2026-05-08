@@ -683,17 +683,60 @@ export default function DraftRoom() {
         className="mt-8 border-t border-border/40 px-4 py-6 text-center"
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)" }}
       >
-        <p
-          className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-foreground/85"
-          style={{
-            fontFamily: '"Special Elite", "Courier New", monospace',
-            transform: "rotate(-3deg)",
-            textShadow: "1px 1px 0 hsl(var(--background)), 2px 2px 0 hsl(var(--foreground) / 0.15)",
-            filter: "contrast(1.05)",
-          }}
-        >
-          Built by Andrew Weingarten
-        </p>
+        <div className="inline-block">
+          {/* faux spray-paint stencil — slight tilt, jagged edges, paint drip */}
+          <p
+            className="relative inline-block text-sm uppercase"
+            style={{
+              fontFamily: '"Stardos Stencil", "Special Elite", monospace',
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              color: "hsl(0 75% 45%)",
+              transform: "rotate(-4deg)",
+              textShadow:
+                "0 0 1px hsl(0 75% 35%), 1px 0 0 hsl(0 75% 30% / 0.6), 0 1px 2px hsl(0 0% 0% / 0.35)",
+              filter: "url(#bansky-rough)",
+            }}
+          >
+            Built by Andrew Weingarten
+            {/* paint drip */}
+            <span
+              aria-hidden
+              className="absolute"
+              style={{
+                left: "62%",
+                top: "100%",
+                width: "2px",
+                height: "10px",
+                background: "hsl(0 75% 45%)",
+                borderBottomLeftRadius: "2px",
+                borderBottomRightRadius: "2px",
+                opacity: 0.85,
+              }}
+            />
+            <span
+              aria-hidden
+              className="absolute"
+              style={{
+                left: "20%",
+                top: "100%",
+                width: "1.5px",
+                height: "6px",
+                background: "hsl(0 75% 45%)",
+                borderBottomLeftRadius: "2px",
+                borderBottomRightRadius: "2px",
+                opacity: 0.7,
+              }}
+            />
+          </p>
+          {/* SVG filter for rough stencil edges */}
+          <svg width="0" height="0" style={{ position: "absolute" }}>
+            <filter id="bansky-rough">
+              <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
+              <feDisplacementMap in="SourceGraphic" scale="1.4" />
+            </filter>
+          </svg>
+        </div>
       </footer>
     </div>
   );
