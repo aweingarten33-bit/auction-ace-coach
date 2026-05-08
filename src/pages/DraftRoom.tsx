@@ -676,6 +676,22 @@ export default function DraftRoom() {
           />
         </SheetContent>
       </Sheet>
+
+      {/* ── FOOTER CREDIT ────────────────────────────────────────────── */}
+      <footer
+        className="mt-8 border-t border-border/40 px-4 py-4 text-center"
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
+      >
+        <p className="inline-flex items-center justify-center gap-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          <span>Built by A.</span>
+          <img
+            src={superFootballLogo}
+            alt="W"
+            className="inline-block h-4 w-4 object-contain align-[-2px]"
+          />
+          <span>eingarten</span>
+        </p>
+      </footer>
     </div>
   );
 }
