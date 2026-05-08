@@ -1157,10 +1157,12 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function Top100List({
   prices,
+  anchorMap,
   events,
   onPick,
 }: {
   prices: PriceEstimate[];
+  anchorMap: Record<string, import("@/lib/decision-engine").AnchorEntry>;
   events: ReturnType<typeof useDraftStore.getState>["events"];
   onPick: (name: string) => void;
 }) {
@@ -1169,12 +1171,22 @@ function Top100List({
     [events],
   );
 
+  // Use the full cascade (anchorMap) for $ values — same math as the player cards
+  // (Sleeper 80 / ESPN 20, blended with last-3-yr league history + VORP).
+  // Falls back to sheet price if no anchor exists.
   const top = useMemo(() => {
-    return prices
-      .filter((p) => p.price > 0)
+    type Row = { name: string; price: number; position?: PriceEstimate["position"] };
+    const byName = new Map<string, Row>();
+    for (const p of prices) {
+      const key = norm(p.name);
+      const anchor = anchorMap[key]?.price;
+      const finalPrice = anchor && anchor > 0 ? anchor : p.price;
+      if (finalPrice > 0) byName.set(key, { name: p.name, price: finalPrice, position: p.position });
+    }
+    return Array.from(byName.values())
       .sort((a, b) => b.price - a.price)
       .slice(0, 100);
-  }, [prices]);
+  }, [prices, anchorMap]);
 
   if (top.length === 0) {
     return (
