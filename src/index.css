@@ -141,43 +141,43 @@
   .dark {
     /* DARK — "Returns" night sky. Deep midnight-navy clay,
        warm bone foreground, ochre + maroon accents. */
-    --background:        222 40% 11%;        /* deep midnight navy */
-    --background-alt:    222 40% 11%;
-    --foreground:        40 35% 88%;         /* warm bone */
-    --muted-bg:          222 40% 11%;
+    --background:        223 38% 13%;        /* suit midnight navy */
+    --background-alt:    223 34% 16%;
+    --foreground:        43 34% 88%;         /* warm shield bone */
+    --muted-bg:          223 34% 16%;
 
-    --card:              222 40% 11%;
-    --card-foreground:   40 35% 88%;
-    --popover:           222 40% 11%;
-    --popover-foreground:40 35% 88%;
+    --card:              223 34% 16%;
+    --card-foreground:   43 34% 88%;
+    --popover:           223 34% 16%;
+    --popover-foreground:43 34% 88%;
 
-    --primary:           36 60% 58%;         /* lifted ochre */
-    --primary-foreground: 222 40% 8%;
-    --primary-glow:      36 70% 68%;
+    --primary:           36 58% 56%;         /* shield ochre */
+    --primary-foreground: 223 42% 9%;
+    --primary-glow:      39 70% 68%;
 
-    --secondary:         222 40% 11%;
-    --secondary-foreground: 40 35% 88%;
-    --muted:             222 40% 11%;
-    --muted-foreground:  220 15% 62%;
+    --secondary:         223 34% 16%;
+    --secondary-foreground: 43 34% 88%;
+    --muted:             223 34% 16%;
+    --muted-foreground:  219 18% 72%;
 
-    --accent:            36 60% 58%;
-    --accent-foreground: 222 40% 8%;
-    --accent-secondary:  350 55% 52%;        /* lifted maroon */
+    --accent:            36 58% 56%;
+    --accent-foreground: 223 42% 9%;
+    --accent-secondary:  350 52% 45%;        /* cape maroon */
 
-    --destructive:       350 55% 52%;
-    --destructive-foreground: 40 35% 92%;
+    --destructive:       350 52% 45%;
+    --destructive-foreground: 43 34% 92%;
     --warning:           36 80% 60%;
-    --success:           36 60% 58%;
+    --success:           36 58% 56%;
 
     --border:            transparent;
-    --input:             222 40% 11%;
-    --ring:              36 60% 58%;
+    --input:             223 34% 16%;
+    --ring:              36 58% 56%;
 
-    --surface:           222 40% 11%;
-    --surface-2:         222 40% 11%;
+    --surface:           223 34% 16%;
+    --surface-2:         223 31% 19%;
     /* Highlight = a touch of cool steel-navy lift. Shadow = ink. */
-    --shadow-light-rgb:  56, 70, 100;
-    --shadow-dark-rgb:   4, 6, 12;
+    --shadow-light-rgb:  56, 73, 112;
+    --shadow-dark-rgb:   2, 5, 14;
 
     --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.75),
                          -9px -9px 16px rgba(var(--shadow-light-rgb), 0.5);
