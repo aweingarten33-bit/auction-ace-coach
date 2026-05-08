@@ -375,10 +375,10 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         //   T2: League history >= $25 but market < $10 (or vice versa) AND no injury flag
         //   T3: High-value (>= $25 anchor) with NO injury flag — suspect stale feed
         // Cached 24hr per player in localStorage. AI can only SUBTRACT value.
-        const NEWS_CACHE_KEY = "ai-news-cache-v1";
+        const NEWS_CACHE_KEY = "ai-news-newsCache-v1";
         const TTL = 24 * 60 * 60 * 1000;
         type CacheRow = { factor: number; reason: string; source_url: string; ts: number };
-        const cache: Record<string, CacheRow> = (() => {
+        const newsCache: Record<string, CacheRow> = (() => {
           try { return JSON.parse(localStorage.getItem(NEWS_CACHE_KEY) || "{}"); } catch { return {}; }
         })();
         const now = Date.now();
@@ -409,7 +409,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           if (!trigger) continue;
 
           // Use cached result if fresh
-          const cached = cache[k];
+          const cached = newsCache[k];
           if (cached && now - cached.ts < TTL) {
             if (cached.factor < 1) {
               const newPrice = Math.max(1, Math.round(entry.price * cached.factor));
@@ -469,8 +469,8 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
           const updated = { ...out };
           for (const r of data.results as Array<{ id: string; factor: number; reason: string; source_url: string }>) {
-            // Always cache (even no-op results) so we don't re-call for 24hr
-            cache[r.id] = { factor: r.factor, reason: r.reason, source_url: r.source_url, ts: now };
+            // Always newsCache (even no-op results) so we don't re-call for 24hr
+            newsCache[r.id] = { factor: r.factor, reason: r.reason, source_url: r.source_url, ts: now };
             const cur = updated[r.id];
             if (!cur || r.factor >= 1) continue;
             const newPrice = Math.max(1, Math.round(cur.price * r.factor));
@@ -484,7 +484,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
               },
             };
           }
-          try { localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(cache)); } catch { /* quota */ }
+          try { localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify(newsCache)); } catch { /* quota */ }
           if (!cancelled) setMap(updated);
         } catch (e) {
           console.warn("[useAnchorMap] news-check failed (non-fatal)", e);
