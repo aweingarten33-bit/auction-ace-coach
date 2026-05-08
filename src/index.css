@@ -460,7 +460,7 @@
     font-family: "Cormorant Garamond", Georgia, serif;
   }
 
-  /* Surfaces — leather-bound panels, aged oak */
+  /* Surfaces — slabs of black leather, stamped into the page */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
@@ -470,32 +470,42 @@
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
     background-color: hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--border)) !important;
-    box-shadow: 0 1px 0 0 hsl(0 0% 100% / 0.03), 0 8px 24px -10px hsl(var(--ink) / 0.6) !important;
-    border-radius: 4px !important;
-    transition: border-color 300ms ease-out, box-shadow 300ms ease-out;
+    border: 1px solid hsl(var(--ink)) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--brass) / 0.18),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.04),
+      4px 4px 0 0 hsl(var(--ink) / 0.85),
+      0 14px 32px -10px hsl(var(--ink)) !important;
+    border-radius: 3px !important;
+    transition: border-color 200ms ease-out, box-shadow 200ms ease-out, transform 200ms ease-out;
   }
   .rounded-md.border:hover,
   .rounded-lg.border:hover,
   .rounded-xl.border:hover,
   .rounded-2xl.border:hover {
-    border-color: hsl(var(--brass) / 0.5) !important;
+    border-color: hsl(var(--brass)) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--brass) / 0.45),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.06),
+      6px 6px 0 0 hsl(var(--ink)),
+      0 18px 40px -10px hsl(var(--ink)) !important;
   }
 
-  /* Featured panel — gilt-edged folio */
+  /* Featured panel — wax-dipped folio, brass clasp, blood at the edge */
   .border-2.border-primary {
     background:
-      radial-gradient(ellipse at top, hsl(var(--brass) / 0.06), transparent 60%),
+      radial-gradient(ellipse at top, hsl(var(--brass) / 0.12), transparent 60%),
+      radial-gradient(ellipse at bottom left, hsl(var(--crimson) / 0.10), transparent 65%),
       hsl(var(--card)) !important;
-    border: 1px solid hsl(var(--brass) / 0.7) !important;
+    border: 1px solid hsl(var(--brass)) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--brass) / 0.25),
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.06),
-      0 22px 60px -22px hsl(var(--ink) / 0.7) !important;
-    border-radius: 4px !important;
+      0 0 0 1px hsl(var(--brass) / 0.4),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.08),
+      6px 6px 0 0 hsl(var(--ink)),
+      0 24px 60px -18px hsl(var(--crimson) / 0.4),
+      0 30px 80px -22px hsl(var(--ink)) !important;
+    border-radius: 3px !important;
   }
-
-  /* Pills — Cinzel small caps */
   .rounded-full.border {
     background-color: hsl(var(--background-alt)) !important;
     border: 1px solid hsl(var(--brass) / 0.4) !important;
