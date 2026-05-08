@@ -764,8 +764,6 @@ export default function DraftRoom() {
             </div>
 
             <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "720ms", animationDuration: "800ms", animationFillMode: "both" }}>
-
-            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "380ms", animationDuration: "500ms", animationFillMode: "both" }}>
               {toolPage === "lookup" && (
                 <LookupSection
                   prices={prices}
