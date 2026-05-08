@@ -366,16 +366,40 @@ function PriceLine({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Section({ label, placeholder }: { label: string; placeholder?: boolean }) {
+function Section({
+  label,
+  body,
+  tone,
+}: {
+  label: string;
+  body?: string[];
+  tone?: "warning" | "bold";
+}) {
+  const items = (body ?? []).filter(Boolean);
+  const toneCls =
+    tone === "warning"
+      ? "border-rose-700/40 bg-rose-700/5"
+      : tone === "bold"
+      ? "border-[#1b2238]/40 bg-[#1b2238]/10"
+      : "border-[#1b2238]/30 bg-[#1b2238]/5";
   return (
-    <div className="rounded border border-dashed border-[#1b2238]/30 bg-[#1b2238]/5 px-2.5 py-1.5">
+    <div className={`rounded border ${toneCls} px-2.5 py-1.5`}>
       <p className="text-[9px] font-black uppercase tracking-widest text-[#d2691e]">
         {label}
       </p>
-      {placeholder && (
-        <p className="mt-0.5 text-[11px] italic text-[#1b2238]/50">
-          Coming soon — let's design what goes here.
+      {items.length === 0 ? (
+        <p className="mt-0.5 text-[11px] italic text-[#1b2238]/40">
+          Not enough data yet — pick a player with a price to see math.
         </p>
+      ) : (
+        <ul className="mt-1 space-y-0.5 text-[11px] leading-snug">
+          {items.map((t, i) => (
+            <li key={i} className="flex gap-1">
+              <span className="text-[#d2691e]">•</span>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
