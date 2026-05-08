@@ -44,7 +44,7 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
         spend: spendByPosition(prevEvents.filter((e) => e.drafter === "me"))[pos!] ?? 0,
       }
     : null;
-  const posAfter = isMine && isTrackedPos
+  const posAfter = canShowDeltas && isTrackedPos
     ? {
         count: countByPosition([
           ...keepers.map((k) => ({ player: k.player, position: k.position, price: k.cost, source: "keeper" as const })),
