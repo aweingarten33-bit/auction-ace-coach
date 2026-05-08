@@ -165,8 +165,12 @@ export default function AuctionPlayerCard({
 
   // Risk: injury status from anchor + price-vs-budget
   const riskParts: string[] = [];
-  if (anchor?.injuryDiscount && anchor.injuryDiscount > 0) {
-    riskParts.push(`Injury discount of ~$${Math.round(anchor.injuryDiscount)} already baked in.`);
+  if (anchor?.injuryDiscount) {
+    const pre = anchor.injuryDiscount.preInjuryPrice;
+    const cut = pre - (anchor.price ?? pre);
+    if (cut > 0) {
+      riskParts.push(`Injury discount of ~$${Math.round(cut)} baked in (${anchor.injuryDiscount.reason}).`);
+    }
   }
   if (suggested != null && remaining != null && slotsLeft != null && slotsLeft > 1) {
     const afterRemaining = remaining - suggested;
