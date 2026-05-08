@@ -493,35 +493,41 @@ function SetupChecklist() {
   };
 
   const Step = ({ n, label, done, children }: { n: string; label: string; done: boolean; children: React.ReactNode }) => (
-    <div className="flex items-start gap-2 rounded-md border bg-card/40 p-2">
-      <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${done ? "bg-emerald-500 text-white" : "bg-muted text-muted-foreground"}`}>
+    <div className="flex items-start gap-2 rounded-xl bg-white/[0.04] p-2.5">
+      <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${done ? "bg-emerald-500 text-white" : "bg-white/10 text-muted-foreground"}`}>
         {done ? "✓" : n}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="text-xs font-semibold">{label}</div>
+        <div className="text-xs font-semibold text-foreground">{label}</div>
         <div className="mt-1 text-[11px] text-muted-foreground">{children}</div>
       </div>
     </div>
   );
 
   const hasPrices = prices.length > 0;
+  const allDone = !!espnConnected && historySeasons.length > 0 && rankSeasons.length > 0 && hasPrices;
 
   return (
-    <Card className="p-3">
-      <div className="mb-2 flex items-center gap-2">
-        <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">1</span>
-        <h2 className="text-sm font-semibold">Setup — load your data</h2>
+    <div className="rounded-2xl bg-[#141414] p-4">
+      <div className="mb-3 flex min-w-0 items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5">
+          <Check className={`h-4 w-4 ${allDone ? "text-emerald-400" : "text-foreground"}`} />
+        </div>
+        <div className="min-w-0">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Step 1</div>
+          <h2 className="truncate text-[15px] font-semibold text-foreground">Setup — load your data</h2>
+        </div>
       </div>
       <div className="space-y-2">
         <Step n="1a" label="Connect ESPN league" done={!!espnConnected}>
           {espnConnected ? (
-            <span className="text-emerald-500">Connected.</span>
+            <span className="text-emerald-400">Connected.</span>
           ) : (
             <span className="text-muted-foreground">Use "Connect ESPN" on the sign-in page.</span>
           )}
         </Step>
         <Step n="1b" label="Sync last 3 yrs of auction history" done={historySeasons.length > 0 && rankSeasons.length > 0}>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" variant="outline" onClick={runSync} disabled={busy || !espnConnected} className="h-6 text-[11px]">
               <Download className="mr-1 h-3 w-3" />
               {busy ? "Syncing…" : historySeasons.length ? "Re-sync" : "Sync now"}
@@ -533,10 +539,10 @@ function SetupChecklist() {
         </Step>
         <Step n="1c" label="Upload this year's cheat sheet (tiers)" done={hasPrices}>
           {hasPrices
-            ? <span className="text-emerald-500">{prices.length} players priced. Re-import in setup wizard.</span>
+            ? <span className="text-emerald-400">{prices.length} players priced. Re-import in setup wizard.</span>
             : <button onClick={() => navigate("/?step=1&edit=1")} className="text-primary underline">Open setup wizard →</button>}
         </Step>
       </div>
-    </Card>
+    </div>
   );
 }
