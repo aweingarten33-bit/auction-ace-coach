@@ -3,7 +3,6 @@
 // team-trends edge function.
 import { useEffect, useState } from "react";
 import { TrendingUp, Crown, Target, Banknote } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { POS_COLORS } from "@/lib/positions";
 
 interface Trends {
