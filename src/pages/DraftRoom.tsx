@@ -51,7 +51,6 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import TeamTrends from "@/components/TeamTrends";
-import PositionBudgetBar from "@/components/PositionBudgetBar";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -273,9 +272,6 @@ export default function DraftRoom() {
               gaps={gaps}
             />
           )}
-
-          {/* Budget planner — spending by position vs fair share */}
-          <PositionBudgetBar />
 
           {/* Personalized 3-year drafting trends */}
           {selectedTeam && (
