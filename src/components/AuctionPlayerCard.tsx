@@ -101,7 +101,9 @@ export default function AuctionPlayerCard({
 
   const sleeperVal = anchor?.marketSources?.sleeper;
   const espnVal = anchor?.marketSources?.espn ?? anchor?.marketPrice;
-  const berryVal = sheetPrice;
+  // Berry from Fantasy Life (Firecrawl-scraped, superflex-adjusted, blended in edge fn).
+  // Falls back to user's price sheet only if no Berry value found for this player.
+  const berryVal = anchor?.marketSources?.berry ?? sheetPrice;
   const leagueVal = anchor?.leaguePrice;
   const lastSold = history[0];
 
