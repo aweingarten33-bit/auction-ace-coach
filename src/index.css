@@ -231,12 +231,33 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 400;
-    line-height: 1.6;
+    font-family: "Caveat", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    line-height: 1.5;
     background-color: hsl(var(--background));
-    background-image: none;
+    background-image:
+      /* halftone dot screen */
+      radial-gradient(rgba(20,28,52,0.16) 1px, transparent 1.4px),
+      /* gold spray haze top-left */
+      radial-gradient(60% 45% at 8% 6%,  hsl(38 78% 46% / 0.20) 0%, transparent 70%),
+      /* maroon spray haze bottom-right */
+      radial-gradient(55% 50% at 96% 96%, hsl(354 65% 36% / 0.22) 0%, transparent 70%),
+      /* navy bleed */
+      radial-gradient(80% 60% at 50% 50%, hsl(222 60% 24% / 0.10) 0%, transparent 75%);
+    background-size: 6px 6px, auto, auto, auto;
+    background-attachment: fixed;
   }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      /* diagonal ink hatch */
+      repeating-linear-gradient(135deg,
+        rgba(20,28,52,0.05) 0 1px,
+        transparent 1px 7px);
+    mix-blend-mode: multiply;
+  }
+  #root { position: relative; z-index: 1; }
 
   /* ── FRANK MILLER SWIRL — gold + cape-blood smeared over ink ── */
   .dark body {
