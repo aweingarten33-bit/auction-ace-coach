@@ -34,43 +34,40 @@ export default function PricingMathExplainer() {
       {open && (
         <div className="mt-4 space-y-4 text-sm text-foreground/90 leading-relaxed">
           <section>
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
-              📚 What it studies
-            </h3>
             <p className="text-muted-foreground">
-              Your league's <span className="text-foreground font-medium">spending habits</span>, the <span className="text-foreground font-medium">expert rankings</span>, and <span className="text-foreground font-medium">live news</span> on every player. Three sources, one opinion.
+              We built our own algorithm. It doesn't just copy ESPN or Sleeper — it watches <span className="text-foreground font-medium">your league</span> and learns how your money actually moves.
             </p>
           </section>
 
           <section>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
-              💰 How it picks a price
+              🧠 The brain
             </h3>
             <p className="text-muted-foreground">
-              Two voices argue: one says "this is what your league pays guys like him," the other says "this is what he's actually worth." We blend them. Vets lean on history, rookies lean on talent.
+              It uses <span className="text-foreground font-medium">Bayesian reasoning</span> — fancy way of saying it starts with what the market thinks, then updates that belief every time new info comes in. Same math NASA uses to land rovers. We use it to win your draft.
             </p>
           </section>
 
           <section>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
-              🚨 The news guard
+              👀 What it watches
             </h3>
             <p className="text-muted-foreground">
-              If something bad breaks — injury, suspension, lost job — prices drop. We <span className="text-foreground">never</span> hype a guy up off rumors. Bad news only.
+              Your league's spending DNA, the expert consensus, and live news. It weighs all three based on which one is most trustworthy <span className="text-foreground">for that specific player</span>.
             </p>
           </section>
 
           <section>
             <h3 className="text-xs font-semibold uppercase tracking-wide text-primary mb-1">
-              🎯 Live at the table
+              🎯 At the table
             </h3>
             <p className="text-muted-foreground">
-              Every bid, the engine checks your <span className="text-foreground">wallet, empty roster spots, and how thin the position is</span> — then says Bid, Wait, or Pass. It'll never tell you to spend money you don't have.
+              Every bid, it does the math on your wallet, your open spots, and how thin the position is — and tells you the most you should pay. Period. No bloat, no math you have to do in your head.
             </p>
           </section>
 
           <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground italic pt-2 border-t border-border/40">
-            <Lock className="h-3 w-3" /> The secret sauce stays secret.
+            <Lock className="h-3 w-3" /> The actual formulas are ours. We're not telling.
           </p>
         </div>
       )}
