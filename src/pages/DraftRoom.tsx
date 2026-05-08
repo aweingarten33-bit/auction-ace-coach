@@ -425,7 +425,7 @@ export default function DraftRoom() {
         className="origin-center"
         style={{
           transform: toolPage ? "scale(0.94) translateX(-18px)" : "none",
-          transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: "transform 850ms cubic-bezier(0.22, 1, 0.36, 1)",
           willChange: "transform",
         }}
       >
