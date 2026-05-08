@@ -19,16 +19,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(s);
       setLoading(false);
       if (s?.user) {
-        // Fire-and-forget activity ping for the admin report
         supabase.rpc("touch_last_seen").then(() => {});
       }
     });
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) {
+        // Auto sign-in anonymously so RLS-protected queries still work
+        await supabase.auth.signInAnonymously().catch(() => {});
+        return;
+      }
       setSession(data.session);
       setLoading(false);
-      if (data.session?.user) {
-        supabase.rpc("touch_last_seen").then(() => {});
-      }
+      supabase.rpc("touch_last_seen").then(() => {});
     });
     return () => sub.subscription.unsubscribe();
   }, []);
