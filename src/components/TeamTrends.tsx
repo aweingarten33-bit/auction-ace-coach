@@ -97,9 +97,26 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
 
       {/* Avg spend by position */}
       <div>
-        <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <button
+          type="button"
+          onClick={() => setShowHelp((v) => !v)}
+          className="mb-0.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition hover:text-foreground"
+        >
           Total $ spent on each position
-        </p>
+          <Info className="h-3 w-3" />
+        </button>
+        {showHelp && (
+          <div className="mb-1.5 rounded-md border border-border/50 bg-foreground/5 px-2 py-1.5 text-[11px] leading-snug text-foreground/80">
+            <p className="mb-1">
+              <strong>Total $ on position</strong> = everything they spend on ALL their QBs
+              (or RBs, etc.) in one draft, added up. e.g. $55 QB1 + $20 QB2 + $5 backup = $80 total.
+            </p>
+            <p>
+              <strong>$ per player</strong> = what they paid for one individual guy. Useful for
+              spotting their ceiling on a single bid.
+            </p>
+          </div>
+        )}
         <p className="mb-1.5 text-[10px] text-muted-foreground">
           What they actually paid at each spot per draft (avg of last {seasons.length} yrs). Tap a row to see how many they draft.
         </p>
