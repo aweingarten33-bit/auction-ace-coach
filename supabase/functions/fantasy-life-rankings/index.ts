@@ -46,9 +46,19 @@ const SOURCES: { source: string; label: string; position: string; url: string }[
   },
 ];
 
+// In-memory cache shared across warm invocations (~6h TTL)
+let CACHE: { at: number; payload: unknown } | null = null;
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
+    const url = new URL(req.url);
+    const force = url.searchParams.get("refresh") === "1";
+    if (!force && CACHE && Date.now() - CACHE.at < CACHE_TTL_MS) {
+      return j(CACHE.payload);
+    }
+
     const key = Deno.env.get("FIRECRAWL_API_KEY");
     if (!key) return j({ error: "FIRECRAWL_API_KEY not configured" }, 500);
 
@@ -63,7 +73,9 @@ Deno.serve(async (req) => {
         }
       }),
     );
-    return j({ lists, fetchedAt: new Date().toISOString() });
+    const payload = { lists, fetchedAt: new Date().toISOString() };
+    CACHE = { at: Date.now(), payload };
+    return j(payload);
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
