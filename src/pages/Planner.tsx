@@ -388,26 +388,28 @@ function StrategyPickerCard({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <Card className="p-3">
+    <div className="rounded-2xl bg-[#141414] p-4">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2 text-left"
+        className="flex w-full items-center gap-3 text-left"
         aria-expanded={open}
       >
-        <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary">★</span>
-        <h2 className="text-sm font-semibold">Draft strategy</h2>
-        <span className="ml-auto rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-          {strategy.label}
-        </span>
-        <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/5">
+          <span className="text-base font-semibold text-foreground">★</span>
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Draft strategy</div>
+          <div className="text-[15px] font-semibold text-foreground truncate">{strategy.label}</div>
+        </div>
+        <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="mt-2">
-          <p className="mb-2 text-[11px] text-muted-foreground">
-            Pick a build to lock in. The $ allocations and Coach AI will follow it. Pick <strong>No strategy</strong> if you want to stay flexible.
+        <div className="mt-4">
+          <p className="mb-3 text-[12px] text-muted-foreground leading-snug">
+            Pick a build to lock in. The $ allocations and Coach AI will follow it. Pick <strong className="text-foreground">No strategy</strong> if you want to stay flexible.
           </p>
-          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {STRATEGIES.map((s) => {
               const active = s.id === strategyId;
               return (
@@ -415,25 +417,25 @@ function StrategyPickerCard({
                   key={s.id}
                   type="button"
                   onClick={() => onPick(s.id, s.weights)}
-                  className={`rounded-md border px-2.5 py-2 text-left transition-colors ${
+                  className={`rounded-xl px-3 py-2.5 text-left transition-colors ${
                     active
-                      ? "border-primary bg-primary/10 ring-1 ring-primary/40"
-                      : "border-border bg-card/40 hover:bg-card/70"
+                      ? "bg-white/10 ring-1 ring-white/20"
+                      : "bg-white/[0.03] hover:bg-white/[0.06]"
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-xs font-semibold">
+                  <div className="flex items-center gap-1.5 text-[13px] font-semibold text-foreground">
                     {s.label}
-                    {active && <Check className="h-3 w-3 text-primary" />}
+                    {active && <Check className="h-3.5 w-3.5 text-foreground/80" />}
                   </div>
                   <div className="text-[11px] text-muted-foreground leading-tight">{s.short}</div>
                 </button>
               );
             })}
           </div>
-          <p className="mt-2 text-[11px] italic text-muted-foreground/80">{strategy.description}</p>
+          <p className="mt-3 text-[11px] italic text-muted-foreground/80">{strategy.description}</p>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
