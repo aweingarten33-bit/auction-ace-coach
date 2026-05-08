@@ -1,22 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import SetupWizard from "./SetupWizard";
+import WarRoom from "./WarRoom";
 
-const Index = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { loading } = useAuth();
-  const editing = searchParams.has("step") || searchParams.get("edit") === "1";
-  const [routing, setRouting] = useState(true);
-
-  useEffect(() => {
-    if (loading || editing) { setRouting(false); return; }
-    navigate("/draft-room", { replace: true });
-  }, [editing, loading, navigate]);
-
-  if (loading || routing) return null;
-  return <SetupWizard />;
-};
+const Index = () => <WarRoom />;
 
 export default Index;
