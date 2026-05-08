@@ -38,11 +38,11 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             .then((r) => r.data ?? []),
           supabase
             .from("espn_player_ranks")
-            .select("player_name_norm, position, auction_value")
+            .select("player_name_norm, position, auction_value, injury_status, injury_note")
             .then((r) => r.data ?? []),
           supabase
             .from("sleeper_players")
-            .select("player_name_norm, position, projected_auction_value, depth_chart_order, search_rank")
+            .select("player_name_norm, position, projected_auction_value, depth_chart_order, search_rank, injury_status, injury_notes")
             .then((r) => r.data ?? []),
         ]);
         if (cancelled) return;
