@@ -249,42 +249,44 @@ function parseSleeperList(md: string, defaultPos: string): Player[] {
   //   ### 1. Emeka Egbuka | WR | Buccaneers
   //   ## Matthew Golden | WR | Packers
   //   ## Sean Tucker, RB, Buccaneers
+  // Pattern 1: Name | POS | Team   or   Name, POS, Team
   const headingRe = new RegExp(
     `(^|\\n)#{2,4}\\s+(?:\\d{1,2}\\.\\s+)?` +
-      // name (2-4 words, allow apostrophes and hyphens)
-      `([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})` +
-      // separator + position
+      `([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})(?:\\s*\\([^)]*\\))?` +
       `\\s*[|,(]\\s*(QB|RB|WR|TE|K|D\\/ST|DST)` +
-      // separator + team (optional)
       `(?:\\s*[|,)]\\s*${teamWordRe})?`,
     "g",
   );
+  // Pattern 2 (fallback): Name | Team  — uses defaultPos
+  const headingRe2 = new RegExp(
+    `(^|\\n)#{2,4}\\s+(?:\\d{1,2}\\.\\s+)?` +
+      `([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})(?:\\s*\\([^)]*\\))?` +
+      `\\s*[|,]\\s*${teamWordRe}\\b`,
+    "g",
+  );
 
-  let rank = 0;
-  for (const m of clean.matchAll(headingRe)) {
-    const name = m[2].trim();
-    if (name.split(/\s+/).length < 2) continue;
-    const k = name.toLowerCase();
-    if (seen.has(k)) continue;
-    const posRaw = m[3];
-    const pos = posRaw === "DST" ? "D/ST" : posRaw;
-    if (defaultPos !== "ALL" && pos !== defaultPos) {
-      // Some articles still mix positions in their headings; allow but skip mismatches
+  const consume = (re: RegExp, hasPos: boolean) => {
+    for (const m of clean.matchAll(re)) {
+      const name = m[2].trim();
+      if (name.split(/\s+/).length < 2) continue;
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      const pos = hasPos
+        ? (m[3] === "DST" ? "D/ST" : m[3])
+        : (defaultPos === "ALL" ? "" : defaultPos);
+      const teamRaw = (hasPos ? m[4] : m[3]) ?? "";
+      const team = teamMap[teamRaw] ?? ((teamRaw.length === 2 || teamRaw.length === 3) ? teamRaw : "");
+      const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 1200);
+      const blurb = after
+        .split(/\n+/)
+        .map((s) => s.trim())
+        .find((s) => s.length > 50 && !s.startsWith("#") && !s.startsWith("-") && !s.startsWith("[") && !s.startsWith("|") && !s.startsWith("!"));
+      seen.add(k);
+      out.push({ rank: out.length + 1, name, position: pos, team, note: blurb ? blurb.slice(0, 240) : undefined });
     }
-    const teamRaw = m[4] ?? "";
-    const team = teamMap[teamRaw] ?? (teamRaw.length === 2 || teamRaw.length === 3 ? teamRaw : "");
-
-    // Grab a short blurb: first non-empty paragraph after the heading
-    const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 1200);
-    const blurb = after
-      .split(/\n+/)
-      .map((s) => s.trim())
-      .find((s) => s.length > 50 && !s.startsWith("#") && !s.startsWith("-") && !s.startsWith("[") && !s.startsWith("|"));
-
-    seen.add(k);
-    rank += 1;
-    out.push({ rank, name, position: pos, team, note: blurb ? blurb.slice(0, 240) : undefined });
-  }
+  };
+  consume(headingRe, true);
+  consume(headingRe2, false);
 
   return out.slice(0, 40);
 }
