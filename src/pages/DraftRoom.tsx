@@ -611,19 +611,12 @@ export default function DraftRoom() {
           <button
             type="button"
             aria-label="Open AI tools"
-            className="fixed bottom-5 right-5 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-transparent"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+            className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#1c1c1c]/95 backdrop-blur text-white shadow-[0_10px_30px_rgba(0,0,0,0.7)] active:scale-95 transition"
+            style={{ marginBottom: "env(safe-area-inset-bottom)" }}
           >
-            <img
-              src={superFootballLogo}
-              alt="Open AI tools"
-              className="h-16 w-16 object-contain drop-shadow-[0_0_10px_rgba(255,180,80,0.7)] hover:drop-shadow-[0_0_16px_rgba(255,180,80,1)] active:scale-90 transition-all"
-            />
-            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-background bg-foreground text-background shadow-md">
-              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
-            </span>
+            <Sparkles className="h-6 w-6" strokeWidth={1.5} />
             {targets.length > 0 && (
-              <span className="absolute -top-1 -right-1 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="absolute -top-1 -right-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                 {targets.length}
               </span>
             )}
