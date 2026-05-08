@@ -513,13 +513,11 @@ export default function DraftRoom() {
               onUnpin={unpinPlayer}
               initialSection={drawerInitial}
             />
-          </Sheet>
+      </Sheet>
 
-          {/* Budget lives inside the hamburger menu — no chip on the homepage. */}
-        </div>
-
-        {/* Live nomination strip — only when something's actively up for bid */}
-        {espnSync.liveBid && (
+      {/* Live nomination strip — only when something's actively up for bid */}
+      {espnSync.liveBid && (
+        <header className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
           <div className="border-t border-border/40 bg-secondary/40 px-4 py-1.5">
             <div className="mx-auto flex max-w-3xl flex-col gap-1">
               <p className="flex items-center gap-2 text-[11px]">
@@ -546,9 +544,8 @@ export default function DraftRoom() {
               />
             </div>
           </div>
-        )}
-      </header>
-
+        </header>
+      )}
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
         {/* Find (player or $) lives in the hamburger drawer now. */}
