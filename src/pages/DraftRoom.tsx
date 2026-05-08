@@ -77,6 +77,7 @@ import AffordabilityChecker from "@/components/AffordabilityChecker";
 import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
 import PricingMathExplainer from "@/components/PricingMathExplainer";
+import FootballShieldIcon from "@/components/FootballShieldIcon";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
