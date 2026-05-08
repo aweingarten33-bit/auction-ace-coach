@@ -727,16 +727,16 @@ export default function DraftRoom() {
         <>
           {/* backdrop — frosted glass, fades in, click to dismiss */}
           <div
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-md animate-fade-in"
-            style={{ animationDuration: "0.2s" }}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-lg animate-fade-in"
+            style={{ animationDuration: "0.45s" }}
             onClick={() => setToolPage(null)}
             aria-hidden
           />
           {/* panel — spring slide+scale from right */}
           <div
-            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[-20px_0_60px_rgba(0,0,0,0.7)] overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[-20px_0_80px_rgba(0,0,0,0.85)] overflow-y-auto"
             style={{
-              animation: "tool-panel-in 0.28s cubic-bezier(0.34, 1.4, 0.64, 1) both",
+              animation: "tool-panel-in 0.55s cubic-bezier(0.34, 1.25, 0.64, 1) both",
               transformOrigin: "right center",
             }}
           >
