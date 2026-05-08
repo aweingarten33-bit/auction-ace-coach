@@ -81,6 +81,7 @@ import { PlannerBody } from "@/pages/Planner";
 
 import FootballShieldIcon from "@/components/FootballShieldIcon";
 import superFootballLogo from "@/assets/logo-wu-football-clean.png";
+import wuWOutline from "@/assets/wu-w-outline.png";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
