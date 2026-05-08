@@ -35,6 +35,7 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
