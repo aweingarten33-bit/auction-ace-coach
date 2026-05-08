@@ -94,7 +94,7 @@
     background-color: hsl(var(--background));
     /* Subtle dot grid + faint warm wash to read as paper */
     background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23111111' fill-opacity='0.05' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23F0E6CC' fill-opacity='0.06' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E"),
       radial-gradient(ellipse 80% 60% at 100% 0%, hsl(var(--accent) / 0.04), transparent 70%),
       radial-gradient(ellipse 60% 50% at 0% 100%, hsl(0 0% 7% / 0.04), transparent 70%);
     background-attachment: fixed;
@@ -327,7 +327,7 @@
   input::placeholder, textarea::placeholder { color: hsl(0 0% 7% / 0.45); font-weight: 400; font-style: italic; }
   input:focus, textarea:focus, select:focus {
     outline: none !important;
-    background-color: hsl(50 8% 94%) !important;
+    background-color: hsl(220 28% 18%) !important;
     box-shadow: none !important;
   }
 
