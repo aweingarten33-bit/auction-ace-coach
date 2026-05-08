@@ -14,7 +14,7 @@ const buttonVariants = cva(
     "rounded-none border-4 border-foreground",
     "shadow-[4px_4px_0_0_hsl(var(--foreground))]",
     "transition-all duration-100 ease-linear",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "disabled:pointer-events-none disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[3]",
     "hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[6px_6px_0_0_hsl(var(--foreground))]",
