@@ -416,40 +416,15 @@ export default function DraftRoom() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ── LEAGUE TITLE BAR — Frank Miller masthead ─────────────── */}
+      {/* ── LEAGUE TITLE ─────────────────────────────────────────── */}
       <div
-        className="relative overflow-hidden px-4 py-5 text-center"
-        style={{
-          paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
-          background:
-            "linear-gradient(180deg, hsl(354 72% 18% / 0.55) 0%, hsl(354 72% 10% / 0.25) 60%, transparent 100%)",
-          boxShadow:
-            "inset 0 -1px 0 hsl(38 78% 48% / 0.6), inset 0 -3px 0 hsl(354 72% 36% / 0.5), 0 8px 24px -12px hsl(354 80% 6% / 0.9)",
-        }}
+        className="relative px-5 pt-10 pb-6 text-left"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
       >
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background:
-              "radial-gradient(60% 80% at 50% 0%, hsl(38 78% 48% / 0.35) 0%, transparent 70%)",
-          }}
-        />
-        <h1
-          className="relative font-display text-2xl sm:text-3xl font-extrabold tracking-tight truncate"
-          style={{
-            backgroundImage:
-              "linear-gradient(180deg, hsl(48 100% 72%) 0%, hsl(38 92% 52%) 50%, hsl(28 78% 32%) 100%)",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-            textShadow: "0 1px 0 hsl(225 50% 4% / 0.6)",
-            filter: "drop-shadow(0 2px 0 hsl(354 72% 18% / 0.6))",
-          }}
-        >
+        <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
           {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
         </h1>
-        <p className="relative mt-2 broadcast-label" style={{ color: "hsl(354 60% 70%)" }}>
+        <p className="mt-2 text-sm text-muted-foreground">
           Auction Draft Assistant
         </p>
       </div>
@@ -636,19 +611,12 @@ export default function DraftRoom() {
           <button
             type="button"
             aria-label="Open AI tools"
-            className="fixed bottom-5 right-5 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-transparent"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+            className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#1c1c1c]/95 backdrop-blur text-white shadow-[0_10px_30px_rgba(0,0,0,0.7)] active:scale-95 transition"
+            style={{ marginBottom: "env(safe-area-inset-bottom)" }}
           >
-            <img
-              src={superFootballLogo}
-              alt="Open AI tools"
-              className="h-16 w-16 object-contain drop-shadow-[0_0_10px_rgba(255,180,80,0.7)] hover:drop-shadow-[0_0_16px_rgba(255,180,80,1)] active:scale-90 transition-all"
-            />
-            <span className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-background bg-foreground text-background shadow-md">
-              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.5} />
-            </span>
+            <Sparkles className="h-6 w-6" strokeWidth={1.5} />
             {targets.length > 0 && (
-              <span className="absolute -top-1 -right-1 rounded-full bg-emerald-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="absolute -top-1 -right-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
                 {targets.length}
               </span>
             )}
