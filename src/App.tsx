@@ -17,6 +17,7 @@ import CardPreview from "./pages/CardPreview.tsx";
 import LogoPicker from "./pages/LogoPicker.tsx";
 import ClaimTeam from "./pages/ClaimTeam.tsx";
 import Zine from "./pages/Zine.tsx";
+import Studio from "./pages/Studio.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 
@@ -91,6 +92,7 @@ const App = () => (
               <Route path="/card-preview" element={<CardPreview />} />
               <Route path="/logos" element={<LogoPicker />} />
               <Route path="/zine" element={<Zine />} />
+              <Route path="/studio" element={<Studio />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </LockProvider>
