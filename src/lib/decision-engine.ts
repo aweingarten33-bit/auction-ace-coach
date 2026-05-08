@@ -114,11 +114,12 @@ export function decide(input: EngineInput): DecisionResult {
   }
   const goingPrice = anchorPrice > 0 ? Math.max(1, Math.round(anchorPrice * mult)) : 0;
 
-  // YOU CAN GO UP TO: min(market going, your max bid). Cap by leaving $1/slot.
+  // YOU CAN GO UP TO: anchor is the ceiling — never let market pulse push you
+  // above what the player is actually worth. Then cap by your wallet.
   const cap = Math.max(0, budget.maxBid);
-  const goUpTo = goingPrice > 0
-    ? Math.min(cap, Math.max(1, goingPrice))
-    : cap; // no anchor at all → fall back to your max (last resort)
+  const goUpTo = anchorPrice > 0
+    ? Math.min(cap, anchorPrice)
+    : Math.min(cap, Math.max(1, goingPrice || 1));
   // STOP AT: 1 dollar above goUpTo (anything ≥ stopAt is bad)
   const stopAt = goUpTo + 1;
 
