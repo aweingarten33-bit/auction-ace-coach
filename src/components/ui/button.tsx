@@ -25,11 +25,16 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]",
-        secondary: "bg-[hsl(var(--surface))] text-[hsl(var(--foreground))]",
-        outline: "bg-[hsl(var(--surface))] text-[hsl(var(--foreground))]",
-        destructive: "bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))]",
-        gold: "bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]",
+        default:
+          "bg-gradient-to-b from-[hsl(42_92%_55%)] to-[hsl(34_82%_38%)] text-[hsl(225_50%_6%)] shadow-[inset_0_1px_0_hsl(48_100%_75%/0.7),inset_0_-2px_0_hsl(20_60%_18%/0.6),0_8px_18px_-6px_hsl(38_90%_30%/0.7)] hover:from-[hsl(44_95%_60%)] hover:to-[hsl(34_82%_42%)]",
+        secondary:
+          "bg-[hsl(var(--surface))] text-[hsl(var(--foreground))] shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.3),0_8px_18px_-8px_hsl(0_0%_0%/0.8)]",
+        outline:
+          "bg-transparent text-[hsl(var(--primary))] shadow-[inset_0_0_0_1.5px_hsl(var(--primary)/0.7)] hover:bg-[hsl(var(--primary)/0.08)]",
+        destructive:
+          "bg-gradient-to-b from-[hsl(354_72%_42%)] to-[hsl(354_78%_24%)] text-[hsl(40_55%_92%)] shadow-[inset_0_1px_0_hsl(354_80%_60%/0.5),0_8px_18px_-6px_hsl(354_80%_15%/0.7)]",
+        gold:
+          "bg-gradient-to-b from-[hsl(42_92%_55%)] to-[hsl(34_82%_38%)] text-[hsl(225_50%_6%)] shadow-[inset_0_1px_0_hsl(48_100%_75%/0.7),inset_0_-2px_0_hsl(20_60%_18%/0.6)]",
         ghost:
           "bg-transparent shadow-none text-[hsl(var(--foreground))] hover:bg-[hsl(var(--surface))] hover:shadow-[var(--neu-extruded-sm)]",
         link:

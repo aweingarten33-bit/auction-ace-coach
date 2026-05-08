@@ -416,15 +416,40 @@ export default function DraftRoom() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ── LEAGUE TITLE BAR ─────────────────────────────────────────── */}
+      {/* ── LEAGUE TITLE BAR — Frank Miller masthead ─────────────── */}
       <div
-        className="bg-background px-4 py-3 text-center"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+        className="relative overflow-hidden px-4 py-5 text-center"
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top) + 1rem)",
+          background:
+            "linear-gradient(180deg, hsl(354 72% 18% / 0.55) 0%, hsl(354 72% 10% / 0.25) 60%, transparent 100%)",
+          boxShadow:
+            "inset 0 -1px 0 hsl(38 78% 48% / 0.6), inset 0 -3px 0 hsl(354 72% 36% / 0.5), 0 8px 24px -12px hsl(354 80% 6% / 0.9)",
+        }}
       >
-        <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            background:
+              "radial-gradient(60% 80% at 50% 0%, hsl(38 78% 48% / 0.35) 0%, transparent 70%)",
+          }}
+        />
+        <h1
+          className="relative font-display text-2xl sm:text-3xl font-extrabold tracking-tight truncate"
+          style={{
+            backgroundImage:
+              "linear-gradient(180deg, hsl(48 100% 72%) 0%, hsl(38 92% 52%) 50%, hsl(28 78% 32%) 100%)",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            textShadow: "0 1px 0 hsl(225 50% 4% / 0.6)",
+            filter: "drop-shadow(0 2px 0 hsl(354 72% 18% / 0.6))",
+          }}
+        >
           {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
         </h1>
-        <p className="mt-1 broadcast-label">
+        <p className="relative mt-2 broadcast-label" style={{ color: "hsl(354 60% 70%)" }}>
           Auction Draft Assistant
         </p>
       </div>

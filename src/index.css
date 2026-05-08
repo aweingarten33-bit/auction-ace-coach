@@ -139,45 +139,48 @@
   }
 
   .dark {
-    /* DARK — "Returns" night sky. Deep midnight-navy clay,
-       warm bone foreground, ochre + maroon accents. */
-    --background:        223 38% 13%;        /* suit midnight navy */
-    --background-alt:    223 34% 16%;
-    --foreground:        43 34% 88%;         /* warm shield bone */
-    --muted-bg:          223 34% 16%;
+    /* DARK — Frank Miller "Dark Knight Returns" Superman.
+       Ink-black night, blood-red cape, beaten-gold shield.
+       No pastels. High contrast. Heavy ink shadows. */
+    --background:        225 50% 7%;         /* ink-black w/ navy bleed */
+    --background-alt:    225 40% 11%;
+    --foreground:        40 55% 86%;         /* bleached bone */
+    --muted-bg:          225 40% 11%;
 
-    --card:              223 34% 16%;
-    --card-foreground:   43 34% 88%;
-    --popover:           223 34% 16%;
-    --popover-foreground:43 34% 88%;
+    --card:              225 40% 11%;
+    --card-foreground:   40 55% 86%;
+    --popover:           225 38% 13%;
+    --popover-foreground:40 55% 86%;
 
-    --primary:           36 58% 56%;         /* shield ochre */
-    --primary-foreground: 223 42% 9%;
-    --primary-glow:      39 70% 68%;
+    /* GOLD = the action / shield color, beaten brass not yellow */
+    --primary:           38 78% 48%;         /* hammered gold */
+    --primary-foreground: 225 50% 6%;
+    --primary-glow:      42 92% 60%;
 
-    --secondary:         223 34% 16%;
-    --secondary-foreground: 43 34% 88%;
-    --muted:             223 34% 16%;
-    --muted-foreground:  219 18% 72%;
+    --secondary:         225 38% 14%;
+    --secondary-foreground: 40 55% 86%;
+    --muted:             225 32% 16%;
+    --muted-foreground:  40 18% 68%;
 
-    --accent:            36 58% 56%;
-    --accent-foreground: 223 42% 9%;
-    --accent-secondary:  350 52% 45%;        /* cape maroon */
+    /* ACCENT = the cape. Dried-blood crimson, not pink. */
+    --accent:            38 78% 48%;         /* gold accent */
+    --accent-foreground: 225 50% 6%;
+    --accent-secondary:  354 72% 36%;        /* cape blood */
 
-    --destructive:       350 52% 45%;
-    --destructive-foreground: 43 34% 92%;
-    --warning:           36 80% 60%;
-    --success:           36 58% 56%;
+    --destructive:       354 72% 36%;        /* blood */
+    --destructive-foreground: 40 55% 92%;
+    --warning:           38 92% 56%;
+    --success:           38 78% 48%;
 
     --border:            transparent;
-    --input:             223 34% 16%;
-    --ring:              36 58% 56%;
+    --input:             225 40% 10%;
+    --ring:              38 78% 48%;
 
-    --surface:           223 34% 16%;
-    --surface-2:         223 31% 19%;
-    /* Highlight = a touch of cool steel-navy lift. Shadow = ink. */
-    --shadow-light-rgb:  56, 73, 112;
-    --shadow-dark-rgb:   2, 5, 14;
+    --surface:           225 40% 11%;
+    --surface-2:         225 34% 15%;
+    /* Highlight = cold steel-navy. Shadow = pitch ink. */
+    --shadow-light-rgb:  46, 64, 110;
+    --shadow-dark-rgb:   0, 0, 0;
 
     --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.75),
                          -9px -9px 16px rgba(var(--shadow-light-rgb), 0.5);
@@ -192,28 +195,28 @@
     --neu-inset-sm:      inset 3px 3px 6px rgba(var(--shadow-dark-rgb), 0.75),
                          inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.45);
 
-    /* Legacy aliases re-mapped for dark suit */
-    --bone:              43 34% 88%;
-    --paper:             219 18% 72%;
-    --void:              223 38% 13%;
-    --ink:               223 38% 13%;
-    --charcoal:          223 34% 16%;
-    --gunmetal:          223 31% 19%;
-    --blood:             350 52% 45%;
-    --signal-red:        350 52% 45%;
-    --dirty-gold:        36 58% 56%;
-    --warning-yellow:    36 80% 60%;
-    --parchment:         43 34% 88%;
-    --ink-faded:         219 18% 72%;
-    --steel:             219 18% 72%;
+    /* Legacy aliases re-mapped for Frank-Miller suit */
+    --bone:              40 55% 86%;
+    --paper:             40 18% 68%;
+    --void:              225 50% 5%;
+    --ink:               225 50% 5%;
+    --charcoal:          225 40% 11%;
+    --gunmetal:          225 32% 16%;
+    --blood:             354 72% 36%;
+    --signal-red:        354 78% 42%;
+    --dirty-gold:        38 78% 48%;
+    --warning-yellow:    38 92% 56%;
+    --parchment:         40 55% 86%;
+    --ink-faded:         40 18% 68%;
+    --steel:             40 18% 68%;
 
-    --sidebar-background: 223 38% 13%;
-    --sidebar-foreground: 43 34% 88%;
-    --sidebar-primary: 36 58% 56%;
-    --sidebar-primary-foreground: 223 42% 9%;
-    --sidebar-accent: 223 34% 16%;
-    --sidebar-accent-foreground: 43 34% 88%;
-    --sidebar-ring: 36 58% 56%;
+    --sidebar-background: 225 50% 7%;
+    --sidebar-foreground: 40 55% 86%;
+    --sidebar-primary: 38 78% 48%;
+    --sidebar-primary-foreground: 225 50% 6%;
+    --sidebar-accent: 225 40% 11%;
+    --sidebar-accent-foreground: 40 55% 86%;
+    --sidebar-ring: 38 78% 48%;
   }
 
   * { border-color: transparent; }
@@ -235,10 +238,46 @@
     background-image: none;
   }
 
+  /* ── FRANK MILLER SWIRL — gold + cape-blood smeared over ink ── */
   .dark body {
+    background-color: hsl(225 50% 5%);
     background-image:
-      radial-gradient(circle at 18% 0%, hsl(var(--surface-2) / 0.88) 0, transparent 32rem),
-      linear-gradient(135deg, hsl(var(--background)) 0%, hsl(223 44% 10%) 100%);
+      radial-gradient(60% 45% at 12% 8%,  hsl(38 78% 48% / 0.22) 0%, transparent 70%),
+      radial-gradient(55% 50% at 92% 22%, hsl(354 72% 36% / 0.28) 0%, transparent 70%),
+      radial-gradient(70% 55% at 78% 95%, hsl(38 78% 48% / 0.14) 0%, transparent 72%),
+      radial-gradient(80% 60% at 10% 88%, hsl(354 72% 36% / 0.20) 0%, transparent 70%),
+      radial-gradient(120% 90% at 50% 50%, hsl(225 60% 9%) 0%, hsl(225 70% 4%) 100%);
+    background-attachment: fixed;
+  }
+  .dark body::before {
+    content: "";
+    position: fixed; inset: -10%;
+    pointer-events: none; z-index: 0;
+    background:
+      conic-gradient(from 210deg at 30% 40%,
+        hsl(38 78% 48% / 0.10) 0deg,
+        transparent 80deg,
+        hsl(354 72% 36% / 0.14) 160deg,
+        transparent 240deg,
+        hsl(38 78% 48% / 0.08) 320deg,
+        transparent 360deg);
+    filter: blur(60px);
+    mix-blend-mode: screen;
+    animation: miller-swirl 38s linear infinite;
+  }
+  .dark body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background-image: radial-gradient(hsl(40 55% 86% / 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: overlay;
+    opacity: 0.55;
+  }
+  .dark #root { position: relative; z-index: 1; }
+  @keyframes miller-swirl {
+    0%   { transform: rotate(0deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1.1); }
   }
 
   h1, h2, h3, h4, h5, h6 {
