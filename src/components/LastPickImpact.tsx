@@ -89,14 +89,26 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
 
       <div className="mb-3">
         <p className="text-base font-semibold text-foreground">
-          {last.player}
+          {last.player || <span className="text-muted-foreground italic">Unknown player</span>}
           <span className="ml-2 text-[11px] font-normal text-muted-foreground">
-            {pos ?? ""} · ${last.price}
+            {pos ?? "—"} · {hasPrice ? `$${last.price}` : "$?"}
           </span>
         </p>
       </div>
 
-      {isMine && (
+      {warnings.length > 0 && (
+        <div className="mb-3 rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-[11px] text-amber-200">
+          <div className="flex items-center gap-1 font-semibold">
+            <AlertTriangle className="h-3 w-3" />
+            Import incomplete
+          </div>
+          <ul className="mt-0.5 list-disc pl-4 text-amber-200/90">
+            {warnings.map((w, i) => <li key={i}>{w}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {canShowDeltas && (
         <div className="mb-3 grid grid-cols-3 gap-2">
           <Delta label="Remaining" before={`$${before.remaining}`} after={`$${after.remaining}`} />
           <Delta label="Max bid" before={`$${before.maxBid}`} after={`$${after.maxBid}`} />
