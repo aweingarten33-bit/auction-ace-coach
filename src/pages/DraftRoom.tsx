@@ -700,6 +700,7 @@ interface DrawerProps {
   keepers: { player: string; cost?: number }[];
   onPin: (name: string) => void;
   onUnpin: (name: string) => void;
+  initialSection?: "menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife";
 }
 
 function DrawerContents({
@@ -722,10 +723,12 @@ function DrawerContents({
   keepers,
   onPin,
   onUnpin,
+  initialSection = "menu",
 }: DrawerProps) {
   const [section, setSection] = useState<
     "menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife"
-  >("menu");
+  >(initialSection);
+  useEffect(() => { setSection(initialSection); }, [initialSection]);
 
   void activeName;
   void onGoToClassicDraft;
