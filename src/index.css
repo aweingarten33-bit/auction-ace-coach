@@ -1,215 +1,205 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Unbounded:wght@600;800;900&family=DM+Sans:wght@400;500;700&family=Bangers&family=Bungee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   GOTHAM DOPAMINE — Maximalism through Miller's Dark Knight lens
-   Ink-void base. Five clashing Gotham accents. Stacked colored shadows.
-   Pattern-on-pattern. Broken grids. Floodlight glows. Chalk crosshatch.
-   MORE IS MORE — but every neon is a city light, every shadow is Janson.
+   GOTHAM MINIMAL — Frank Miller × Jony Ive
+   Miller supplies the ink, the menace, the heavy slabs of shadow and
+   the bat-signal yellow that cuts through fog.
+   Ive supplies the restraint: one typeface, generous negative space,
+   precise edges, materials you want to touch, no decoration that
+   isn't load-bearing.
+   The result is a Dark Knight that feels machined from a single billet
+   of obsidian. Quiet menace. Premium dread. No wasted pixels.
    ===================================================================== */
 
 @layer base {
   :root {
-    /* Base — Gotham ink void */
-    --background: 240 35% 7%;            /* #0D0D1A cosmic ink */
-    --foreground: 0 0% 100%;             /* pure white */
-    --muted-bg: 264 50% 20%;             /* deep violet wash */
+    /* The void — a single piece of black glass */
+    --background: 220 20% 6%;            /* obsidian */
+    --foreground: 40 18% 92%;            /* cold bone */
+    --muted-bg: 220 15% 11%;             /* graphite */
 
-    --card: 240 38% 11%;
-    --card-foreground: 0 0% 100%;
+    --card: 220 18% 9%;                  /* anodized panel */
+    --card-foreground: 40 18% 92%;
 
-    --popover: 240 38% 11%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 220 20% 7%;
+    --popover-foreground: 40 18% 92%;
 
-    /* The Five — Gotham-tinted maximalism */
-    --max-1: 358 80% 52%;                /* blood red */
-    --max-2: 196 95% 55%;                /* cold Gotham cyan */
-    --max-3: 46 100% 55%;                /* bat-signal amber */
-    --max-4: 22 95% 55%;                 /* sodium streetlamp */
-    --max-5: 270 80% 58%;                /* midnight violet */
+    /* The signal — used sparingly, like Miller's spot color */
+    --signal: 46 94% 54%;                /* bat-signal amber */
+    --blood:  358 72% 44%;               /* Janson dried blood */
+    --steel:  220 12% 62%;               /* gunmetal */
+    --ink:    220 40% 3%;                /* pure shadow */
 
-    /* shadcn token mapping */
-    --primary: 358 80% 52%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 358 90% 62%;
+    /* shadcn mapping — restrained */
+    --primary: 46 94% 54%;
+    --primary-foreground: 220 40% 4%;
+    --primary-glow: 46 94% 54%;
 
-    --secondary: 196 95% 55%;
-    --secondary-foreground: 240 40% 8%;
+    --secondary: 220 15% 14%;
+    --secondary-foreground: 40 18% 92%;
 
-    --muted: 264 50% 20%;
-    --muted-foreground: 0 0% 80%;
+    --muted: 220 15% 11%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 46 100% 55%;
-    --accent-foreground: 240 40% 8%;
+    --accent: 358 72% 44%;
+    --accent-foreground: 40 18% 95%;
 
-    --destructive: 358 80% 52%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 358 72% 44%;
+    --destructive-foreground: 40 18% 95%;
 
-    --warning: 46 100% 55%;
-    --warning-foreground: 240 40% 8%;
+    --warning: 46 94% 54%;
+    --warning-foreground: 220 40% 4%;
 
-    --success: 196 95% 55%;
-    --success-foreground: 240 40% 8%;
+    --success: 46 94% 54%;
+    --success-foreground: 220 40% 4%;
 
-    --border: 358 80% 52%;
-    --input: 240 38% 14%;
-    --ring: 46 100% 55%;
+    --border: 220 15% 16%;
+    --input: 220 18% 10%;
+    --ring: 46 94% 54%;
 
-    --radius: 1.5rem;
+    --radius: 2px;
 
-    /* Heavy ink + neon shadow set */
-    --ink: 240 60% 3%;
-    --shadow-card:      8px 8px 0 0 hsl(var(--max-3)), 16px 16px 0 0 hsl(var(--max-1));
-    --shadow-floating:  0 0 30px hsl(var(--max-1) / 0.45), 8px 8px 0 0 hsl(var(--max-3));
-    --shadow-pressed:   0 0 0 0 hsl(var(--ink));
-    --shadow-recessed:  inset 0 0 0 3px hsl(var(--ink));
-    --shadow-sharp:     6px 6px 0 0 hsl(var(--max-1));
-    --shadow-glow:      0 0 30px hsl(var(--max-3) / 0.6), 0 0 60px hsl(var(--max-1) / 0.4);
-    --shadow-primary:   8px 8px 0 0 hsl(var(--max-3)), 16px 16px 0 0 hsl(var(--max-1));
-    --shadow-led-green: 0 0 20px hsl(var(--max-2) / 0.7);
+    /* Shadows — Janson ink slabs, no blur unless it's atmosphere */
+    --shadow-card:      0 1px 0 0 hsl(var(--border)), 0 24px 60px -20px hsl(var(--ink) / 0.9);
+    --shadow-floating:  0 40px 80px -30px hsl(var(--ink) / 0.95), 0 1px 0 0 hsl(var(--border));
+    --shadow-pressed:   inset 0 1px 0 0 hsl(var(--ink));
+    --shadow-recessed:  inset 0 0 0 1px hsl(var(--border));
+    --shadow-sharp:     6px 6px 0 0 hsl(var(--ink));
+    --shadow-glow:      0 0 0 1px hsl(var(--signal) / 0.4), 0 0 32px -4px hsl(var(--signal) / 0.35);
+    --shadow-primary:   0 0 0 1px hsl(var(--signal)), 0 12px 40px -12px hsl(var(--signal) / 0.4);
+    --shadow-led-green: 0 0 12px hsl(var(--signal) / 0.5);
 
-    --shadow-brut-sm:   4px 4px 0 0 hsl(var(--max-1));
-    --shadow-brut:      8px 8px 0 0 hsl(var(--max-3)), 16px 16px 0 0 hsl(var(--max-1));
-    --shadow-brut-lg:   12px 12px 0 0 hsl(var(--max-2)), 24px 24px 0 0 hsl(var(--max-1));
-    --shadow-brut-xl:   12px 12px 0 0 hsl(var(--max-3)), 24px 24px 0 0 hsl(var(--max-1)), 36px 36px 0 0 hsl(var(--max-5));
+    --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
+    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
+    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
+    --shadow-brut-xl:   16px 16px 0 0 hsl(var(--ink));
 
-    --sidebar-background: 240 38% 11%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 358 80% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 46 100% 55%;
-    --sidebar-accent-foreground: 240 40% 8%;
-    --sidebar-border: 358 80% 52%;
-    --sidebar-ring: 46 100% 55%;
+    --sidebar-background: 220 22% 5%;
+    --sidebar-foreground: 40 18% 88%;
+    --sidebar-primary: 46 94% 54%;
+    --sidebar-primary-foreground: 220 40% 4%;
+    --sidebar-accent: 220 18% 10%;
+    --sidebar-accent-foreground: 40 18% 92%;
+    --sidebar-border: 220 15% 14%;
+    --sidebar-ring: 46 94% 54%;
   }
 
-  .dark { /* permanent dark mode */ }
+  .dark { /* permanent dark */ }
 
-  * { @apply border-border; border-color: transparent; }
+  * { @apply border-border; }
 
   html {
     width: 100%; max-width: 100%; overflow-x: hidden;
     font-size: 16px; scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 500;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.005em;
     background-color: hsl(var(--background));
-    /* Pattern stack: dot grid + diagonal stripes + floodlight mesh */
+    /* Atmosphere only — a single floodlight from above-left,
+       a low blood wash at the bottom, and a fine paper grain. */
     background-image:
-      /* magenta dot grid */
-      radial-gradient(circle, hsl(var(--max-1) / 0.18) 1px, transparent 1px),
-      /* diagonal amber stripes, faint */
-      repeating-linear-gradient(45deg, transparent 0, transparent 14px, hsl(var(--max-3) / 0.05) 14px, hsl(var(--max-3) / 0.05) 15px),
-      /* floodlight gradient mesh */
-      radial-gradient(ellipse 60% 40% at 15% 10%, hsl(var(--max-1) / 0.18), transparent 60%),
-      radial-gradient(ellipse 50% 35% at 90% 20%, hsl(var(--max-3) / 0.16), transparent 65%),
-      radial-gradient(ellipse 55% 45% at 80% 90%, hsl(var(--max-2) / 0.15), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 10% 95%, hsl(var(--max-5) / 0.18), transparent 65%),
-      linear-gradient(180deg, hsl(240 45% 5%) 0%, hsl(var(--background)) 50%, hsl(240 50% 4%) 100%);
-    background-size: 24px 24px, auto, auto, auto, auto, auto, auto;
+      radial-gradient(ellipse 80% 50% at 18% 0%, hsl(var(--signal) / 0.07), transparent 60%),
+      radial-gradient(ellipse 70% 40% at 100% 100%, hsl(var(--blood) / 0.10), transparent 65%),
+      linear-gradient(180deg, hsl(220 25% 4%) 0%, hsl(var(--background)) 40%, hsl(220 28% 3%) 100%);
     background-attachment: fixed;
   }
 
-  /* Janson chalk crosshatch overlay */
+  /* Fine ink grain — Janson newsprint, but milled smooth */
   body::before {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none;
     z-index: 1;
     background-image:
-      repeating-linear-gradient( 45deg, hsl(var(--ink) / 0.15) 0 1px, transparent 1px 7px),
-      repeating-linear-gradient(-45deg, hsl(var(--ink) / 0.10) 0 1px, transparent 1px 9px);
+      repeating-linear-gradient(0deg, hsl(var(--ink) / 0.18) 0 1px, transparent 1px 3px);
     mix-blend-mode: multiply;
+    opacity: 0.35;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Outfit", "Unbounded", sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    text-transform: uppercase;
+    font-family: "Inter", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
     color: hsl(var(--foreground));
-    line-height: 0.95;
-    text-shadow:
-      2px 2px 0 hsl(var(--max-5)),
-      4px 4px 0 hsl(var(--max-1)),
-      6px 6px 0 hsl(var(--max-2));
+    line-height: 0.98;
   }
+  h1 { font-weight: 900; letter-spacing: -0.045em; }
 
-  ::selection { background: hsl(var(--max-3)); color: hsl(var(--ink)); }
+  ::selection { background: hsl(var(--signal)); color: hsl(var(--ink)); }
 }
 
 @layer utilities {
-  .font-display { font-family: "Bangers", "Bungee", sans-serif; letter-spacing: 0.04em; }
-  .font-heading { font-family: "Outfit", sans-serif; font-weight: 900; letter-spacing: -0.02em; }
-  .font-body    { font-family: "DM Sans", sans-serif; font-weight: 500; }
-  .font-mono    { font-family: ui-monospace, "JetBrains Mono", monospace; font-weight: 600; }
+  .font-display { font-family: "Playfair Display", "Inter", serif; font-weight: 900; letter-spacing: -0.03em; }
+  .font-heading { font-family: "Inter", sans-serif; font-weight: 800; letter-spacing: -0.035em; }
+  .font-body    { font-family: "Inter", sans-serif; font-weight: 400; }
+  .font-mono    { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 500; }
 
-  /* Five accent text colors */
-  .text-max-1 { color: hsl(var(--max-1)); }
-  .text-max-2 { color: hsl(var(--max-2)); }
-  .text-max-3 { color: hsl(var(--max-3)); }
-  .text-max-4 { color: hsl(var(--max-4)); }
-  .text-max-5 { color: hsl(var(--max-5)); }
-  .bg-max-1 { background-color: hsl(var(--max-1)); }
-  .bg-max-2 { background-color: hsl(var(--max-2)); }
-  .bg-max-3 { background-color: hsl(var(--max-3)); }
-  .bg-max-4 { background-color: hsl(var(--max-4)); }
-  .bg-max-5 { background-color: hsl(var(--max-5)); }
+  /* Semantic accents — keep the palette tight */
+  .text-signal { color: hsl(var(--signal)); }
+  .text-blood  { color: hsl(var(--blood)); }
+  .text-steel  { color: hsl(var(--steel)); }
+  .bg-signal { background-color: hsl(var(--signal)); }
+  .bg-blood  { background-color: hsl(var(--blood)); }
+  .bg-ink    { background-color: hsl(var(--ink)); }
+  .bg-panel  { background-color: hsl(var(--card)); }
+  .border-signal { border-color: hsl(var(--signal)); }
+  .border-blood  { border-color: hsl(var(--blood)); }
+
+  /* Back-compat with prior maximalist tokens — collapsed to the new palette */
+  .text-max-1, .text-max-5 { color: hsl(var(--blood)); }
+  .text-max-2 { color: hsl(var(--steel)); }
+  .text-max-3, .text-max-4 { color: hsl(var(--signal)); }
+  .bg-max-1, .bg-max-5 { background-color: hsl(var(--blood)); }
+  .bg-max-2 { background-color: hsl(var(--steel)); }
+  .bg-max-3, .bg-max-4 { background-color: hsl(var(--signal)); }
   .bg-max-muted { background-color: hsl(var(--muted-bg)); }
-  .border-max-1 { border-color: hsl(var(--max-1)); }
-  .border-max-2 { border-color: hsl(var(--max-2)); }
-  .border-max-3 { border-color: hsl(var(--max-3)); }
-  .border-max-4 { border-color: hsl(var(--max-4)); }
-  .border-max-5 { border-color: hsl(var(--max-5)); }
+  .border-max-1, .border-max-5 { border-color: hsl(var(--blood)); }
+  .border-max-2 { border-color: hsl(var(--border)); }
+  .border-max-3, .border-max-4 { border-color: hsl(var(--signal)); }
 
-  /* Gradient text — animated multi-color */
+  /* Single-color "gradient" — restraint over rainbow */
   .text-gradient {
-    background: linear-gradient(90deg, hsl(var(--max-1)), hsl(var(--max-3)), hsl(var(--max-2)), hsl(var(--max-5)), hsl(var(--max-1)));
-    background-size: 300% 100%;
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--steel)) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
-    animation: gradient-shift 4s ease infinite;
   }
 
-  /* Layered text shadows */
-  .text-shadow-1 { text-shadow: 2px 2px 0 hsl(var(--max-5)); }
-  .text-shadow-2 { text-shadow: 2px 2px 0 hsl(var(--max-5)), 4px 4px 0 hsl(var(--max-1)); }
-  .text-shadow-3 { text-shadow: 2px 2px 0 hsl(var(--max-5)), 4px 4px 0 hsl(var(--max-1)), 6px 6px 0 hsl(var(--max-2)); }
-  .text-shadow-mega { text-shadow: 4px 4px 0 hsl(var(--max-5)), 8px 8px 0 hsl(var(--max-1)), 12px 12px 0 hsl(var(--max-2)); }
-  .text-emboss { text-shadow: 3px 3px 0 hsl(var(--ink)); }
+  .text-shadow-1, .text-shadow-2, .text-shadow-3 { text-shadow: 0 1px 0 hsl(var(--ink)); }
+  .text-shadow-mega { text-shadow: 0 2px 0 hsl(var(--ink)), 0 12px 32px hsl(var(--ink) / 0.6); }
+  .text-emboss { text-shadow: 0 1px 0 hsl(var(--ink)); }
 
   .label-stamped {
-    font-family: "Outfit", sans-serif;
+    font-family: "JetBrains Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-weight: 800;
-    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    font-size: 0.66rem;
     color: hsl(var(--ink));
-    background: hsl(var(--max-3));
-    padding: 4px 10px;
-    border: 3px solid hsl(var(--max-1));
-    box-shadow: 4px 4px 0 hsl(var(--max-2));
+    background: hsl(var(--signal));
+    padding: 3px 9px;
+    border-radius: 2px;
     display: inline-block;
-    transform: rotate(-1deg);
   }
 
-  /* Multi-layer shadow utilities */
-  .shadow-multi    { box-shadow: 8px 8px 0 hsl(var(--max-3)), 16px 16px 0 hsl(var(--max-1)); }
-  .shadow-multi-lg { box-shadow: 12px 12px 0 hsl(var(--max-2)), 24px 24px 0 hsl(var(--max-1)), 36px 36px 0 hsl(var(--max-3)); }
-  .shadow-glow-accent    { box-shadow: 0 0 20px hsl(var(--max-1) / 0.5), 0 0 40px hsl(var(--max-2) / 0.3); }
-  .shadow-glow-accent-lg { box-shadow: 0 0 40px hsl(var(--max-1) / 0.6), 0 0 80px hsl(var(--max-3) / 0.4), 0 0 120px hsl(var(--max-5) / 0.3); }
-  .shadow-mixed    { box-shadow: 0 0 30px hsl(var(--max-1) / 0.6), 8px 8px 0 hsl(var(--max-3)), 16px 16px 0 hsl(var(--max-1)); }
+  /* Shadow utilities — flat ink slabs, no rainbow stacks */
+  .shadow-multi    { box-shadow: 0 1px 0 0 hsl(var(--border)), 0 24px 60px -20px hsl(var(--ink) / 0.9); }
+  .shadow-multi-lg { box-shadow: 0 1px 0 0 hsl(var(--border)), 0 40px 80px -30px hsl(var(--ink)); }
+  .shadow-glow-accent    { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.35), 0 0 24px -4px hsl(var(--signal) / 0.3); }
+  .shadow-glow-accent-lg { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.5), 0 0 60px -8px hsl(var(--signal) / 0.4); }
+  .shadow-mixed    { box-shadow: 6px 6px 0 hsl(var(--ink)), 0 0 0 1px hsl(var(--border)); }
 
   .shadow-brut-sm   { box-shadow: var(--shadow-brut-sm); }
   .shadow-brut      { box-shadow: var(--shadow-brut); }
@@ -223,97 +213,94 @@
   .shadow-glow      { box-shadow: var(--shadow-glow); }
   .shadow-primary-key { box-shadow: var(--shadow-primary); }
 
-  /* Pattern utilities */
+  /* Patterns — atmosphere only, never decoration */
   .pattern-dots {
-    background-image: radial-gradient(circle, hsl(var(--max-1)) 1.2px, transparent 1.4px);
-    background-size: 22px 22px;
+    background-image: radial-gradient(circle, hsl(var(--steel) / 0.18) 0.8px, transparent 1px);
+    background-size: 18px 18px;
   }
   .pattern-stripes {
-    background-image: repeating-linear-gradient(45deg, transparent 0 10px, hsl(var(--max-3) / 0.10) 10px 20px);
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, hsl(var(--ink) / 0.4) 3px 4px);
   }
   .pattern-checker {
-    background-image: conic-gradient(from 90deg at 1px 1px, transparent 90deg, hsl(var(--max-2) / 0.06) 0);
-    background-size: 40px 40px;
+    background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
+                      linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 48px 48px;
   }
   .pattern-mesh {
     background:
-      radial-gradient(ellipse at 20% 30%, hsl(var(--max-1) / 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 70%, hsl(var(--max-2) / 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, hsl(var(--max-5) / 0.10) 0%, transparent 60%);
+      radial-gradient(ellipse at 18% 0%, hsl(var(--signal) / 0.08) 0%, transparent 55%),
+      radial-gradient(ellipse at 100% 100%, hsl(var(--blood) / 0.10) 0%, transparent 60%);
   }
   .bg-grid {
     background-image:
-      linear-gradient(to right, hsl(var(--max-1) / 0.08) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--max-2) / 0.08) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(to right, hsl(var(--border) / 0.6) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.6) 1px, transparent 1px);
+    background-size: 56px 56px;
   }
   .bg-halftone {
-    background-image: radial-gradient(hsl(var(--max-3) / 0.5) 1.5px, transparent 1.5px);
-    background-size: 14px 14px;
+    background-image: radial-gradient(hsl(var(--steel) / 0.22) 0.8px, transparent 1px);
+    background-size: 10px 10px;
   }
 
-  /* Sticker rotations */
-  .tilt-l { transform: rotate(-2deg); }
-  .tilt-r { transform: rotate(2deg); }
+  .tilt-l, .tilt-r { transform: none; }
 
-  .led { width: 0.7rem; height: 0.7rem; border-radius: 9999px; display: inline-block; background: hsl(var(--max-3)); border: 2px solid hsl(var(--max-1)); box-shadow: 0 0 10px hsl(var(--max-3) / 0.7); }
-  .led-green { background: hsl(var(--max-2)); border-color: hsl(var(--max-3)); }
+  .led { width: 0.5rem; height: 0.5rem; border-radius: 9999px; display: inline-block; background: hsl(var(--signal)); box-shadow: 0 0 8px hsl(var(--signal) / 0.7); }
+  .led-green { background: hsl(var(--signal)); }
 
   .screws::before, .screws::after,
   .screws > .screws-bottom::before, .screws > .screws-bottom::after { content: none; }
   .vent-slot { display: none; }
 
   .scanlines {
-    background-image: linear-gradient(hsl(var(--max-1) / 0) 50%, hsl(var(--max-1) / 0.06) 50%);
-    background-size: 100% 4px;
+    background-image: linear-gradient(hsl(var(--ink) / 0) 50%, hsl(var(--ink) / 0.25) 50%);
+    background-size: 100% 3px;
   }
 
-  .ease-mech { transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+  .ease-mech { transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-  /* Keyframes */
+  /* Motion — quiet, precise, Ive-grade */
   @keyframes float {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50%      { transform: translateY(-18px) rotate(4deg); }
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
   }
-  .animate-float { animation: float 6s ease-in-out infinite; will-change: transform; }
+  .animate-float { animation: float 7s ease-in-out infinite; will-change: transform; }
 
   @keyframes float-reverse {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50%      { transform: translateY(18px) rotate(-4deg); }
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(6px); }
   }
-  .animate-float-reverse { animation: float-reverse 5s ease-in-out infinite; will-change: transform; }
+  .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; will-change: transform; }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--max-1) / 0.5); }
-    50%      { box-shadow: 0 0 40px hsl(var(--max-1) / 0.85), 0 0 60px hsl(var(--max-3) / 0.5); }
+    0%, 100% { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.3), 0 0 16px -4px hsl(var(--signal) / 0.3); }
+    50%      { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.6), 0 0 36px -4px hsl(var(--signal) / 0.55); }
   }
-  .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 
   @keyframes gradient-shift {
-    0%   { background-position: 0% 50%; }
-    50%  { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
   }
-  .animate-gradient-shift { animation: gradient-shift 4s ease infinite; }
+  .animate-gradient-shift { animation: gradient-shift 8s ease infinite; }
 
   @keyframes spin-slow { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-  .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+  .animate-spin-slow { animation: spin-slow 30s linear infinite; }
 
   @keyframes wiggle {
-    0%, 100% { transform: rotate(-3deg); }
-    50%      { transform: rotate(3deg); }
+    0%, 100% { transform: rotate(0); }
+    50%      { transform: rotate(0); }
   }
-  .animate-wiggle { animation: wiggle 1s ease-in-out infinite; }
+  .animate-wiggle { animation: none; }
 
   @keyframes bounce-subtle {
     0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-10px); }
+    50%      { transform: translateY(-4px); }
   }
-  .animate-bounce-subtle { animation: bounce-subtle 2s ease-in-out infinite; }
+  .animate-bounce-subtle { animation: bounce-subtle 3s ease-in-out infinite; }
 
   @media (prefers-reduced-motion: reduce) {
     .animate-float, .animate-float-reverse, .animate-pulse-glow,
-    .animate-gradient-shift, .animate-spin-slow, .animate-wiggle, .animate-bounce-subtle {
+    .animate-gradient-shift, .animate-spin-slow, .animate-bounce-subtle {
       animation: none !important;
     }
     *, *::before, *::after { transition-duration: 0.15s !important; }
@@ -321,19 +308,20 @@
 }
 
 /* =====================================================================
-   AUTO-PROMOTION LAYER — existing utility patterns → maximalism
+   AUTO-PROMOTION LAYER — existing utility patterns → Gotham minimal
    ===================================================================== */
 @layer components {
-  /* Sticky header — neon ink bar */
+  /* Sticky header — a hairline of cold steel, a kiss of signal */
   header.sticky,
   .sticky.top-0 {
-    background-color: hsl(var(--card) / 0.85) !important;
-    border-bottom: 4px solid hsl(var(--max-1)) !important;
-    box-shadow: 0 6px 0 0 hsl(var(--max-3)), 0 12px 24px hsl(var(--ink) / 0.6) !important;
-    backdrop-filter: blur(8px);
+    background-color: hsl(var(--background) / 0.78) !important;
+    border-bottom: 1px solid hsl(var(--border)) !important;
+    box-shadow: 0 1px 0 0 hsl(var(--ink)), 0 24px 60px -30px hsl(var(--ink)) !important;
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
   }
 
-  /* Generic surfaces — clashing-border cards */
+  /* Surfaces — anodized panels milled to spec */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
@@ -342,36 +330,39 @@
   [class*="bg-secondary/40"],
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
-    background-color: hsl(var(--muted-bg) / 0.55) !important;
-    border: 4px solid hsl(var(--max-1)) !important;
-    box-shadow: 6px 6px 0 hsl(var(--max-3)), 12px 12px 0 hsl(var(--max-2)) !important;
-    border-radius: 1.25rem !important;
-    backdrop-filter: blur(4px);
+    background-color: hsl(var(--card) / 0.85) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: 0 1px 0 0 hsl(var(--ink)), 0 24px 60px -24px hsl(var(--ink) / 0.9) !important;
+    border-radius: 4px !important;
+    backdrop-filter: blur(8px);
   }
 
-  /* Featured panel — mega stacked shadow */
+  /* Featured panel — single hairline of signal, nothing more */
   .border-2.border-primary {
-    background: linear-gradient(135deg, hsl(var(--max-5) / 0.35), hsl(var(--max-1) / 0.25)) !important;
-    border: 6px solid hsl(var(--max-3)) !important;
-    box-shadow: 8px 8px 0 hsl(var(--max-1)), 16px 16px 0 hsl(var(--max-2)), 24px 24px 0 hsl(var(--max-5)) !important;
-    border-radius: 1.5rem !important;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted-bg)) 100%) !important;
+    border: 1px solid hsl(var(--signal) / 0.6) !important;
+    box-shadow:
+      0 0 0 1px hsl(var(--signal) / 0.25),
+      0 30px 80px -20px hsl(var(--ink)),
+      inset 0 1px 0 0 hsl(var(--signal) / 0.15) !important;
+    border-radius: 4px !important;
   }
 
-  /* Pills / chips — neon tags */
+  /* Pills — quiet uppercase tags */
   .rounded-full.border {
-    background-color: hsl(var(--max-5) / 0.35) !important;
-    border: 3px dashed hsl(var(--max-3)) !important;
-    box-shadow: 0 0 14px hsl(var(--max-3) / 0.5) !important;
-    color: hsl(var(--foreground));
+    background-color: hsl(var(--muted-bg)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: none !important;
+    color: hsl(var(--muted-foreground));
     text-transform: uppercase;
-    letter-spacing: 0.16em;
-    font-family: "Outfit", sans-serif;
-    font-weight: 800;
-    font-size: 0.72rem;
-    padding: 4px 12px;
+    letter-spacing: 0.18em;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 500;
+    font-size: 0.68rem;
+    padding: 3px 10px;
   }
 
-  /* Inputs — thick neon border, glowy focus */
+  /* Inputs — single hairline, signal underline on focus */
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -379,103 +370,114 @@
   input:not([type]),
   textarea,
   select {
-    background-color: hsl(var(--muted-bg) / 0.55) !important;
-    border: 4px solid hsl(var(--max-1)) !important;
-    border-radius: 9999px !important;
-    font-family: "DM Sans", sans-serif !important;
-    font-weight: 700;
+    background-color: hsl(var(--input)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 4px !important;
+    font-family: "Inter", sans-serif !important;
+    font-weight: 500;
     color: hsl(var(--foreground));
-    box-shadow: none !important;
-    padding: 0.75rem 1.25rem;
-    transition: all 250ms ease-out;
-    backdrop-filter: blur(4px);
+    box-shadow: inset 0 1px 0 0 hsl(var(--ink) / 0.6) !important;
+    padding: 0.7rem 1rem;
+    transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   textarea {
-    border-radius: 1.25rem !important;
+    border-radius: 4px !important;
     padding: 0.875rem 1rem;
   }
-  input::placeholder, textarea::placeholder { color: hsl(0 0% 100% / 0.45); font-weight: 500; }
+  input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground) / 0.7); font-weight: 400; }
   input:focus, textarea:focus, select:focus {
     outline: none !important;
-    border-color: hsl(var(--max-3)) !important;
-    background-color: hsl(var(--muted-bg) / 0.85) !important;
-    box-shadow: 0 0 24px hsl(var(--max-3) / 0.6), 0 0 0 4px hsl(var(--max-1) / 0.4) !important;
+    border-color: hsl(var(--signal)) !important;
+    background-color: hsl(var(--input)) !important;
+    box-shadow:
+      inset 0 1px 0 0 hsl(var(--ink) / 0.6),
+      0 0 0 3px hsl(var(--signal) / 0.18) !important;
   }
 
-  /* Floating coach orb — neon button */
+  /* Floating coach orb — a single spotlight bulb */
   .fixed.bottom-5.right-5 {
-    background: linear-gradient(135deg, hsl(var(--max-1)), hsl(var(--max-5)), hsl(var(--max-2))) !important;
-    background-size: 200% 200%;
-    border: 4px solid hsl(var(--max-3)) !important;
+    background: hsl(var(--signal)) !important;
+    color: hsl(var(--ink));
+    border: 1px solid hsl(var(--signal)) !important;
     border-radius: 9999px;
-    box-shadow: 0 0 30px hsl(var(--max-1) / 0.6), 6px 6px 0 hsl(var(--max-3)), 12px 12px 0 hsl(var(--max-2)) !important;
-    animation: gradient-shift 4s ease infinite;
-    transition: all 250ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow:
+      0 0 0 1px hsl(var(--ink)),
+      0 12px 36px -8px hsl(var(--signal) / 0.5),
+      0 24px 60px -12px hsl(var(--ink)) !important;
+    transition: all 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .fixed.bottom-5.right-5:hover  { transform: scale(1.1) rotate(-4deg); box-shadow: 0 0 50px hsl(var(--max-3) / 0.8), 8px 8px 0 hsl(var(--max-1)), 16px 16px 0 hsl(var(--max-5)) !important; }
-  .fixed.bottom-5.right-5:active { transform: scale(0.95); box-shadow: 0 0 20px hsl(var(--max-1) / 0.5) !important; }
+  .fixed.bottom-5.right-5:hover  {
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px hsl(var(--ink)),
+      0 18px 50px -8px hsl(var(--signal) / 0.7),
+      0 30px 70px -12px hsl(var(--ink)) !important;
+  }
+  .fixed.bottom-5.right-5:active { transform: translateY(0); }
 
-  /* Code/destructive callout */
+  /* Code/destructive callout — blood under glass */
   .rounded.bg-destructive\/10 {
-    border-radius: 1rem !important;
-    background-color: hsl(var(--max-1) / 0.18) !important;
-    border: 3px dashed hsl(var(--max-1)) !important;
-    box-shadow: 4px 4px 0 hsl(var(--max-3)) !important;
+    border-radius: 4px !important;
+    background-color: hsl(var(--blood) / 0.10) !important;
+    border: 1px solid hsl(var(--blood) / 0.5) !important;
+    box-shadow: inset 0 1px 0 0 hsl(var(--ink)) !important;
     color: hsl(var(--foreground));
-    font-weight: 700;
+    font-weight: 500;
   }
 
-  /* DraftRoom helpers */
+  /* DraftRoom — the war room */
   .scoreboard-tile {
-    background: linear-gradient(135deg, hsl(var(--max-5) / 0.4), hsl(var(--max-1) / 0.3)) !important;
-    border: 3px solid hsl(var(--max-3)) !important;
-    border-radius: 1rem !important;
-    box-shadow: 4px 4px 0 hsl(var(--max-1)), 0 0 18px hsl(var(--max-3) / 0.4) !important;
+    background: hsl(var(--ink)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 1px 0 0 hsl(var(--ink)), 0 0 0 1px hsl(var(--signal) / 0.15) !important;
     padding: 0.5rem 0.875rem;
-    font-family: "Outfit", sans-serif !important;
-    font-weight: 800;
-    color: hsl(var(--foreground));
-    text-shadow: 2px 2px 0 hsl(var(--ink));
+    font-family: "JetBrains Mono", monospace !important;
+    font-weight: 700;
+    color: hsl(var(--signal));
+    text-shadow: 0 0 12px hsl(var(--signal) / 0.4);
+    letter-spacing: 0.04em;
   }
   .scoreboard-plinth {
-    background-color: hsl(var(--muted-bg) / 0.6) !important;
-    border: 6px solid hsl(var(--max-3)) !important;
-    border-radius: 1.5rem !important;
-    box-shadow: 12px 12px 0 hsl(var(--max-1)), 24px 24px 0 hsl(var(--max-2)) !important;
+    background-color: hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 4px !important;
+    box-shadow:
+      0 1px 0 0 hsl(var(--ink)),
+      0 30px 80px -24px hsl(var(--ink)) !important;
     padding: 1.5rem 2rem;
   }
-  .font-score   { font-family: "Outfit", sans-serif; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
-  .score-digit  { color: hsl(var(--foreground)); text-shadow: 2px 2px 0 hsl(var(--max-5)), 4px 4px 0 hsl(var(--max-1)); }
+  .font-score   { font-family: "JetBrains Mono", monospace; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .score-digit  { color: hsl(var(--signal)); text-shadow: 0 0 16px hsl(var(--signal) / 0.4); }
   .broadcast-label {
-    font-family: "Outfit", sans-serif;
+    font-family: "JetBrains Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.18em;
-    font-weight: 800;
-    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    font-weight: 700;
+    font-size: 0.66rem;
     color: hsl(var(--ink));
-    background: hsl(var(--max-3));
-    padding: 3px 8px;
-    border: 2px solid hsl(var(--max-1));
+    background: hsl(var(--signal));
+    padding: 2px 8px;
+    border-radius: 2px;
     display: inline-block;
-    transform: rotate(-1deg);
   }
   .accent-flare { position: relative; }
   .accent-flare::after {
     content: "";
-    position: absolute; inset: -6px;
-    background: radial-gradient(ellipse at center, hsl(var(--max-1) / 0.4), transparent 70%);
-    z-index: -1; pointer-events: none; filter: blur(12px);
+    position: absolute; inset: -8px;
+    background: radial-gradient(ellipse at center, hsl(var(--signal) / 0.18), transparent 70%);
+    z-index: -1; pointer-events: none; filter: blur(16px);
   }
   .whistle-focus:focus-visible {
     outline: none !important;
-    box-shadow: 0 0 0 4px hsl(var(--max-3)), 0 0 0 8px hsl(var(--max-1)), 0 0 30px hsl(var(--max-3) / 0.6) !important;
+    box-shadow: 0 0 0 1px hsl(var(--signal)), 0 0 0 4px hsl(var(--signal) / 0.25) !important;
   }
 }
 
-/* Markdown styles for AI coach output */
-.coach-md p { @apply mb-2 leading-relaxed; font-family: "DM Sans", sans-serif; }
+/* Markdown styles for AI coach output — quiet, readable, Ive-grade */
+.coach-md p { @apply mb-2 leading-relaxed; font-family: "Inter", sans-serif; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply text-foreground font-black; color: hsl(var(--max-3)); }
-.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground; font-family: "Outfit", sans-serif; font-weight: 900; }
-.coach-md code { @apply px-1.5 py-0.5 text-xs font-mono; background: hsl(var(--max-1) / 0.2); color: hsl(var(--max-3)); border: 2px solid hsl(var(--max-1)); border-radius: 0.5rem; }
+.coach-md strong { @apply font-bold; color: hsl(var(--signal)); }
+.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground; font-family: "Inter", sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+.coach-md code { @apply px-1.5 py-0.5 text-xs font-mono; background: hsl(var(--ink)); color: hsl(var(--signal)); border: 1px solid hsl(var(--border)); border-radius: 3px; }
