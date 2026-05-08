@@ -702,6 +702,81 @@ export default function DraftRoom() {
         </SheetContent>
       </Sheet>
 
+      {/* ── DICE-style FULLSCREEN TOOL PAGE ─────────────────────────── */}
+      {toolPage && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-background text-foreground">
+          <div
+            className="px-5"
+            style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}
+          >
+            <button
+              type="button"
+              onClick={() => setToolPage(null)}
+              aria-label="Back"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1c1c1c] text-foreground active:scale-95 transition"
+            >
+              <ChevronLeft className="h-6 w-6" strokeWidth={2} />
+            </button>
+            <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight">
+              {toolPage === "lookup" && "Find"}
+              {toolPage === "top100" && "Top 100"}
+              {toolPage === "afford" && "Afford"}
+              {toolPage === "market" && "Market"}
+              {toolPage === "fantasylife" && "News"}
+            </h1>
+            <p className="mb-6 text-sm text-muted-foreground">
+              {toolPage === "lookup" && "Search any player or dollar amount."}
+              {toolPage === "top100" && "Best-value board, math-backed."}
+              {toolPage === "afford" && "Pressure-test a plan before spending."}
+              {toolPage === "market" && "Room pulse plus opponent scan."}
+              {toolPage === "fantasylife" && "Latest from fantasylife.com."}
+            </p>
+          </div>
+
+          <div className="px-3 pb-24">
+            {toolPage === "lookup" && (
+              <LookupSection
+                prices={prices}
+                anchorMap={anchorMap}
+                events={events}
+                maxBid={budget.maxBid}
+                onPick={(name) => {
+                  lockToPlayer(name);
+                  setToolPage(null);
+                }}
+              />
+            )}
+            {toolPage === "top100" && (
+              <Top100List
+                prices={prices}
+                anchorMap={anchorMap}
+                events={events}
+                onPick={(name) => {
+                  lockToPlayer(name);
+                  setToolPage(null);
+                }}
+              />
+            )}
+            {toolPage === "afford" && <AffordabilityChecker />}
+            {toolPage === "market" && (
+              <div className="space-y-3">
+                <StealReachCounter events={events} />
+                <MarketHeat
+                  events={events}
+                  prices={prices}
+                  gaps={gaps}
+                  maxBid={budget.maxBid}
+                  remaining={budget.remaining}
+                  pulseMultiplier={pulse.multiplier}
+                />
+                <OpponentHeatmap settings={settings} />
+              </div>
+            )}
+            {toolPage === "fantasylife" && <FantasyLifeFeed />}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
