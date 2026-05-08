@@ -86,7 +86,7 @@ const App = () => (
               <Route path="/m" element={<Navigate to="/draft-room" replace />} />
               <Route path="/mobile" element={<Navigate to="/draft-room" replace />} />
 
-              <Route path="/claim" element={<Protected><ClaimTeam /></Protected>} />
+              <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
               <Route path="/card-preview" element={<CardPreview />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
