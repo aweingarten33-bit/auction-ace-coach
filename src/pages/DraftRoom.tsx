@@ -493,7 +493,6 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
-        <PricingMathExplainer />
         {/* Find (player or $) lives in the hamburger drawer now. */}
 
         {/* DECISION CARD — rendered INLINE (no Dialog/Portal/Overlay).

@@ -114,9 +114,6 @@ export default function SetupWizard() {
           </div>
         </header>
 
-        <div className="mb-6">
-          <PricingMathExplainer />
-        </div>
 
         <Progress value={progress} className="mb-6 h-1.5" />
 
