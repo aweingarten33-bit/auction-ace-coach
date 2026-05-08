@@ -5,75 +5,74 @@
 @tailwind utilities;
 
 /* =====================================================================
-   NEWSPRINT — "All The News That's Fit To Print"
-   Editorial authority. Sharp grids. Serif drama. Hard offset shadows.
-   Tinted toward a Frank-Miller-Superman daily: faded brick-red ink,
-   sun-yellow stamp, halftone newsprint grain.
+   MILLER INK — Dark Knight palette
+   Cobalt midnight. Bone newsprint. Bat-signal yellow. Dried-blood red.
+   Heavy Janson ink, halftone grain, panel-gutter borders.
    ===================================================================== */
 
 @layer base {
   :root {
-    --background: 50 25% 97%;            /* #F9F9F7 newsprint off-white */
-    --foreground: 0 0% 7%;               /* #111111 ink black */
+    --background: 220 35% 9%;            /* deep cobalt midnight */
+    --foreground: 42 32% 88%;            /* bone newsprint */
 
-    --card: 50 25% 97%;
-    --card-foreground: 0 0% 7%;
+    --card: 220 30% 13%;                 /* inked panel */
+    --card-foreground: 42 32% 88%;
 
-    --popover: 50 25% 97%;
-    --popover-foreground: 0 0% 7%;
+    --popover: 220 32% 12%;
+    --popover-foreground: 42 32% 88%;
 
-    --primary: 0 0% 7%;                  /* black is primary in print */
-    --primary-foreground: 50 25% 97%;
-    --primary-glow: 0 0% 14%;
+    --primary: 46 92% 56%;               /* bat-signal yellow */
+    --primary-foreground: 220 40% 8%;
+    --primary-glow: 50 95% 62%;
 
-    --secondary: 50 12% 90%;             /* #E5E5E0 divider grey */
-    --secondary-foreground: 0 0% 7%;
+    --secondary: 42 32% 88%;             /* bone block */
+    --secondary-foreground: 220 40% 8%;
 
-    --muted: 50 12% 92%;
-    --muted-foreground: 0 0% 32%;
+    --muted: 220 22% 18%;                /* alley charcoal */
+    --muted-foreground: 42 22% 75%;
 
-    --accent: 0 100% 40%;                /* #CC0000 editorial red — brick faded */
-    --accent-foreground: 50 25% 97%;
+    --accent: 358 70% 46%;               /* dried blood red */
+    --accent-foreground: 42 32% 92%;
 
-    --destructive: 0 100% 40%;
-    --destructive-foreground: 50 25% 97%;
+    --destructive: 358 70% 46%;
+    --destructive-foreground: 42 32% 92%;
 
-    --warning: 46 92% 48%;               /* sun-yellow stamp */
-    --warning-foreground: 0 0% 7%;
+    --warning: 46 92% 56%;
+    --warning-foreground: 220 40% 8%;
 
-    --success: 0 0% 7%;
-    --success-foreground: 50 25% 97%;
+    --success: 42 32% 88%;
+    --success-foreground: 220 40% 8%;
 
-    --border: 0 0% 7%;
-    --input: 50 25% 97%;
-    --ring: 0 0% 7%;
+    --border: 42 32% 88%;                /* bone gutter line */
+    --input: 220 30% 13%;
+    --ring: 46 92% 56%;
 
     --radius: 0px;
 
-    /* Hard offset ink shadows — newspaper cutout effect */
-    --ink: 0 0% 7%;
+    /* Heavy Janson ink shadows — flat, no blur */
+    --ink: 220 50% 3%;
     --shadow-card:      4px 4px 0 0 hsl(var(--ink));
-    --shadow-floating:  6px 6px 0 0 hsl(var(--ink));
+    --shadow-floating:  8px 8px 0 0 hsl(var(--ink));
     --shadow-pressed:   0 0 0 0 hsl(var(--ink));
-    --shadow-recessed:  inset 0 0 0 2px hsl(var(--ink));
+    --shadow-recessed:  inset 0 0 0 3px hsl(var(--ink));
     --shadow-sharp:     4px 4px 0 0 hsl(var(--ink));
-    --shadow-glow:      4px 4px 0 0 hsl(var(--accent));
-    --shadow-primary:   4px 4px 0 0 hsl(var(--ink));
+    --shadow-glow:      0 0 0 2px hsl(var(--primary) / 0.6), 6px 6px 0 0 hsl(var(--ink));
+    --shadow-primary:   6px 6px 0 0 hsl(var(--ink));
     --shadow-led-green: 4px 4px 0 0 hsl(var(--ink));
 
     --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
-    --shadow-brut:      4px 4px 0 0 hsl(var(--ink));
-    --shadow-brut-lg:   6px 6px 0 0 hsl(var(--ink));
-    --shadow-brut-xl:   8px 8px 0 0 hsl(var(--ink));
+    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
+    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
+    --shadow-brut-xl:   14px 14px 0 0 hsl(var(--ink));
 
-    --sidebar-background: 50 25% 97%;
-    --sidebar-foreground: 0 0% 7%;
-    --sidebar-primary: 0 0% 7%;
-    --sidebar-primary-foreground: 50 25% 97%;
-    --sidebar-accent: 0 100% 40%;
-    --sidebar-accent-foreground: 50 25% 97%;
-    --sidebar-border: 0 0% 7%;
-    --sidebar-ring: 0 0% 7%;
+    --sidebar-background: 220 32% 12%;
+    --sidebar-foreground: 42 32% 88%;
+    --sidebar-primary: 46 92% 56%;
+    --sidebar-primary-foreground: 220 40% 8%;
+    --sidebar-accent: 358 70% 46%;
+    --sidebar-accent-foreground: 42 32% 92%;
+    --sidebar-border: 42 32% 88%;
+    --sidebar-ring: 46 92% 56%;
   }
 
   .dark { /* single permanent light mode */ }
