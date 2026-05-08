@@ -30,23 +30,19 @@ function Protected({
   allowWhenLocked?: boolean;
   adminOnly?: boolean;
 }) {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const { locked, isAdmin, loading: lockLoading } = useLock();
   if (loading || lockLoading) return null;
-  if (!user) return <Navigate to="/auth" replace />;
-  // Site-wide lock — show fake 404 to non-admins (admins always get through)
   if (locked && !isAdmin && !allowWhenLocked) return <NotFound />;
-  // Admin-only routes — show 404 to non-admins
   if (adminOnly && !isAdmin) return <NotFound />;
   return children;
 }
 
 function PublicGate({ children }: { children: JSX.Element }) {
   const { locked, isAdmin, loading } = useLock();
-  const { user, loading: authLoading } = useAuth();
+  const { loading: authLoading } = useAuth();
   if (loading || authLoading) return null;
-  // Hide auth/landing behind fake 404 too when locked, unless admin
-  if (locked && !(user && isAdmin)) return <NotFound />;
+  if (locked && !isAdmin) return <NotFound />;
   return children;
 }
 

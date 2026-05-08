@@ -1,23 +1,21 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import SetupWizard from "./SetupWizard";
 
 const Index = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
   const editing = searchParams.has("step") || searchParams.get("edit") === "1";
   const [routing, setRouting] = useState(true);
 
   useEffect(() => {
-    if (loading || !user || editing) { setRouting(false); return; }
+    if (loading || editing) { setRouting(false); return; }
     navigate("/draft-room", { replace: true });
-  }, [user, editing, loading, navigate]);
+  }, [editing, loading, navigate]);
 
   if (loading || routing) return null;
-  if (!user) return <Navigate to="/auth" replace />;
   return <SetupWizard />;
 };
 
