@@ -275,6 +275,28 @@
     opacity: 0.55;
   }
   .dark #root { position: relative; z-index: 1; }
+
+  /* Bleed the cape-blood + gold swirl through every page surface that uses bg-background */
+  .dark .bg-background {
+    background-color: transparent !important;
+    background-image:
+      radial-gradient(80% 60% at 100% 0%,   hsl(354 78% 38% / 0.55) 0%, transparent 60%),
+      radial-gradient(70% 55% at 0% 100%,   hsl(354 72% 32% / 0.45) 0%, transparent 65%),
+      radial-gradient(60% 50% at 20% 10%,   hsl(38 78% 48% / 0.18)  0%, transparent 70%),
+      linear-gradient(160deg, hsl(225 55% 7%) 0%, hsl(354 60% 10%) 55%, hsl(225 60% 5%) 100%) !important;
+  }
+  .dark .min-h-screen.bg-background::before {
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(40% 30% at 85% 15%, hsl(354 82% 42% / 0.45) 0%, transparent 70%),
+      radial-gradient(50% 35% at 10% 85%, hsl(354 72% 32% / 0.40) 0%, transparent 70%);
+    mix-blend-mode: screen;
+    z-index: 0;
+  }
+  .dark .min-h-screen.bg-background { position: relative; }
+  .dark .min-h-screen.bg-background > * { position: relative; z-index: 1; }
   @keyframes miller-swirl {
     0%   { transform: rotate(0deg) scale(1.1); }
     100% { transform: rotate(360deg) scale(1.1); }
