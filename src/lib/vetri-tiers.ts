@@ -38,7 +38,7 @@ export interface ComputedValue {
  * Position spend share of total league $.
  * Defaults reflect typical PPR auction patterns; we adjust per scoring/leagueType.
  */
-function positionShare(settings: LeagueSettings): Record<Position, number> {
+export function positionShare(settings: LeagueSettings): Record<Position, number> {
   const base: Record<Position, number> = {
     RB: 0.42,
     WR: 0.34,
