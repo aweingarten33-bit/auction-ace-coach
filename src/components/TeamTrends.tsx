@@ -122,13 +122,50 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
           </div>
         )}
         <p className="mb-1.5 text-[10px] text-muted-foreground">
-          What they actually paid at each spot per draft (avg of last {seasons.length} yrs). Tap a row to see how many they draft.
+          Averaged dollars paid at that position per draft (last {seasons.length} yrs) — not a per-player target. Tap a row for the breakdown.
         </p>
+
+        {/* Mode toggle */}
+        <div className="mb-2 inline-flex rounded-md border border-border/50 bg-foreground/5 p-0.5 text-[10px] font-semibold">
+          <button
+            type="button"
+            onClick={() => setBreakdownMode("total")}
+            className={`rounded px-2 py-0.5 transition ${
+              breakdownMode === "total" ? "bg-foreground/15 text-foreground" : "text-muted-foreground"
+            }`}
+          >
+            $ total on position
+          </button>
+          <button
+            type="button"
+            onClick={() => setBreakdownMode("perPlayer")}
+            className={`rounded px-2 py-0.5 transition ${
+              breakdownMode === "perPlayer" ? "bg-foreground/15 text-foreground" : "text-muted-foreground"
+            }`}
+          >
+            $ per player
+          </button>
+        </div>
+
         <div className="space-y-1">
           {POS_ORDER.map((pos) => {
             const v = trends.avgByPos[pos] ?? 0;
             const count = trends.avgCountByPos?.[pos] ?? 0;
-            const pct = (v / maxSpend) * 100;
+            const perPlayerAvg = trends.avgPerPlayerByPos?.[pos] ?? 0;
+            const perPlayerMed = trends.medianPerPlayerByPos?.[pos] ?? 0;
+            const spread = trends.seasonSpreadByPos?.[pos] ?? [];
+            const spreadVals = spread.map((s) => s.spend);
+            const low = spreadVals.length ? Math.min(...spreadVals) : 0;
+            const high = spreadVals.length ? Math.max(...spreadVals) : 0;
+            const rowVal = breakdownMode === "total" ? v : perPlayerAvg;
+            const rowMax =
+              breakdownMode === "total"
+                ? maxSpend
+                : Math.max(
+                    ...POS_ORDER.map((p) => trends.avgPerPlayerByPos?.[p] ?? 0),
+                    1,
+                  );
+            const pct = (rowVal / rowMax) * 100;
             const color = (POS_COLORS as any)[pos] ?? "bg-foreground/40";
             const isOpen = expanded === pos;
             const hasData = v > 0 || count > 0;
@@ -150,13 +187,49 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
                     <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
                   </div>
                   <span className="w-10 text-right text-[10px] tabular-nums text-foreground/80">
-                    ${v}
+                    ${rowVal}
                   </span>
                 </button>
                 {isOpen && hasData && (
-                  <div className="ml-6 mt-0.5 mb-1 rounded-md bg-foreground/5 px-2 py-1 text-[11px] text-foreground/80">
-                    Drafts <strong>{count}</strong> {pos}{count === 1 ? "" : "s"} per year, spending{" "}
-                    <strong>${v}</strong> total on the position.
+                  <div className="ml-6 mt-0.5 mb-1 space-y-1.5 rounded-md bg-foreground/5 px-2 py-1.5 text-[11px] text-foreground/80">
+                    <div>
+                      Drafts <strong>{count}</strong> {pos}{count === 1 ? "" : "s"} per year, spending{" "}
+                      <strong>${v}</strong> total on the position.
+                    </div>
+                    <div>
+                      Per-player: avg <strong>${perPlayerAvg}</strong> · median{" "}
+                      <strong>${perPlayerMed}</strong>
+                    </div>
+                    {spread.length > 0 && high > 0 && (
+                      <div>
+                        <div className="mb-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                          Spread last {spread.length} yrs · low ${low} / avg ${v} / high ${high}
+                        </div>
+                        <div className="relative h-2 w-full overflow-hidden rounded-full bg-foreground/10">
+                          {/* low-to-high range bar */}
+                          <div
+                            className={`absolute inset-y-0 ${color} opacity-40`}
+                            style={{
+                              left: `${(low / high) * 100}%`,
+                              width: `${100 - (low / high) * 100}%`,
+                            }}
+                          />
+                          {/* avg marker */}
+                          <div
+                            className="absolute inset-y-[-2px] w-0.5 bg-foreground"
+                            style={{ left: `${(v / high) * 100}%` }}
+                            title={`avg $${v}`}
+                          />
+                        </div>
+                        <div className="mt-1 flex gap-2 text-[10px] font-mono text-muted-foreground">
+                          {spread.map((s) => (
+                            <span key={s.season}>
+                              {s.season}: <span className="text-foreground/80">${s.spend}</span>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
