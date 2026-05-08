@@ -13,6 +13,7 @@ import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import CardPreview from "./pages/CardPreview.tsx";
+import LogoPicker from "./pages/LogoPicker.tsx";
 import ClaimTeam from "./pages/ClaimTeam.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
@@ -88,6 +89,7 @@ const App = () => (
 
               <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
               <Route path="/card-preview" element={<CardPreview />} />
+              <Route path="/logos" element={<LogoPicker />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </LockProvider>
