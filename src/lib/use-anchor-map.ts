@@ -9,6 +9,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "./decision-engine";
+import { useVorpMap } from "./use-vorp-map";
+import { useDraftStore } from "./draft-store";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -22,6 +24,8 @@ export type PosScale = Record<string, number>; // position -> multiplier
 export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: PosScale } {
   const [map, setMap] = useState<Record<string, AnchorEntry>>({});
   const [posScale, setPosScale] = useState<PosScale>({});
+  const settings = useDraftStore((s) => s.settings);
+  const { map: vorpMap } = useVorpMap(settings);
 
   useEffect(() => {
     let cancelled = false;
@@ -184,6 +188,19 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
 
 
+        // 5) VORP fallback — for projected players without league or market data,
+        //    use computed VORP $ as the anchor. This is the "no anchor ever again"
+        //    safety net for rookies/sleepers ESPN/Sleeper haven't priced.
+        for (const [k, v] of Object.entries(vorpMap)) {
+          if (out[k]) continue;
+          out[k] = {
+            price: v.price,
+            source: "espn", // closest existing tier; engine treats as "market"
+            marketPrice: v.price,
+            marketSources: {},
+          };
+        }
+
         setMap(out);
         setPosScale(scales);
       } catch (e) {
@@ -191,7 +208,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [vorpMap]);
 
   return { map, posScale };
 }
