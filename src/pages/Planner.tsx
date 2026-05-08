@@ -277,19 +277,18 @@ export function PlannerBody() {
                 <Calculator className="h-4 w-4 text-foreground" />
               </div>
               <div className="min-w-0">
-                <div className="text-[11px] uppercase tracking-wider text-muted-foreground">Step 2</div>
                 <h2 className="truncate text-[15px] font-semibold text-foreground">$ per roster slot</h2>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-1">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={() => clearSlotAllocations()}
                 title="Reset all slot dollars to empty"
-                className="h-8 gap-1 px-2 text-foreground hover:bg-white/10"
+                className="h-8 px-3 text-[12px] font-semibold border-white/20 bg-white/5 text-foreground hover:bg-white/15"
               >
-                <Trash2 className="h-3.5 w-3.5" /> Clear
+                Clear
               </Button>
             </div>
           </div>
