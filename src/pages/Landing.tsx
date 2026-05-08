@@ -39,42 +39,59 @@ const FEED = [
 export default function Landing() {
   return (
     <div className="min-h-screen bg-black text-white pb-32 font-sans">
-      <main className="mx-auto max-w-[440px] px-5 pt-6">
+      <style>{`.no-scrollbar::-webkit-scrollbar{display:none}.no-scrollbar{scrollbar-width:none}`}</style>
+
+      <main className="mx-auto max-w-[440px] px-5 pt-10">
         {/* Headline */}
-        <h1 className="text-[34px] leading-[1.1] font-semibold tracking-tight mb-7">
+        <h1 className="text-[36px] leading-[1.05] font-semibold tracking-tight mb-8">
           Make plans
         </h1>
 
         {/* Category rail */}
-        <div className="-mx-5 px-5 mb-6 flex gap-7 overflow-x-auto scrollbar-none">
+        <div className="-mx-5 px-5 mb-7 flex gap-8 overflow-x-auto no-scrollbar">
           {CATEGORIES.map(({ icon: Icon, label }) => (
             <button
               key={label}
-              className="flex flex-col items-center gap-2 shrink-0 text-white/95"
+              className="flex flex-col items-center gap-2 shrink-0 text-white"
             >
-              <Icon strokeWidth={1.25} className="size-8" />
-              <span className="text-[13px] font-medium whitespace-nowrap">{label}</span>
+              <Icon strokeWidth={1.25} className="size-9" />
+              <span className="text-[14px] font-normal whitespace-nowrap">{label}</span>
             </button>
           ))}
         </div>
 
         {/* Feed */}
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-6">
           {FEED.map((card, i) => (
             <article
               key={i}
-              className="relative overflow-hidden rounded-[22px] bg-[#111] aspect-[3/4]"
+              className="relative overflow-hidden rounded-[20px] bg-[#0d0d0d] aspect-[3/4]"
             >
               {/* Visual */}
               {card.visual === "splatter" ? (
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse at 65% 35%, #1d6bff 0%, transparent 55%), radial-gradient(circle at 70% 30%, #ff6a1f 0 2px, transparent 3px) 0 0/14px 14px, radial-gradient(circle at 30% 60%, #2dbb3d 0 2px, transparent 3px) 0 0/18px 18px, linear-gradient(135deg, #0c1410 0%, #0a0a0a 100%)",
-                  }}
-                  aria-hidden
-                />
+                <div className="absolute inset-0">
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "linear-gradient(160deg, #d8d2bf 0%, #6b8a3a 35%, #1a4ab8 60%, #0a1430 100%)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 mix-blend-screen opacity-90"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 60% 40%, rgba(255,90,30,0.55) 0%, transparent 38%), radial-gradient(circle at 30% 65%, rgba(40,200,80,0.45) 0%, transparent 40%), radial-gradient(circle at 75% 25%, rgba(255,140,40,0.4) 0%, transparent 30%)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-70 mix-blend-overlay"
+                    style={{
+                      backgroundImage:
+                        "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.4 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+                    }}
+                  />
+                </div>
               ) : (
                 <div
                   className="absolute inset-0"
@@ -82,61 +99,50 @@ export default function Landing() {
                     background:
                       "radial-gradient(ellipse at 50% 35%, #4a4540 0%, #1a1814 60%, #0a0908 100%)",
                   }}
-                  aria-hidden
                 />
               )}
 
-              {/* Bottom shade for legibility */}
+              {/* Bottom shade */}
               <div
-                className="absolute inset-x-0 bottom-0 h-[70%]"
+                className="absolute inset-x-0 bottom-0 h-[75%] pointer-events-none"
                 style={{
                   background:
-                    "linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 35%, rgba(0,0,0,0) 100%)",
+                    "linear-gradient(to top, rgba(0,0,0,0.95) 10%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0) 100%)",
                 }}
-                aria-hidden
               />
 
-              {/* New badge */}
               {card.badge && (
-                <span className="absolute top-4 left-4 z-10 bg-[#dcff1e] text-black text-[13px] font-semibold px-2.5 py-1 rounded-md">
+                <span className="absolute top-4 left-4 z-10 bg-[#dcff1e] text-black text-[14px] font-semibold px-2.5 py-1 rounded-md">
                   {card.badge}
                 </span>
               )}
 
               {/* Content */}
-              <div className="absolute inset-x-0 bottom-0 p-5 pr-4">
-                <div className="text-[11px] tracking-[0.14em] font-semibold text-white/90 mb-2">
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <div className="text-[12px] tracking-[0.16em] font-semibold text-white mb-2">
                   {card.tag}
                 </div>
-                <h2 className="text-[26px] leading-[1.1] font-bold tracking-tight mb-3 pr-16">
+                <h2 className="text-[28px] leading-[1.1] font-bold tracking-tight mb-3">
                   {card.title}
                 </h2>
-                {card.when && (
-                  <div className="text-[15px] leading-snug text-white/95">
-                    {card.when}
-                    <br />
-                    {card.venue}
-                    <br />
-                    {card.price}
-                  </div>
-                )}
-                {!card.when && card.venue && (
-                  <p className="text-[14px] leading-snug text-white/85 pr-16">
-                    {card.venue}
-                  </p>
-                )}
 
-                {/* Action row bottom-right */}
-                <div className="absolute right-4 bottom-5 flex items-center gap-2">
-                  <button aria-label="Save" className="size-9 rounded-full bg-white/10 backdrop-blur-sm grid place-items-center">
-                    <Bookmark className="size-[18px]" strokeWidth={1.5} />
-                  </button>
-                  <button aria-label="Like" className="size-9 rounded-full bg-white/10 backdrop-blur-sm grid place-items-center">
-                    <ThumbsUp className="size-[18px]" strokeWidth={1.5} />
-                  </button>
-                  <button aria-label="Dislike" className="size-9 rounded-full bg-white/10 backdrop-blur-sm grid place-items-center">
-                    <ThumbsDown className="size-[18px]" strokeWidth={1.5} />
-                  </button>
+                <div className="flex items-end justify-between gap-3">
+                  <div className="text-[16px] leading-[1.35] text-white">
+                    {card.when && <>{card.when}<br /></>}
+                    {card.venue}
+                    {card.price && <><br />{card.price}</>}
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button aria-label="Save" className="size-10 rounded-full bg-white/15 grid place-items-center">
+                      <Bookmark className="size-[18px]" strokeWidth={1.5} />
+                    </button>
+                    <button aria-label="Like" className="size-10 rounded-full bg-white/15 grid place-items-center">
+                      <ThumbsUp className="size-[18px]" strokeWidth={1.5} />
+                    </button>
+                    <button aria-label="Dislike" className="size-10 rounded-full bg-white/15 grid place-items-center">
+                      <ThumbsDown className="size-[18px]" strokeWidth={1.5} />
+                    </button>
+                  </div>
                 </div>
               </div>
             </article>
@@ -144,21 +150,21 @@ export default function Landing() {
         </div>
       </main>
 
-      {/* Floating bottom controls — DICE pattern: home pill (left) + search circle (right) */}
-      <div className="fixed bottom-5 left-0 right-0 z-50 px-5 flex items-center justify-between max-w-[440px] mx-auto">
+      {/* Floating bottom: home pill (left) + search circle (right) */}
+      <div className="fixed bottom-5 left-0 right-0 z-50 px-5 flex items-center justify-between max-w-[440px] mx-auto pointer-events-none">
         <Link
           to="/landing"
           aria-label="Home"
-          className="size-14 rounded-full bg-[#1c1c1c]/90 backdrop-blur grid place-items-center text-white shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+          className="size-14 rounded-full bg-[#1c1c1c]/95 backdrop-blur grid place-items-center text-white shadow-[0_10px_30px_rgba(0,0,0,0.7)] pointer-events-auto"
         >
-          <Home className="size-6" strokeWidth={1.5} />
+          <Home className="size-[22px]" strokeWidth={1.5} />
         </Link>
         <Link
           to="/draft-room"
           aria-label="Search"
-          className="size-14 rounded-full bg-[#1c1c1c]/90 backdrop-blur grid place-items-center text-white shadow-[0_8px_24px_rgba(0,0,0,0.6)]"
+          className="size-14 rounded-full bg-[#1c1c1c]/95 backdrop-blur grid place-items-center text-white shadow-[0_10px_30px_rgba(0,0,0,0.7)] pointer-events-auto"
         >
-          <Search className="size-6" strokeWidth={1.5} />
+          <Search className="size-[22px]" strokeWidth={1.5} />
         </Link>
       </div>
     </div>
