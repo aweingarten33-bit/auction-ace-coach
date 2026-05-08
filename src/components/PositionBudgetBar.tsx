@@ -85,7 +85,7 @@ export default function PositionBudgetBar() {
         })}
       </div>
       <p className="text-[10px] text-muted-foreground">
-        Target = league position share × ${settings.totalBudget} budget, adjusted for {settings.scoring} + {settings.leagueType}.
+        Suggestions based on your league size, scoring ({settings.scoring}), and roster type ({settings.leagueType}).
       </p>
     </Card>
   );
