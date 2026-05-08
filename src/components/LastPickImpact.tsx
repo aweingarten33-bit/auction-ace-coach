@@ -22,7 +22,7 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
   const after = computeBudget(settings, keepers, events);
 
   const isMine = last.drafter === "me";
-  const pos = (last.position ?? "—") as Position;
+  const pos = last.position as Position | undefined;
 
   // Position-specific deltas (only meaningful when YOU made the pick)
   const posBefore = isMine
