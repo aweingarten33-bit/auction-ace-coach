@@ -113,9 +113,13 @@ Deno.serve(async (req) => {
       if (!k) continue;
       let v = Number(r.projected_auction_value || 0);
       const pos = (r.position === "DEF" ? "D/ST" : r.position) || "";
-      // Sleeper's projected_auction_value is single-QB tuned. SF inflates QBs but
-      // not as much as raw 2x — top QBs cap around Berry's $45 SF top.
-      if (superflex && pos === "QB") v = Math.min(50, Math.round(v * 1.35));
+      // Sleeper's projected_auction_value is single-QB tuned. In SF, inflate QBs
+      // and DEFLATE every other position (~22% off) — total budget is fixed, so
+      // RB/WR/TE money has to come from somewhere when QBs go up.
+      if (superflex) {
+        if (pos === "QB") v = Math.min(50, Math.round(v * 1.35));
+        else if (pos === "RB" || pos === "WR" || pos === "TE") v = Math.round(v * 0.78);
+      }
       const cur = rows.get(k) ?? { name: r.player_name, key: k, position: pos, team: "" };
       cur.sleeper = Math.max(1, Math.round(v));
       if (!cur.position) cur.position = pos;
