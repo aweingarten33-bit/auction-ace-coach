@@ -22,30 +22,31 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
   const after = computeBudget(settings, keepers, events);
 
   const isMine = last.drafter === "me";
-  const pos = last.position as Position | undefined;
+  const pos = last.position;
+  const isTrackedPos = !!pos && POS.includes(pos);
 
-  // Position-specific deltas (only meaningful when YOU made the pick)
-  const posBefore = isMine
+  // Position-specific deltas (only meaningful when YOU made the pick at a tracked pos)
+  const posBefore = isMine && isTrackedPos
     ? {
         count: countByPosition([
           ...keepers.map((k) => ({ player: k.player, position: k.position, price: k.cost, source: "keeper" as const })),
           ...prevEvents.filter((e) => e.drafter === "me").map((e) => ({ player: e.player, position: e.position, price: e.price, source: "draft" as const })),
-        ])[pos] ?? 0,
-        spend: spendByPosition(prevEvents.filter((e) => e.drafter === "me"))[pos] ?? 0,
+        ])[pos!] ?? 0,
+        spend: spendByPosition(prevEvents.filter((e) => e.drafter === "me"))[pos!] ?? 0,
       }
     : null;
-  const posAfter = isMine
+  const posAfter = isMine && isTrackedPos
     ? {
         count: countByPosition([
           ...keepers.map((k) => ({ player: k.player, position: k.position, price: k.cost, source: "keeper" as const })),
           ...events.filter((e) => e.drafter === "me").map((e) => ({ player: e.player, position: e.position, price: e.price, source: "draft" as const })),
-        ])[pos] ?? 0,
-        spend: spendByPosition(events.filter((e) => e.drafter === "me"))[pos] ?? 0,
+        ])[pos!] ?? 0,
+        spend: spendByPosition(events.filter((e) => e.drafter === "me"))[pos!] ?? 0,
       }
     : null;
 
   const share = positionShare(settings);
-  const target = POS.includes(pos) ? Math.round(settings.totalBudget * share[pos]) : 0;
+  const target = isTrackedPos ? Math.round(settings.totalBudget * share[pos!]) : 0;
 
   // Strategy nudge
   let nudge: string | null = null;
@@ -55,7 +56,7 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
     } else if (posAfter.spend < target * 0.4 && pos === "QB" && (settings.leagueType === "Superflex" || settings.leagueType === "2QB")) {
       nudge = `Still light on QB spend in Superflex — keep one in your sights.`;
     }
-  } else if (!isMine && POS.includes(pos)) {
+  } else if (!isMine && isTrackedPos) {
     nudge = `${pos} pool shrank by 1 — fewer options at the top.`;
   }
 
@@ -81,7 +82,7 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
         <p className="text-base font-semibold text-foreground">
           {last.player}
           <span className="ml-2 text-[11px] font-normal text-muted-foreground">
-            {pos !== "—" ? pos : ""} · ${last.price}
+            {pos ?? ""} · ${last.price}
           </span>
         </p>
       </div>
