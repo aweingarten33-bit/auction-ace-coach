@@ -100,6 +100,7 @@ export default function NextTargetCard({
   }
 
   const runnerUp = scored[1];
+  const [open, setOpen] = useState(false);
 
   return (
     <section className="rounded-lg border border-primary/40 bg-primary/5 p-4">
