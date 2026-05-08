@@ -228,32 +228,62 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
 function parseSleeperList(md: string, defaultPos: string): Player[] {
   const out: Player[] = [];
   const seen = new Set<string>();
-  const clean = md.replace(/\\/g, "");
+  // Strip image markdown, escaped chars, and bold markers
+  const clean = md
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+    .replace(/\\/g, "")
+    .replace(/\*\*/g, "");
 
-  // Heading patterns:
-  //   ## Marvin Mims, WR, DEN
-  //   ### **Keon Coleman | BUF**
-  //   ## Sean Tucker (RB, TB)
-  //   ## 1. Marvin Mims | WR | DEN
-  const headingRe = /(^|\n)#{2,4}\s+(?:\*\*)?\s*(?:\d{1,2}\.\s+)?([A-Z][A-Za-z'.\-]+(?:\s+[A-Za-z'.\-]+){1,3})\s*[,|(\s]+\s*(QB|RB|WR|TE|K|D\/ST|DST)?[\s,|)]*\s*(ARI|ATL|BAL|BUF|CAR|CHI|CIN|CLE|DAL|DEN|DET|GB|HOU|IND|JAC|JAX|KC|LV|LAC|LA|LAR|MIA|MIN|NE|NO|NYG|NYJ|PHI|PIT|SEA|SF|TB|TEN|WAS)?/g;
+  const teamMap: Record<string, string> = {
+    Cardinals: "ARI", Falcons: "ATL", Ravens: "BAL", Bills: "BUF", Panthers: "CAR",
+    Bears: "CHI", Bengals: "CIN", Browns: "CLE", Cowboys: "DAL", Broncos: "DEN",
+    Lions: "DET", Packers: "GB", Texans: "HOU", Colts: "IND", Jaguars: "JAX",
+    Chiefs: "KC", Raiders: "LV", Chargers: "LAC", Rams: "LAR", Dolphins: "MIA",
+    Vikings: "MIN", Patriots: "NE", Saints: "NO", Giants: "NYG", Jets: "NYJ",
+    Eagles: "PHI", Steelers: "PIT", Seahawks: "SEA", "49ers": "SF", Niners: "SF",
+    Buccaneers: "TB", Titans: "TEN", Commanders: "WAS",
+  };
+  const teamWordRe = "(ARI|ATL|BAL|BUF|CAR|CHI|CIN|CLE|DAL|DEN|DET|GB|HOU|IND|JAC|JAX|KC|LV|LAC|LA|LAR|MIA|MIN|NE|NO|NYG|NYJ|PHI|PIT|SEA|SF|TB|TEN|WAS|Cardinals|Falcons|Ravens|Bills|Panthers|Bears|Bengals|Browns|Cowboys|Broncos|Lions|Packers|Texans|Colts|Jaguars|Chiefs|Raiders|Chargers|Rams|Dolphins|Vikings|Patriots|Saints|Giants|Jets|Eagles|Steelers|Seahawks|49ers|Niners|Buccaneers|Titans|Commanders)";
+
+  // Headings of the form (after stripping):
+  //   ### 1. Emeka Egbuka | WR | Buccaneers
+  //   ## Matthew Golden | WR | Packers
+  //   ## Sean Tucker, RB, Buccaneers
+  const headingRe = new RegExp(
+    `(^|\\n)#{2,4}\\s+(?:\\d{1,2}\\.\\s+)?` +
+      // name (2-4 words, allow apostrophes and hyphens)
+      `([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})` +
+      // separator + position
+      `\\s*[|,(]\\s*(QB|RB|WR|TE|K|D\\/ST|DST)` +
+      // separator + team (optional)
+      `(?:\\s*[|,)]\\s*${teamWordRe})?`,
+    "g",
+  );
 
   let rank = 0;
-  let m: RegExpExecArray | null;
-  while ((m = headingRe.exec(clean)) !== null) {
+  for (const m of clean.matchAll(headingRe)) {
     const name = m[2].trim();
-    // Skip section/admin headings
-    if (/^(The|Sleeper|Breakout|Late|Year|Wide|Running|Quarterback|Tight|Note|Why|How|What|Final|Honorable|Conclusion|Introduction|Last|First|My|Our|Top|Bottom|Bonus)\b/i.test(name)) continue;
     if (name.split(/\s+/).length < 2) continue;
     const k = name.toLowerCase();
     if (seen.has(k)) continue;
-    const pos = m[3] ? (m[3] === "DST" ? "D/ST" : m[3]) : (defaultPos === "ALL" ? "" : defaultPos);
-    const team = m[4] ?? "";
-    // Grab a short blurb: first non-empty line after the heading
-    const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 800);
-    const blurb = after.split(/\n+/).map((s) => s.trim()).find((s) => s.length > 40 && !s.startsWith("#") && !s.startsWith("![") && !s.startsWith("|"));
+    const posRaw = m[3];
+    const pos = posRaw === "DST" ? "D/ST" : posRaw;
+    if (defaultPos !== "ALL" && pos !== defaultPos) {
+      // Some articles still mix positions in their headings; allow but skip mismatches
+    }
+    const teamRaw = m[4] ?? "";
+    const team = teamMap[teamRaw] ?? (teamRaw.length === 2 || teamRaw.length === 3 ? teamRaw : "");
+
+    // Grab a short blurb: first non-empty paragraph after the heading
+    const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 1200);
+    const blurb = after
+      .split(/\n+/)
+      .map((s) => s.trim())
+      .find((s) => s.length > 50 && !s.startsWith("#") && !s.startsWith("-") && !s.startsWith("[") && !s.startsWith("|"));
+
     seen.add(k);
     rank += 1;
-    out.push({ rank, name, position: pos, team, note: blurb ? blurb.replace(/\*\*/g, "").slice(0, 220) : undefined });
+    out.push({ rank, name, position: pos, team, note: blurb ? blurb.slice(0, 240) : undefined });
   }
 
   return out.slice(0, 40);
