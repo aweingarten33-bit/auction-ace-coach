@@ -158,12 +158,20 @@
   h1, h2, h3, h4 {
     font-family: "Bebas Neue", "Anton", "Impact", sans-serif;
     font-weight: 400;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
-    line-height: 0.95;
+    line-height: 0.9;
     color: hsl(var(--foreground));
   }
-  h1 { letter-spacing: -0.02em; }
+  h1 {
+    letter-spacing: -0.02em;
+    text-shadow:
+      2px 0 0 hsl(111 100% 54% / 0.25),
+      -2px 0 0 hsl(111 100% 54% / 0.25),
+      0 0 14px hsl(111 100% 54% / 0.35);
+  }
+  h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }
+  h3 { font-size: clamp(1.25rem, 2.4vw, 1.75rem); }
 
   /* numerics + scoreboard */
   .font-mono, code, kbd, pre, samp, .tabular-nums, [class*="tabular"] {
