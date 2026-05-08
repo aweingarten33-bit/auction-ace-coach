@@ -12,51 +12,51 @@
 
 @layer base {
   :root {
-    --background: 200 18% 14%;           /* dirty teal-slate, dusk */
-    --foreground: 38 35% 84%;            /* aged newsprint cream */
+    --background: 218 38% 18%;           /* bleached cobalt dusk */
+    --foreground: 42 40% 86%;            /* sun-faded cream */
 
-    --card: 205 20% 18%;                 /* flat panel slate */
-    --card-foreground: 38 35% 84%;
+    --card: 218 32% 22%;                 /* propaganda-poster blue */
+    --card-foreground: 42 40% 86%;
 
-    --popover: 205 22% 16%;
-    --popover-foreground: 38 35% 84%;
+    --popover: 218 35% 20%;
+    --popover-foreground: 42 40% 86%;
 
-    --primary: 44 90% 55%;               /* sodium-lamp yellow */
-    --primary-foreground: 205 30% 10%;
-    --primary-glow: 48 95% 62%;
+    --primary: 8 72% 48%;                /* faded brick-red cape */
+    --primary-foreground: 42 45% 92%;
+    --primary-glow: 12 80% 56%;
 
-    --secondary: 38 35% 84%;             /* cream paper block */
-    --secondary-foreground: 205 30% 10%;
+    --secondary: 46 88% 56%;             /* sun-disc yellow shield */
+    --secondary-foreground: 218 40% 12%;
 
-    --muted: 205 15% 22%;                /* alley shadow */
-    --muted-foreground: 38 18% 68%;
+    --muted: 218 25% 28%;                /* metropolis smog */
+    --muted-foreground: 42 22% 72%;
 
-    --accent: 358 65% 44%;               /* dried-blood crimson */
-    --accent-foreground: 38 35% 88%;
+    --accent: 46 88% 56%;                /* yellow accent block */
+    --accent-foreground: 218 40% 12%;
 
-    --destructive: 358 70% 42%;
-    --destructive-foreground: 38 35% 88%;
+    --destructive: 8 72% 48%;
+    --destructive-foreground: 42 45% 92%;
 
-    --warning: 44 90% 55%;
-    --warning-foreground: 205 30% 10%;
+    --warning: 46 88% 56%;
+    --warning-foreground: 218 40% 12%;
 
-    --success: 38 35% 84%;
-    --success-foreground: 205 30% 10%;
+    --success: 42 40% 86%;
+    --success-foreground: 218 40% 12%;
 
-    --border: 205 30% 6%;                /* heavy ink line */
-    --input: 205 22% 16%;
-    --ring: 44 90% 55%;
+    --border: 218 50% 8%;                /* heavy Janson ink */
+    --input: 218 35% 20%;
+    --ring: 46 88% 56%;
 
     --radius: 0px;
 
-    /* Heavy ink shadows — flat black, no blur, like inked panel borders */
-    --ink: 205 35% 4%;
+    /* Heavy ink shadows — Klaus Janson black, no blur */
+    --ink: 218 55% 5%;
     --shadow-card:      4px 4px 0 0 hsl(var(--ink));
     --shadow-floating:  8px 8px 0 0 hsl(var(--ink));
     --shadow-pressed:   0 0 0 0 hsl(var(--ink));
     --shadow-recessed:  inset 0 0 0 4px hsl(var(--ink));
     --shadow-sharp:     4px 4px 0 0 hsl(var(--ink));
-    --shadow-glow:      0 0 0 3px hsl(var(--primary) / 0.6), 6px 6px 0 0 hsl(var(--ink));
+    --shadow-glow:      0 0 0 3px hsl(var(--secondary) / 0.7), 6px 6px 0 0 hsl(var(--ink));
     --shadow-primary:   6px 6px 0 0 hsl(var(--ink));
     --shadow-led-green: 4px 4px 0 0 hsl(var(--ink));
 
