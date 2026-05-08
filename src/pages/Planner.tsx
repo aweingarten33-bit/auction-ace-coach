@@ -254,6 +254,9 @@ export function PlannerBody() {
       {/* Refresh league moved to the hamburger menu (Settings → Refresh league from ESPN). */}
 
       <main className="mx-auto max-w-3xl space-y-4 p-3">
+        {/* ---------- Step 1: Setup ---------- */}
+        <SetupChecklist />
+
         {/* ---------- Strategy picker ---------- */}
         <StrategyPickerCard
           strategyId={strategyId}
