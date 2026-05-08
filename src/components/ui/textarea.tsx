@@ -5,17 +5,20 @@ import { cn } from "@/lib/utils";
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
 /**
- * Newsprint Textarea — bordered editorial form field with monospace text.
+ * Maximalism Textarea — rounded-2xl, neon border, glow on focus.
  */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => {
   return (
     <textarea
       className={cn(
-        "flex min-h-[112px] w-full rounded-none bg-transparent px-3 py-3 text-sm font-mono text-foreground",
-        "border border-foreground",
-        "transition-colors duration-150 ease-out",
-        "placeholder:text-foreground/45 placeholder:italic placeholder:font-body",
-        "focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-[hsl(50_8%_94%)]",
+        "flex min-h-[120px] w-full rounded-2xl bg-[hsl(var(--muted-bg)/0.55)] backdrop-blur-sm",
+        "px-5 py-3 text-base font-body font-bold text-white",
+        "border-4 border-[hsl(var(--max-1))]",
+        "transition-all duration-300 ease-out",
+        "placeholder:text-white/45 placeholder:font-medium",
+        "focus-visible:outline-none focus-visible:ring-0",
+        "focus-visible:border-[hsl(var(--max-3))] focus-visible:bg-[hsl(var(--muted-bg)/0.85)]",
+        "focus-visible:shadow-[0_0_24px_hsl(var(--max-3)/0.6),0_0_0_4px_hsl(var(--max-1)/0.4)]",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
