@@ -151,10 +151,7 @@ export default function DraftRoom() {
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  // Force users into setup if it's not done yet
-  useEffect(() => {
-    if (!setupComplete) navigate("/setup");
-  }, [setupComplete, navigate]);
+  // Visitors land directly in the draft room — setup is opt-in via the menu
 
   // Live extension sync — backfills picks, tracks the current nomination
   const espnSync = useEspnLiveSync({ expectingEvents: setupComplete });
