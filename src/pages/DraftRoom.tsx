@@ -416,25 +416,16 @@ export default function DraftRoom() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* ── LEAGUE TITLE BAR — wheat-paste stencil banner ──────────────── */}
+      {/* ── LEAGUE TITLE BAR ─────────────────────────────────────────── */}
       <div
-        className="relative border-b-2 border-border bg-locker px-4 py-3 text-center overflow-hidden"
+        className="bg-background px-4 py-3 text-center"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
       >
-        {/* property stamp */}
-        <span className="property-stamp absolute left-2 top-2 z-10 hidden sm:inline-block">
-          PROPERTY OF NFL
-        </span>
-        <span className="absolute right-2 top-2 z-10 font-mono text-[9px] tracking-widest text-muted-foreground cctv-blink">
-          REC · LIVE
-        </span>
-        {/* yard line */}
-        <div className="pointer-events-none absolute inset-x-0 top-1/2 h-px bg-foreground/5" aria-hidden />
-        <h1 className="stencil overspray-green text-2xl sm:text-4xl leading-none text-chalk tilt-slight">
-          {leagueName ? `THE ${leagueName.toUpperCase()}` : "THE BRO WE'RE SENIOR CITIZENS"}
+        <h1 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-foreground truncate">
+          {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
         </h1>
-        <p className="mt-1 font-stardos text-[10px] sm:text-xs uppercase tracking-[0.25em] text-muted-foreground">
-          ▮ Auction Draft Assistant ▮ Unauthorized Access ▮
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Auction Draft Assistant
         </p>
       </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
