@@ -78,7 +78,7 @@ import AffordabilityChecker from "@/components/AffordabilityChecker";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
-import PricingMathExplainer from "@/components/PricingMathExplainer";
+
 import FootballShieldIcon from "@/components/FootballShieldIcon";
 import superFootballLogo from "@/assets/logo-super-football.png";
 

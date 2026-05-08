@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
-import PricingMathExplainer from "@/components/PricingMathExplainer";
+
 
 const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
 
