@@ -274,6 +274,18 @@ export default function DraftRoom() {
             />
           )}
 
+          {/* Next-target suggestion (read-only) */}
+          {selectedTeam && (
+            <NextTargetCard
+              settings={settings}
+              gaps={gaps}
+              spend={spend}
+              remaining={budget.remaining}
+              anchorMap={anchorMap}
+              pulse={pulse}
+            />
+          )}
+
           {/* Personalized 3-year drafting trends */}
           {selectedTeam && (
             <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
