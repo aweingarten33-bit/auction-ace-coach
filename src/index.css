@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -222,6 +222,160 @@
 
   /* Strip glow effects from old design */
   .shadow-glow { box-shadow: var(--shadow-extruded-hover) !important; }
+}
+
+/* =====================================================================
+   PRIMETIME LAYER — Monday Night Football mode
+   Rides on top of neumorphism. Use sparingly, for stakes moments only.
+   ===================================================================== */
+@layer utilities {
+  /* Broadcast numerals — scoreboard tiles */
+  .font-score {
+    font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  /* Engraved primetime digit (sits on a tile) */
+  .score-digit {
+    color: hsl(var(--foreground));
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  /* Scoreboard tile — tighter shadow than a card, "broadcast hardware" */
+  .scoreboard-tile {
+    background-color: hsl(var(--background));
+    border-radius: 0.75rem;
+    box-shadow: var(--shadow-extruded-sm);
+    padding: 0.75rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Trophy plinth — for hero score reveals */
+  .scoreboard-plinth {
+    background-color: hsl(var(--background));
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-extruded-hover);
+    padding: 2rem 2.5rem;
+    position: relative;
+  }
+  .scoreboard-plinth::before {
+    content: "";
+    position: absolute;
+    inset: -8%;
+    background: radial-gradient(closest-side, hsl(var(--primary) / 0.22), transparent 70%);
+    filter: blur(24px);
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* Broadcast lower-third label */
+  .broadcast-label {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Stadium-light flare — subtle radial glow behind an element */
+  .accent-flare { position: relative; isolation: isolate; }
+  .accent-flare::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(closest-side, hsl(var(--primary) / 0.28), transparent 70%);
+    filter: blur(28px);
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Momentum: leading (teal accent bar inset on the left edge) */
+  .momentum-leading {
+    box-shadow:
+      inset 4px 0 8px hsl(var(--accent) / 0.35),
+      var(--shadow-extruded-sm);
+    border-radius: 1rem;
+  }
+
+  /* Momentum: trailing (calm — desaturate + soften shadow, never red) */
+  .momentum-trailing {
+    box-shadow:
+      4px 4px 8px rgba(var(--neu-dark), 0.45),
+      -4px -4px 8px rgba(var(--neu-light), 0.4);
+    filter: saturate(0.7);
+    opacity: 0.92;
+  }
+
+  /* Momentum: streak / hot — pulsing accent halo */
+  .momentum-streak {
+    position: relative;
+    isolation: isolate;
+    animation: streak-pulse 2s ease-in-out infinite;
+  }
+  .momentum-streak::after {
+    content: "";
+    position: absolute;
+    inset: -15%;
+    background: radial-gradient(closest-side, hsl(var(--primary) / 0.25), transparent 70%);
+    filter: blur(20px);
+    z-index: -1;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* Crowd-roar ambient pulse for the leading row */
+  .crowd-roar { animation: crowd-roar 3.5s ease-in-out infinite; }
+
+  /* Reaction one-shots */
+  .react-just-scored { animation: just-scored 600ms ease-out 1; }
+  .react-rank-up    { animation: rank-up 500ms ease-out 1; }
+  .react-thunk      { animation: thunk 400ms ease-out 1; }
+
+  /* Replay slow-mo — apply to a transitioning container */
+  .replay-slowmo { transition: all 700ms ease-in-out !important; }
+
+  /* Whistle: snappy focus ring (use on inputs in primetime contexts) */
+  .whistle-focus:focus-visible {
+    outline: none;
+    box-shadow:
+      var(--shadow-inset-deep),
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--primary));
+    transition: box-shadow 150ms ease-out;
+  }
+}
+
+@layer base {
+  @keyframes streak-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.01); }
+  }
+  @keyframes crowd-roar {
+    0%, 100% { box-shadow: var(--shadow-extruded-sm), inset 4px 0 8px hsl(var(--accent) / 0.35); }
+    50%      { box-shadow: var(--shadow-extruded),    inset 4px 0 10px hsl(var(--accent) / 0.5); }
+  }
+  @keyframes just-scored {
+    0%   { transform: scale(1);    box-shadow: var(--shadow-extruded); }
+    35%  { transform: scale(1.02); box-shadow: var(--shadow-extruded-hover), 0 0 40px hsl(var(--primary) / 0.45); }
+    100% { transform: scale(1);    box-shadow: var(--shadow-extruded); }
+  }
+  @keyframes rank-up {
+    0%   { box-shadow: var(--shadow-inset);          transform: translateY(2px); }
+    50%  { box-shadow: none;                          transform: translateY(0); }
+    100% { box-shadow: var(--shadow-extruded-hover); transform: translateY(-1px); }
+  }
+  @keyframes thunk {
+    0%   { box-shadow: var(--shadow-extruded); }
+    40%  { box-shadow: var(--shadow-inset-deep); transform: translateY(1px); }
+    100% { box-shadow: var(--shadow-extruded-hover); transform: translateY(0); }
+  }
 }
 
 
