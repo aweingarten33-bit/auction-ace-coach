@@ -8,7 +8,7 @@ import { Loader2, RefreshCw } from "lucide-react";
 interface Player { rank: number; name: string; position: string; team: string; note?: string; }
 interface RankList { source: string; label: string; position: string; url: string; players: Player[]; kind?: "ranking" | "sleeper"; }
 
-const CACHE_KEY = "fl_rankings_cache_v2";
+const CACHE_KEY = "fl_rankings_cache_v3";
 
 function readCache(): { lists: RankList[]; at: number } | null {
   try {
