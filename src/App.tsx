@@ -74,6 +74,7 @@ const App = () => (
 
               {/* New home page when setup is complete */}
               <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
+              <Route path="/war-room" element={<WarRoom />} />
 
               {/* Setup wizard — accessible from drawer */}
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
