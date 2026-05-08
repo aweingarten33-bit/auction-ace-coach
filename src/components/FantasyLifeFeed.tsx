@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, RefreshCw } from "lucide-react";
 
-interface Player { rank: number; name: string; position: string; team: string; }
-interface RankList { source: string; label: string; position: string; url: string; players: Player[]; }
+interface Player { rank: number; name: string; position: string; team: string; note?: string; }
+interface RankList { source: string; label: string; position: string; url: string; players: Player[]; kind?: "ranking" | "sleeper"; }
 
 const CACHE_KEY = "fl_rankings_cache_v2";
 
