@@ -160,7 +160,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
         // Stack injury + availability — take the SINGLE LARGEST discount (don't multiply).
         const combinedFactor = (k: string, llm?: { factor: number; reason: string } | null) => {
-          const inj = combinedFactor(k, llmMap.get(k));
+          const inj = injuryFactor(k);
           const avail = regexAvailability(k);
           const candidates: Array<{ factor: number; reason: string | null }> = [inj, avail];
           if (llm) candidates.push(llm);
