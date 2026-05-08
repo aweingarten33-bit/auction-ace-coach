@@ -76,6 +76,7 @@ import RedditBuzz from "@/components/RedditBuzz";
 import AffordabilityChecker from "@/components/AffordabilityChecker";
 import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
+import PricingMathExplainer from "@/components/PricingMathExplainer";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -511,6 +512,7 @@ export default function DraftRoom() {
 
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
+        <PricingMathExplainer />
         {/* Find (player or $) lives in the hamburger drawer now. */}
 
         {/* DECISION CARD — rendered INLINE (no Dialog/Portal/Overlay).
