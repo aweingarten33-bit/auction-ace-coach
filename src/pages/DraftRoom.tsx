@@ -464,6 +464,7 @@ export default function DraftRoom() {
                 size="icon"
                 className="-ml-2 h-12 w-12 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
                 aria-label="Open menu"
+                onClick={() => setDrawerInitial("menu")}
               >
                 <Menu className="h-7 w-7" strokeWidth={2.5} />
               </Button>
