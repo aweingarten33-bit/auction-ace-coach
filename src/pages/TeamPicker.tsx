@@ -23,7 +23,7 @@ export default function TeamPicker() {
   useEffect(() => {
     (async () => {
       try {
-        const { data, error: invokeErr } = await supabase.functions.invoke("espn-sync");
+        const { data, error: invokeErr } = await supabase.functions.invoke("league-teams");
         const errMsg =
           (data && typeof data === "object" && "error" in data ? (data as any).error : null) ||
           invokeErr?.message ||
