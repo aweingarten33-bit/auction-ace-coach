@@ -31,10 +31,17 @@ const STD_CURVES: Record<string, Curve> = {
   "D/ST": { top: 3, decay: 6 },
   DST:  { top: 3, decay: 6 },
 };
-// Superflex inflates QBs dramatically — top QBs become RB1-tier money.
+// Superflex shifts ~25-30% of league budget into QBs. Top QBs become RB1-tier
+// money AND every RB/WR/TE/K/DST top number drops accordingly. Don't just inflate
+// QBs — deflate everyone else, otherwise the budget doesn't add up.
 const SF_CURVES: Record<string, Curve> = {
-  ...STD_CURVES,
-  QB: { top: 45, decay: 12 },
+  QB:   { top: 45, decay: 12 },  // top QBs ~$45 (was $14 in 1QB)
+  RB:   { top: 48, decay: 9 },   // ~22% off standard
+  WR:   { top: 45, decay: 10 },  // ~22% off standard
+  TE:   { top: 18, decay: 5 },   // ~25% off standard
+  K:    { top: 1,  decay: 6 },
+  "D/ST": { top: 2, decay: 6 },
+  DST:  { top: 2, decay: 6 },
 };
 
 function curveValue(c: Curve, rank: number): number {
@@ -106,9 +113,13 @@ Deno.serve(async (req) => {
       if (!k) continue;
       let v = Number(r.projected_auction_value || 0);
       const pos = (r.position === "DEF" ? "D/ST" : r.position) || "";
-      // Sleeper's projected_auction_value is single-QB tuned. SF inflates QBs but
-      // not as much as raw 2x — top QBs cap around Berry's $45 SF top.
-      if (superflex && pos === "QB") v = Math.min(50, Math.round(v * 1.35));
+      // Sleeper's projected_auction_value is single-QB tuned. In SF, inflate QBs
+      // and DEFLATE every other position (~22% off) — total budget is fixed, so
+      // RB/WR/TE money has to come from somewhere when QBs go up.
+      if (superflex) {
+        if (pos === "QB") v = Math.min(50, Math.round(v * 1.35));
+        else if (pos === "RB" || pos === "WR" || pos === "TE") v = Math.round(v * 0.78);
+      }
       const cur = rows.get(k) ?? { name: r.player_name, key: k, position: pos, team: "" };
       cur.sleeper = Math.max(1, Math.round(v));
       if (!cur.position) cur.position = pos;
