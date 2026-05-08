@@ -491,6 +491,7 @@ export default function DraftRoom() {
               keepers={keepers}
               onPin={pinPlayer}
               onUnpin={unpinPlayer}
+              initialSection={drawerInitial}
             />
           </Sheet>
 
