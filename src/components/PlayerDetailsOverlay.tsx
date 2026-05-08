@@ -11,6 +11,7 @@ import {
 } from "@/lib/sleeper";
 import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube, DollarSign, TrendingUp, History, Target } from "lucide-react";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "@/lib/decision-engine";
 
