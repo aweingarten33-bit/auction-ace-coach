@@ -742,3 +742,16 @@
     padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
   }
 }
+
+@keyframes tool-panel-in {
+  0%   { opacity: 0; transform: translateX(40px) scale(0.96); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes icon-tap-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+.icon-tap-pulse { animation: icon-tap-pulse 0.32s cubic-bezier(0.34, 1.4, 0.64, 1); }
