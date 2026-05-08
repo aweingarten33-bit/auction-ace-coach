@@ -193,27 +193,27 @@
                          inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.45);
 
     /* Legacy aliases re-mapped for dark suit */
-    --bone:              40 35% 88%;
-    --paper:             220 15% 62%;
-    --void:              222 40% 11%;
-    --ink:               222 40% 11%;
-    --charcoal:          222 40% 11%;
-    --gunmetal:          222 40% 11%;
-    --blood:             350 55% 52%;
-    --signal-red:        350 55% 52%;
-    --dirty-gold:        36 60% 58%;
+    --bone:              43 34% 88%;
+    --paper:             219 18% 72%;
+    --void:              223 38% 13%;
+    --ink:               223 38% 13%;
+    --charcoal:          223 34% 16%;
+    --gunmetal:          223 31% 19%;
+    --blood:             350 52% 45%;
+    --signal-red:        350 52% 45%;
+    --dirty-gold:        36 58% 56%;
     --warning-yellow:    36 80% 60%;
-    --parchment:         40 35% 88%;
-    --ink-faded:         220 15% 62%;
-    --steel:             220 15% 62%;
+    --parchment:         43 34% 88%;
+    --ink-faded:         219 18% 72%;
+    --steel:             219 18% 72%;
 
-    --sidebar-background: 222 40% 11%;
-    --sidebar-foreground: 40 35% 88%;
-    --sidebar-primary: 36 60% 58%;
-    --sidebar-primary-foreground: 222 40% 8%;
-    --sidebar-accent: 222 40% 11%;
-    --sidebar-accent-foreground: 40 35% 88%;
-    --sidebar-ring: 36 60% 58%;
+    --sidebar-background: 223 38% 13%;
+    --sidebar-foreground: 43 34% 88%;
+    --sidebar-primary: 36 58% 56%;
+    --sidebar-primary-foreground: 223 42% 9%;
+    --sidebar-accent: 223 34% 16%;
+    --sidebar-accent-foreground: 43 34% 88%;
+    --sidebar-ring: 36 58% 56%;
   }
 
   * { border-color: transparent; }
