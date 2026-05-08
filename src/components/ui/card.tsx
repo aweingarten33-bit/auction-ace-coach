@@ -3,22 +3,19 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * FRANK MILLER NEWSPRINT BRUTALISM — Card.
- * A dossier. Hard corners, visible borders, ink-slab shadow.
- * Top hairline of bone — turns gold on hover. No floating, no rounding.
+ * Neumorphism Card — soft pillow molded from the page surface.
+ * Hyper-rounded. Dual shadows. Lifts on hover.
  */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "relative bg-[hsl(var(--card))] text-foreground rounded-none",
-        "border border-[hsl(var(--border))] border-t-[3px] border-t-[hsl(var(--bone))]",
-        "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
-        "transition-[transform,box-shadow,border-color] duration-200 ease-[cubic-bezier(0.2,0,0.1,1)]",
-        "hover:-translate-x-[2px] hover:-translate-y-[2px]",
-        "hover:shadow-[10px_10px_0_0_hsl(0_0%_0%)]",
-        "hover:border-t-[hsl(var(--dirty-gold))]",
+        "relative bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))]",
+        "rounded-[2rem] border-0",
+        "shadow-[var(--neu-extruded)]",
+        "transition-[transform,box-shadow] duration-300 ease-out",
+        "hover:-translate-y-[2px] hover:shadow-[var(--neu-extruded-hover)]",
         className,
       )}
       {...props}
@@ -31,14 +28,7 @@ Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        "flex flex-col space-y-1.5 p-5 pb-4 border-b border-[hsl(var(--border))]",
-        className,
-      )}
-      {...props}
-    />
+    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
   ),
 );
 CardHeader.displayName = "CardHeader";
@@ -48,8 +38,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
     <h3
       ref={ref}
       className={cn(
-        "font-headline text-2xl lg:text-3xl uppercase tracking-wide text-[hsl(var(--bone))] leading-[0.92]",
-        "[text-shadow:2px_2px_0_hsl(0_0%_0%)]",
+        "font-display text-2xl lg:text-3xl tracking-tight text-[hsl(var(--foreground))] leading-tight font-bold",
         className,
       )}
       {...props}
@@ -62,7 +51,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn("text-sm font-editorial italic text-[hsl(var(--paper))] leading-snug", className)}
+      className={cn("text-sm text-[hsl(var(--muted-foreground))] leading-relaxed", className)}
       {...props}
     />
   ),
@@ -70,13 +59,13 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
 CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-5", className)} {...props} />,
+  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />,
 );
 CardContent.displayName = "CardContent";
 
 const CardFooter = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex items-center p-5 pt-0 border-t border-[hsl(var(--border))]", className)} {...props} />
+    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
   ),
 );
 CardFooter.displayName = "CardFooter";

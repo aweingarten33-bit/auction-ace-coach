@@ -5,71 +5,41 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * FRANK MILLER NEWSPRINT BRUTALISM — Button.
- * Industrial. Authoritative. Sharp corners, hard borders, mono labels.
- * Hover inverts ink. Active presses into the page.
+ * Neumorphism (Soft UI) — Button.
+ * Same-surface pillows. Dual opposing shadows. Soft press on active.
+ * Suit palette: navy primary, ochre gold, maroon destructive.
  */
 const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 whitespace-nowrap select-none",
-    "font-mono uppercase tracking-[0.14em] font-semibold",
-    "rounded-none border-2",
-    "transition-[transform,background-color,color,border-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0.1,1)]",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--bone))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--background))]",
-    "disabled:pointer-events-none disabled:opacity-40",
-    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[2.25]",
-    "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none",
+    "font-medium tracking-tight",
+    "rounded-2xl border-0",
+    "transition-[transform,background-color,color,box-shadow] duration-300 ease-out",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--background))]",
+    "disabled:pointer-events-none disabled:opacity-50",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+    "shadow-[var(--neu-extruded)]",
+    "hover:-translate-y-[1px] hover:shadow-[var(--neu-extruded-hover)]",
+    "active:translate-y-[0.5px] active:shadow-[var(--neu-inset-sm)]",
   ].join(" "),
   {
     variants: {
       variant: {
-        // Primary — bone on void. The headline action.
-        default: [
-          "bg-[hsl(var(--bone))] text-[hsl(var(--void))] border-[hsl(var(--bone))]",
-          "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
-          "hover:bg-[hsl(var(--void))] hover:text-[hsl(var(--bone))]",
-        ].join(" "),
-        // Secondary — ghost steel
-        secondary: [
-          "bg-transparent text-[hsl(var(--bone))] border-[hsl(var(--bone))]",
-          "shadow-[4px_4px_0_0_hsl(0_0%_0%)]",
-          "hover:bg-[hsl(var(--bone))] hover:text-[hsl(var(--void))]",
-        ].join(" "),
-        // Outline — gunmetal frame
-        outline: [
-          "bg-[hsl(var(--charcoal))] text-[hsl(var(--bone))] border-[hsl(var(--border))]",
-          "shadow-[4px_4px_0_0_hsl(0_0%_0%)]",
-          "hover:border-[hsl(var(--bone))]",
-        ].join(" "),
-        // Destructive — blood stamp
-        destructive: [
-          "bg-[hsl(var(--blood))] text-[hsl(var(--bone))] border-[hsl(var(--blood))]",
-          "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
-          "hover:bg-[hsl(var(--signal-red))] hover:border-[hsl(var(--signal-red))]",
-        ].join(" "),
-        // Gold — earned, dirty
-        gold: [
-          "bg-[hsl(var(--dirty-gold))] text-[hsl(var(--void))] border-[hsl(var(--dirty-gold))]",
-          "shadow-[6px_6px_0_0_hsl(0_0%_0%)]",
-          "hover:bg-[hsl(var(--warning-yellow))] hover:border-[hsl(var(--warning-yellow))]",
-        ].join(" "),
-        // Ghost — invisible until touched
-        ghost: [
-          "bg-transparent text-[hsl(var(--bone))] border-transparent",
-          "hover:bg-[hsl(var(--charcoal))] hover:border-[hsl(var(--border))]",
-        ].join(" "),
-        // Link — newsprint underline
-        link: [
-          "bg-transparent text-[hsl(var(--bone))] border-transparent shadow-none",
-          "underline underline-offset-4 decoration-2 decoration-[hsl(var(--dirty-gold))]",
-          "hover:decoration-[hsl(var(--blood))] active:translate-x-0 active:translate-y-0",
-        ].join(" "),
+        default: "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]",
+        secondary: "bg-[hsl(var(--surface))] text-[hsl(var(--foreground))]",
+        outline: "bg-[hsl(var(--surface))] text-[hsl(var(--foreground))]",
+        destructive: "bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))]",
+        gold: "bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]",
+        ghost:
+          "bg-transparent shadow-none text-[hsl(var(--foreground))] hover:bg-[hsl(var(--surface))] hover:shadow-[var(--neu-extruded-sm)]",
+        link:
+          "bg-transparent shadow-none text-[hsl(var(--primary))] underline underline-offset-4 hover:translate-y-0 active:translate-y-0",
       },
       size: {
-        default: "h-12 px-6 text-xs",
-        sm:      "h-10 px-4 text-[0.65rem]",
-        lg:      "h-14 px-9 text-sm",
-        icon:    "h-12 w-12",
+        default: "h-12 px-6 text-sm",
+        sm: "h-10 px-4 text-xs rounded-xl",
+        lg: "h-14 px-9 text-base rounded-2xl",
+        icon: "h-12 w-12 rounded-2xl",
       },
     },
     defaultVariants: { variant: "default", size: "default" },
