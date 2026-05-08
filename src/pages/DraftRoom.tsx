@@ -104,6 +104,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [drawerInitial, setDrawerInitial] = useState<"menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife">("menu");
   const [aiOpen, setAiOpen] = useState<boolean>(false);
   
   const [query, setQuery] = useState<string>("");
@@ -418,7 +419,7 @@ export default function DraftRoom() {
     <div className="min-h-screen bg-background text-foreground">
       {/* ── LEAGUE TITLE ─────────────────────────────────────────── */}
       <div
-        className="relative px-5 pt-10 pb-6 text-left"
+        className="relative px-5 pt-10 pb-4 text-left"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
       >
         <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
@@ -427,6 +428,29 @@ export default function DraftRoom() {
         <p className="mt-2 text-sm text-muted-foreground">
           Auction Draft Assistant
         </p>
+      </div>
+
+      {/* ── DICE-style icon rail — quick access to drawer sections ── */}
+      <div className="relative px-5 pb-4">
+        <div className="-mx-5 px-5 flex gap-7 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          {[
+            { id: "lookup" as const,     icon: Search,      label: "Find" },
+            { id: "top100" as const,     icon: ListOrdered, label: "Top 100" },
+            { id: "afford" as const,     icon: Check,       label: "Afford" },
+            { id: "market" as const,     icon: TrendingUp,  label: "Market" },
+            { id: "fantasylife" as const, icon: ExternalLink, label: "News" },
+          ].map(({ id, icon: Icon, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => { setDrawerInitial(id); setDrawerOpen(true); }}
+              className="flex flex-col items-center gap-2 shrink-0 text-foreground"
+            >
+              <Icon strokeWidth={1.25} className="size-9" />
+              <span className="text-[13px] font-normal whitespace-nowrap">{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
       <header
@@ -467,6 +491,7 @@ export default function DraftRoom() {
               keepers={keepers}
               onPin={pinPlayer}
               onUnpin={unpinPlayer}
+              initialSection={drawerInitial}
             />
           </Sheet>
 
@@ -700,6 +725,7 @@ interface DrawerProps {
   keepers: { player: string; cost?: number }[];
   onPin: (name: string) => void;
   onUnpin: (name: string) => void;
+  initialSection?: "menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife";
 }
 
 function DrawerContents({
@@ -722,10 +748,12 @@ function DrawerContents({
   keepers,
   onPin,
   onUnpin,
+  initialSection = "menu",
 }: DrawerProps) {
   const [section, setSection] = useState<
     "menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife"
-  >("menu");
+  >(initialSection);
+  useEffect(() => { setSection(initialSection); }, [initialSection]);
 
   void activeName;
   void onGoToClassicDraft;
@@ -771,20 +799,19 @@ function DrawerContents({
               slotsLeft={budget.slotsLeft}
             />
           </div>
-          <div className="space-y-1 p-3">
+          <div className="grid grid-cols-2 gap-3 p-4">
             {sections.map((s) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setSection(s.id)}
-                className="flex w-full items-center gap-3 rounded-md border border-border/40 bg-secondary/20 px-3 py-2.5 text-left hover:bg-secondary/40"
+                className="flex aspect-square flex-col justify-between rounded-2xl bg-[#141414] p-4 text-left active:scale-[0.98] transition"
               >
-                <s.icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium">{s.label}</p>
-                  <p className="text-[11px] text-muted-foreground">{s.hint}</p>
+                <s.icon className="h-7 w-7 text-primary" strokeWidth={1.5} />
+                <div>
+                  <p className="text-[15px] font-semibold leading-tight text-foreground">{s.label}</p>
+                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{s.hint}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             ))}
           </div>
