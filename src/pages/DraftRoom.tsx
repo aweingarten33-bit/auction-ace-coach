@@ -703,6 +703,7 @@ interface DrawerProps {
   pulseMultiplier: number;
   events: ReturnType<typeof useDraftStore.getState>["events"];
   prices: PriceEstimate[];
+  anchorMap: Record<string, import("@/lib/decision-engine").AnchorEntry>;
   settings: ReturnType<typeof useDraftStore.getState>["settings"];
   activeName: string;
   onSignOut: () => void;
