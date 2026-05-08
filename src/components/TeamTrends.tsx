@@ -8,6 +8,9 @@ import { POS_COLORS } from "@/lib/positions";
 interface Trends {
   avgByPos: Record<string, number>;
   avgCountByPos?: Record<string, number>;
+  avgPerPlayerByPos?: Record<string, number>;
+  medianPerPlayerByPos?: Record<string, number>;
+  seasonSpreadByPos?: Record<string, { season: number; spend: number }[]>;
   avgTotal: number;
   avgTop3Pct: number;
   avgTopBid: number;
