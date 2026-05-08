@@ -418,7 +418,7 @@ export default function DraftRoom() {
     <div className="min-h-screen bg-background text-foreground">
       {/* ── LEAGUE TITLE ─────────────────────────────────────────── */}
       <div
-        className="relative px-5 pt-10 pb-6 text-left"
+        className="relative px-5 pt-10 pb-4 text-left"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
       >
         <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
@@ -427,6 +427,29 @@ export default function DraftRoom() {
         <p className="mt-2 text-sm text-muted-foreground">
           Auction Draft Assistant
         </p>
+      </div>
+
+      {/* ── DICE-style icon rail — quick access to drawer sections ── */}
+      <div className="relative px-5 pb-4">
+        <div className="-mx-5 px-5 flex gap-7 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          {[
+            { id: "lookup" as const,     icon: Search,      label: "Find" },
+            { id: "top100" as const,     icon: ListOrdered, label: "Top 100" },
+            { id: "afford" as const,     icon: Check,       label: "Afford" },
+            { id: "market" as const,     icon: TrendingUp,  label: "Market" },
+            { id: "fantasylife" as const, icon: ExternalLink, label: "News" },
+          ].map(({ id, icon: Icon, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => { setDrawerInitial(id); setDrawerOpen(true); }}
+              className="flex flex-col items-center gap-2 shrink-0 text-foreground"
+            >
+              <Icon strokeWidth={1.25} className="size-9" />
+              <span className="text-[13px] font-normal whitespace-nowrap">{label}</span>
+            </button>
+          ))}
+        </div>
       </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
       <header
