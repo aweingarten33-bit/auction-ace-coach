@@ -127,7 +127,8 @@ export default function DraftRoom() {
         .select("raw")
         .order("created_at", { ascending: false })
         .limit(25);
-      const found = (data ?? []).find((r: { raw: any }) => r?.raw?.league?.name)?.raw?.league?.name as
+      const rows = (data ?? []) as Array<{ raw: any }>;
+      const found = rows.find((r) => r?.raw?.league?.name)?.raw?.league?.name as
         | string
         | undefined;
       if (found) {
