@@ -189,7 +189,26 @@ export default function DraftRoom() {
             {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Draft research dossier
+            {selectedTeam ? (
+              <>
+                Personalized for{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/team")}
+                  className="font-semibold text-foreground underline-offset-2 hover:underline"
+                >
+                  {selectedTeam.name}
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={() => navigate("/team")}
+                className="underline-offset-2 hover:underline"
+              >
+                Pick your team for personalized recommendations →
+              </button>
+            )}
           </p>
         </div>
 
