@@ -502,7 +502,7 @@ function firstName(full: string): string {
 }
 
 // ─── derived copy ────────────────────────────────────────
-function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardInsights>) {
+function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardInsights>, posRank?: number | null) {
   const pos = d.position ?? "player";
   const anchor = d.anchorPrice || d.goUpTo || d.currentPrice || 1;
 
@@ -521,7 +521,14 @@ function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardIns
     recBig === "BAIT" ? C.blue  :
     recBig === "HOLD" ? C.amber : C.red;
 
-  const tier = anchor >= 45 ? "1" : anchor >= 28 ? "2" : anchor >= 15 ? "3" : "4";
+  // Tier from real positional rank when available (RB1 → T1), else fall back to anchor $.
+  const tier = (() => {
+    if (posRank && pos && pos !== "player") {
+      const t = tierForPosRank(pos, posRank);
+      return String(t);
+    }
+    return anchor >= 45 ? "1" : anchor >= 28 ? "2" : anchor >= 15 ? "3" : "4";
+  })();
 
   const vitals = [
     { label: "Tier",   value: `T${tier}` },
