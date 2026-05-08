@@ -9,14 +9,21 @@ import {
   byeWeekForTeam,
   SleeperPlayer,
 } from "@/lib/sleeper";
-import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube } from "lucide-react";
+import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube, DollarSign, TrendingUp, History, Target } from "lucide-react";
 import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import { supabase } from "@/integrations/supabase/client";
+import type { AnchorEntry } from "@/lib/decision-engine";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   name: string;
   position?: Position;
+  // Auction research data
+  sheetPrice?: number;        // user's price sheet
+  anchor?: AnchorEntry;       // blended league/ESPN anchor
+  posRank?: number;           // rank within position by price
+  totalAtPos?: number;        // how many ranked players at this pos
   // AI-derived enrichment we already have
   matchPct?: number;
   maxBid?: number;
