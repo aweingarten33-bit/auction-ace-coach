@@ -12,10 +12,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
-        sans:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
-        body:    ['"Space Grotesk"', "ui-sans-serif", "system-ui", "sans-serif"],
-        mono:    ['"Space Grotesk"', "ui-monospace", "monospace"],
+        display: ['"Playfair Display"', '"Times New Roman"', "serif"],
+        serif:   ['"Playfair Display"', '"Times New Roman"', "serif"],
+        sans:    ['"Inter"', '"Helvetica Neue"', "sans-serif"],
+        body:    ['"Lora"', "Georgia", "serif"],
+        mono:    ['"JetBrains Mono"', '"Courier New"', "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

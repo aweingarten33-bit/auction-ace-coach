@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Neo-brutalist Input — thick-bordered paper slot. Turns yellow on focus.
+ * Newsprint Input — bottom-bordered form slot. Monospace text. Sharp corners.
  */
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
@@ -11,11 +11,11 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
       <input
         type={type}
         className={cn(
-          "flex h-14 w-full rounded-none bg-card px-4 py-2 text-base font-bold text-foreground",
-          "border-4 border-foreground shadow-[4px_4px_0_0_hsl(var(--foreground))]",
-          "transition-all duration-100 ease-linear",
-          "placeholder:text-foreground/40 placeholder:font-bold",
-          "focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-[hsl(var(--secondary))] focus-visible:shadow-[6px_6px_0_0_hsl(var(--foreground))]",
+          "flex h-11 w-full rounded-none bg-transparent px-3 py-2 text-sm font-mono text-foreground",
+          "border-0 border-b-2 border-foreground",
+          "transition-colors duration-150 ease-out",
+          "placeholder:text-foreground/45 placeholder:italic placeholder:font-body",
+          "focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-[hsl(50_8%_94%)]",
           "disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}
