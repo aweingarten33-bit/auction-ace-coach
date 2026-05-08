@@ -1,67 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Special+Elite&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   NEO-BRUTALISM
-   Cream paper. Pure black ink. Hot accents. Hard offset shadows. No blur.
+   GOTHAM INK — Mazzucchelli graphic-novel palette
+   Flat dirty color. Sodium-lamp yellow. Dried-blood red. Heavy black ink.
+   Crosshatch grain. Cream-paper bleed. No gradients pretending to glow.
    ===================================================================== */
 
 @layer base {
   :root {
-    --background: 220 25% 8%;            /* deep blue-black night */
-    --foreground: 40 30% 82%;            /* dirty newsprint cream */
+    --background: 200 18% 14%;           /* dirty teal-slate, dusk */
+    --foreground: 38 35% 84%;            /* aged newsprint cream */
 
-    --card: 220 22% 11%;
-    --card-foreground: 40 30% 82%;
+    --card: 205 20% 18%;                 /* flat panel slate */
+    --card-foreground: 38 35% 84%;
 
-    --popover: 220 22% 11%;
-    --popover-foreground: 40 30% 82%;
+    --popover: 205 22% 16%;
+    --popover-foreground: 38 35% 84%;
 
-    --primary: 42 85% 52%;               /* muted Gotham amber */
-    --primary-foreground: 220 30% 6%;
-    --primary-glow: 42 90% 58%;
+    --primary: 44 90% 55%;               /* sodium-lamp yellow */
+    --primary-foreground: 205 30% 10%;
+    --primary-glow: 48 95% 62%;
 
-    --secondary: 40 25% 78%;             /* aged paper block */
-    --secondary-foreground: 220 30% 6%;
+    --secondary: 38 35% 84%;             /* cream paper block */
+    --secondary-foreground: 205 30% 10%;
 
-    --muted: 220 18% 16%;                /* charcoal alley */
-    --muted-foreground: 40 20% 65%;
+    --muted: 205 15% 22%;                /* alley shadow */
+    --muted-foreground: 38 18% 68%;
 
-    --accent: 42 85% 52%;
-    --accent-foreground: 220 30% 6%;
+    --accent: 358 65% 44%;               /* dried-blood crimson */
+    --accent-foreground: 38 35% 88%;
 
-    --destructive: 358 70% 42%;          /* dried-blood red */
-    --destructive-foreground: 40 30% 82%;
+    --destructive: 358 70% 42%;
+    --destructive-foreground: 38 35% 88%;
 
-    --warning: 42 85% 52%;
-    --warning-foreground: 220 30% 6%;
+    --warning: 44 90% 55%;
+    --warning-foreground: 205 30% 10%;
 
-    --success: 40 25% 78%;
-    --success-foreground: 220 30% 6%;
+    --success: 38 35% 84%;
+    --success-foreground: 205 30% 10%;
 
-    --border: 40 30% 82%;
-    --input: 220 22% 11%;
-    --ring: 42 85% 52%;
+    --border: 205 30% 6%;                /* heavy ink line */
+    --input: 205 22% 16%;
+    --ring: 44 90% 55%;
 
     --radius: 0px;
 
-    /* Hard offset ink shadows */
-    --shadow-card:      4px 4px 0 0 hsl(var(--foreground));
-    --shadow-floating:  8px 8px 0 0 hsl(var(--foreground));
-    --shadow-pressed:   0 0 0 0 hsl(var(--foreground));
-    --shadow-recessed:  inset 0 0 0 4px hsl(var(--foreground));
-    --shadow-sharp:     4px 4px 0 0 hsl(var(--foreground));
-    --shadow-glow:      6px 6px 0 0 hsl(var(--foreground));
-    --shadow-primary:   6px 6px 0 0 hsl(var(--foreground));
-    --shadow-led-green: 4px 4px 0 0 hsl(var(--foreground));
+    /* Heavy ink shadows — flat black, no blur, like inked panel borders */
+    --ink: 205 35% 4%;
+    --shadow-card:      4px 4px 0 0 hsl(var(--ink));
+    --shadow-floating:  8px 8px 0 0 hsl(var(--ink));
+    --shadow-pressed:   0 0 0 0 hsl(var(--ink));
+    --shadow-recessed:  inset 0 0 0 4px hsl(var(--ink));
+    --shadow-sharp:     4px 4px 0 0 hsl(var(--ink));
+    --shadow-glow:      0 0 0 3px hsl(var(--primary) / 0.6), 6px 6px 0 0 hsl(var(--ink));
+    --shadow-primary:   6px 6px 0 0 hsl(var(--ink));
+    --shadow-led-green: 4px 4px 0 0 hsl(var(--ink));
 
-    --shadow-brut-sm:   4px 4px 0 0 hsl(var(--foreground));
-    --shadow-brut:      8px 8px 0 0 hsl(var(--foreground));
-    --shadow-brut-lg:   12px 12px 0 0 hsl(var(--foreground));
-    --shadow-brut-xl:   16px 16px 0 0 hsl(var(--foreground));
+    --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
+    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
+    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
+    --shadow-brut-xl:   14px 14px 0 0 hsl(var(--ink));
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 0%;
@@ -91,23 +93,41 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1.2px),
-      radial-gradient(hsl(var(--primary) / 0.04) 1px, transparent 1.4px),
-      linear-gradient(180deg, hsl(220 30% 4%) 0%, hsl(var(--background)) 40%, hsl(220 25% 6%) 100%);
-    background-size: 18px 18px, 32px 32px, 100% 100%;
-    background-position: 0 0, 9px 9px, 0 0;
+      /* fine ink halftone */
+      radial-gradient(hsl(var(--ink) / 0.55) 0.8px, transparent 1.1px),
+      /* sodium-lamp warm wash, top-right */
+      radial-gradient(ellipse 60% 40% at 85% 0%, hsl(var(--primary) / 0.10), transparent 70%),
+      /* alley shadow gutter, bottom-left */
+      radial-gradient(ellipse 70% 50% at 0% 100%, hsl(var(--ink) / 0.55), transparent 65%),
+      /* base flat color */
+      linear-gradient(180deg, hsl(200 20% 12%) 0%, hsl(var(--background)) 50%, hsl(205 22% 10%) 100%);
+    background-size: 6px 6px, 100% 100%, 100% 100%, 100% 100%;
+    background-attachment: fixed;
+  }
+
+  /* Crosshatch ink overlay — diagonal lines, very faint */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+      repeating-linear-gradient( 45deg, hsl(var(--ink) / 0.10) 0 1px, transparent 1px 6px),
+      repeating-linear-gradient(-45deg, hsl(var(--ink) / 0.06) 0 1px, transparent 1px 8px);
+    mix-blend-mode: multiply;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: "Special Elite", "Space Grotesk", sans-serif;
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.01em;
     text-transform: uppercase;
     color: hsl(var(--foreground));
     line-height: 0.95;
+    text-shadow: 2px 2px 0 hsl(var(--ink));
   }
 
-  ::selection { background: hsl(var(--secondary)); color: hsl(var(--foreground)); }
+  ::selection { background: hsl(var(--primary)); color: hsl(var(--ink)); }
 }
 
 @layer utilities {
