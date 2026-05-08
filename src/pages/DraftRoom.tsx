@@ -80,6 +80,7 @@ import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
 import PricingMathExplainer from "@/components/PricingMathExplainer";
 import FootballShieldIcon from "@/components/FootballShieldIcon";
+import superFootballLogo from "@/assets/logo-super-football.png";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -409,7 +410,13 @@ export default function DraftRoom() {
                 className="-ml-2 h-12 w-12 text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
                 aria-label="Open menu"
               >
-                <FootballShieldIcon className="h-7 w-7" />
+                <img
+                  src={superFootballLogo}
+                  alt="Menu"
+                  className={`h-9 w-9 object-contain transition-transform duration-500 ease-[cubic-bezier(0.6,-0.28,0.735,0.045)] drop-shadow-[0_0_8px_rgba(255,200,0,0.6)] ${
+                    drawerOpen ? "rotate-[120deg] scale-110" : "rotate-0"
+                  }`}
+                />
               </Button>
             </SheetTrigger>
             <DrawerContents
