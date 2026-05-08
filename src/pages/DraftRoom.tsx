@@ -100,7 +100,7 @@ export default function DraftRoom() {
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [aiOpen, setAiOpen] = useState<boolean>(false);
-  const [top100Open, setTop100Open] = useState<boolean>(false);
+  
   const [query, setQuery] = useState<string>("");
   const [activeName, setActiveName] = useState<string>("");
   const [sleeper, setSleeper] = useState<SleeperPlayer[]>([]);
@@ -445,38 +445,7 @@ export default function DraftRoom() {
             />
           </div>
 
-          {/* TOP 100 — pull-tab anchored to the LEFT edge, under the hamburger. */}
-          <Sheet open={top100Open} onOpenChange={setTop100Open}>
-            <SheetTrigger asChild>
-              <button
-                aria-label="Pull out Top 100"
-                className="fixed left-0 top-24 z-40 flex items-center gap-1 rounded-r-lg border border-l-0 border-primary/40 bg-primary/90 py-3 pl-1.5 pr-2 text-primary-foreground shadow-lg backdrop-blur transition-transform hover:translate-x-1 active:translate-x-2"
-                style={{ writingMode: "vertical-rl" }}
-              >
-                <ListOrdered className="h-4 w-4 -rotate-90" />
-                <span className="text-[11px] font-semibold tracking-wide uppercase">Top 100</span>
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
-              <SheetHeader className="border-b border-border/60 px-4 py-3">
-                <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <ListOrdered className="h-4 w-4 text-primary" />
-                  Top 100 · math-backed $
-                </SheetTitle>
-              </SheetHeader>
-              <div className="flex-1 overflow-y-auto p-3">
-                <Top100List
-                  prices={prices}
-                  anchorMap={anchorMap}
-                  events={events}
-                  onPick={(name) => {
-                    setTop100Open(false);
-                    setTimeout(() => lockToPlayer(name), 220);
-                  }}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
+          {/* Top 100 lives inside the hamburger menu now. */}
         </div>
 
         {/* Live nomination strip — only when something's actively up for bid */}
@@ -637,19 +606,6 @@ export default function DraftRoom() {
             </SheetTitle>
           </SheetHeader>
           <AiQuickPanel
-            targets={targets}
-            targetsLoading={targetsMutation.isPending}
-            onRefreshTargets={() => targetsMutation.mutate()}
-            onPickTarget={(name) => {
-              // Two animations were colliding: the AI Sheet was still
-              // closing (350ms) when the Decision Dialog tried to open.
-              // On mobile that left you staring at the dimmed overlay
-              // with no card. We close the Sheet first, wait for its
-              // animation to finish, THEN lock the player in (which
-              // triggers the Dialog).
-              setAiOpen(false);
-              setTimeout(() => lockToPlayer(name), 220);
-            }}
             coachContext={() => ({
               settings: {
                 totalBudget: settings.totalBudget,
@@ -743,7 +699,7 @@ function DrawerContents({
   onUnpin,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "afford" | "market" | "reddit"
+    "menu" | "lookup" | "top100" | "afford" | "market" | "reddit"
   >("menu");
 
   void activeName;
@@ -752,6 +708,7 @@ function DrawerContents({
 
   const sections = [
     { id: "lookup" as const, label: "Find (player or $)", icon: Search, hint: "Type a player name or dollar amount." },
+    { id: "top100" as const, label: "Top 100 · math-backed $", icon: ListOrdered, hint: "Best-value board, blended anchors." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
     { id: "reddit" as const, label: "Reddit buzz", icon: MessageSquare, hint: "Live r/fantasyfootball threads." },
@@ -846,6 +803,20 @@ function DrawerContents({
             anchorMap={anchorMap}
             events={events}
             maxBid={budget.maxBid}
+            onPick={(name) => {
+              onLockPlayer(name);
+              onClose();
+            }}
+          />
+        </div>
+      )}
+
+      {section === "top100" && (
+        <div className="flex-1 overflow-y-auto p-3">
+          <Top100List
+            prices={prices}
+            anchorMap={anchorMap}
+            events={events}
             onPick={(name) => {
               onLockPlayer(name);
               onClose();
