@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=Delius+Swash+Caps&family=Permanent+Marker&family=Caveat:wght@500;700&family=Architects+Daughter&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -21,42 +21,42 @@
        Maroon = trunks/cape lining. */
     --background:        220 24% 89%;
     --background-alt:    220 24% 89%;
-    --foreground:        222 44% 18%;        /* suit midnight navy */
+    --foreground:        222 55% 16%;        /* suit midnight navy */
     --muted-bg:          220 24% 89%;
 
     --card:              220 24% 89%;
-    --card-foreground:   222 44% 18%;
+    --card-foreground:   222 55% 16%;
 
     --popover:           220 24% 89%;
-    --popover-foreground:222 44% 18%;
+    --popover-foreground:222 55% 16%;
 
-    /* ---------- ACCENTS ---------- */
-    --primary:           222 44% 26%;        /* suit navy */
-    --primary-foreground: 40 35% 92%;
-    --primary-glow:      222 38% 38%;
+    /* ---------- ACCENTS — Superman: navy / gold-ochre / maroon ---------- */
+    --primary:           222 60% 24%;        /* shield navy */
+    --primary-foreground: 42 90% 92%;
+    --primary-glow:      222 55% 38%;
 
     --secondary:         220 24% 89%;
-    --secondary-foreground: 222 44% 18%;
+    --secondary-foreground: 222 55% 16%;
 
-    --accent:            36 50% 42%;         /* shield ochre / belt buckle */
-    --accent-foreground: 40 35% 92%;
-    --accent-secondary:  350 48% 30%;        /* maroon — trunks / cape lining */
+    --accent:            38 78% 46%;         /* shield gold / belt buckle */
+    --accent-foreground: 222 60% 12%;
+    --accent-secondary:  354 58% 30%;        /* maroon — trunks / cape lining */
 
     --muted:             220 24% 89%;
-    --muted-foreground:  220 14% 38%;
+    --muted-foreground:  220 18% 34%;
 
-    --destructive:       350 48% 30%;        /* maroon */
-    --destructive-foreground: 40 35% 92%;
+    --destructive:       354 65% 36%;        /* maroon-red */
+    --destructive-foreground: 42 90% 92%;
 
-    --warning:           36 65% 48%;
-    --warning-foreground: 222 44% 12%;
+    --warning:           38 88% 50%;
+    --warning-foreground: 222 60% 12%;
 
-    --success:           36 50% 42%;
-    --success-foreground: 40 35% 92%;
+    --success:           38 78% 46%;
+    --success-foreground: 222 60% 12%;
 
     --border:            transparent;
     --input:             220 24% 89%;
-    --ring:              222 44% 26%;
+    --ring:              38 78% 46%;
 
     --radius: 1rem;
 
