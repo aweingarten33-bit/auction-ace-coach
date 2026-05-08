@@ -231,12 +231,33 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 400;
-    line-height: 1.6;
+    font-family: "Caveat", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    line-height: 1.5;
     background-color: hsl(var(--background));
-    background-image: none;
+    background-image:
+      /* halftone dot screen */
+      radial-gradient(rgba(20,28,52,0.16) 1px, transparent 1.4px),
+      /* gold spray haze top-left */
+      radial-gradient(60% 45% at 8% 6%,  hsl(38 78% 46% / 0.20) 0%, transparent 70%),
+      /* maroon spray haze bottom-right */
+      radial-gradient(55% 50% at 96% 96%, hsl(354 65% 36% / 0.22) 0%, transparent 70%),
+      /* navy bleed */
+      radial-gradient(80% 60% at 50% 50%, hsl(222 60% 24% / 0.10) 0%, transparent 75%);
+    background-size: 6px 6px, auto, auto, auto;
+    background-attachment: fixed;
   }
+  body::before {
+    content: "";
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      /* diagonal ink hatch */
+      repeating-linear-gradient(135deg,
+        rgba(20,28,52,0.05) 0 1px,
+        transparent 1px 7px);
+    mix-blend-mode: multiply;
+  }
+  #root { position: relative; z-index: 1; }
 
   /* ── FRANK MILLER SWIRL — gold + cape-blood smeared over ink ── */
   .dark body {
@@ -303,15 +324,15 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Plus Jakarta Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    font-family: "Permanent Marker", "Delius Swash Caps", "Plus Jakarta Sans", ui-sans-serif, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.005em;
+    line-height: 1.05;
     color: hsl(var(--foreground));
     text-transform: none;
-    text-shadow: none;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.08);
   }
-  h1 { font-weight: 800; letter-spacing: -0.03em; }
+  h1 { letter-spacing: -0.01em; }
 
   ::selection { background: hsl(var(--primary) / 0.25); color: hsl(var(--foreground)); }
 }
@@ -324,36 +345,36 @@
   .font-display,
   .font-headline,
   .font-heading {
-    font-family: "Plus Jakarta Sans", "DM Sans", sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+    font-family: "Permanent Marker", "Delius Swash Caps", "Plus Jakarta Sans", sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.005em;
     text-transform: none;
     line-height: 1.05;
   }
   .font-condensed {
-    font-family: "Plus Jakarta Sans", sans-serif;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-family: "Permanent Marker", "Plus Jakarta Sans", sans-serif;
+    font-weight: 400;
+    letter-spacing: 0;
     text-transform: none;
   }
   .font-editorial,
   .font-serif,
   .font-body {
-    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 400;
+    font-family: "Caveat", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
     letter-spacing: 0;
   }
   .font-mono,
   .font-data {
-    font-family: ui-monospace, "JetBrains Mono", "IBM Plex Mono", monospace;
+    font-family: "Architects Daughter", ui-monospace, "JetBrains Mono", monospace;
     font-feature-settings: "tnum";
     letter-spacing: 0;
     text-transform: none;
   }
 
-  .headline-mega { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: clamp(3rem, 9vw, 6rem); line-height: 1; letter-spacing: -0.035em; text-transform: none; }
-  .headline-xl   { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.03em; text-transform: none; }
-  .headline-lg   { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: clamp(1.75rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; text-transform: none; }
+  .headline-mega { font-family: "Permanent Marker", sans-serif; font-weight: 400; font-size: clamp(3rem, 9vw, 6rem); line-height: 1; letter-spacing: -0.005em; text-transform: none; text-shadow: 3px 3px 0 rgba(0,0,0,0.10); }
+  .headline-xl   { font-family: "Permanent Marker", sans-serif; font-weight: 400; font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.005em; text-transform: none; text-shadow: 2px 2px 0 rgba(0,0,0,0.10); }
+  .headline-lg   { font-family: "Permanent Marker", sans-serif; font-weight: 400; font-size: clamp(1.75rem, 4vw, 3rem); line-height: 1.1; letter-spacing: 0; text-transform: none; }
 
   .pull-quote {
     font-family: "DM Sans", sans-serif; font-style: italic; font-weight: 400;
