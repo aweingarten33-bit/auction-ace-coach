@@ -11,40 +11,40 @@
 
 @layer base {
   :root {
-    --background: 0 0% 6%;               /* near-black */
-    --foreground: 0 0% 96%;              /* bone white */
+    --background: 220 25% 8%;            /* deep blue-black night */
+    --foreground: 40 30% 82%;            /* dirty newsprint cream */
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 96%;
+    --card: 220 22% 11%;
+    --card-foreground: 40 30% 82%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 96%;
+    --popover: 220 22% 11%;
+    --popover-foreground: 40 30% 82%;
 
-    --primary: 0 90% 50%;                /* blood red */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 0 95% 55%;
+    --primary: 42 85% 52%;               /* muted Gotham amber */
+    --primary-foreground: 220 30% 6%;
+    --primary-glow: 42 90% 58%;
 
-    --secondary: 0 0% 96%;               /* bone white block */
-    --secondary-foreground: 0 0% 6%;
+    --secondary: 40 25% 78%;             /* aged paper block */
+    --secondary-foreground: 220 30% 6%;
 
-    --muted: 0 0% 18%;                   /* charcoal */
-    --muted-foreground: 0 0% 70%;
+    --muted: 220 18% 16%;                /* charcoal alley */
+    --muted-foreground: 40 20% 65%;
 
-    --accent: 0 90% 50%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 42 85% 52%;
+    --accent-foreground: 220 30% 6%;
 
-    --destructive: 0 90% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 358 70% 42%;          /* dried-blood red */
+    --destructive-foreground: 40 30% 82%;
 
-    --warning: 0 0% 96%;
-    --warning-foreground: 0 0% 6%;
+    --warning: 42 85% 52%;
+    --warning-foreground: 220 30% 6%;
 
-    --success: 0 0% 96%;
-    --success-foreground: 0 0% 6%;
+    --success: 40 25% 78%;
+    --success-foreground: 220 30% 6%;
 
-    --border: 0 0% 96%;
-    --input: 0 0% 10%;
-    --ring: 0 0% 96%;
+    --border: 40 30% 82%;
+    --input: 220 22% 11%;
+    --ring: 42 85% 52%;
 
     --radius: 0px;
 
@@ -91,8 +91,11 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
     background-image:
-      radial-gradient(hsl(var(--foreground)) 1.2px, transparent 1.4px);
-    background-size: 24px 24px;
+      radial-gradient(hsl(var(--foreground) / 0.08) 1px, transparent 1.2px),
+      radial-gradient(hsl(var(--primary) / 0.04) 1px, transparent 1.4px),
+      linear-gradient(180deg, hsl(220 30% 4%) 0%, hsl(var(--background)) 40%, hsl(220 25% 6%) 100%);
+    background-size: 18px 18px, 32px 32px, 100% 100%;
+    background-position: 0 0, 9px 9px, 0 0;
   }
 
   h1, h2, h3, h4, h5, h6 {
