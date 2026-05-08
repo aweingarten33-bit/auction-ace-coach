@@ -109,6 +109,55 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
   pushAll(reA, 3, 4);
   pushAll(reB, 3, 4);
   if (out.length === 0) pushAll(reC, null, 3);
+
+  // Pattern D (FantasyLife player-card embeds, document order):
+  //   POSTEAM![...](.../players/ID/Slug-With%20Encoded)
+  {
+    const reD = new RegExp(`(${POS})(${TEAM})\\b[^\\n]*?/players/\\d+/([A-Za-z0-9%.'\\-]+)`, "g");
+    let rank = out.length;
+    for (const m of clean.matchAll(reD)) {
+      const pos = m[1] === "DST" ? "D/ST" : m[1];
+      const team = m[2];
+      let name = m[3];
+      try { name = decodeURIComponent(name); } catch { /* ignore */ }
+      name = name.replace(/-/g, " ").replace(/\s+/g, " ").trim();
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      rank += 1;
+      out.push({ rank, name, position: pos, team });
+    }
+  }
+
+  // Pattern E (heading style): "Name | TEAM" with default position
+  if (defaultPos !== "ALL") {
+    const reE = new RegExp(`([A-Z][A-Za-z'.\\-]+(?:\\s[A-Za-z'.\\-]+){0,3})\\s*\\|\\s*(${TEAM}|Rookie)\\b`, "g");
+    let rank = out.length;
+    for (const m of clean.matchAll(reE)) {
+      const name = m[1].trim();
+      const team = m[2];
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      rank += 1;
+      out.push({ rank, name, position: defaultPos, team });
+    }
+  }
+
+  // Pattern F (plain numbered text list, often after the embedded cards):
+  //   "16. Tetairoa McMillan"   "23. DK Metcalf"
+  if (defaultPos !== "ALL") {
+    const reF = /(?:^|\n)\s{0,4}(\d{1,3})\.\s+([A-Z][A-Za-z'.]+(?:\s+(?:Jr\.|Sr\.|II|III|IV|[A-Z][A-Za-z'.]+)){1,3})\s*$/gm;
+    for (const m of clean.matchAll(reF)) {
+      const rank = parseInt(m[1], 10);
+      const name = m[2].trim();
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      out.push({ rank, name, position: defaultPos, team: "" });
+    }
+  }
+
   out.sort((a, b) => a.rank - b.rank);
   return out.slice(0, 60);
 }
