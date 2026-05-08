@@ -376,7 +376,7 @@ export default function DraftRoom() {
           {events.length === 0 && watchlist.length === 0 && myItems.length === 0 && (
             <div className="rounded-lg border border-dashed border-border/60 bg-secondary/20 p-8 text-center text-sm text-muted-foreground">
               <p className="mb-2 font-semibold text-foreground">Welcome to your draft research dossier.</p>
-              <p>Tap <span className="font-semibold">Find</span> to look up any player, <span className="font-semibold">Top 100</span> for the value board, or <span className="font-semibold">Market</span> for room pulse.</p>
+              <p>Tap <span className="font-semibold">Find</span> to look up any player, <span className="font-semibold">Top 50</span> for the value board, or <span className="font-semibold">Market</span> for room pulse.</p>
             </div>
           )}
         </main>
