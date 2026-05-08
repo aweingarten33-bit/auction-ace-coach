@@ -51,6 +51,7 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import TeamTrends from "@/components/TeamTrends";
+import PositionBudgetBar from "@/components/PositionBudgetBar";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
@@ -297,6 +298,9 @@ export default function DraftRoom() {
           {selectedTeam && (
             <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
           )}
+
+          {/* Spending vs target by position */}
+          <PositionBudgetBar />
 
           {/* Recent picks (read-only live ticker) */}
           {events.length > 0 && (
