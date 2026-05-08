@@ -1,11 +1,9 @@
 // Position Budget Bar
-// "Are you spending the right % of your budget on each position?"
-// Pulls from VORP-derived dollar pool: each position's "fair share" of your
-// total budget = sum of VORP $ at that position / sum of all VORP $.
-// Compares actual % spent vs fair %. Red flag if you're >25 pts over budget.
+// Fair-share target = sum of top-N prices at that position (from your price
+// sheet) ÷ number of teams. N = roster slots needed across the league.
+// If no prices loaded, falls back to a league-type heuristic.
 import { Card } from "@/components/ui/card";
 import { useDraftStore } from "@/lib/draft-store";
-import { useVorpMap } from "@/lib/use-vorp-map";
 import { spendByPosition, computeBudget } from "@/lib/draft-math";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -17,7 +15,6 @@ export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
   const keepers = useDraftStore((s) => s.keepers);
   const events = useDraftStore((s) => s.events);
-  const { map: vorpMap } = useVorpMap(settings);
 
   const prices = useDraftStore((s) => s.prices);
 
