@@ -171,10 +171,18 @@ export function useVorpMap(settings: LeagueSettings): {
     });
     console.info("[useVorpMap] $/VORP (league-tuned)", posDPV, "global:", globalDPV);
 
+    // Superflex/2QB premium: leagues that start 2 QBs pay a scarcity tax above
+    // pure VORP value. Apply a multiplier on QB prices ONLY when leagueType
+    // demands a 2nd QB. Tuned to bridge the gap between projected value and
+    // actual auction behavior in Superflex.
+    const isSuperflex = settings.leagueType !== "Standard";
+    const qbPremium = isSuperflex ? 1.25 : 1;
+
     const out: Record<string, VorpEntry> = {};
     for (const d of draftable) {
       const dpv = posDPV[d.pos] || globalDPV;
-      const price = Math.max(1, Math.round(1 + d.vorp * dpv));
+      const mult = d.pos === "QB" ? qbPremium : 1;
+      const price = Math.max(1, Math.round(1 + d.vorp * dpv * mult));
       out[norm(d.name)] = {
         price,
         vorp: Math.round(d.vorp),
