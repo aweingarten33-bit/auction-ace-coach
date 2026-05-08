@@ -4,45 +4,62 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface Player { rank: number; name: string; position: string; team: string; }
-interface RankList { source: string; label: string; position: string; url: string; players: Player[]; }
+interface Player { rank: number; name: string; position: string; team: string; note?: string; }
+interface RankList { source: string; label: string; position: string; url: string; players: Player[]; kind: "ranking" | "sleeper"; }
 
-const SOURCES: { source: string; label: string; position: string; url: string }[] = [
+const SOURCES: { source: string; label: string; position: string; url: string; kind: "ranking" | "sleeper" }[] = [
   {
-    source: "qb",
-    label: "QB",
-    position: "QB",
+    source: "qb", label: "QB", position: "QB", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-qb",
   },
   {
-    source: "rb",
-    label: "RB",
-    position: "RB",
+    source: "rb", label: "RB", position: "RB", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-bijan-robinson-leads-the-top-20",
   },
   {
-    source: "wr",
-    label: "WR",
-    position: "WR",
+    source: "wr", label: "WR", position: "WR", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-wr",
   },
   {
-    source: "te",
-    label: "TE",
-    position: "TE",
+    source: "te", label: "TE", position: "TE", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2026-tight-end-tiers-for-fantasy-football-harold-fannin",
   },
   {
-    source: "k",
-    label: "K",
-    position: "K",
+    source: "k", label: "K", position: "K", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-kicker-rankings-2025",
   },
   {
-    source: "dst",
-    label: "DEF",
-    position: "D/ST",
+    source: "dst", label: "DEF", position: "D/ST", kind: "ranking",
     url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-defense-rankings-and-tiers-broncos-eagles-and-more",
+  },
+  // — Sleepers / breakouts (under-the-radar league winners) —
+  {
+    source: "sleepers-all", label: "💤 Sleepers", position: "ALL", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-sleepers",
+  },
+  {
+    source: "sleepers-qb", label: "💤 QB", position: "QB", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/quarterback-sleepers-for-fantasy-football-2025",
+  },
+  {
+    source: "sleepers-rb", label: "💤 RB", position: "RB", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/running-back-sleepers-for-fantasy-football-2025",
+  },
+  {
+    source: "sleepers-wr", label: "💤 WR", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/wide-receiver-sleepers-for-2025-fantasy-football-keon-coleman-ra",
+  },
+  {
+    source: "breakouts", label: "🚀 Breakouts", position: "ALL", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-breakouts-marvin-mims-sean-tucker-and-more",
+  },
+  {
+    source: "breakouts-wr", label: "🚀 WR Y2-3", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/year-2-3-wide-receiver-breakouts-for-fantasy-football",
+  },
+  {
+    source: "breakouts-wr-late", label: "🚀 WR Late", position: "WR", kind: "sleeper",
+    url: "https://www.fantasylife.com/articles/fantasy/late-breakout-wide-receiver-candidates-for-2025-fantasy-football",
   },
 ];
 
@@ -66,7 +83,10 @@ Deno.serve(async (req) => {
       SOURCES.map(async (s): Promise<RankList> => {
         try {
           const md = await scrape(s.url, key);
-          return { ...s, players: parseArticleList(md, s.position) };
+          const players = s.kind === "sleeper"
+            ? parseSleeperList(md, s.position)
+            : parseArticleList(md, s.position);
+          return { ...s, players };
         } catch (e) {
           console.error(s.source, e);
           return { ...s, players: [] };
@@ -200,6 +220,95 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
 
   out.sort((a, b) => a.rank - b.rank);
   return out.slice(0, 60);
+}
+
+// Sleeper / breakout articles: each candidate is typically introduced via a
+// heading. We try to capture name + (pos/team) and the first sentence of body
+// text as the blurb.
+function parseSleeperList(md: string, defaultPos: string): Player[] {
+  const out: Player[] = [];
+  const seen = new Set<string>();
+  // Strip image markdown, escaped chars, and bold markers
+  const clean = md
+    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
+    .replace(/\\/g, "")
+    .replace(/\*\*/g, "");
+
+  const teamMap: Record<string, string> = {
+    Cardinals: "ARI", Falcons: "ATL", Ravens: "BAL", Bills: "BUF", Panthers: "CAR",
+    Bears: "CHI", Bengals: "CIN", Browns: "CLE", Cowboys: "DAL", Broncos: "DEN",
+    Lions: "DET", Packers: "GB", Texans: "HOU", Colts: "IND", Jaguars: "JAX",
+    Chiefs: "KC", Raiders: "LV", Chargers: "LAC", Rams: "LAR", Dolphins: "MIA",
+    Vikings: "MIN", Patriots: "NE", Saints: "NO", Giants: "NYG", Jets: "NYJ",
+    Eagles: "PHI", Steelers: "PIT", Seahawks: "SEA", "49ers": "SF", Niners: "SF",
+    Buccaneers: "TB", Titans: "TEN", Commanders: "WAS",
+  };
+  const teamWordRe = "(ARI|ATL|BAL|BUF|CAR|CHI|CIN|CLE|DAL|DEN|DET|GB|HOU|IND|JAC|JAX|KC|LV|LAC|LA|LAR|MIA|MIN|NE|NO|NYG|NYJ|PHI|PIT|SEA|SF|TB|TEN|WAS|Cardinals|Falcons|Ravens|Bills|Panthers|Bears|Bengals|Browns|Cowboys|Broncos|Lions|Packers|Texans|Colts|Jaguars|Chiefs|Raiders|Chargers|Rams|Dolphins|Vikings|Patriots|Saints|Giants|Jets|Eagles|Steelers|Seahawks|49ers|Niners|Buccaneers|Titans|Commanders)";
+
+  // Headings of the form (after stripping):
+  //   ### 1. Emeka Egbuka | WR | Buccaneers
+  //   ## Matthew Golden | WR | Packers
+  //   ## Sean Tucker, RB, Buccaneers
+  // Pattern 1: Name | POS | Team   or   Name, POS, Team
+  const headingRe = new RegExp(
+    `(^|\\n)#{2,4}\\s+(?:\\d{1,2}\\.\\s+)?` +
+      `([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})(?:\\s*\\([^)]*\\))?` +
+      `\\s*[|,(]\\s*(QB|RB|WR|TE|K|D\\/ST|DST)` +
+      `(?:\\s*[|,)]\\s*${teamWordRe})?`,
+    "g",
+  );
+  // Pattern 2 (fallback): Name | Team  — uses defaultPos
+  const headingRe2 = new RegExp(
+    `(^|\\n)#{2,4}\\s+(?:\\d{1,2}\\.\\s+)?` +
+      `([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})(?:\\s*\\([^)]*\\))?` +
+      `\\s*[|,]\\s*${teamWordRe}\\b`,
+    "g",
+  );
+
+  const consume = (re: RegExp, hasPos: boolean) => {
+    for (const m of clean.matchAll(re)) {
+      const name = m[2].trim();
+      if (name.split(/\s+/).length < 2) continue;
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      const pos = hasPos
+        ? (m[3] === "DST" ? "D/ST" : m[3])
+        : (defaultPos === "ALL" ? "" : defaultPos);
+      const teamRaw = (hasPos ? m[4] : m[3]) ?? "";
+      const team = teamMap[teamRaw] ?? ((teamRaw.length === 2 || teamRaw.length === 3) ? teamRaw : "");
+      const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 1200);
+      const blurb = after
+        .split(/\n+/)
+        .map((s) => s.trim())
+        .find((s) => s.length > 50 && !s.startsWith("#") && !s.startsWith("-") && !s.startsWith("[") && !s.startsWith("|") && !s.startsWith("!"));
+      seen.add(k);
+      out.push({ rank: out.length + 1, name, position: pos, team, note: blurb ? blurb.slice(0, 240) : undefined });
+    }
+  };
+  consume(headingRe, true);
+  consume(headingRe2, false);
+
+  // Pattern 3: "### Team POS Name" — note we already stripped ** so heading is plain
+  if (out.length === 0) {
+    const re3 = new RegExp(
+      `(^|\\n)#{2,4}\\s+${teamWordRe}\\s+(QB|RB|WR|TE|K|D\\/ST|DST)\\s+([A-Z][A-Za-z'.\\-]+(?:\\s+[A-Za-z'.\\-]+){1,3})`,
+      "g",
+    );
+    for (const m of clean.matchAll(re3)) {
+      const teamRaw = m[2];
+      const pos = m[3] === "DST" ? "D/ST" : m[3];
+      const name = m[4].trim();
+      const k = name.toLowerCase();
+      if (seen.has(k)) continue;
+      const team = teamMap[teamRaw] ?? ((teamRaw.length === 2 || teamRaw.length === 3) ? teamRaw : "");
+      const after = clean.slice(m.index + m[0].length, m.index + m[0].length + 1200);
+      const blurb = after.split(/\n+/).map((s) => s.trim()).find((s) => s.length > 50 && !s.startsWith("#") && !s.startsWith("-") && !s.startsWith("[") && !s.startsWith("|") && !s.startsWith("!"));
+      seen.add(k);
+      out.push({ rank: out.length + 1, name, position: pos, team, note: blurb ? blurb.slice(0, 240) : undefined });
+    }
+  }
+
+  return out.slice(0, 40);
 }
 
 function j(b: unknown, s = 200) {
