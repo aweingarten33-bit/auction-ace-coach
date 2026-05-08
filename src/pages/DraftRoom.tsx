@@ -701,7 +701,7 @@ function DrawerContents({
   onUnpin,
 }: DrawerProps) {
   const [section, setSection] = useState<
-    "menu" | "lookup" | "top100" | "afford" | "market"
+    "menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife"
   >("menu");
 
   void activeName;
@@ -713,6 +713,7 @@ function DrawerContents({
     { id: "top100" as const, label: "Top 100 · math-backed $", icon: ListOrdered, hint: "Best-value board, blended anchors." },
     { id: "afford" as const, label: "Can I afford X + Y + Z?", icon: Check, hint: "Pressure-test a plan before spending." },
     { id: "market" as const, label: "Market & Opponents", icon: TrendingUp, hint: "Room pulse plus opponent scan." },
+    { id: "fantasylife" as const, label: "Fantasy Life", icon: ExternalLink, hint: "Latest articles from fantasylife.com." },
   ];
 
   return (
