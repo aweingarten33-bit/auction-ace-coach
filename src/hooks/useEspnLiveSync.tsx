@@ -26,6 +26,8 @@ const STALE_AFTER_MS = 90_000;
 
 interface Options {
   expectingEvents?: boolean;
+  /** Optional override — when set, treat picks by this ESPN team_id as "me" */
+  teamIdOverride?: number | null;
 }
 
 /**
@@ -35,7 +37,7 @@ interface Options {
  *  - Tracks the *current* nomination + climbing bid so the UI can render
  *    a live bidding-war strip without polluting the draft log
  */
-export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
+export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null }: Options = {}) {
   const [status, setStatus] = useState<EspnSyncStatus>("connecting");
   const [lastEventAt, setLastEventAt] = useState<number | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
@@ -78,6 +80,11 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
   // Pull our ESPN team_id once we know the user. This is what we compare
   // against incoming `drafter_team_id` to decide if a pick was ours.
   useEffect(() => {
+    // Override wins — visitor explicitly picked their team in the front-door.
+    if (typeof teamIdOverride === "number") {
+      setMyTeamId(teamIdOverride);
+      return;
+    }
     if (!userId) return;
     let cancelled = false;
     supabase
@@ -92,7 +99,7 @@ export function useEspnLiveSync({ expectingEvents = true }: Options = {}) {
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, teamIdOverride]);
 
   // Apply a single event row to local state (used for both backfill and realtime)
   const applyEvent = (row: any, fromBackfill = false) => {
