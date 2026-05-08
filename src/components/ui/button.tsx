@@ -5,42 +5,39 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Neo-brutalist Button — bordered sticker. Click presses down onto its shadow.
+ * Newsprint Button — bordered editorial CTA.
+ * Inverts color on hover. Sharp corners. Uppercase tracking-widest.
  */
 const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-display font-black uppercase tracking-wide",
-    "rounded-none border-4 border-foreground",
-    "shadow-[4px_4px_0_0_hsl(var(--foreground))]",
-    "transition-all duration-100 ease-linear",
+    "font-sans uppercase tracking-widest font-semibold",
+    "rounded-none border transition-all duration-200 ease-out",
     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-    "disabled:pointer-events-none disabled:opacity-50",
-    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[3]",
-    "hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[6px_6px_0_0_hsl(var(--foreground))]",
-    "active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
+    "disabled:pointer-events-none disabled:opacity-40",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[1.5]",
   ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "bg-[hsl(var(--primary))] text-foreground",
+          "bg-foreground text-background border-foreground hover:bg-background hover:text-foreground",
         secondary:
-          "bg-[hsl(var(--secondary))] text-foreground",
+          "bg-background text-foreground border-foreground hover:bg-foreground hover:text-background",
         outline:
-          "bg-card text-foreground",
+          "bg-transparent text-foreground border-foreground hover:bg-foreground hover:text-background",
         destructive:
-          "bg-[hsl(var(--primary))] text-foreground",
+          "bg-[hsl(var(--accent))] text-background border-[hsl(var(--accent))] hover:bg-background hover:text-[hsl(var(--accent))]",
         ghost:
-          "bg-transparent text-foreground border-transparent shadow-none hover:bg-[hsl(var(--secondary))] hover:border-foreground hover:shadow-[4px_4px_0_0_hsl(var(--foreground))]",
+          "bg-transparent text-foreground border-transparent hover:bg-secondary",
         link:
-          "bg-transparent text-foreground border-transparent shadow-none underline-offset-4 hover:underline hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0",
+          "bg-transparent text-foreground border-transparent underline-offset-4 decoration-2 decoration-[hsl(var(--accent))] hover:underline",
       },
       size: {
-        default: "h-12 px-5 text-sm",
-        sm:      "h-10 px-4 text-xs",
-        lg:      "h-14 px-8 text-base",
-        icon:    "h-12 w-12",
+        default: "h-11 px-5 text-xs",
+        sm:      "h-10 px-4 text-[11px]",
+        lg:      "h-12 px-8 text-sm",
+        icon:    "h-11 w-11",
       },
     },
     defaultVariants: { variant: "default", size: "default" },
