@@ -684,7 +684,7 @@ export default function DraftRoom() {
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 1.25rem)" }}
       >
         <p
-          className="inline-block text-xs uppercase tracking-[0.18em] text-foreground/85"
+          className="inline-block text-xs font-bold uppercase tracking-[0.18em] text-foreground/85"
           style={{
             fontFamily: '"Special Elite", "Courier New", monospace',
             transform: "rotate(-3deg)",
