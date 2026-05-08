@@ -71,27 +71,58 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
         // 2) ESPN map
         const espnMap = new Map<string, { val: number; pos: string | null }>();
-        for (const row of espn as Array<{ player_name_norm: string | null; position: string | null; auction_value: number | null }>) {
-          if (!row.player_name_norm || row.auction_value == null) continue;
+        const injuryMap = new Map<string, { status: string | null; note: string | null }>();
+        for (const row of espn as Array<{ player_name_norm: string | null; position: string | null; auction_value: number | null; injury_status: string | null; injury_note: string | null }>) {
+          if (!row.player_name_norm) continue;
           const k = norm(row.player_name_norm);
-          const v = Number(row.auction_value);
-          if (v > 0) espnMap.set(k, { val: v, pos: row.position });
+          if (row.auction_value != null) {
+            const v = Number(row.auction_value);
+            if (v > 0) espnMap.set(k, { val: v, pos: row.position });
+          }
+          if (row.injury_status || row.injury_note) {
+            injuryMap.set(k, { status: row.injury_status, note: row.injury_note });
+          }
         }
 
-        // 2b) Sleeper map — independent free market signal that's typically more
-        //     up-to-date than ESPN for ascending players (rookies stepping into
-        //     starting roles, depth-chart movers). depth_chart_order=1 = starter.
+        // 2b) Sleeper map
         const sleeperMap = new Map<string, { val: number; pos: string | null; isStarter: boolean }>();
-        for (const row of sleeper as Array<{ player_name_norm: string | null; position: string | null; projected_auction_value: number | null; depth_chart_order: number | null }>) {
-          if (!row.player_name_norm || row.projected_auction_value == null) continue;
+        for (const row of sleeper as Array<{ player_name_norm: string | null; position: string | null; projected_auction_value: number | null; depth_chart_order: number | null; injury_status: string | null; injury_notes: string | null }>) {
+          if (!row.player_name_norm) continue;
           const k = norm(row.player_name_norm);
-          const v = Number(row.projected_auction_value);
-          if (v > 0) sleeperMap.set(k, {
-            val: v,
-            pos: row.position,
-            isStarter: row.depth_chart_order != null && Number(row.depth_chart_order) <= 1,
-          });
+          if (row.projected_auction_value != null) {
+            const v = Number(row.projected_auction_value);
+            if (v > 0) sleeperMap.set(k, {
+              val: v,
+              pos: row.position,
+              isStarter: row.depth_chart_order != null && Number(row.depth_chart_order) <= 1,
+            });
+          }
+          // Sleeper injury fills in if ESPN didn't have one
+          const existing = injuryMap.get(k);
+          if (!existing && (row.injury_status || row.injury_notes)) {
+            injuryMap.set(k, { status: row.injury_status, note: row.injury_notes });
+          } else if (existing && !existing.note && row.injury_notes) {
+            injuryMap.set(k, { status: existing.status, note: row.injury_notes });
+          }
         }
+
+        // Injury discount factor (multiplier on final anchor).
+        // OUT 70% off, IR 50% off, Doubtful 30%, Questionable+Surgery 20%, Questionable 10%.
+        const injuryFactor = (k: string): { factor: number; reason: string | null } => {
+          const inj = injuryMap.get(k);
+          if (!inj) return { factor: 1, reason: null };
+          const status = (inj.status || "").toUpperCase().trim();
+          const note = (inj.note || "").toLowerCase();
+          if (status === "OUT") return { factor: 0.3, reason: "OUT" };
+          if (status === "IR" || status === "INJURED_RESERVE" || status === "INJURED RESERVE") return { factor: 0.5, reason: "IR" };
+          if (status === "DOUBTFUL") return { factor: 0.7, reason: "Doubtful" };
+          if (status === "QUESTIONABLE") {
+            if (note.includes("surgery")) return { factor: 0.8, reason: "Questionable (surgery)" };
+            return { factor: 0.9, reason: "Questionable" };
+          }
+          return { factor: 1, reason: null };
+        };
+
 
         // Market consensus = blend of ESPN and Sleeper. When they agree, high
         // confidence. When they disagree wildly, take the higher one IF the
