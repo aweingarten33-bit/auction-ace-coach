@@ -503,12 +503,34 @@ export default function DraftRoom() {
       )}
 
       {/* Player details modal */}
-      <PlayerDetailsOverlay
-        open={!!detailFor}
-        onOpenChange={(o) => !o && setDetailFor(null)}
-        name={detailFor?.name ?? ""}
-        position={detailFor?.position}
-      />
+      {(() => {
+        const key = detailFor ? norm(detailFor.name) : "";
+        const sheet = detailFor ? prices.find((p) => norm(p.name) === key) : undefined;
+        const anchor = key ? anchorMap[key] : undefined;
+        let posRank: number | undefined;
+        let totalAtPos: number | undefined;
+        const pos = detailFor?.position ?? sheet?.position;
+        if (pos) {
+          const samePos = prices
+            .filter((p) => p.position === pos && p.price > 0)
+            .sort((a, b) => b.price - a.price);
+          totalAtPos = samePos.length;
+          const idx = samePos.findIndex((p) => norm(p.name) === key);
+          if (idx >= 0) posRank = idx + 1;
+        }
+        return (
+          <PlayerDetailsOverlay
+            open={!!detailFor}
+            onOpenChange={(o) => !o && setDetailFor(null)}
+            name={detailFor?.name ?? ""}
+            position={detailFor?.position}
+            sheetPrice={sheet?.price}
+            anchor={anchor}
+            posRank={posRank}
+            totalAtPos={totalAtPos}
+          />
+        );
+      })()}
 
       {/* Pin/unpin chip strip when a detail is open */}
       {detailFor && (
