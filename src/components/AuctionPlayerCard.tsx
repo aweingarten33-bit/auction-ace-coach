@@ -106,6 +106,106 @@ export default function AuctionPlayerCard({
 
   const firstName = name.split(" ")[0] || "Player";
 
+  // ── Personalized section copy (math + your roster context) ───────────
+  const myGap = position && gaps ? gaps.find((g) => g.pos === position) : undefined;
+  const need = myGap?.severity ?? "depth";
+  const needLabel: Record<string, string> = {
+    critical: `CRITICAL hole at ${position}`,
+    need: `Open starter at ${position}`,
+    depth: `Depth at ${position}`,
+    done: `${position} starters filled`,
+  };
+
+  // Math: compare suggested price vs market values
+  const refPrices: number[] = [];
+  if (leagueVal != null) refPrices.push(leagueVal);
+  if (espnVal != null) refPrices.push(espnVal);
+  const marketAvg = refPrices.length
+    ? Math.round(refPrices.reduce((a, b) => a + b, 0) / refPrices.length)
+    : undefined;
+  const suggested = headlinePrice != null ? Math.round(headlinePrice) : undefined;
+  const delta = suggested != null && marketAvg != null ? suggested - marketAvg : undefined;
+  const valueVerdict =
+    delta == null ? null : delta <= -3 ? "VALUE" : delta >= 3 ? "OVERPAY" : "FAIR";
+
+  // Why-draft text
+  const whyParts: string[] = [];
+  if (suggested != null && marketAvg != null) {
+    if (delta! < 0) {
+      whyParts.push(
+        `Suggested $${suggested} is $${Math.abs(delta!)} UNDER market avg $${marketAvg} — buy-low spot.`
+      );
+    } else if (delta! > 0) {
+      whyParts.push(
+        `Suggested $${suggested} is $${delta} OVER market avg $${marketAvg} — only chase if you need ${position}.`
+      );
+    } else {
+      whyParts.push(`Suggested $${suggested} matches market avg $${marketAvg} — fair price.`);
+    }
+  }
+  if (posRank && totalAtPos) {
+    whyParts.push(`${position}${posRank} of ${totalAtPos} on the board by price.`);
+  }
+  if (myGap && (need === "critical" || need === "need")) {
+    whyParts.push(`You still need ${myGap.starterShort} starting ${position}.`);
+  }
+
+  // Path-to-smash: based on usage rank + injury history
+  const pathParts: string[] = [];
+  if (posRank && posRank <= 6) {
+    pathParts.push(`Top-${posRank} ${position} usage = ceiling pick if healthy.`);
+  } else if (posRank && posRank <= 15) {
+    pathParts.push(`Mid-tier ${position}; smash case is one tier jump in role.`);
+  } else if (posRank) {
+    pathParts.push(`Late-round ${position}; smash needs an injury ahead or breakout role.`);
+  }
+  if (lastSold && marketAvg != null && lastSold.bid < marketAvg - 2) {
+    pathParts.push(`Sold for $${lastSold.bid} in '${String(lastSold.season).slice(2)} — room for upside.`);
+  }
+
+  // Risk: injury status from anchor + price-vs-budget
+  const riskParts: string[] = [];
+  if (anchor?.injuryDiscount && anchor.injuryDiscount > 0) {
+    riskParts.push(`Injury discount of ~$${Math.round(anchor.injuryDiscount)} already baked in.`);
+  }
+  if (suggested != null && remaining != null && slotsLeft != null && slotsLeft > 1) {
+    const afterRemaining = remaining - suggested;
+    const slotsAfter = slotsLeft - 1;
+    const avgPerSlotAfter = slotsAfter > 0 ? Math.floor(afterRemaining / slotsAfter) : 0;
+    if (avgPerSlotAfter < 2) {
+      riskParts.push(
+        `Spending $${suggested} leaves $${afterRemaining} for ${slotsAfter} slots ($${avgPerSlotAfter}/slot avg). TOO TIGHT.`
+      );
+    } else if (avgPerSlotAfter < 5) {
+      riskParts.push(
+        `After this you'd have $${afterRemaining} for ${slotsAfter} slots ($${avgPerSlotAfter}/slot). Tight.`
+      );
+    }
+  }
+  if (suggested != null && maxBid != null && suggested > maxBid) {
+    riskParts.push(`Suggested $${suggested} exceeds your max bid $${maxBid}.`);
+  }
+
+  // Bottom line
+  const bottomParts: string[] = [];
+  if (suggested != null) {
+    if (need === "critical" || need === "need") {
+      bottomParts.push(
+        `You NEED ${position}. Pay up to $${suggested}${marketAvg != null ? ` (market $${marketAvg})` : ""}.`
+      );
+    } else if (need === "depth") {
+      bottomParts.push(
+        `Depth pick — only at $${Math.max(1, suggested - 2)} or under (${marketAvg != null ? `market $${marketAvg}` : "value play"}).`
+      );
+    } else {
+      bottomParts.push(`Position is filled — pass unless price drops to a bargain.`);
+    }
+  }
+  if (remaining != null && slotsLeft != null) {
+    bottomParts.push(`Budget: $${remaining} left, ${slotsLeft} slots.`);
+  }
+
+
   return (
     // Cream magazine-card background
     <div className="rounded-xl bg-[#f5efe4] text-[#1b2238] shadow-lg ring-1 ring-[#1b2238]/15 overflow-hidden">
