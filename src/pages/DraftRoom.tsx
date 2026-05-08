@@ -878,7 +878,7 @@ function DrawerContents({
   ];
 
   return (
-    <SheetContent side="left" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
+    <SheetContent side="bottom" className="flex h-[88vh] flex-col gap-0 rounded-t-3xl border-t border-border/60 p-0">
       <SheetHeader className="border-b border-border/60 px-4 py-3">
         <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
           {section !== "menu" && (
