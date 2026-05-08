@@ -1,6 +1,6 @@
 // LastPickImpact — read-only snapshot of how the most recently imported pick
 // shifted YOUR budget/roster. No bidding, no recommendations — pure delta.
-import { ArrowDown, ArrowRight, Clock } from "lucide-react";
+import { ArrowDown, ArrowRight, Clock, AlertTriangle } from "lucide-react";
 import type { DraftEvent, Keeper, LeagueSettings, Position } from "@/lib/draft-types";
 import { computeBudget, countByPosition, spendByPosition } from "@/lib/draft-math";
 import { positionShare } from "@/lib/vetri-tiers";
