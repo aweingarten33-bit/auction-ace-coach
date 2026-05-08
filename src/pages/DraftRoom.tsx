@@ -50,6 +50,7 @@ import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
+import TeamTrends from "@/components/TeamTrends";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -270,6 +271,11 @@ export default function DraftRoom() {
               slotsLeft={budget.slotsLeft}
               gaps={gaps}
             />
+          )}
+
+          {/* Personalized 3-year drafting trends */}
+          {selectedTeam && (
+            <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
           )}
 
           {/* Recent picks (read-only live ticker) */}
