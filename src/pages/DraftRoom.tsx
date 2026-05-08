@@ -465,6 +465,7 @@ export default function DraftRoom() {
               <div className="flex-1 overflow-y-auto p-3">
                 <Top100List
                   prices={prices}
+                  anchorMap={anchorMap}
                   events={events}
                   onPick={(name) => {
                     setTop100Open(false);
