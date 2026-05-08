@@ -453,7 +453,7 @@ export default function DraftRoom() {
               >
                 <ChevronLeft className="h-6 w-6" strokeWidth={2} />
               </button>
-              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight">
+              <h1 className="mt-8 mb-2 text-[36px] leading-[1.02] font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-[44px]">
                 {toolPage === "lookup" && "Find"}
                 {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
                 {toolPage === "market" && "Market"}
