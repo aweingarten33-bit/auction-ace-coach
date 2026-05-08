@@ -510,21 +510,20 @@
    COMPONENT LAYER — global overrides for shadcn primitives
    ===================================================================== */
 @layer components {
-  /* Cards — soft pillow */
+  /* Cards — flat dark tile, large radius (DICE) */
   .bg-card,
   [data-slot="card"],
   .surface,
   .panel {
     background-color: hsl(var(--surface));
     border: none;
-    border-radius: 2rem;
+    border-radius: 1.5rem;
     box-shadow: var(--neu-extruded);
     position: relative;
-    transition: transform 300ms ease-out, box-shadow 300ms ease-out;
+    transition: transform 250ms ease-out, box-shadow 250ms ease-out;
   }
   .bg-card:hover,
   [data-slot="card"]:hover {
-    transform: translateY(-2px);
     box-shadow: var(--neu-extruded-hover);
   }
 
