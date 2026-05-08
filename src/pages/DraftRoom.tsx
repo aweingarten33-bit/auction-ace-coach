@@ -59,6 +59,7 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 export default function DraftRoom() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
+  const { team: selectedTeam } = useSelectedTeam();
   const {
     settings,
     keepers,
@@ -77,8 +78,11 @@ export default function DraftRoom() {
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
 
-  // Read-only live sync — no interaction, just shows live picks as they come in
-  useEspnLiveSync({ expectingEvents: setupComplete });
+  // Read-only live sync — picks made by the selected team auto-tag as "me"
+  useEspnLiveSync({
+    expectingEvents: setupComplete,
+    teamIdOverride: selectedTeam?.id ?? null,
+  });
 
   // Pull league name from the most recent live_draft_event raw payload
   useEffect(() => {
