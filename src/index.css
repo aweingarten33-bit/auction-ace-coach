@@ -1,81 +1,82 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&family=Special+Elite&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   GOTHAM INK — Mazzucchelli graphic-novel palette
-   Flat dirty color. Sodium-lamp yellow. Dried-blood red. Heavy black ink.
-   Crosshatch grain. Cream-paper bleed. No gradients pretending to glow.
+   NEWSPRINT — "All The News That's Fit To Print"
+   Editorial authority. Sharp grids. Serif drama. Hard offset shadows.
+   Tinted toward a Frank-Miller-Superman daily: faded brick-red ink,
+   sun-yellow stamp, halftone newsprint grain.
    ===================================================================== */
 
 @layer base {
   :root {
-    --background: 218 38% 18%;           /* bleached cobalt dusk */
-    --foreground: 42 40% 86%;            /* sun-faded cream */
+    --background: 50 25% 97%;            /* #F9F9F7 newsprint off-white */
+    --foreground: 0 0% 7%;               /* #111111 ink black */
 
-    --card: 218 32% 22%;                 /* propaganda-poster blue */
-    --card-foreground: 42 40% 86%;
+    --card: 50 25% 97%;
+    --card-foreground: 0 0% 7%;
 
-    --popover: 218 35% 20%;
-    --popover-foreground: 42 40% 86%;
+    --popover: 50 25% 97%;
+    --popover-foreground: 0 0% 7%;
 
-    --primary: 8 72% 48%;                /* faded brick-red cape */
-    --primary-foreground: 42 45% 92%;
-    --primary-glow: 12 80% 56%;
+    --primary: 0 0% 7%;                  /* black is primary in print */
+    --primary-foreground: 50 25% 97%;
+    --primary-glow: 0 0% 14%;
 
-    --secondary: 46 88% 56%;             /* sun-disc yellow shield */
-    --secondary-foreground: 218 40% 12%;
+    --secondary: 50 12% 90%;             /* #E5E5E0 divider grey */
+    --secondary-foreground: 0 0% 7%;
 
-    --muted: 218 25% 28%;                /* metropolis smog */
-    --muted-foreground: 42 22% 72%;
+    --muted: 50 12% 92%;
+    --muted-foreground: 0 0% 32%;
 
-    --accent: 46 88% 56%;                /* yellow accent block */
-    --accent-foreground: 218 40% 12%;
+    --accent: 0 100% 40%;                /* #CC0000 editorial red — brick faded */
+    --accent-foreground: 50 25% 97%;
 
-    --destructive: 8 72% 48%;
-    --destructive-foreground: 42 45% 92%;
+    --destructive: 0 100% 40%;
+    --destructive-foreground: 50 25% 97%;
 
-    --warning: 46 88% 56%;
-    --warning-foreground: 218 40% 12%;
+    --warning: 46 92% 48%;               /* sun-yellow stamp */
+    --warning-foreground: 0 0% 7%;
 
-    --success: 42 40% 86%;
-    --success-foreground: 218 40% 12%;
+    --success: 0 0% 7%;
+    --success-foreground: 50 25% 97%;
 
-    --border: 218 50% 8%;                /* heavy Janson ink */
-    --input: 218 35% 20%;
-    --ring: 46 88% 56%;
+    --border: 0 0% 7%;
+    --input: 50 25% 97%;
+    --ring: 0 0% 7%;
 
     --radius: 0px;
 
-    /* Heavy ink shadows — Klaus Janson black, no blur */
-    --ink: 218 55% 5%;
+    /* Hard offset ink shadows — newspaper cutout effect */
+    --ink: 0 0% 7%;
     --shadow-card:      4px 4px 0 0 hsl(var(--ink));
-    --shadow-floating:  8px 8px 0 0 hsl(var(--ink));
+    --shadow-floating:  6px 6px 0 0 hsl(var(--ink));
     --shadow-pressed:   0 0 0 0 hsl(var(--ink));
-    --shadow-recessed:  inset 0 0 0 4px hsl(var(--ink));
+    --shadow-recessed:  inset 0 0 0 2px hsl(var(--ink));
     --shadow-sharp:     4px 4px 0 0 hsl(var(--ink));
-    --shadow-glow:      0 0 0 3px hsl(var(--secondary) / 0.7), 6px 6px 0 0 hsl(var(--ink));
-    --shadow-primary:   6px 6px 0 0 hsl(var(--ink));
+    --shadow-glow:      4px 4px 0 0 hsl(var(--accent));
+    --shadow-primary:   4px 4px 0 0 hsl(var(--ink));
     --shadow-led-green: 4px 4px 0 0 hsl(var(--ink));
 
     --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
-    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
-    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
-    --shadow-brut-xl:   14px 14px 0 0 hsl(var(--ink));
+    --shadow-brut:      4px 4px 0 0 hsl(var(--ink));
+    --shadow-brut-lg:   6px 6px 0 0 hsl(var(--ink));
+    --shadow-brut-xl:   8px 8px 0 0 hsl(var(--ink));
 
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 0%;
-    --sidebar-primary: 0 100% 71%;
-    --sidebar-primary-foreground: 0 0% 0%;
-    --sidebar-accent: 50 100% 62%;
-    --sidebar-accent-foreground: 0 0% 0%;
-    --sidebar-border: 0 0% 0%;
-    --sidebar-ring: 0 0% 0%;
+    --sidebar-background: 50 25% 97%;
+    --sidebar-foreground: 0 0% 7%;
+    --sidebar-primary: 0 0% 7%;
+    --sidebar-primary-foreground: 50 25% 97%;
+    --sidebar-accent: 0 100% 40%;
+    --sidebar-accent-foreground: 50 25% 97%;
+    --sidebar-border: 0 0% 7%;
+    --sidebar-ring: 0 0% 7%;
   }
 
-  .dark { /* single mandatory light mode */ }
+  .dark { /* single permanent light mode */ }
 
   * { @apply border-border; border-color: transparent; }
 
@@ -87,71 +88,78 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-    font-weight: 700;
+    font-family: 'Lora', Georgia, serif;
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: hsl(var(--background));
+    /* Subtle dot grid + faint warm wash to read as paper */
     background-image:
-      /* fine ink halftone */
-      radial-gradient(hsl(var(--ink) / 0.45) 0.8px, transparent 1.1px),
-      /* red sun, top-right */
-      radial-gradient(circle 220px at 88% 12%, hsl(var(--primary) / 0.55), hsl(var(--primary) / 0.18) 55%, transparent 75%),
-      /* sun-yellow halo around it */
-      radial-gradient(circle 320px at 88% 12%, hsl(var(--secondary) / 0.18), transparent 70%),
-      /* dusky blue ground wash */
-      radial-gradient(ellipse 80% 60% at 10% 100%, hsl(var(--ink) / 0.55), transparent 70%),
-      /* base sky */
-      linear-gradient(180deg, hsl(218 45% 22%) 0%, hsl(var(--background)) 50%, hsl(218 50% 12%) 100%);
-    background-size: 6px 6px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23111111' fill-opacity='0.05' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'/%3E%3C/svg%3E"),
+      radial-gradient(ellipse 80% 60% at 100% 0%, hsl(var(--accent) / 0.04), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 0% 100%, hsl(0 0% 7% / 0.04), transparent 70%);
     background-attachment: fixed;
   }
 
-  /* Crosshatch ink overlay — diagonal lines, very faint */
+  /* Fine line texture overlay — like graph paper bleed-through */
   body::before {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none;
     z-index: 1;
     background-image:
-      repeating-linear-gradient( 45deg, hsl(var(--ink) / 0.10) 0 1px, transparent 1px 6px),
-      repeating-linear-gradient(-45deg, hsl(var(--ink) / 0.06) 0 1px, transparent 1px 8px);
-    mix-blend-mode: multiply;
+      linear-gradient(0deg, transparent 98%, rgba(0,0,0,0.04) 100%),
+      linear-gradient(90deg, transparent 98%, rgba(0,0,0,0.04) 100%);
+    background-size: 3px 3px;
+    opacity: 0.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Special Elite", "Space Grotesk", sans-serif;
+    font-family: 'Playfair Display', 'Times New Roman', serif;
     font-weight: 900;
-    letter-spacing: 0.01em;
-    text-transform: uppercase;
     color: hsl(var(--foreground));
     line-height: 0.95;
-    text-shadow: 2px 2px 0 hsl(var(--ink));
+    letter-spacing: -0.02em;
   }
 
-  ::selection { background: hsl(var(--primary)); color: hsl(var(--ink)); }
+  ::selection { background: hsl(var(--accent)); color: hsl(var(--background)); }
 }
 
 @layer utilities {
-  .font-display { font-family: "Space Grotesk", sans-serif; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; }
-  .font-body    { font-family: "Space Grotesk", sans-serif; font-weight: 700; }
-  .font-mono    { font-family: "Space Grotesk", ui-monospace, monospace; font-weight: 700; }
+  .font-serif   { font-family: 'Playfair Display', 'Times New Roman', serif; }
+  .font-body    { font-family: 'Lora', Georgia, serif; }
+  .font-sans    { font-family: 'Inter', 'Helvetica Neue', sans-serif; }
+  .font-mono    { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .font-display { font-family: 'Playfair Display', serif; font-weight: 900; letter-spacing: -0.02em; }
+
+  .sharp-corners { border-radius: 0 !important; }
 
   .label-stamped {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: 'JetBrains Mono', monospace;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    font-weight: 900;
-    font-size: 0.75rem;
-    color: hsl(var(--foreground));
-    background: hsl(var(--secondary));
+    letter-spacing: 0.18em;
+    font-weight: 500;
+    font-size: 0.7rem;
+    color: hsl(var(--background));
+    background: hsl(var(--foreground));
     padding: 4px 8px;
-    border: 2px solid hsl(var(--foreground));
+    display: inline-block;
+  }
+
+  .label-extra {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: hsl(var(--accent));
+    background: hsl(var(--background));
+    border: 2px solid hsl(var(--accent));
+    padding: 2px 8px;
     display: inline-block;
   }
 
   .text-stroke {
-    -webkit-text-stroke: 2px hsl(var(--foreground));
+    -webkit-text-stroke: 1px hsl(var(--foreground));
     color: transparent;
   }
 
@@ -159,7 +167,6 @@
   .shadow-brut      { box-shadow: var(--shadow-brut); }
   .shadow-brut-lg   { box-shadow: var(--shadow-brut-lg); }
   .shadow-brut-xl   { box-shadow: var(--shadow-brut-xl); }
-
   .shadow-card      { box-shadow: var(--shadow-card); }
   .shadow-floating  { box-shadow: var(--shadow-floating); }
   .shadow-pressed   { box-shadow: var(--shadow-pressed); }
@@ -168,27 +175,66 @@
   .shadow-glow      { box-shadow: var(--shadow-glow); }
   .shadow-primary-key { box-shadow: var(--shadow-primary); }
 
-  .text-emboss      { text-shadow: 3px 3px 0 hsl(var(--foreground)); }
+  .text-emboss      { text-shadow: 2px 2px 0 hsl(var(--ink)); }
+
+  .hard-shadow-hover { transition: transform 150ms ease-out, box-shadow 150ms ease-out; }
+  .hard-shadow-hover:hover {
+    box-shadow: 4px 4px 0 0 hsl(var(--foreground));
+    transform: translate(-2px, -2px);
+  }
 
   /* Backgrounds */
   .bg-grid {
     background-image:
-      linear-gradient(to right, rgba(0,0,0,0.1) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0,0,0,0.1) 1px, transparent 1px);
+      linear-gradient(to right, rgba(17,17,17,0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(17,17,17,0.08) 1px, transparent 1px);
     background-size: 40px 40px;
   }
   .bg-halftone {
-    background-image: radial-gradient(hsl(var(--foreground)) 1.5px, transparent 1.5px);
-    background-size: 20px 20px;
+    background-image: radial-gradient(hsl(var(--foreground) / 0.18) 1.2px, transparent 1.4px);
+    background-size: 8px 8px;
+  }
+  .newsprint-texture { position: relative; }
+  .newsprint-texture::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(0deg, transparent 98%, rgba(0,0,0,0.025) 100%),
+      linear-gradient(90deg, transparent 98%, rgba(0,0,0,0.025) 100%);
+    background-size: 3px 3px;
+    pointer-events: none;
+    opacity: 0.6;
   }
 
-  /* Sticker rotations */
-  .tilt-l { transform: rotate(-2deg); }
-  .tilt-r { transform: rotate(2deg); }
+  /* Ornamental section divider */
+  .ornament::before {
+    content: '✧ ✧ ✧';
+    display: block;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: hsl(var(--foreground));
+    letter-spacing: 0.4em;
+    margin: 1.25rem 0;
+  }
 
-  /* LED indicator (re-purposed as pill dot) */
-  .led { width: 0.7rem; height: 0.7rem; border-radius: 9999px; display: inline-block; background: hsl(var(--primary)); border: 2px solid hsl(var(--foreground)); }
-  .led-green { background: #22c55e; }
+  /* Drop cap helper */
+  .drop-cap::first-letter {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    float: left;
+    font-size: 4.5rem;
+    line-height: 0.85;
+    padding: 0.25rem 0.5rem 0 0;
+    color: hsl(var(--foreground));
+  }
+
+  /* Sticker rotations — disabled for newsprint sobriety */
+  .tilt-l, .tilt-r { transform: none; }
+
+  /* Pill dot */
+  .led { width: 0.6rem; height: 0.6rem; border-radius: 9999px; display: inline-block; background: hsl(var(--accent)); border: 1px solid hsl(var(--foreground)); }
+  .led-green { background: hsl(var(--foreground)); }
 
   /* Legacy industrial hooks neutralized */
   .screws::before, .screws::after,
@@ -196,34 +242,34 @@
   .vent-slot { display: none; }
 
   .scanlines {
-    background-image: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.08) 50%);
-    background-size: 100% 4px;
+    background-image: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.04) 50%);
+    background-size: 100% 3px;
   }
 
-  .ease-mech { transition-timing-function: linear; }
+  .ease-mech { transition-timing-function: ease-out; }
 
-  @keyframes float { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(-2deg); } }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
   .animate-float { animation: float 3s ease-in-out infinite; }
 
   @keyframes spin-slow { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-  .animate-spin-slow { animation: spin-slow 10s linear infinite; }
+  .animate-spin-slow { animation: spin-slow 12s linear infinite; }
 }
 
 /* =====================================================================
    AUTO-PROMOTION LAYER
-   Maps existing utility patterns → neo-brutalist sticker collage.
+   Maps existing utility patterns → newsprint editorial grid.
    ===================================================================== */
 @layer components {
-  /* Sticky header — bordered ink bar */
+  /* Sticky header — masthead bar */
   header.sticky,
   .sticky.top-0 {
     background-color: hsl(var(--background)) !important;
     border-bottom: 4px solid hsl(var(--foreground)) !important;
-    box-shadow: 0 4px 0 0 hsl(var(--foreground)) !important;
+    box-shadow: 0 1px 0 0 hsl(var(--foreground) / 0.15) !important;
     backdrop-filter: none !important;
   }
 
-  /* Generic surfaces — bordered paper cards */
+  /* Generic surfaces — bordered editorial blocks */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
@@ -233,32 +279,34 @@
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
     background-color: hsl(var(--card)) !important;
-    border: 4px solid hsl(var(--foreground)) !important;
-    box-shadow: var(--shadow-brut-sm) !important;
+    border: 1px solid hsl(var(--foreground)) !important;
+    box-shadow: none !important;
     border-radius: 0 !important;
   }
 
-  /* Active/hero card — yellow sticker with deep shadow */
+  /* Featured panel — heavy border + offset shadow */
   .border-2.border-primary {
-    background-color: hsl(var(--secondary)) !important;
-    border: 4px solid hsl(var(--foreground)) !important;
-    box-shadow: var(--shadow-brut-lg) !important;
+    background-color: hsl(var(--background)) !important;
+    border: 2px solid hsl(var(--foreground)) !important;
+    box-shadow: var(--shadow-brut) !important;
     border-radius: 0 !important;
   }
 
-  /* Pills / chips — bordered tags */
+  /* Pills / chips — uppercase tag */
   .rounded-full.border {
-    background-color: hsl(var(--muted)) !important;
-    border: 3px solid hsl(var(--foreground)) !important;
-    box-shadow: 3px 3px 0 0 hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+    border: 1px solid hsl(var(--foreground)) !important;
+    box-shadow: none !important;
     color: hsl(var(--foreground));
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 900;
+    letter-spacing: 0.16em;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 0.7rem;
+    padding: 2px 10px;
   }
 
-  /* Inputs — thick-bordered paper slots */
+  /* Inputs — bottom-bordered form slot */
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -266,92 +314,95 @@
   input:not([type]),
   textarea,
   select {
-    background-color: hsl(var(--card)) !important;
-    border: 4px solid hsl(var(--foreground)) !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid hsl(var(--foreground)) !important;
     border-radius: 0 !important;
-    font-family: "Space Grotesk", sans-serif !important;
-    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 500;
     color: hsl(var(--foreground));
-    box-shadow: var(--shadow-brut-sm) !important;
-    transition: all 100ms linear;
+    box-shadow: none !important;
+    transition: background-color 150ms ease-out;
+    padding: 0.5rem 0.75rem;
   }
-  input::placeholder, textarea::placeholder { color: rgba(0,0,0,0.4); font-weight: 700; }
+  input::placeholder, textarea::placeholder { color: hsl(0 0% 7% / 0.45); font-weight: 400; font-style: italic; }
   input:focus, textarea:focus, select:focus {
     outline: none !important;
-    background-color: hsl(var(--secondary)) !important;
-    box-shadow: var(--shadow-brut) !important;
+    background-color: hsl(50 8% 94%) !important;
+    box-shadow: none !important;
   }
 
-  /* Floating coach orb — sticker button */
+  /* Floating coach orb — bordered icon button */
   .fixed.bottom-5.right-5 {
-    background-color: hsl(var(--primary)) !important;
-    border: 4px solid hsl(var(--foreground)) !important;
+    background-color: hsl(var(--foreground)) !important;
+    color: hsl(var(--background)) !important;
+    border: 2px solid hsl(var(--foreground)) !important;
     border-radius: 9999px;
-    box-shadow: var(--shadow-brut) !important;
-    transition: all 100ms linear;
+    box-shadow: 4px 4px 0 0 hsl(var(--accent)) !important;
+    transition: all 150ms ease-out;
   }
-  .fixed.bottom-5.right-5:hover  { transform: translate(-2px,-2px); box-shadow: var(--shadow-brut-lg) !important; }
-  .fixed.bottom-5.right-5:active { transform: translate(4px,4px); box-shadow: none !important; }
+  .fixed.bottom-5.right-5:hover  {
+    background-color: hsl(var(--background)) !important;
+    color: hsl(var(--foreground)) !important;
+    transform: translate(-2px,-2px);
+    box-shadow: 6px 6px 0 0 hsl(var(--accent)) !important;
+  }
+  .fixed.bottom-5.right-5:active { transform: translate(2px,2px); box-shadow: 0 0 0 0 hsl(var(--accent)) !important; }
 
-  /* Code/destructive callout */
+  /* Code/destructive callout — breaking news box */
   .rounded.bg-destructive\/10 {
     border-radius: 0 !important;
-    background-color: hsl(var(--primary)) !important;
-    border: 4px solid hsl(var(--foreground)) !important;
-    box-shadow: var(--shadow-brut-sm) !important;
-    color: hsl(var(--foreground));
-    font-weight: 900;
+    background-color: hsl(var(--background)) !important;
+    border: 2px solid hsl(var(--accent)) !important;
+    box-shadow: none !important;
+    color: hsl(var(--accent));
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
   }
 
-  /* DraftRoom helpers retargeted to neo-brutalism */
+  /* DraftRoom helpers retargeted to newsprint */
   .scoreboard-tile {
-    background-color: hsl(var(--secondary)) !important;
-    border: 3px solid hsl(var(--foreground)) !important;
+    background-color: hsl(var(--background)) !important;
+    border: 1px solid hsl(var(--foreground)) !important;
     border-radius: 0 !important;
-    box-shadow: 3px 3px 0 0 hsl(var(--foreground)) !important;
+    box-shadow: none !important;
     padding: 0.5rem 0.75rem;
-    font-family: "Space Grotesk", sans-serif !important;
-    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-weight: 500;
     color: hsl(var(--foreground));
   }
   .scoreboard-plinth {
-    background-color: hsl(var(--muted)) !important;
+    background-color: hsl(var(--background)) !important;
     border: 4px solid hsl(var(--foreground)) !important;
     border-radius: 0 !important;
     box-shadow: var(--shadow-brut-lg) !important;
     padding: 1.5rem 2rem;
   }
-  .font-score   { font-family: "Space Grotesk", sans-serif; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+  .font-score   { font-family: 'Playfair Display', serif; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
   .score-digit  { color: hsl(var(--foreground)); }
   .broadcast-label {
-    font-family: "Space Grotesk", sans-serif;
+    font-family: 'JetBrains Mono', monospace;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    font-weight: 900;
+    font-weight: 500;
     font-size: 0.7rem;
-    color: hsl(var(--foreground));
-    background: hsl(var(--secondary));
+    color: hsl(var(--background));
+    background: hsl(var(--foreground));
     padding: 2px 6px;
-    border: 2px solid hsl(var(--foreground));
     display: inline-block;
   }
   .accent-flare { position: relative; }
-  .accent-flare::after {
-    content: ""; position: absolute; inset: 0;
-    background: hsl(var(--primary) / 0.0);
-    z-index: -1; pointer-events: none;
-  }
+  .accent-flare::after { content: none; }
   .whistle-focus:focus-visible {
     outline: none !important;
-    box-shadow: var(--shadow-brut) !important;
-    background-color: hsl(var(--secondary)) !important;
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--foreground)) !important;
   }
 }
 
 /* Markdown styles for AI coach output */
-.coach-md p { @apply mb-2 leading-relaxed font-bold; }
+.coach-md p { @apply mb-2 leading-relaxed; font-family: 'Lora', Georgia, serif; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply text-foreground font-black; }
-.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground font-display; }
-.coach-md code { @apply px-1 py-0.5 bg-secondary text-foreground text-xs font-mono border-2 border-foreground; }
+.coach-md strong { @apply text-foreground font-bold; }
+.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground font-serif; font-weight: 900; }
+.coach-md code { @apply px-1 py-0.5 bg-secondary text-foreground text-xs font-mono border border-foreground; }
