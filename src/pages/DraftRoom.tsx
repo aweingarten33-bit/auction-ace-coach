@@ -104,6 +104,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [drawerInitial, setDrawerInitial] = useState<"menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife">("menu");
   const [aiOpen, setAiOpen] = useState<boolean>(false);
   
   const [query, setQuery] = useState<string>("");
