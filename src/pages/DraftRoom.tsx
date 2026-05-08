@@ -425,7 +425,7 @@ export default function DraftRoom() {
         className="origin-center"
         style={{
           transform: toolPage ? "scale(0.94) translateX(-18px)" : "none",
-          transition: "transform 500ms cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: "transform 850ms cubic-bezier(0.22, 1, 0.36, 1)",
           willChange: "transform",
         }}
       >
@@ -474,23 +474,21 @@ export default function DraftRoom() {
         </div>
       </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
-      >
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Sheet open={drawerOpen} onOpenChange={(o) => { setDrawerOpen(o); if (!o) setDrawerInitial("menu"); }}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="-ml-2 h-12 w-12 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
-                aria-label="Open menu"
-                onClick={() => setDrawerInitial("menu")}
-              >
-                <Menu className="h-7 w-7" strokeWidth={2.5} />
-              </Button>
-            </SheetTrigger>
-            <DrawerContents
+      {/* ── Floating hamburger (bottom-left) — opens settings sheet from ground ── */}
+      <Sheet open={drawerOpen} onOpenChange={(o) => { setDrawerOpen(o); if (!o) setDrawerInitial("menu"); }}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Open menu"
+            onClick={() => setDrawerInitial("menu")}
+            className="fixed left-4 z-40 h-14 w-14 rounded-full border border-border/60 bg-background/85 backdrop-blur-md text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
+            style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
+          >
+            <Menu className="h-7 w-7" strokeWidth={2.5} />
+          </Button>
+        </SheetTrigger>
+        <DrawerContents
               onClose={() => setDrawerOpen(false)}
               gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
               budget={budget}
@@ -515,13 +513,11 @@ export default function DraftRoom() {
               onUnpin={unpinPlayer}
               initialSection={drawerInitial}
             />
-          </Sheet>
+      </Sheet>
 
-          {/* Budget lives inside the hamburger menu — no chip on the homepage. */}
-        </div>
-
-        {/* Live nomination strip — only when something's actively up for bid */}
-        {espnSync.liveBid && (
+      {/* Live nomination strip — only when something's actively up for bid */}
+      {espnSync.liveBid && (
+        <header className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
           <div className="border-t border-border/40 bg-secondary/40 px-4 py-1.5">
             <div className="mx-auto flex max-w-3xl flex-col gap-1">
               <p className="flex items-center gap-2 text-[11px]">
@@ -548,9 +544,8 @@ export default function DraftRoom() {
               />
             </div>
           </div>
-        )}
-      </header>
-
+        </header>
+      )}
       {/* ── MAIN ──────────────────────────────────────────────────────── */}
       <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
         {/* Find (player or $) lives in the hamburger drawer now. */}
@@ -728,7 +723,7 @@ export default function DraftRoom() {
           {/* backdrop — frosted glass, fades in, click to dismiss */}
           <div
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-lg animate-fade-in"
-            style={{ animationDuration: "0.45s" }}
+            style={{ animationDuration: "0.7s" }}
             onClick={() => setToolPage(null)}
             aria-hidden
           />
@@ -736,7 +731,7 @@ export default function DraftRoom() {
           <div
             className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[-20px_0_80px_rgba(0,0,0,0.85)] overflow-y-auto"
             style={{
-              animation: "tool-panel-in 0.55s cubic-bezier(0.34, 1.25, 0.64, 1) both",
+              animation: "tool-panel-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) both",
               transformOrigin: "right center",
             }}
           >
@@ -752,14 +747,14 @@ export default function DraftRoom() {
               >
                 <ChevronLeft className="h-6 w-6" strokeWidth={2} />
               </button>
-              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in" style={{ animationDelay: "180ms", animationDuration: "500ms", animationFillMode: "both" }}>
+              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in" style={{ animationDelay: "320ms", animationDuration: "750ms", animationFillMode: "both" }}>
                 {toolPage === "lookup" && "Find"}
                 {toolPage === "top100" && "Top 100"}
                 {toolPage === "afford" && "Afford"}
                 {toolPage === "market" && "Market"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
-              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "280ms", animationDuration: "500ms", animationFillMode: "both" }}>
+              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "500ms", animationDuration: "750ms", animationFillMode: "both" }}>
                 {toolPage === "lookup" && "Search any player or dollar amount."}
                 {toolPage === "top100" && "Best-value board, math-backed."}
                 {toolPage === "afford" && "Pressure-test a plan before spending."}
@@ -768,7 +763,7 @@ export default function DraftRoom() {
               </p>
             </div>
 
-            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "380ms", animationDuration: "500ms", animationFillMode: "both" }}>
+            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "720ms", animationDuration: "800ms", animationFillMode: "both" }}>
               {toolPage === "lookup" && (
                 <LookupSection
                   prices={prices}
@@ -883,7 +878,7 @@ function DrawerContents({
   ];
 
   return (
-    <SheetContent side="left" className="flex w-[88%] max-w-md flex-col p-0 sm:w-[420px]">
+    <SheetContent side="bottom" className="flex h-[88vh] flex-col gap-0 rounded-t-3xl border-t border-border/60 p-0">
       <SheetHeader className="border-b border-border/60 px-4 py-3">
         <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
           {section !== "menu" && (
