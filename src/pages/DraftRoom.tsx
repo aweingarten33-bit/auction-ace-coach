@@ -231,7 +231,7 @@ export default function DraftRoom() {
           <div className="-mx-5 px-5 flex gap-7 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             {[
               { id: "lookup" as const,      icon: Search,       label: "Find" },
-              { id: "top100" as const,      icon: ListOrdered,  label: "Top 100" },
+              { id: "top100" as const,      icon: ListOrdered,  label: "Top 50" },
               { id: "market" as const,      icon: TrendingUp,   label: "Market" },
               { id: "fantasylife" as const, icon: ExternalLink, label: "News" },
             ].map(({ id, icon: Icon, label }) => (
@@ -376,7 +376,7 @@ export default function DraftRoom() {
           {events.length === 0 && watchlist.length === 0 && myItems.length === 0 && (
             <div className="rounded-lg border border-dashed border-border/60 bg-secondary/20 p-8 text-center text-sm text-muted-foreground">
               <p className="mb-2 font-semibold text-foreground">Welcome to your draft research dossier.</p>
-              <p>Tap <span className="font-semibold">Find</span> to look up any player, <span className="font-semibold">Top 100</span> for the value board, or <span className="font-semibold">Market</span> for room pulse.</p>
+              <p>Tap <span className="font-semibold">Find</span> to look up any player, <span className="font-semibold">Top 50</span> for the value board, or <span className="font-semibold">Market</span> for room pulse.</p>
             </div>
           )}
         </main>
@@ -454,7 +454,7 @@ export default function DraftRoom() {
               </button>
               <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight">
                 {toolPage === "lookup" && "Find"}
-                {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 100` : "Top 100")}
+                {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
                 {toolPage === "market" && "Market"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
@@ -783,7 +783,7 @@ function Top100List({
       const finalPrice = anchor && anchor > 0 ? anchor : p.price;
       if (finalPrice > 0) byName.set(key, { name: p.name, price: finalPrice, position: p.position });
     }
-    return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 100);
+    return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 50);
   }, [prices, anchorMap]);
 
   if (top.length === 0) {
