@@ -241,14 +241,19 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
           const effScale = 1 + (rawScale - 1) * fade;
           const adj = Math.max(1, Math.round(mv.val * effScale));
+          const inj = injuryFactor(k);
+          const finalPrice = Math.max(1, Math.round(adj * inj.factor));
           out[k] = {
-            price: adj,
+            price: finalPrice,
             source: "espn",
             marketPrice: Math.max(1, Math.round(mv.val)),
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
             },
+            injuryDiscount: inj.reason
+              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: adj }
+              : undefined,
           };
         }
 
