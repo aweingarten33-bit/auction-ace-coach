@@ -35,7 +35,7 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
   const canShowDeltas = isMine && hasPrice;
 
   // Position-specific deltas (only meaningful when YOU made the pick at a tracked pos)
-  const posBefore = isMine && isTrackedPos
+  const posBefore = canShowDeltas && isTrackedPos
     ? {
         count: countByPosition([
           ...keepers.map((k) => ({ player: k.player, position: k.position, price: k.cost, source: "keeper" as const })),
