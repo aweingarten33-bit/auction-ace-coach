@@ -9,10 +9,8 @@ import {
   byeWeekForTeam,
   SleeperPlayer,
 } from "@/lib/sleeper";
-import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube, DollarSign, TrendingUp, History, Target } from "lucide-react";
-import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle } from "lucide-react";
 import AuctionPlayerCard from "@/components/AuctionPlayerCard";
-import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "@/lib/decision-engine";
 
 interface RosterGap {
@@ -86,8 +84,6 @@ export default function PlayerDetailsOverlay({
 }: Props) {
   const [meta, setMeta] = useState<SleeperPlayer | null | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-  const [history, setHistory] = useState<Array<{ season: number; bid: number }>>([]);
-
   useEffect(() => {
     if (!open || !name) return;
     let cancelled = false;
@@ -102,35 +98,11 @@ export default function PlayerDetailsOverlay({
     return () => { cancelled = true; };
   }, [open, name]);
 
-  // Pull this player's auction history in your league (last 3 yrs)
-  useEffect(() => {
-    if (!open || !name) { setHistory([]); return; }
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from("league_auction_history")
-        .select("season, bid_amount, player_name")
-        .ilike("player_name", name)
-        .order("season", { ascending: false })
-        .limit(5);
-      if (cancelled) return;
-      setHistory(((data ?? []) as Array<{ season: number; bid_amount: number }>).map(
-        (r) => ({ season: r.season, bid: r.bid_amount })
-      ));
-    })();
-    return () => { cancelled = true; };
-  }, [open, name]);
-
   const team = meta?.team ?? undefined;
   const bye = byeWeekForTeam(team);
   const pos = (meta?.position as Position | undefined) ?? position;
   const injury = meta?.injury_status ?? meta?.status;
   const showInjury = injury && injury !== "Active";
-
-  // Pick the headline price: sheet → blended anchor → ESPN value
-  const espnVal = anchor?.marketSources?.espn ?? anchor?.marketPrice;
-  const leagueVal = anchor?.leaguePrice;
-  const suggested = sheetPrice ?? anchor?.price ?? espnVal;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -242,19 +214,6 @@ export default function PlayerDetailsOverlay({
             </Block>
           ) : null}
         </div>
-
-        {/* Analyst takes — only shown when there's actually something to say */}
-        <VetriTakesForPlayer
-          player={name}
-          compact
-          hideWhenEmpty
-          wrapperClassName="rounded-md border border-border/60 bg-secondary/30 p-3"
-          header={
-            <p className="mb-2 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <Youtube className="h-3 w-3" /> What the analysts say
-            </p>
-          }
-        />
       </DialogContent>
     </Dialog>
   );

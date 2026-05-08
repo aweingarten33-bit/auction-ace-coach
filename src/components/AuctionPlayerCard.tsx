@@ -1,8 +1,6 @@
 // Magazine cheat-sheet style player card — research-only.
-// Cream bg, navy banner, BYE badge, headshot, team logo. The dollar/why/how
-// sections show research data we already have (league 3yr avg, ESPN value,
-// last-sold, position rank). Content sections marked "Coming soon" are
-// placeholders we'll design together — no bidding/decision logic.
+// Cream bg, navy banner, BYE badge, headshot, team logo, roster math,
+// and blended Matthew Berry/Fantasy Life + Sleeper market context.
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +11,8 @@ import {
 } from "@/lib/sleeper";
 import type { Position } from "@/lib/draft-types";
 import type { AnchorEntry } from "@/lib/decision-engine";
+
+const fmt = (n: number) => `$${Math.round(n)}`;
 
 interface RosterGap {
   pos: string;
@@ -99,10 +99,21 @@ export default function AuctionPlayerCard({
     ? `https://sleepercdn.com/images/team_logos/nfl/${meta.team.toLowerCase()}.png`
     : null;
 
+  const sleeperVal = anchor?.marketSources?.sleeper;
   const espnVal = anchor?.marketSources?.espn ?? anchor?.marketPrice;
+  const berryVal = sheetPrice;
   const leagueVal = anchor?.leaguePrice;
   const lastSold = history[0];
-  const headlinePrice = sheetPrice ?? anchor?.price ?? espnVal;
+
+  const analystInputs = [berryVal, sleeperVal].filter((v): v is number => typeof v === "number" && v > 0);
+  const analystAvg = analystInputs.length
+    ? Math.round(analystInputs.reduce((a, b) => a + b, 0) / analystInputs.length)
+    : undefined;
+  const headlinePrice = analystAvg ?? sheetPrice ?? anchor?.price ?? sleeperVal ?? espnVal;
+  const suggested = headlinePrice != null ? Math.round(headlinePrice) : undefined;
+  const marketAvg = analystAvg ?? anchor?.marketPrice ?? (espnVal && sleeperVal ? Math.round((espnVal + sleeperVal) / 2) : espnVal ?? sleeperVal ?? leagueVal);
+  const delta = suggested != null && marketAvg != null ? suggested - Math.round(marketAvg) : undefined;
+  const valueVerdict = delta == null ? null : delta <= -3 ? "VALUE" : delta >= 3 ? "OVERPAY" : "FAIR";
 
   const firstName = name.split(" ")[0] || "Player";
 
@@ -115,52 +126,55 @@ export default function AuctionPlayerCard({
     depth: `Depth at ${position}`,
     done: `${position} starters filled`,
   };
-
-  // Math: compare suggested price vs market values
-  const refPrices: number[] = [];
-  if (leagueVal != null) refPrices.push(leagueVal);
-  if (espnVal != null) refPrices.push(espnVal);
-  const marketAvg = refPrices.length
-    ? Math.round(refPrices.reduce((a, b) => a + b, 0) / refPrices.length)
+  const needsLeft = (gaps ?? [])
+    .filter((g) => g.starterShort > 0)
+    .map((g) => `${g.starterShort} ${g.pos}`)
+    .join(", ");
+  const rosterLine = remaining != null && slotsLeft != null
+    ? `Your roster math now: ${fmt(remaining)} left for ${slotsLeft} slots${needsLeft ? `; starter needs left: ${needsLeft}` : "; starter spots are covered"}.`
+    : needsLeft
+      ? `Starter needs left: ${needsLeft}.`
+      : "Starter spots are covered; this is about value/depth.";
+  const afterRemaining = suggested != null && remaining != null ? remaining - suggested : undefined;
+  const slotsAfter = slotsLeft != null ? Math.max(0, slotsLeft - 1) : undefined;
+  const avgPerSlotAfter = afterRemaining != null && slotsAfter != null && slotsAfter > 0
+    ? Math.floor(afterRemaining / slotsAfter)
     : undefined;
-  const suggested = headlinePrice != null ? Math.round(headlinePrice) : undefined;
-  const delta = suggested != null && marketAvg != null ? suggested - marketAvg : undefined;
-  const valueVerdict =
-    delta == null ? null : delta <= -3 ? "VALUE" : delta >= 3 ? "OVERPAY" : "FAIR";
 
   // Why-draft text
-  const whyParts: string[] = [];
+  const whyParts: string[] = [rosterLine];
   if (suggested != null && marketAvg != null) {
+    const roundedMarket = Math.round(marketAvg);
+    const math = `${fmt(suggested)} price vs ${fmt(roundedMarket)} Berry/Sleeper value = ${delta! >= 0 ? "+" : "-"}${fmt(Math.abs(delta!))}`;
     if (delta! < 0) {
-      whyParts.push(
-        `Suggested $${suggested} is $${Math.abs(delta!)} UNDER market avg $${marketAvg} — buy-low spot.`
-      );
+      whyParts.push(`${math}; discount if you still need ${position ?? "this position"}.`);
     } else if (delta! > 0) {
-      whyParts.push(
-        `Suggested $${suggested} is $${delta} OVER market avg $${marketAvg} — only chase if you need ${position}.`
-      );
+      whyParts.push(`${math}; premium only makes sense if the roster hole is real.`);
     } else {
-      whyParts.push(`Suggested $${suggested} matches market avg $${marketAvg} — fair price.`);
+      whyParts.push(`${math}; fair blend, not generic app pricing.`);
     }
   }
+  if (berryVal != null || sleeperVal != null) {
+    whyParts.push(`Analyst blend uses Matthew Berry/Fantasy Life${berryVal != null ? ` ${fmt(berryVal)}` : ""} + Sleeper${sleeperVal != null ? ` ${fmt(sleeperVal)}` : ""}.`);
+  }
   if (posRank && totalAtPos) {
-    whyParts.push(`${position}${posRank} of ${totalAtPos} on the board by price.`);
+    whyParts.push(`${position}${posRank} of ${totalAtPos} by auction value, so compare him to your remaining ${position} need.`);
   }
   if (myGap && (need === "critical" || need === "need")) {
-    whyParts.push(`You still need ${myGap.starterShort} starting ${position}.`);
+    whyParts.push(`You still need ${myGap.starterShort} starting ${position}; this card is judging him against that hole.`);
   }
 
-  // Path-to-smash: based on usage rank + injury history
+  // Path-to-smash: based on rank + Fantasy Life/Sleeper context
   const pathParts: string[] = [];
   if (posRank && posRank <= 6) {
-    pathParts.push(`Top-${posRank} ${position} usage = ceiling pick if healthy.`);
+    pathParts.push(`Top-${posRank} ${position} profile; Berry/Fantasy Life + Sleeper value says ceiling is already priced like a difference-maker.`);
   } else if (posRank && posRank <= 15) {
-    pathParts.push(`Mid-tier ${position}; smash case is one tier jump in role.`);
+    pathParts.push(`Mid-tier ${position}; payoff is beating the blended ${marketAvg ? fmt(marketAvg) : "market"} number while your expensive slots stay intact.`);
   } else if (posRank) {
-    pathParts.push(`Late-round ${position}; smash needs an injury ahead or breakout role.`);
+    pathParts.push(`Late ${position}; path is cheap depth, injury-away upside, or Sleeper depth-chart movement.`);
   }
   if (lastSold && marketAvg != null && lastSold.bid < marketAvg - 2) {
-    pathParts.push(`Sold for $${lastSold.bid} in '${String(lastSold.season).slice(2)} — room for upside.`);
+    pathParts.push(`Your league last paid ${fmt(lastSold.bid)} in '${String(lastSold.season).slice(2)}, below today's ${fmt(marketAvg)} blend.`);
   }
 
   // Risk: injury status from anchor + price-vs-budget
@@ -169,46 +183,38 @@ export default function AuctionPlayerCard({
     const pre = anchor.injuryDiscount.preInjuryPrice;
     const cut = pre - (anchor.price ?? pre);
     if (cut > 0) {
-      riskParts.push(`Injury discount of ~$${Math.round(cut)} baked in (${anchor.injuryDiscount.reason}).`);
+      riskParts.push(`Availability discount of ~${fmt(cut)} baked in (${anchor.injuryDiscount.reason}).`);
     }
   }
-  if (suggested != null && remaining != null && slotsLeft != null && slotsLeft > 1) {
-    const afterRemaining = remaining - suggested;
-    const slotsAfter = slotsLeft - 1;
-    const avgPerSlotAfter = slotsAfter > 0 ? Math.floor(afterRemaining / slotsAfter) : 0;
-    if (avgPerSlotAfter < 2) {
-      riskParts.push(
-        `Spending $${suggested} leaves $${afterRemaining} for ${slotsAfter} slots ($${avgPerSlotAfter}/slot avg). TOO TIGHT.`
-      );
-    } else if (avgPerSlotAfter < 5) {
-      riskParts.push(
-        `After this you'd have $${afterRemaining} for ${slotsAfter} slots ($${avgPerSlotAfter}/slot). Tight.`
-      );
+  if (suggested != null && afterRemaining != null && slotsAfter != null && slotsLeft != null && slotsLeft > 1) {
+    if (avgPerSlotAfter != null && avgPerSlotAfter < 2) {
+      riskParts.push(`At ${fmt(suggested)}, you have ${fmt(afterRemaining)} for ${slotsAfter} slots (${fmt(avgPerSlotAfter)}/slot). TOO TIGHT.`);
+    } else if (avgPerSlotAfter != null && avgPerSlotAfter < 5) {
+      riskParts.push(`At ${fmt(suggested)}, you have ${fmt(afterRemaining)} for ${slotsAfter} slots (${fmt(avgPerSlotAfter)}/slot). Tight.`);
+    } else {
+      riskParts.push(`At ${fmt(suggested)}, remaining build is ${fmt(afterRemaining)} for ${slotsAfter} slots (${fmt(avgPerSlotAfter ?? 0)}/slot).`);
     }
   }
   if (suggested != null && maxBid != null && suggested > maxBid) {
-    riskParts.push(`Suggested $${suggested} exceeds your max bid $${maxBid}.`);
+    riskParts.push(`${fmt(suggested)} is above your max single-player spend ${fmt(maxBid)}.`);
   }
 
   // Bottom line
   const bottomParts: string[] = [];
   if (suggested != null) {
+    const roundedMarket = marketAvg != null ? Math.round(marketAvg) : undefined;
+    const math = roundedMarket != null ? `${fmt(suggested)} - ${fmt(roundedMarket)} = ${delta! >= 0 ? "+" : "-"}${fmt(Math.abs(delta!))}` : `${fmt(suggested)} current value`;
     if (need === "critical" || need === "need") {
-      bottomParts.push(
-        `You NEED ${position}. Pay up to $${suggested}${marketAvg != null ? ` (market $${marketAvg})` : ""}.`
-      );
+      bottomParts.push(`${needLabel[need]}: ${math}. If you tap him, the key is whether ${fmt(afterRemaining ?? 0)} for ${slotsAfter ?? 0} slots still fits your build.`);
     } else if (need === "depth") {
-      bottomParts.push(
-        `Depth pick — only at $${Math.max(1, suggested - 2)} or under (${marketAvg != null ? `market $${marketAvg}` : "value play"}).`
-      );
+      bottomParts.push(`Depth only: ${math}. Better if he falls below the blended Berry/Sleeper number.`);
     } else {
-      bottomParts.push(`Position is filled — pass unless price drops to a bargain.`);
+      bottomParts.push(`Position filled: ${math}. This has to be a clear discount, not another spend slot.`);
     }
   }
   if (remaining != null && slotsLeft != null) {
-    bottomParts.push(`Budget: $${remaining} left, ${slotsLeft} slots.`);
+    bottomParts.push(`Current inputs: ${fmt(remaining)} remaining, ${slotsLeft} roster slots left${maxBid != null ? `, ${fmt(maxBid)} max single-player spend` : ""}.`);
   }
-
 
   return (
     // Cream magazine-card background
@@ -280,7 +286,7 @@ export default function AuctionPlayerCard({
         <div className="flex flex-col justify-between">
           <div>
             <p className="text-[9px] font-black uppercase tracking-widest text-[#d2691e]">
-              Auction value
+              Berry + Sleeper value
             </p>
             {headlinePrice != null ? (
               <p className="font-serif text-4xl font-black leading-none">
@@ -292,17 +298,23 @@ export default function AuctionPlayerCard({
               </p>
             )}
             <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[#1b2238]/60">
-              suggested bid
+              blended research price
             </p>
           </div>
 
           {/* Compact price stack */}
           <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px]">
+            {analystAvg != null && (
+              <PriceLine label="Berry/Sleeper avg" value={`$${analystAvg}`} />
+            )}
+            {sleeperVal != null && (
+              <PriceLine label="Sleeper" value={`$${Math.round(sleeperVal)}`} />
+            )}
             {leagueVal != null && (
               <PriceLine label="League 3yr avg" value={`$${Math.round(leagueVal)}`} />
             )}
             {espnVal != null && (
-              <PriceLine label="ESPN value" value={`$${Math.round(espnVal)}`} />
+              <PriceLine label="Market value" value={`$${Math.round(espnVal)}`} />
             )}
             {sheetPrice != null && (
               <PriceLine label="Your sheet" value={`$${sheetPrice}`} />
@@ -351,7 +363,7 @@ export default function AuctionPlayerCard({
 
       {/* ── FOOTER ─────────────────────────────────────── */}
       <div className="bg-[#1b2238] px-3 py-1.5 text-center text-[9px] font-bold uppercase tracking-[0.2em] text-[#f5efe4]/70">
-        Research only · No bidding
+        Research only · Matthew Berry/Fantasy Life + Sleeper blend
       </div>
     </div>
   );
