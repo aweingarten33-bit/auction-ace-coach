@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
     }
 
     const cookie = `SWID=${creds.swid}; espn_s2=${creds.espn_s2}`;
-    const espnUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${creds.season_id}/segments/0/leagues/${creds.league_id}?view=mTeam`;
+    const espnUrl = `https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/${creds.season_id}/segments/0/leagues/${creds.league_id}?view=mTeam&view=mSettings`;
     const r = await fetch(espnUrl, {
       headers: { cookie, accept: "application/json", "user-agent": "Mozilla/5.0" },
     });

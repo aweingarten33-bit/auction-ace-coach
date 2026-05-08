@@ -88,17 +88,27 @@ export default function DraftRoom() {
     teamIdOverride: selectedTeam?.id ?? null,
   });
 
-  // Pull league name from the most recent live_draft_event raw payload
+  // Pull league name from ESPN (via league-teams edge fn), with cache fallback
   useEffect(() => {
     (async () => {
       const cached = localStorage.getItem("league_name_cache");
       if (cached) setLeagueName(cached);
-      const { data } = await supabase
+      try {
+        const { data } = await supabase.functions.invoke("league-teams");
+        const name = (data as any)?.league?.name as string | undefined;
+        if (name) {
+          setLeagueName(name);
+          try { localStorage.setItem("league_name_cache", name); } catch { /* ignore */ }
+          return;
+        }
+      } catch { /* fall through */ }
+      // Fallback: try to find league name on a recent live event payload
+      const { data: ev } = await supabase
         .from("live_draft_events")
         .select("raw")
         .order("created_at", { ascending: false })
         .limit(25);
-      const rows = (data ?? []) as Array<{ raw: any }>;
+      const rows = (ev ?? []) as Array<{ raw: any }>;
       const found = rows.find((r) => r?.raw?.league?.name)?.raw?.league?.name as string | undefined;
       if (found) {
         setLeagueName(found);
@@ -190,7 +200,7 @@ export default function DraftRoom() {
           style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
         >
           <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
-            {leagueName ? `The ${leagueName}` : "The Bro We're Senior Citizens"}
+            {leagueName ? `The ${leagueName}` : "\u00a0"}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             {selectedTeam ? (
@@ -444,7 +454,7 @@ export default function DraftRoom() {
               </button>
               <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight">
                 {toolPage === "lookup" && "Find"}
-                {toolPage === "top100" && "Top 100"}
+                {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 100` : "Top 100")}
                 {toolPage === "market" && "Market"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
