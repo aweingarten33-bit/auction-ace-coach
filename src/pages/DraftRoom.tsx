@@ -106,6 +106,8 @@ export default function DraftRoom() {
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [drawerInitial, setDrawerInitial] = useState<"menu" | "lookup" | "top100" | "afford" | "market" | "fantasylife">("menu");
+  type ToolId = "lookup" | "top100" | "afford" | "market" | "fantasylife";
+  const [toolPage, setToolPage] = useState<ToolId | null>(null);
   const [aiOpen, setAiOpen] = useState<boolean>(false);
   
   const [query, setQuery] = useState<string>("");
