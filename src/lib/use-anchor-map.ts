@@ -283,21 +283,58 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const mv = marketConsensus(k);
           const vv = vorpMap[k];
 
-          // Blend league w/ VORP first (projection-based reality check on stale prices),
-          // then nudge with market consensus if it strongly disagrees.
+          // ─── Variance-aware blending ────────────────────────────────────
+          // The OLD behavior used fixed league weights (0.85/0.6/0.4) regardless
+          // of how much league history and current market sources disagreed.
+          // That's why a player like Mahomes whose league bid history was
+          // $60-$63 stayed pinned to ~$62 even when ESPN/Sleeper had moved to
+          // $38 — the static weight ignored the disagreement.
+          //
+          // NEW: keep the same base league weight (3+ seasons of YOUR money is
+          // still gospel) but DECAY it proportionally to the gap between your
+          // historical price and the current market consensus. The bigger the
+          // gap, the more we treat the league number as stale.
+          //
+          // Examples (3-season player, base league weight 0.85):
+          //   league $62, market $60 → disagreement 0.03 → weight 0.85 (no change)
+          //   league $62, market $50 → disagreement 0.19 → weight 0.76
+          //   league $62, market $38 → disagreement 0.39 → weight 0.65
+          //   league $62, market $20 → disagreement 0.68 → weight 0.50 (floor)
+          // We cap the decay so league can never drop below 0.50 — your
+          // multi-year league data is still the strongest signal we have.
           let final = leaguePrice;
           const seasonsCount = v.bySeason.size;
+          const baseLeagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
+
+          // Disagreement scalar in [0, 1]: how far apart are league and market?
+          // 0 = perfect agreement, 1 = one is double the other.
+          let disagreement = 0;
+          if (mv && mv.val > 0 && leaguePrice > 0) {
+            const hi = Math.max(mv.val, leaguePrice);
+            const lo = Math.min(mv.val, leaguePrice);
+            disagreement = Math.min(1, (hi - lo) / hi);
+          }
+          // Decay coefficient — how much the disagreement is allowed to chip
+          // away at the league weight. 0.6 means a 50% disagreement reduces
+          // league weight by 30 percentage points. Clamped so league weight
+          // never falls below 0.5 (your league data still wins ties).
+          const DECAY = 0.6;
+          const FLOOR = seasonsCount >= 3 ? 0.5 : seasonsCount === 2 ? 0.4 : 0.3;
+          const adjustedLeagueWeight = Math.max(
+            FLOOR,
+            baseLeagueWeight * (1 - disagreement * DECAY),
+          );
+
           if (vv && vv.price > 0) {
-            // 3+ seasons of YOUR money is gospel — heavy lean on league.
-            // 2 seasons: trust league but let VORP nudge.
-            // 1 season: VORP gets real say (small sample).
-            const leagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
-            final = leaguePrice * leagueWeight + vv.price * (1 - leagueWeight);
+            // Blend league w/ VORP using the variance-adjusted weight
+            final = leaguePrice * adjustedLeagueWeight + vv.price * (1 - adjustedLeagueWeight);
           }
           if (mv && mv.val > 0) {
             const ratio = mv.val / Math.max(1, final);
-            // With 3+ seasons of league data, only let market UP-revise (catches
-            // ascending players). Never let market drag down a proven league price.
+            // Existing market-disagreement nudge — kept as a SECOND pass on top
+            // of the variance-aware blend above. With 3+ seasons, market can
+            // only push UP (catches breakouts). With <3 seasons, market can
+            // also push down (younger players, less data).
             if (seasonsCount >= 3) {
               if (ratio >= 1.5) final = final * 0.7 + mv.val * 0.3;
               // ratio <= 0.5 path intentionally removed for veteran data
