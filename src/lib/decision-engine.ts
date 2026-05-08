@@ -293,7 +293,7 @@ export function decide(input: EngineInput): DecisionResult {
 
   // Confidence — high if we have a real anchor + confident market, medium if anchor only, low otherwise
   const confidence: DecisionResult["confidence"] =
-    anchorSource === "sheet" && pulse.confident ? "high" :
+    anchorSource === "league" && pulse.confident ? "high" :
     anchorPrice > 0 ? "medium" : "low";
 
   return {
