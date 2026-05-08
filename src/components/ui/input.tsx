@@ -3,7 +3,8 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Maximalism Input — pill-shaped, neon border, glow on focus.
+ * FRANK MILLER NEWSPRINT BRUTALISM — Input.
+ * Terminal field. Mono type, sharp corners, hairline border, gold focus rule.
  */
 const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
@@ -11,14 +12,13 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
       <input
         type={type}
         className={cn(
-          "flex h-14 w-full rounded-full bg-[hsl(var(--muted-bg)/0.55)] backdrop-blur-sm",
-          "px-6 py-3 text-base font-body font-bold text-white",
-          "border-4 border-[hsl(var(--max-1))]",
-          "transition-all duration-300 ease-out",
-          "placeholder:text-white/45 placeholder:font-medium",
-          "focus-visible:outline-none focus-visible:ring-0",
-          "focus-visible:border-[hsl(var(--max-3))] focus-visible:bg-[hsl(var(--muted-bg)/0.85)]",
-          "focus-visible:shadow-[0_0_24px_hsl(var(--max-3)/0.6),0_0_0_4px_hsl(var(--max-1)/0.4)]",
+          "flex h-12 w-full rounded-none bg-[hsl(var(--input))]",
+          "px-4 py-2 text-sm font-mono tracking-wide text-[hsl(var(--bone))]",
+          "border border-[hsl(var(--border))] border-b-2 border-b-[hsl(var(--bone)/0.45)]",
+          "transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.2,0,0.1,1)]",
+          "placeholder:text-[hsl(var(--muted-foreground))] placeholder:uppercase placeholder:tracking-widest placeholder:text-xs",
+          "focus-visible:outline-none focus-visible:border-[hsl(var(--bone))] focus-visible:border-b-[hsl(var(--dirty-gold))]",
+          "focus-visible:shadow-[inset_0_-3px_0_hsl(var(--dirty-gold)/0.55)]",
           "disabled:cursor-not-allowed disabled:opacity-50",
           className,
         )}

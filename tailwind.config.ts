@@ -12,11 +12,16 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Bangers"', '"Bungee"', "sans-serif"],
-        heading: ['"Outfit"', '"Unbounded"', "sans-serif"],
-        sans:    ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
-        body:    ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
-        mono:    ['ui-monospace', '"JetBrains Mono"', "monospace"],
+        display:   ['"Anton"', '"Bebas Neue"', "Impact", "sans-serif"],
+        headline:  ['"Bebas Neue"', '"Oswald"', "Impact", "sans-serif"],
+        heading:   ['"Bebas Neue"', '"Oswald"', "Impact", "sans-serif"],
+        condensed: ['"Oswald"', '"Bebas Neue"', "sans-serif"],
+        editorial: ['"Playfair Display"', "Georgia", "serif"],
+        serif:     ['"Playfair Display"', "Georgia", "serif"],
+        sans:      ['"Oswald"', "ui-sans-serif", "system-ui", "sans-serif"],
+        body:      ['"Playfair Display"', "Georgia", "serif"],
+        mono:      ['"JetBrains Mono"', '"IBM Plex Mono"', "ui-monospace", "monospace"],
+        data:      ['"JetBrains Mono"', "ui-monospace", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
