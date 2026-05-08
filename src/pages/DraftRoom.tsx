@@ -685,12 +685,14 @@ export default function DraftRoom() {
       >
         <p className="inline-flex items-center justify-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
           <span>Built by A.</span>
-          <img
-            src={wuWOutline}
-            alt="W"
-            className="inline-block h-7 w-8 object-contain align-[-4px]"
-          />
-          <span>eingarten</span>
+          <span className="inline-flex items-center gap-0">
+            <img
+              src={wuWOutline}
+              alt="W"
+              className="inline-block h-7 w-8 object-contain align-[-4px]"
+            />
+            <span className="-ml-1">eingarten</span>
+          </span>
         </p>
       </footer>
     </div>
