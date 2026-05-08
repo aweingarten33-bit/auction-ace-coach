@@ -375,7 +375,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         //   T2: League history >= $25 but market < $10 (or vice versa) AND no injury flag
         //   T3: High-value (>= $25 anchor) with NO injury flag — suspect stale feed
         // Cached 24hr per player in localStorage. AI can only SUBTRACT value.
-        const NEWS_CACHE_KEY = "ai-news-newsCache-v1";
+        const NEWS_CACHE_KEY = "ai-news-cache-v1";
         const TTL = 24 * 60 * 60 * 1000;
         type CacheRow = { factor: number; reason: string; source_url: string; ts: number };
         const newsCache: Record<string, CacheRow> = (() => {
