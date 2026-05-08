@@ -723,7 +723,7 @@ export default function DraftRoom() {
           {/* backdrop — frosted glass, fades in, click to dismiss */}
           <div
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-lg animate-fade-in"
-            style={{ animationDuration: "0.45s" }}
+            style={{ animationDuration: "0.7s" }}
             onClick={() => setToolPage(null)}
             aria-hidden
           />
@@ -731,7 +731,7 @@ export default function DraftRoom() {
           <div
             className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[-20px_0_80px_rgba(0,0,0,0.85)] overflow-y-auto"
             style={{
-              animation: "tool-panel-in 0.55s cubic-bezier(0.34, 1.25, 0.64, 1) both",
+              animation: "tool-panel-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) both",
               transformOrigin: "right center",
             }}
           >
@@ -747,14 +747,14 @@ export default function DraftRoom() {
               >
                 <ChevronLeft className="h-6 w-6" strokeWidth={2} />
               </button>
-              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in" style={{ animationDelay: "180ms", animationDuration: "500ms", animationFillMode: "both" }}>
+              <h1 className="mt-8 mb-2 text-[44px] leading-[1.02] font-semibold tracking-tight animate-fade-in" style={{ animationDelay: "320ms", animationDuration: "750ms", animationFillMode: "both" }}>
                 {toolPage === "lookup" && "Find"}
                 {toolPage === "top100" && "Top 100"}
                 {toolPage === "afford" && "Afford"}
                 {toolPage === "market" && "Market"}
                 {toolPage === "fantasylife" && "News"}
               </h1>
-              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "280ms", animationDuration: "500ms", animationFillMode: "both" }}>
+              <p className="mb-6 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "500ms", animationDuration: "750ms", animationFillMode: "both" }}>
                 {toolPage === "lookup" && "Search any player or dollar amount."}
                 {toolPage === "top100" && "Best-value board, math-backed."}
                 {toolPage === "afford" && "Pressure-test a plan before spending."}
@@ -762,6 +762,8 @@ export default function DraftRoom() {
                 {toolPage === "fantasylife" && "Latest from fantasylife.com."}
               </p>
             </div>
+
+            <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "720ms", animationDuration: "800ms", animationFillMode: "both" }}>
 
             <div className="px-3 pb-24 animate-fade-in" style={{ animationDelay: "380ms", animationDuration: "500ms", animationFillMode: "both" }}>
               {toolPage === "lookup" && (
