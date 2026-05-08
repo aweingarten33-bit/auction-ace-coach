@@ -65,13 +65,18 @@ export default function DecisionCard({ d }: { d: DecisionResult }) {
             </p>
           )}
         </div>
-        <div className={`shrink-0 rounded-md px-3 py-1.5 ring-1 ${v.bg} ${v.ring}`}>
-          <p className={`text-2xl font-extrabold leading-none tracking-tight ${v.text}`}>
-            {d.verdict}
-          </p>
-          <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-wider ${v.text}`}>
-            {d.oneLiner}
-          </p>
+        <div className={`shrink-0 rounded-md px-3 py-1.5 ring-1 ${v.bg} ${v.ring} flex items-center gap-2`}>
+          <span className="text-3xl leading-none">
+            {d.verdict === "PASS" || d.verdict === "STOP" ? "👎" : "👍"}
+          </span>
+          <div>
+            <p className={`font-mono text-2xl font-extrabold leading-none tabular-nums ${v.text}`}>
+              ${d.goUpTo}
+            </p>
+            <p className={`mt-0.5 text-[10px] font-semibold uppercase tracking-wider ${v.text}`}>
+              {d.oneLiner}
+            </p>
+          </div>
         </div>
       </div>
 
