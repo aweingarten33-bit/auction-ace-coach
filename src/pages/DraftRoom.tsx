@@ -415,6 +415,7 @@ export default function DraftRoom() {
               pulseMultiplier={pulse.multiplier}
               events={events}
               prices={prices}
+              anchorMap={anchorMap}
               settings={settings}
               activeName={activeName}
               onSignOut={async () => {
@@ -725,6 +726,7 @@ function DrawerContents({
   pulseMultiplier,
   events,
   prices,
+  anchorMap,
   settings,
   activeName,
   onSignOut,
@@ -839,6 +841,7 @@ function DrawerContents({
         <div className="flex-1 overflow-y-auto p-3">
           <LookupSection
             prices={prices}
+            anchorMap={anchorMap}
             events={events}
             maxBid={budget.maxBid}
             onPick={(name) => {
@@ -1020,11 +1023,13 @@ function PlanSection({ budget }: { budget: ReturnType<typeof computeBudget> }) {
 // ─────────────────────────────────────────────────────────────────────────────
 function LookupSection({
   prices,
+  anchorMap,
   events,
   maxBid,
   onPick,
 }: {
   prices: PriceEstimate[];
+  anchorMap: Record<string, import("@/lib/decision-engine").AnchorEntry>;
   events: ReturnType<typeof useDraftStore.getState>["events"];
   maxBid: number;
   onPick: (name: string) => void;
@@ -1035,12 +1040,28 @@ function LookupSection({
     [events],
   );
 
+  // Merge sheet prices with anchor cascade — same math as player cards.
+  const pricedPool = useMemo(() => {
+    type Row = { name: string; price: number; position?: PriceEstimate["position"] };
+    const out: Row[] = [];
+    const seen = new Set<string>();
+    for (const p of prices) {
+      const key = norm(p.name);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const anchor = anchorMap[key]?.price;
+      const finalPrice = anchor && anchor > 0 ? anchor : p.price;
+      out.push({ name: p.name, price: finalPrice, position: p.position });
+    }
+    return out;
+  }, [prices, anchorMap]);
+
   const trimmed = input.trim();
   const isDollar = /^\$?\d+$/.test(trimmed);
   const target = isDollar ? Number(trimmed.replace(/\D/g, "")) : 0;
 
   const matches = useMemo(() => {
-    const pool = prices.filter((p) => !drafted.has(norm(p.name)));
+    const pool = pricedPool.filter((p) => !drafted.has(norm(p.name)));
 
     if (isDollar && target > 0) {
       return pool
@@ -1058,7 +1079,7 @@ function LookupSection({
     }
 
     return [];
-  }, [prices, drafted, target, trimmed, isDollar]);
+  }, [pricedPool, drafted, target, trimmed, isDollar]);
 
   return (
     <div className="space-y-3">
