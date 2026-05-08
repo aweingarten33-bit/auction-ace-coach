@@ -379,6 +379,69 @@
   .animate-flag-drop  { animation: flag-drop 0.4s steps(3) both; }
   .animate-flicker    { animation: flicker 4s steps(1) infinite; }
 
+  /* SHAKE — last 10 seconds on the clock, the stadium tilts */
+  @keyframes shake-violent {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    20% { transform: translate(-3px, 2px) rotate(-0.6deg); }
+    40% { transform: translate(3px, -2px) rotate(0.6deg); }
+    60% { transform: translate(-2px, 3px) rotate(-0.3deg); }
+    80% { transform: translate(2px, -3px) rotate(0.3deg); }
+  }
+  .animate-shake { animation: shake-violent 0.3s steps(3) infinite; }
+
+  /* FLASHBULB — touchdown / draft pick made / siren */
+  @keyframes flashbulb {
+    0% { background: hsl(60 11% 95% / 0); }
+    8% { background: hsl(60 11% 95% / 0.85); }
+    20% { background: hsl(60 11% 95% / 0); }
+    100% { background: hsl(60 11% 95% / 0); }
+  }
+  .flashbulb-once::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 10000;
+    animation: flashbulb 220ms steps(2) 1;
+  }
+
+  /* GLITCH — score updates, ##.# before reveal */
+  @keyframes glitch {
+    0%, 100% { transform: translate(0); text-shadow: 0 0 0 transparent; }
+    20% { transform: translate(-2px, 1px); text-shadow: 2px 0 hsl(348 83% 47%), -2px 0 hsl(111 100% 54%); }
+    40% { transform: translate(2px, -1px); text-shadow: -2px 0 hsl(348 83% 47%), 2px 0 hsl(111 100% 54%); }
+    60% { transform: translate(-1px, 2px); text-shadow: 1px 0 hsl(16 100% 50%), -1px 0 hsl(111 100% 54%); }
+    80% { transform: translate(1px, -2px); text-shadow: 0 0 0 transparent; }
+  }
+  .animate-glitch { animation: glitch 200ms steps(2) 1; }
+
+  /* BRUISE PULSE — questionable / IR */
+  @keyframes bruise-pulse {
+    0%, 100% { box-shadow: inset 4px 0 0 hsl(275 100% 25%); }
+    50% { box-shadow: inset 4px 0 0 hsl(275 100% 25% / 0.35); }
+  }
+  .animate-bruise { animation: bruise-pulse 2s steps(4) infinite; }
+
+  /* SCORE FLASH — turf hit / blood loss */
+  @keyframes score-hit {
+    0% { color: hsl(60 11% 95%); transform: scale(1); }
+    20% { color: hsl(111 100% 54%); transform: scale(1.15); text-shadow: 0 0 18px hsl(111 100% 54% / 0.7); }
+    100% { color: hsl(60 11% 95%); transform: scale(1); text-shadow: 0 0 0 transparent; }
+  }
+  .animate-score-hit { animation: score-hit 0.6s steps(3) 1; }
+  @keyframes score-loss {
+    0% { color: hsl(60 11% 95%); }
+    20% { color: hsl(348 83% 47%); transform: translateX(-2px); }
+    40% { color: hsl(348 83% 47%); transform: translateX(2px); }
+    100% { color: hsl(60 11% 95%); transform: translateX(0); }
+  }
+  .animate-score-loss { animation: score-loss 0.6s steps(3) 1; }
+
+  /* respect reduced motion — kill the violence */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-shake, .animate-glitch, .animate-bruise, .animate-flicker,
+    .animate-score-hit, .animate-score-loss,
+    .flashbulb-once::after { animation: none !important; }
+  }
+
   /* slight asymmetric tilt */
   .tilt-slight   { transform: rotate(-0.6deg); }
   .tilt-back     { transform: rotate(0.5deg); }
