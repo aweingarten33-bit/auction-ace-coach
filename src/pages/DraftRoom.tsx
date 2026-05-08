@@ -474,23 +474,21 @@ export default function DraftRoom() {
         </div>
       </div>
       {/* ── STICKY STATUS BAR ────────────────────────────────────────── */}
-      <header
-        className="sticky top-0 z-30 border-b border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
-      >
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <Sheet open={drawerOpen} onOpenChange={(o) => { setDrawerOpen(o); if (!o) setDrawerInitial("menu"); }}>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="-ml-2 h-12 w-12 flex items-center justify-center text-foreground hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
-                aria-label="Open menu"
-                onClick={() => setDrawerInitial("menu")}
-              >
-                <Menu className="h-7 w-7" strokeWidth={2.5} />
-              </Button>
-            </SheetTrigger>
-            <DrawerContents
+      {/* ── Floating hamburger (bottom-left) — opens settings sheet from ground ── */}
+      <Sheet open={drawerOpen} onOpenChange={(o) => { setDrawerOpen(o); if (!o) setDrawerInitial("menu"); }}>
+        <SheetTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Open menu"
+            onClick={() => setDrawerInitial("menu")}
+            className="fixed left-4 z-40 h-14 w-14 rounded-full border border-border/60 bg-background/85 backdrop-blur-md text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
+            style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
+          >
+            <Menu className="h-7 w-7" strokeWidth={2.5} />
+          </Button>
+        </SheetTrigger>
+        <DrawerContents
               onClose={() => setDrawerOpen(false)}
               gaps={gaps.map((g) => ({ pos: g.pos, severity: g.severity }))}
               budget={budget}
