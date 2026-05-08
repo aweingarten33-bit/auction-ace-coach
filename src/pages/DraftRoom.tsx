@@ -80,7 +80,7 @@ import PlayerSearchPanel from "@/components/PlayerSearchPanel";
 import { PlannerBody } from "@/pages/Planner";
 
 import FootballShieldIcon from "@/components/FootballShieldIcon";
-import superFootballLogo from "@/assets/logo-wu-football.png";
+import superFootballLogo from "@/assets/logo-wu-tang.png";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -478,31 +478,7 @@ export default function DraftRoom() {
             />
           </Sheet>
 
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            className="flex min-w-0 flex-1 items-center justify-end gap-2 rounded-md px-2 py-1 font-mono tabular-nums hover:bg-foreground/5 active:scale-[0.98] transition"
-            aria-label="Open menu — full budget breakdown"
-          >
-            <span
-              className={`text-[18px] font-bold leading-none ${
-                budget.remaining / Math.max(1, settings.totalBudget) < 0.2
-                  ? "text-destructive"
-                  : budget.remaining / Math.max(1, settings.totalBudget) < 0.45
-                  ? "text-warning"
-                  : "text-foreground"
-              }`}
-            >
-              ${budget.remaining}
-            </span>
-            {budget.maxBid > 0 && (
-              <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                max <span className="text-foreground">${budget.maxBid}</span>
-              </span>
-            )}
-          </button>
-
-          {/* Top 100 lives inside the hamburger menu now. */}
+          {/* Budget lives inside the hamburger menu — no chip on the homepage. */}
         </div>
 
         {/* Live nomination strip — only when something's actively up for bid */}
