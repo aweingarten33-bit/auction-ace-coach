@@ -156,16 +156,16 @@ export default function PlayerDetailsOverlay({
 
           <div className="grid grid-cols-2 gap-2 text-[11px]">
             {leagueVal != null && (
-              <PriceStat icon={History} label="Your league 3yr avg" value={`$${Math.round(leagueVal)}`} />
+              <Stat icon={History} label="Your league 3yr avg" value={`$${Math.round(leagueVal)}`} />
             )}
             {espnVal != null && (
-              <PriceStat icon={TrendingUp} label="ESPN value" value={`$${Math.round(espnVal)}`} />
+              <Stat icon={TrendingUp} label="ESPN value" value={`$${Math.round(espnVal)}`} />
             )}
             {sheetPrice != null && (
-              <PriceStat icon={Target} label="Your sheet" value={`$${sheetPrice}`} />
+              <Stat icon={Target} label="Your sheet" value={`$${sheetPrice}`} />
             )}
             {history.length > 0 && (
-              <PriceStat
+              <Stat
                 icon={History}
                 label="Last sold"
                 value={`$${history[0].bid} (${history[0].season})`}
