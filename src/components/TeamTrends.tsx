@@ -34,6 +34,7 @@ const POS_ORDER = ["QB", "RB", "WR", "TE", "K", "DST"] as const;
 export default function TeamTrends({ teamId, teamName }: { teamId: number; teamName: string }) {
   const [data, setData] = useState<Payload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
