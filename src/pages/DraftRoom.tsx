@@ -29,6 +29,7 @@ import {
   Check,
   Sparkles,
   ChevronRight,
+  ChevronLeft,
   ListOrdered,
   ExternalLink,
 } from "lucide-react";
