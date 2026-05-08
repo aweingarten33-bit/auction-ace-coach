@@ -17,13 +17,22 @@ export default function LastPickImpact({ settings, keepers, events }: Props) {
   const last = events[events.length - 1];
   if (!last) return null;
 
+  // Guardrails — flag missing fields before computing deltas
+  const warnings: string[] = [];
+  const hasPrice = typeof last.price === "number" && Number.isFinite(last.price) && last.price > 0;
+  const pos = last.position;
+  const isTrackedPos = !!pos && POS.includes(pos);
+  if (!pos) warnings.push("Position missing on import — roster impact can't be computed.");
+  else if (!isTrackedPos) warnings.push(`Position "${pos}" isn't tracked (QB/RB/WR/TE).`);
+  if (!hasPrice) warnings.push("Price missing or invalid — budget impact can't be computed.");
+  if (!last.player || last.player.trim().length < 2) warnings.push("Player name missing on import.");
+
   const prevEvents = events.slice(0, -1);
   const before = computeBudget(settings, keepers, prevEvents);
   const after = computeBudget(settings, keepers, events);
 
   const isMine = last.drafter === "me";
-  const pos = last.position;
-  const isTrackedPos = !!pos && POS.includes(pos);
+  const canShowDeltas = isMine && hasPrice;
 
   // Position-specific deltas (only meaningful when YOU made the pick at a tracked pos)
   const posBefore = isMine && isTrackedPos
