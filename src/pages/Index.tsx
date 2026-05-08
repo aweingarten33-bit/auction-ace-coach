@@ -13,15 +13,7 @@ const Index = () => {
 
   useEffect(() => {
     if (loading || !user || editing) { setRouting(false); return; }
-    (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("espn_team_id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (!data?.espn_team_id) navigate("/claim", { replace: true });
-      else navigate("/draft-room", { replace: true });
-    })();
+    navigate("/draft-room", { replace: true });
   }, [user, editing, loading, navigate]);
 
   if (loading || routing) return null;
