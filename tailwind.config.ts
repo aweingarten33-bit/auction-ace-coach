@@ -12,11 +12,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', '"Times New Roman"', "serif"],
-        serif:   ['"Playfair Display"', '"Times New Roman"', "serif"],
-        sans:    ['"Inter"', '"Helvetica Neue"', "sans-serif"],
-        body:    ['"Lora"', "Georgia", "serif"],
-        mono:    ['"JetBrains Mono"', '"Courier New"', "monospace"],
+        display: ['"Bangers"', '"Bungee"', "sans-serif"],
+        heading: ['"Outfit"', '"Unbounded"', "sans-serif"],
+        sans:    ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        body:    ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        mono:    ['ui-monospace', '"JetBrains Mono"', "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",
