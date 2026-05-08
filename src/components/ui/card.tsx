@@ -12,10 +12,11 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
       ref={ref}
       className={cn(
         "relative bg-[hsl(var(--card))] text-[hsl(var(--card-foreground))]",
-        "rounded-[2rem] border-0",
-        "shadow-[var(--neu-extruded)]",
+        "rounded-[1.75rem] border-0",
+        // gold hairline edge + ink shadow + faint blood undercurrent
+        "shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.25),inset_0_1px_0_hsl(var(--primary)/0.35),0_18px_40px_-12px_hsl(354_80%_8%/0.85),0_1px_0_hsl(354_72%_36%/0.25)]",
         "transition-[transform,box-shadow] duration-300 ease-out",
-        "hover:-translate-y-[2px] hover:shadow-[var(--neu-extruded-hover)]",
+        "hover:-translate-y-[2px] hover:shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.45),inset_0_1px_0_hsl(var(--primary)/0.55),0_24px_48px_-12px_hsl(354_80%_6%/0.9),0_2px_0_hsl(354_72%_36%/0.4)]",
         className,
       )}
       {...props}
