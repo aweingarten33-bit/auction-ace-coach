@@ -9,8 +9,7 @@ import {
   byeWeekForTeam,
   SleeperPlayer,
 } from "@/lib/sleeper";
-import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle, Youtube, DollarSign, TrendingUp, History, Target } from "lucide-react";
-import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
+import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle } from "lucide-react";
 import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "@/lib/decision-engine";
@@ -127,11 +126,6 @@ export default function PlayerDetailsOverlay({
   const injury = meta?.injury_status ?? meta?.status;
   const showInjury = injury && injury !== "Active";
 
-  // Pick the headline price: sheet → blended anchor → ESPN value
-  const espnVal = anchor?.marketSources?.espn ?? anchor?.marketPrice;
-  const leagueVal = anchor?.leaguePrice;
-  const suggested = sheetPrice ?? anchor?.price ?? espnVal;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0 bg-[#f5efe4] border-none">
@@ -242,19 +236,6 @@ export default function PlayerDetailsOverlay({
             </Block>
           ) : null}
         </div>
-
-        {/* Analyst takes — only shown when there's actually something to say */}
-        <VetriTakesForPlayer
-          player={name}
-          compact
-          hideWhenEmpty
-          wrapperClassName="rounded-md border border-border/60 bg-secondary/30 p-3"
-          header={
-            <p className="mb-2 flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
-              <Youtube className="h-3 w-3" /> What the analysts say
-            </p>
-          }
-        />
       </DialogContent>
     </Dialog>
   );

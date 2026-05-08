@@ -1,7 +1,7 @@
 // DraftRoom.tsx — research-only home page.
 // Read-only by default. No bidding, no nominating, no "what to bid" logic.
 // Surfaces: player search, top-100 board, market heat, opponent room,
-// vetri takes, fantasy life feed, watchlist, AI coach Q&A.
+// Fantasy Life feed, watchlist, AI coach Q&A.
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -48,7 +48,6 @@ import {
 } from "@/components/ui/sheet";
 import MarketHeat from "@/components/MarketHeat";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
-import VetriTakesForPlayer from "@/components/VetriTakesForPlayer";
 import AiQuickPanel from "@/components/AiQuickPanel";
 import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
