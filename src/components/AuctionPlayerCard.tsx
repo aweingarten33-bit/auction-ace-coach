@@ -534,7 +534,7 @@ function buildCopy(d: DecisionResult, insights: ReturnType<typeof computeCardIns
   const vitals = [
     { label: "Tier",   value: `T${tier}` },
     { label: "Anchor", value: `$${d.anchorPrice ?? anchor}` },
-    { label: "Cap",    value: `$${d.goUpTo ?? insights.walkAway}` },
+    { label: "Pay up to", value: `$${Math.min(d.goUpTo ?? anchor, d.anchorPrice ?? anchor)}` },
     { label: "Now",    value: `$${d.currentPrice ?? "—"}` },
   ];
 
