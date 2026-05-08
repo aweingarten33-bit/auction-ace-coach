@@ -685,7 +685,7 @@ export default function DraftRoom() {
       >
         <p className="inline-flex items-center justify-center gap-2 text-base font-semibold uppercase tracking-wider text-muted-foreground">
           <span>Built by A.</span>
-          <span className="inline-flex items-center gap-1">
+          <span className="inline-flex items-center gap-[2px]">
             <img
               src={wuWOutline}
               alt="W"
