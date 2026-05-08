@@ -1,94 +1,104 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Playfair+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* =====================================================================
-   GOTHAM MINIMAL — Frank Miller × Jony Ive
-   Miller supplies the ink, the menace, the heavy slabs of shadow and
-   the bat-signal yellow that cuts through fog.
-   Ive supplies the restraint: one typeface, generous negative space,
-   precise edges, materials you want to touch, no decoration that
-   isn't load-bearing.
-   The result is a Dark Knight that feels machined from a single billet
-   of obsidian. Quiet menace. Premium dread. No wasted pixels.
+   MAN OF TOMORROW — Frank Miller writes Superman, in Editorial Serif
+   ---------------------------------------------------------------------
+   Imagine a hardcover graphic novel: cream paper, a deckled edge, and
+   on the cover a single sun-bleached figure standing in the wheat.
+   Miller draws him from below — propaganda angles, halftone dots, ink
+   so heavy the page warps. Inside, the design is whisper-quiet
+   editorial: Playfair Display headlines, gold rules, generous margins.
+   The accent is BURNISHED GOLD — Superman's crest, an illuminated
+   capital, a wedding ring. Used sparingly. Always meaningful.
+   The shadows are STAMPED, not blurred. The kind a press leaves.
    ===================================================================== */
 
 @layer base {
   :root {
-    /* The void — a single piece of black glass */
-    --background: 220 20% 6%;            /* obsidian */
-    --foreground: 40 18% 92%;            /* cold bone */
-    --muted-bg: 220 15% 11%;             /* graphite */
+    /* The page — warm ivory, the color of aged hardcover endpapers */
+    --background: 42 30% 96%;            /* ivory paper */
+    --foreground: 30 12% 10%;            /* press black, never pure */
+    --muted-bg:   38 24% 92%;            /* cream gutter */
 
-    --card: 220 18% 9%;                  /* anodized panel */
-    --card-foreground: 40 18% 92%;
+    --card: 0 0% 100%;                   /* fresh signature page */
+    --card-foreground: 30 12% 10%;
 
-    --popover: 220 20% 7%;
-    --popover-foreground: 40 18% 92%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 12% 10%;
 
-    /* The signal — used sparingly, like Miller's spot color */
-    --signal: 46 94% 54%;                /* bat-signal amber */
-    --blood:  358 72% 44%;               /* Janson dried blood */
-    --steel:  220 12% 62%;               /* gunmetal */
-    --ink:    220 40% 3%;                /* pure shadow */
+    /* The crest — Superman's three colors, refined for editorial */
+    --sungold:  42 78% 38%;              /* burnished gold (S-shield) */
+    --sungold-2: 44 70% 56%;             /* leafed gold highlight */
+    --krypton:  220 55% 14%;             /* deep Krypton midnight blue */
+    --bloodred: 358 64% 38%;             /* cape red, dried */
+    --kryptonite: 110 38% 38%;           /* glowing green — used once a chapter */
+    --steel:    30 8% 38%;               /* Smallville iron */
+    --ink:      30 18% 6%;               /* press shadow */
+    --bone:     42 30% 96%;              /* paper-on-paper */
 
-    /* shadcn mapping — restrained */
-    --primary: 46 94% 54%;
-    --primary-foreground: 220 40% 4%;
-    --primary-glow: 46 94% 54%;
+    /* shadcn mapping — restrained, gold leads */
+    --primary: 42 78% 38%;               /* sungold */
+    --primary-foreground: 42 30% 97%;
+    --primary-glow: 44 70% 56%;
 
-    --secondary: 220 15% 14%;
-    --secondary-foreground: 40 18% 92%;
+    --secondary: 38 24% 92%;
+    --secondary-foreground: 30 12% 10%;
 
-    --muted: 220 15% 11%;
-    --muted-foreground: 220 10% 60%;
+    --muted: 38 24% 92%;
+    --muted-foreground: 30 8% 38%;
 
-    --accent: 358 72% 44%;
-    --accent-foreground: 40 18% 95%;
+    --accent: 42 78% 38%;
+    --accent-foreground: 42 30% 97%;
 
-    --destructive: 358 72% 44%;
-    --destructive-foreground: 40 18% 95%;
+    --destructive: 358 64% 38%;
+    --destructive-foreground: 42 30% 97%;
 
-    --warning: 46 94% 54%;
-    --warning-foreground: 220 40% 4%;
+    --warning: 42 78% 38%;
+    --warning-foreground: 30 18% 6%;
 
-    --success: 46 94% 54%;
-    --success-foreground: 220 40% 4%;
+    --success: 110 38% 32%;
+    --success-foreground: 42 30% 97%;
 
-    --border: 220 15% 16%;
-    --input: 220 18% 10%;
-    --ring: 46 94% 54%;
+    --border: 36 16% 80%;                /* warm hairline */
+    --input:  0 0% 100%;
+    --ring:   42 78% 38%;
 
-    --radius: 2px;
+    --radius: 4px;
 
-    /* Shadows — Janson ink slabs, no blur unless it's atmosphere */
-    --shadow-card:      0 1px 0 0 hsl(var(--border)), 0 24px 60px -20px hsl(var(--ink) / 0.9);
-    --shadow-floating:  0 40px 80px -30px hsl(var(--ink) / 0.95), 0 1px 0 0 hsl(var(--border));
-    --shadow-pressed:   inset 0 1px 0 0 hsl(var(--ink));
+    /* Backwards-compat: old "signal/blood" tokens still used by components */
+    --signal: 42 78% 38%;                /* re-routed to sungold */
+    --blood:  358 64% 38%;
+
+    /* Shadows — letterpress impressions, not Photoshop drops */
+    --shadow-card:      0 1px 0 0 hsl(var(--border)), 0 12px 28px -16px hsl(var(--ink) / 0.18);
+    --shadow-floating:  0 1px 0 0 hsl(var(--border)), 0 28px 56px -22px hsl(var(--ink) / 0.22);
+    --shadow-pressed:   inset 0 1px 0 0 hsl(var(--ink) / 0.10);
     --shadow-recessed:  inset 0 0 0 1px hsl(var(--border));
-    --shadow-sharp:     6px 6px 0 0 hsl(var(--ink));
-    --shadow-glow:      0 0 0 1px hsl(var(--signal) / 0.4), 0 0 32px -4px hsl(var(--signal) / 0.35);
-    --shadow-primary:   0 0 0 1px hsl(var(--signal)), 0 12px 40px -12px hsl(var(--signal) / 0.4);
-    --shadow-led-green: 0 0 12px hsl(var(--signal) / 0.5);
+    --shadow-sharp:     4px 4px 0 0 hsl(var(--ink) / 0.85);
+    --shadow-glow:      0 0 0 1px hsl(var(--sungold) / 0.45), 0 12px 32px -10px hsl(var(--sungold) / 0.30);
+    --shadow-primary:   0 0 0 1px hsl(var(--sungold)), 0 14px 36px -14px hsl(var(--sungold) / 0.45);
+    --shadow-led-green: 0 0 10px hsl(var(--kryptonite) / 0.45);
 
-    --shadow-brut-sm:   3px 3px 0 0 hsl(var(--ink));
-    --shadow-brut:      6px 6px 0 0 hsl(var(--ink));
-    --shadow-brut-lg:   10px 10px 0 0 hsl(var(--ink));
-    --shadow-brut-xl:   16px 16px 0 0 hsl(var(--ink));
+    --shadow-brut-sm:   2px 2px 0 0 hsl(var(--ink) / 0.85);
+    --shadow-brut:      4px 4px 0 0 hsl(var(--ink) / 0.85);
+    --shadow-brut-lg:   8px 8px 0 0 hsl(var(--ink) / 0.85);
+    --shadow-brut-xl:   12px 12px 0 0 hsl(var(--ink) / 0.85);
 
-    --sidebar-background: 220 22% 5%;
-    --sidebar-foreground: 40 18% 88%;
-    --sidebar-primary: 46 94% 54%;
-    --sidebar-primary-foreground: 220 40% 4%;
-    --sidebar-accent: 220 18% 10%;
-    --sidebar-accent-foreground: 40 18% 92%;
-    --sidebar-border: 220 15% 14%;
-    --sidebar-ring: 46 94% 54%;
+    --sidebar-background: 38 24% 94%;
+    --sidebar-foreground: 30 12% 10%;
+    --sidebar-primary: 42 78% 38%;
+    --sidebar-primary-foreground: 42 30% 97%;
+    --sidebar-accent: 38 24% 88%;
+    --sidebar-accent-foreground: 30 12% 10%;
+    --sidebar-border: 36 16% 80%;
+    --sidebar-ring: 42 78% 38%;
   }
 
-  .dark { /* permanent dark */ }
+  .dark { /* this graphic novel is printed on paper — light only */ }
 
   * { @apply border-border; }
 
@@ -102,104 +112,142 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
-    letter-spacing: -0.005em;
+    letter-spacing: 0.005em;
+    line-height: 1.6;
     background-color: hsl(var(--background));
-    /* Atmosphere only — a single floodlight from above-left,
-       a low blood wash at the bottom, and a fine paper grain. */
+    /* Atmosphere: a sun rising at top-right (Superman ascending),
+       a cape-red wash low at bottom-left, and the warmth of paper. */
     background-image:
-      radial-gradient(ellipse 80% 50% at 18% 0%, hsl(var(--signal) / 0.07), transparent 60%),
-      radial-gradient(ellipse 70% 40% at 100% 100%, hsl(var(--blood) / 0.10), transparent 65%),
-      linear-gradient(180deg, hsl(220 25% 4%) 0%, hsl(var(--background)) 40%, hsl(220 28% 3%) 100%);
+      radial-gradient(ellipse 70% 50% at 92% 0%, hsl(var(--sungold) / 0.12), transparent 62%),
+      radial-gradient(ellipse 60% 40% at 0% 100%, hsl(var(--bloodred) / 0.08), transparent 65%),
+      linear-gradient(180deg, hsl(42 34% 97%) 0%, hsl(var(--background)) 45%, hsl(38 22% 93%) 100%);
     background-attachment: fixed;
   }
 
-  /* Fine ink grain — Janson newsprint, but milled smooth */
+  /* Ben-Day halftone — Miller's printer's ghost, faint over the paper */
   body::before {
     content: "";
     position: fixed; inset: 0;
     pointer-events: none;
     z-index: 1;
     background-image:
-      repeating-linear-gradient(0deg, hsl(var(--ink) / 0.18) 0 1px, transparent 1px 3px);
+      radial-gradient(hsl(var(--ink) / 0.18) 0.6px, transparent 1px);
+    background-size: 4px 4px;
     mix-blend-mode: multiply;
-    opacity: 0.35;
+    opacity: 0.18;
+  }
+
+  /* Paper grain — the second layer, a fine vertical fiber */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image:
+      repeating-linear-gradient(90deg, hsl(var(--ink) / 0.04) 0 1px, transparent 1px 3px);
+    mix-blend-mode: multiply;
+    opacity: 0.5;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Inter", sans-serif;
+    font-family: "Playfair Display", Georgia, serif;
     font-weight: 800;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
     color: hsl(var(--foreground));
-    line-height: 0.98;
+    line-height: 1.12;
   }
-  h1 { font-weight: 900; letter-spacing: -0.045em; }
+  h1 { font-weight: 900; letter-spacing: -0.03em; line-height: 1.05; }
 
-  ::selection { background: hsl(var(--signal)); color: hsl(var(--ink)); }
+  ::selection { background: hsl(var(--sungold) / 0.85); color: hsl(var(--ink)); }
 }
 
 @layer utilities {
-  .font-display { font-family: "Playfair Display", "Inter", serif; font-weight: 900; letter-spacing: -0.03em; }
-  .font-heading { font-family: "Inter", sans-serif; font-weight: 800; letter-spacing: -0.035em; }
-  .font-body    { font-family: "Inter", sans-serif; font-weight: 400; }
-  .font-mono    { font-family: "JetBrains Mono", ui-monospace, monospace; font-weight: 500; }
+  .font-display { font-family: "Playfair Display", Georgia, serif; font-weight: 900; letter-spacing: -0.025em; }
+  .font-heading { font-family: "Playfair Display", Georgia, serif; font-weight: 800; letter-spacing: -0.02em; }
+  .font-body    { font-family: "Source Sans 3", ui-sans-serif, sans-serif; font-weight: 400; }
+  .font-mono    { font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 500; }
+  .font-serif   { font-family: "Playfair Display", Georgia, serif; }
 
-  /* Semantic accents — keep the palette tight */
-  .text-signal { color: hsl(var(--signal)); }
-  .text-blood  { color: hsl(var(--blood)); }
-  .text-steel  { color: hsl(var(--steel)); }
-  .bg-signal { background-color: hsl(var(--signal)); }
-  .bg-blood  { background-color: hsl(var(--blood)); }
-  .bg-ink    { background-color: hsl(var(--ink)); }
-  .bg-panel  { background-color: hsl(var(--card)); }
-  .border-signal { border-color: hsl(var(--signal)); }
-  .border-blood  { border-color: hsl(var(--blood)); }
+  /* Semantic accents */
+  .text-signal    { color: hsl(var(--sungold)); }
+  .text-sungold   { color: hsl(var(--sungold)); }
+  .text-krypton   { color: hsl(var(--krypton)); }
+  .text-blood     { color: hsl(var(--bloodred)); }
+  .text-kryptonite{ color: hsl(var(--kryptonite)); }
+  .text-steel     { color: hsl(var(--steel)); }
+  .bg-signal   { background-color: hsl(var(--sungold)); }
+  .bg-sungold  { background-color: hsl(var(--sungold)); }
+  .bg-krypton  { background-color: hsl(var(--krypton)); }
+  .bg-blood    { background-color: hsl(var(--bloodred)); }
+  .bg-ink      { background-color: hsl(var(--ink)); }
+  .bg-bone     { background-color: hsl(var(--bone)); }
+  .bg-panel    { background-color: hsl(var(--card)); }
+  .border-signal  { border-color: hsl(var(--sungold)); }
+  .border-sungold { border-color: hsl(var(--sungold)); }
+  .border-blood   { border-color: hsl(var(--bloodred)); }
+  .border-krypton { border-color: hsl(var(--krypton)); }
 
-  /* Back-compat with prior maximalist tokens — collapsed to the new palette */
-  .text-max-1, .text-max-5 { color: hsl(var(--blood)); }
+  /* Back-compat: old maximalist tokens — collapsed onto the Superman palette */
+  .text-max-1, .text-max-5 { color: hsl(var(--bloodred)); }
   .text-max-2 { color: hsl(var(--steel)); }
-  .text-max-3, .text-max-4 { color: hsl(var(--signal)); }
-  .bg-max-1, .bg-max-5 { background-color: hsl(var(--blood)); }
+  .text-max-3, .text-max-4 { color: hsl(var(--sungold)); }
+  .bg-max-1, .bg-max-5 { background-color: hsl(var(--bloodred)); }
   .bg-max-2 { background-color: hsl(var(--steel)); }
-  .bg-max-3, .bg-max-4 { background-color: hsl(var(--signal)); }
+  .bg-max-3, .bg-max-4 { background-color: hsl(var(--sungold)); }
   .bg-max-muted { background-color: hsl(var(--muted-bg)); }
-  .border-max-1, .border-max-5 { border-color: hsl(var(--blood)); }
+  .border-max-1, .border-max-5 { border-color: hsl(var(--bloodred)); }
   .border-max-2 { border-color: hsl(var(--border)); }
-  .border-max-3, .border-max-4 { border-color: hsl(var(--signal)); }
+  .border-max-3, .border-max-4 { border-color: hsl(var(--sungold)); }
 
-  /* Single-color "gradient" — restraint over rainbow */
+  /* Sun-rise gradient — for headline accents */
   .text-gradient {
-    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--steel)) 100%);
+    background: linear-gradient(180deg, hsl(var(--ink)) 0%, hsl(var(--sungold)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+  .text-gradient-sun {
+    background: linear-gradient(135deg, hsl(var(--sungold)) 0%, hsl(var(--sungold-2)) 50%, hsl(var(--bloodred)) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: transparent;
   }
 
-  .text-shadow-1, .text-shadow-2, .text-shadow-3 { text-shadow: 0 1px 0 hsl(var(--ink)); }
-  .text-shadow-mega { text-shadow: 0 2px 0 hsl(var(--ink)), 0 12px 32px hsl(var(--ink) / 0.6); }
-  .text-emboss { text-shadow: 0 1px 0 hsl(var(--ink)); }
+  .text-shadow-1, .text-shadow-2, .text-shadow-3 { text-shadow: 0 1px 0 hsl(var(--ink) / 0.12); }
+  .text-shadow-mega { text-shadow: 0 1px 0 hsl(var(--ink) / 0.15), 0 8px 24px hsl(var(--ink) / 0.18); }
+  .text-emboss { text-shadow: 0 1px 0 hsl(0 0% 100% / 0.6), 0 -1px 0 hsl(var(--ink) / 0.1); }
 
+  /* Stamped label — like an editor's blue-pencil stamp on the proof */
   .label-stamped {
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", monospace;
     text-transform: uppercase;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
     font-weight: 700;
     font-size: 0.66rem;
-    color: hsl(var(--ink));
-    background: hsl(var(--signal));
+    color: hsl(var(--bone));
+    background: hsl(var(--sungold));
     padding: 3px 9px;
     border-radius: 2px;
     display: inline-block;
+    box-shadow: 1px 1px 0 0 hsl(var(--ink) / 0.4);
   }
 
-  /* Shadow utilities — flat ink slabs, no rainbow stacks */
-  .shadow-multi    { box-shadow: 0 1px 0 0 hsl(var(--border)), 0 24px 60px -20px hsl(var(--ink) / 0.9); }
-  .shadow-multi-lg { box-shadow: 0 1px 0 0 hsl(var(--border)), 0 40px 80px -30px hsl(var(--ink)); }
-  .shadow-glow-accent    { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.35), 0 0 24px -4px hsl(var(--signal) / 0.3); }
-  .shadow-glow-accent-lg { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.5), 0 0 60px -8px hsl(var(--signal) / 0.4); }
-  .shadow-mixed    { box-shadow: 6px 6px 0 hsl(var(--ink)), 0 0 0 1px hsl(var(--border)); }
+  /* Editorial rule line — gold leaf hairline */
+  .rule-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--sungold)) 20%, hsl(var(--sungold)) 80%, transparent);
+  }
+
+  /* Shadows — letterpress, not blur */
+  .shadow-multi    { box-shadow: 0 1px 0 0 hsl(var(--border)), 0 12px 28px -16px hsl(var(--ink) / 0.18); }
+  .shadow-multi-lg { box-shadow: 0 1px 0 0 hsl(var(--border)), 0 28px 56px -22px hsl(var(--ink) / 0.22); }
+  .shadow-glow-accent    { box-shadow: 0 0 0 1px hsl(var(--sungold) / 0.4), 0 0 24px -6px hsl(var(--sungold) / 0.35); }
+  .shadow-glow-accent-lg { box-shadow: 0 0 0 1px hsl(var(--sungold) / 0.55), 0 0 60px -10px hsl(var(--sungold) / 0.45); }
+  .shadow-mixed    { box-shadow: 4px 4px 0 hsl(var(--ink) / 0.85), 0 0 0 1px hsl(var(--border)); }
 
   .shadow-brut-sm   { box-shadow: var(--shadow-brut-sm); }
   .shadow-brut      { box-shadow: var(--shadow-brut); }
@@ -213,13 +261,13 @@
   .shadow-glow      { box-shadow: var(--shadow-glow); }
   .shadow-primary-key { box-shadow: var(--shadow-primary); }
 
-  /* Patterns — atmosphere only, never decoration */
+  /* Patterns — comic-book ink, used like a headline serif */
   .pattern-dots {
-    background-image: radial-gradient(circle, hsl(var(--steel) / 0.18) 0.8px, transparent 1px);
-    background-size: 18px 18px;
+    background-image: radial-gradient(circle, hsl(var(--ink) / 0.22) 0.7px, transparent 1px);
+    background-size: 12px 12px;
   }
   .pattern-stripes {
-    background-image: repeating-linear-gradient(0deg, transparent 0 3px, hsl(var(--ink) / 0.4) 3px 4px);
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, hsl(var(--ink) / 0.18) 3px 4px);
   }
   .pattern-checker {
     background-image: linear-gradient(hsl(var(--border)) 1px, transparent 1px),
@@ -228,8 +276,8 @@
   }
   .pattern-mesh {
     background:
-      radial-gradient(ellipse at 18% 0%, hsl(var(--signal) / 0.08) 0%, transparent 55%),
-      radial-gradient(ellipse at 100% 100%, hsl(var(--blood) / 0.10) 0%, transparent 60%);
+      radial-gradient(ellipse at 92% 0%, hsl(var(--sungold) / 0.12) 0%, transparent 55%),
+      radial-gradient(ellipse at 0% 100%, hsl(var(--bloodred) / 0.10) 0%, transparent 60%);
   }
   .bg-grid {
     background-image:
@@ -238,27 +286,31 @@
     background-size: 56px 56px;
   }
   .bg-halftone {
-    background-image: radial-gradient(hsl(var(--steel) / 0.22) 0.8px, transparent 1px);
-    background-size: 10px 10px;
+    background-image: radial-gradient(hsl(var(--ink) / 0.28) 0.7px, transparent 1px);
+    background-size: 6px 6px;
+  }
+  .bg-halftone-red {
+    background-image: radial-gradient(hsl(var(--bloodred) / 0.55) 0.8px, transparent 1px);
+    background-size: 5px 5px;
   }
 
   .tilt-l, .tilt-r { transform: none; }
 
-  .led { width: 0.5rem; height: 0.5rem; border-radius: 9999px; display: inline-block; background: hsl(var(--signal)); box-shadow: 0 0 8px hsl(var(--signal) / 0.7); }
-  .led-green { background: hsl(var(--signal)); }
+  .led { width: 0.5rem; height: 0.5rem; border-radius: 9999px; display: inline-block; background: hsl(var(--kryptonite)); box-shadow: 0 0 8px hsl(var(--kryptonite) / 0.7); }
+  .led-green { background: hsl(var(--kryptonite)); }
 
   .screws::before, .screws::after,
   .screws > .screws-bottom::before, .screws > .screws-bottom::after { content: none; }
   .vent-slot { display: none; }
 
   .scanlines {
-    background-image: linear-gradient(hsl(var(--ink) / 0) 50%, hsl(var(--ink) / 0.25) 50%);
+    background-image: linear-gradient(hsl(var(--ink) / 0) 50%, hsl(var(--ink) / 0.10) 50%);
     background-size: 100% 3px;
   }
 
   .ease-mech { transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1); }
 
-  /* Motion — quiet, precise, Ive-grade */
+  /* Motion — quiet, editorial */
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50%      { transform: translateY(-6px); }
@@ -272,8 +324,8 @@
   .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; will-change: transform; }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.3), 0 0 16px -4px hsl(var(--signal) / 0.3); }
-    50%      { box-shadow: 0 0 0 1px hsl(var(--signal) / 0.6), 0 0 36px -4px hsl(var(--signal) / 0.55); }
+    0%, 100% { box-shadow: 0 0 0 1px hsl(var(--sungold) / 0.3), 0 0 16px -4px hsl(var(--sungold) / 0.3); }
+    50%      { box-shadow: 0 0 0 1px hsl(var(--sungold) / 0.6), 0 0 36px -4px hsl(var(--sungold) / 0.55); }
   }
   .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
 
@@ -286,10 +338,7 @@
   @keyframes spin-slow { from { transform: rotate(0); } to { transform: rotate(360deg); } }
   .animate-spin-slow { animation: spin-slow 30s linear infinite; }
 
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(0); }
-    50%      { transform: rotate(0); }
-  }
+  @keyframes wiggle { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(0); } }
   .animate-wiggle { animation: none; }
 
   @keyframes bounce-subtle {
@@ -308,20 +357,20 @@
 }
 
 /* =====================================================================
-   AUTO-PROMOTION LAYER — existing utility patterns → Gotham minimal
+   AUTO-PROMOTION LAYER — ambient component patterns → Man of Tomorrow
    ===================================================================== */
 @layer components {
-  /* Sticky header — a hairline of cold steel, a kiss of signal */
+  /* Sticky header — the masthead of the broadsheet */
   header.sticky,
   .sticky.top-0 {
-    background-color: hsl(var(--background) / 0.78) !important;
+    background-color: hsl(var(--background) / 0.86) !important;
     border-bottom: 1px solid hsl(var(--border)) !important;
-    box-shadow: 0 1px 0 0 hsl(var(--ink)), 0 24px 60px -30px hsl(var(--ink)) !important;
-    backdrop-filter: blur(20px) saturate(140%);
-    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 1px 0 0 hsl(var(--sungold) / 0.4), 0 12px 28px -20px hsl(var(--ink) / 0.18) !important;
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
   }
 
-  /* Surfaces — anodized panels milled to spec */
+  /* Surfaces — fresh hardcover signature pages */
   .rounded-md.border,
   .rounded-lg.border,
   .rounded-xl.border,
@@ -330,39 +379,42 @@
   [class*="bg-secondary/40"],
   [class*="bg-secondary/60"],
   [class*="bg-card"] {
-    background-color: hsl(var(--card) / 0.85) !important;
+    background-color: hsl(var(--card)) !important;
     border: 1px solid hsl(var(--border)) !important;
-    box-shadow: 0 1px 0 0 hsl(var(--ink)), 0 24px 60px -24px hsl(var(--ink) / 0.9) !important;
+    border-top: 2px solid hsl(var(--sungold) / 0.7) !important;
+    box-shadow: 0 1px 0 0 hsl(var(--ink) / 0.06), 0 12px 28px -18px hsl(var(--ink) / 0.18) !important;
     border-radius: 4px !important;
-    backdrop-filter: blur(8px);
   }
 
-  /* Featured panel — single hairline of signal, nothing more */
+  /* Featured panel — the illuminated capital, a full leaf of gold */
   .border-2.border-primary {
-    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted-bg)) 100%) !important;
-    border: 1px solid hsl(var(--signal) / 0.6) !important;
+    background:
+      radial-gradient(ellipse at top right, hsl(var(--sungold) / 0.10), transparent 60%),
+      hsl(var(--card)) !important;
+    border: 1px solid hsl(var(--sungold) / 0.7) !important;
+    border-top: 3px solid hsl(var(--sungold)) !important;
     box-shadow:
-      0 0 0 1px hsl(var(--signal) / 0.25),
-      0 30px 80px -20px hsl(var(--ink)),
-      inset 0 1px 0 0 hsl(var(--signal) / 0.15) !important;
+      0 0 0 1px hsl(var(--sungold) / 0.18),
+      0 22px 60px -22px hsl(var(--ink) / 0.22),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.7) !important;
     border-radius: 4px !important;
   }
 
-  /* Pills — quiet uppercase tags */
+  /* Pills — small caps, tracked, like a magazine kicker */
   .rounded-full.border {
     background-color: hsl(var(--muted-bg)) !important;
     border: 1px solid hsl(var(--border)) !important;
     box-shadow: none !important;
-    color: hsl(var(--muted-foreground));
+    color: hsl(var(--steel));
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", monospace;
     font-weight: 500;
     font-size: 0.68rem;
     padding: 3px 10px;
   }
 
-  /* Inputs — single hairline, signal underline on focus */
+  /* Inputs — single hairline, gold ring on focus */
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -373,10 +425,10 @@
     background-color: hsl(var(--input)) !important;
     border: 1px solid hsl(var(--border)) !important;
     border-radius: 4px !important;
-    font-family: "Inter", sans-serif !important;
+    font-family: "Source Sans 3", sans-serif !important;
     font-weight: 500;
     color: hsl(var(--foreground));
-    box-shadow: inset 0 1px 0 0 hsl(var(--ink) / 0.6) !important;
+    box-shadow: inset 0 1px 0 0 hsl(var(--ink) / 0.06) !important;
     padding: 0.7rem 1rem;
     transition: all 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
@@ -387,76 +439,80 @@
   input::placeholder, textarea::placeholder { color: hsl(var(--muted-foreground) / 0.7); font-weight: 400; }
   input:focus, textarea:focus, select:focus {
     outline: none !important;
-    border-color: hsl(var(--signal)) !important;
-    background-color: hsl(var(--input)) !important;
+    border-color: hsl(var(--sungold)) !important;
+    background-color: hsl(var(--card)) !important;
     box-shadow:
-      inset 0 1px 0 0 hsl(var(--ink) / 0.6),
-      0 0 0 3px hsl(var(--signal) / 0.18) !important;
+      inset 0 1px 0 0 hsl(var(--ink) / 0.06),
+      0 0 0 3px hsl(var(--sungold) / 0.20) !important;
   }
 
-  /* Floating coach orb — a single spotlight bulb */
+  /* Floating coach orb — the S-shield, hovering low-right */
   .fixed.bottom-5.right-5 {
-    background: hsl(var(--signal)) !important;
+    background: linear-gradient(135deg, hsl(var(--sungold-2)) 0%, hsl(var(--sungold)) 100%) !important;
     color: hsl(var(--ink));
-    border: 1px solid hsl(var(--signal)) !important;
+    border: 1px solid hsl(var(--sungold)) !important;
     border-radius: 9999px;
     box-shadow:
-      0 0 0 1px hsl(var(--ink)),
-      0 12px 36px -8px hsl(var(--signal) / 0.5),
-      0 24px 60px -12px hsl(var(--ink)) !important;
+      0 0 0 2px hsl(var(--bone)),
+      0 0 0 3px hsl(var(--sungold) / 0.6),
+      0 14px 36px -10px hsl(var(--sungold) / 0.55),
+      0 24px 60px -16px hsl(var(--ink) / 0.3) !important;
     transition: all 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
-  .fixed.bottom-5.right-5:hover  {
+  .fixed.bottom-5.right-5:hover {
     transform: translateY(-2px);
     box-shadow:
-      0 0 0 1px hsl(var(--ink)),
-      0 18px 50px -8px hsl(var(--signal) / 0.7),
-      0 30px 70px -12px hsl(var(--ink)) !important;
+      0 0 0 2px hsl(var(--bone)),
+      0 0 0 3px hsl(var(--sungold)),
+      0 20px 50px -10px hsl(var(--sungold) / 0.7),
+      0 30px 70px -16px hsl(var(--ink) / 0.35) !important;
   }
   .fixed.bottom-5.right-5:active { transform: translateY(0); }
 
-  /* Code/destructive callout — blood under glass */
+  /* Destructive callout — cape-red wax seal */
   .rounded.bg-destructive\/10 {
     border-radius: 4px !important;
-    background-color: hsl(var(--blood) / 0.10) !important;
-    border: 1px solid hsl(var(--blood) / 0.5) !important;
-    box-shadow: inset 0 1px 0 0 hsl(var(--ink)) !important;
-    color: hsl(var(--foreground));
-    font-weight: 500;
+    background-color: hsl(var(--bloodred) / 0.08) !important;
+    border: 1px solid hsl(var(--bloodred) / 0.4) !important;
+    border-left: 3px solid hsl(var(--bloodred)) !important;
+    box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.5) !important;
+    color: hsl(var(--bloodred));
+    font-weight: 600;
   }
 
-  /* DraftRoom — the war room */
+  /* DraftRoom — Daily Planet ticker */
   .scoreboard-tile {
-    background: hsl(var(--ink)) !important;
-    border: 1px solid hsl(var(--border)) !important;
+    background: hsl(var(--krypton)) !important;
+    border: 1px solid hsl(var(--krypton)) !important;
     border-radius: 3px !important;
-    box-shadow: inset 0 1px 0 0 hsl(var(--ink)), 0 0 0 1px hsl(var(--signal) / 0.15) !important;
+    box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.08), 0 0 0 1px hsl(var(--sungold) / 0.4) !important;
     padding: 0.5rem 0.875rem;
-    font-family: "JetBrains Mono", monospace !important;
+    font-family: "IBM Plex Mono", monospace !important;
     font-weight: 700;
-    color: hsl(var(--signal));
-    text-shadow: 0 0 12px hsl(var(--signal) / 0.4);
+    color: hsl(var(--sungold));
+    text-shadow: 0 0 12px hsl(var(--sungold) / 0.5);
     letter-spacing: 0.04em;
   }
   .scoreboard-plinth {
     background-color: hsl(var(--card)) !important;
     border: 1px solid hsl(var(--border)) !important;
+    border-top: 2px solid hsl(var(--sungold)) !important;
     border-radius: 4px !important;
     box-shadow:
-      0 1px 0 0 hsl(var(--ink)),
-      0 30px 80px -24px hsl(var(--ink)) !important;
+      0 1px 0 0 hsl(var(--ink) / 0.06),
+      0 22px 60px -22px hsl(var(--ink) / 0.22) !important;
     padding: 1.5rem 2rem;
   }
-  .font-score   { font-family: "JetBrains Mono", monospace; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-  .score-digit  { color: hsl(var(--signal)); text-shadow: 0 0 16px hsl(var(--signal) / 0.4); }
+  .font-score   { font-family: "Playfair Display", Georgia, serif; font-weight: 900; font-variant-numeric: tabular-nums; letter-spacing: -0.025em; }
+  .score-digit  { color: hsl(var(--sungold)); text-shadow: 0 1px 0 hsl(var(--ink) / 0.1); }
   .broadcast-label {
-    font-family: "JetBrains Mono", monospace;
+    font-family: "IBM Plex Mono", monospace;
     text-transform: uppercase;
     letter-spacing: 0.22em;
     font-weight: 700;
     font-size: 0.66rem;
-    color: hsl(var(--ink));
-    background: hsl(var(--signal));
+    color: hsl(var(--bone));
+    background: hsl(var(--sungold));
     padding: 2px 8px;
     border-radius: 2px;
     display: inline-block;
@@ -465,19 +521,19 @@
   .accent-flare::after {
     content: "";
     position: absolute; inset: -8px;
-    background: radial-gradient(ellipse at center, hsl(var(--signal) / 0.18), transparent 70%);
+    background: radial-gradient(ellipse at center, hsl(var(--sungold) / 0.18), transparent 70%);
     z-index: -1; pointer-events: none; filter: blur(16px);
   }
   .whistle-focus:focus-visible {
     outline: none !important;
-    box-shadow: 0 0 0 1px hsl(var(--signal)), 0 0 0 4px hsl(var(--signal) / 0.25) !important;
+    box-shadow: 0 0 0 1px hsl(var(--sungold)), 0 0 0 4px hsl(var(--sungold) / 0.25) !important;
   }
 }
 
-/* Markdown styles for AI coach output — quiet, readable, Ive-grade */
-.coach-md p { @apply mb-2 leading-relaxed; font-family: "Inter", sans-serif; }
+/* Markdown styles for AI coach output — editorial, readable, serif headlines */
+.coach-md p { @apply mb-2 leading-relaxed; font-family: "Source Sans 3", sans-serif; }
 .coach-md ul { @apply list-disc pl-5 mb-2 space-y-1; }
 .coach-md ol { @apply list-decimal pl-5 mb-2 space-y-1; }
-.coach-md strong { @apply font-bold; color: hsl(var(--signal)); }
-.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground; font-family: "Inter", sans-serif; font-weight: 800; letter-spacing: -0.02em; }
-.coach-md code { @apply px-1.5 py-0.5 text-xs font-mono; background: hsl(var(--ink)); color: hsl(var(--signal)); border: 1px solid hsl(var(--border)); border-radius: 3px; }
+.coach-md strong { @apply font-bold; color: hsl(var(--sungold)); }
+.coach-md h1, .coach-md h2, .coach-md h3 { @apply mt-3 mb-1 text-foreground; font-family: "Playfair Display", Georgia, serif; font-weight: 800; letter-spacing: -0.02em; }
+.coach-md code { @apply px-1.5 py-0.5 text-xs font-mono; background: hsl(var(--muted-bg)); color: hsl(var(--bloodred)); border: 1px solid hsl(var(--border)); border-radius: 3px; }
