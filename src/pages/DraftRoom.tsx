@@ -606,19 +606,6 @@ export default function DraftRoom() {
             </SheetTitle>
           </SheetHeader>
           <AiQuickPanel
-            targets={targets}
-            targetsLoading={targetsMutation.isPending}
-            onRefreshTargets={() => targetsMutation.mutate()}
-            onPickTarget={(name) => {
-              // Two animations were colliding: the AI Sheet was still
-              // closing (350ms) when the Decision Dialog tried to open.
-              // On mobile that left you staring at the dimmed overlay
-              // with no card. We close the Sheet first, wait for its
-              // animation to finish, THEN lock the player in (which
-              // triggers the Dialog).
-              setAiOpen(false);
-              setTimeout(() => lockToPlayer(name), 220);
-            }}
             coachContext={() => ({
               settings: {
                 totalBudget: settings.totalBudget,
