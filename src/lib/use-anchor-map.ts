@@ -123,6 +123,53 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           return { factor: 1, reason: null };
         };
 
+        // Availability discount — non-injury risks (suspensions, holdouts, PUP/NFI,
+        // legal, personal). Tight phrases only + negation guard to avoid false hits
+        // like "signed extension" or "no legal issues".
+        const NEG = /\b(no|not|never|cleared|returned|avoided|signed|extension|restructure|resolved|dropped)\b/i;
+        const PHRASES: Array<{ re: RegExp; reason: string; factor: number }> = [
+          { re: /\b(suspended for|game suspension|suspension|will miss \d+ game|banned)\b/i, reason: "Suspended", factor: 0.6 },
+          { re: /\b(holding out|holdout|hold-?in|did not report|contract dispute)\b/i, reason: "Holdout", factor: 0.8 },
+          { re: /\b(active\/pup|on pup|pup list|placed on pup)\b/i, reason: "PUP", factor: 0.75 },
+          { re: /\b(nfi list|non[- ]football injury)\b/i, reason: "NFI", factor: 0.7 },
+          { re: /\b(arrested|facing charges|charged with|legal trouble|domestic violence|dui)\b/i, reason: "Legal", factor: 0.8 },
+          { re: /\b(personal reasons|away from team|left the team|stepped away)\b/i, reason: "Personal", factor: 0.85 },
+          { re: /\b(missed (training )?camp|did not practice|hasn['’]t practiced)\b/i, reason: "Missed camp", factor: 0.9 },
+        ];
+        // Words that are dangerous alone (need LLM tiebreaker even if regex didn't fire)
+        const AMBIG = /\b(contract|legal|investigation|sign|status update|away)\b/i;
+
+        const regexAvailability = (k: string): { factor: number; reason: string | null; ambiguous: boolean } => {
+          const inj = injuryMap.get(k);
+          if (!inj) return { factor: 1, reason: null, ambiguous: false };
+          const blob = `${inj.status || ""} ${inj.note || ""}`;
+          if (!blob.trim()) return { factor: 1, reason: null, ambiguous: false };
+          let best: { factor: number; reason: string } | null = null;
+          for (const p of PHRASES) {
+            const m = blob.match(p.re);
+            if (!m) continue;
+            // negation guard: check 30 chars before the match
+            const idx = m.index ?? 0;
+            const window = blob.slice(Math.max(0, idx - 30), idx);
+            if (NEG.test(window)) continue;
+            if (!best || p.factor < best.factor) best = { factor: p.factor, reason: p.reason };
+          }
+          const ambiguous = !best && AMBIG.test(blob);
+          return best ? { ...best, ambiguous: false } : { factor: 1, reason: null, ambiguous };
+        };
+
+        // Stack injury + availability — take the SINGLE LARGEST discount (don't multiply).
+        const combinedFactor = (k: string, llm?: { factor: number; reason: string } | null) => {
+          const inj = injuryFactor(k);
+          const avail = regexAvailability(k);
+          const candidates: Array<{ factor: number; reason: string | null }> = [inj, avail];
+          if (llm) candidates.push(llm);
+          let winner = candidates[0];
+          for (const c of candidates) if (c.factor < winner.factor) winner = c;
+          return winner;
+        };
+
+
 
         // Market consensus = blend of ESPN and Sleeper. When they agree, high
         // confidence. When they disagree wildly, take the higher one IF the
@@ -171,6 +218,51 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
         console.info("[useAnchorMap] league→market position scaling", scales);
 
+        // 3.5) LLM tiebreaker — for any player whose note has an ambiguous trigger
+        //      word but no clean phrase match, ask Lovable AI to classify. Cached
+        //      in localStorage by note hash so we only pay once per unique note.
+        const llmMap = new Map<string, { factor: number; reason: string }>();
+        const ambigItems: Array<{ id: string; name: string; status: string | null; note: string | null; cacheKey: string }> = [];
+        const cache: Record<string, { factor: number; reason: string } | null> = (() => {
+          try { return JSON.parse(localStorage.getItem("availability-llm-cache") || "{}"); } catch { return {}; }
+        })();
+        for (const k of injuryMap.keys()) {
+          const r = regexAvailability(k);
+          if (!r.ambiguous) continue;
+          const inj = injuryMap.get(k)!;
+          const cacheKey = `${(inj.status || "").trim()}|${(inj.note || "").trim()}`;
+          if (cacheKey in cache) {
+            const v = cache[cacheKey];
+            if (v) llmMap.set(k, v);
+            continue;
+          }
+          ambigItems.push({ id: k, name: k, status: inj.status, note: inj.note, cacheKey });
+        }
+        if (ambigItems.length > 0 && !cancelled) {
+          try {
+            const { data, error } = await supabase.functions.invoke("classify-availability", {
+              body: { items: ambigItems.map(({ cacheKey: _c, ...rest }) => rest) },
+            });
+            if (!error && data?.classifications) {
+              for (const c of data.classifications as Array<{ id: string; missing: boolean; reason: string; factor: number }>) {
+                const item = ambigItems.find((x) => x.id === c.id);
+                if (!item) continue;
+                if (c.missing && c.factor < 1) {
+                  const v = { factor: c.factor, reason: c.reason };
+                  llmMap.set(c.id, v);
+                  cache[item.cacheKey] = v;
+                } else {
+                  cache[item.cacheKey] = null;
+                }
+              }
+              try { localStorage.setItem("availability-llm-cache", JSON.stringify(cache)); } catch { /* quota */ }
+            }
+          } catch (e) {
+            console.warn("[useAnchorMap] availability LLM failed (non-fatal)", e);
+          }
+        }
+        if (cancelled) return;
+
         // 4) Build the anchor map
         //    Cascade: LEAGUE history (blended w/ VORP) → VORP → market consensus → none
         const out: Record<string, AnchorEntry> = {};
@@ -195,7 +287,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
             else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
           }
           const preInjury = Math.max(1, Math.round(final));
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
           out[k] = {
             price: finalPrice,
@@ -215,7 +307,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         // 5) VORP — #2 priority for any projected player without league history.
         for (const [k, v] of Object.entries(vorpMap)) {
           if (out[k]) continue;
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(v.price * inj.factor));
           out[k] = {
             price: finalPrice,
@@ -241,7 +333,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
           const effScale = 1 + (rawScale - 1) * fade;
           const adj = Math.max(1, Math.round(mv.val * effScale));
-          const inj = injuryFactor(k);
+          const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(adj * inj.factor));
           out[k] = {
             price: finalPrice,
