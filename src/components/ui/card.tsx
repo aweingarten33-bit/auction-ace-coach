@@ -3,26 +3,22 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Cyberpunk Card — chamfered tech panel with corner accents + neon hover glow.
+ * Neo-brutalist Card — paper sticker. Lifts on hover, shadow grows.
  */
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "relative bg-card text-card-foreground cyber-chamfer",
-        "border border-border",
-        "transition-all duration-300 ease-mech",
-        "hover:-translate-y-0.5 hover:border-primary/60 hover:shadow-[var(--glow-primary-sm)]",
+        "relative bg-white text-black rounded-none",
+        "border-4 border-black",
+        "shadow-[8px_8px_0_0_#000]",
+        "transition-all duration-200 ease-out",
+        "hover:-translate-y-1 hover:-translate-x-0.5 hover:shadow-[12px_12px_0_0_#000]",
         className,
       )}
       {...props}
     >
-      {/* HUD corner accents */}
-      <span className="pointer-events-none absolute left-0 top-0 h-3 w-3 border-l border-t border-primary/70" />
-      <span className="pointer-events-none absolute right-0 top-0 h-3 w-3 border-r border-t border-primary/70" />
-      <span className="pointer-events-none absolute left-0 bottom-0 h-3 w-3 border-l border-b border-primary/70" />
-      <span className="pointer-events-none absolute right-0 bottom-0 h-3 w-3 border-r border-b border-primary/70" />
       {children}
     </div>
   ),
@@ -31,7 +27,14 @@ Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex flex-col space-y-1.5 p-6 pb-3", className)} {...props} />
+    <div
+      ref={ref}
+      className={cn(
+        "flex flex-col space-y-1.5 p-6 pb-3 border-b-4 border-black bg-[hsl(var(--muted))]",
+        className,
+      )}
+      {...props}
+    />
   ),
 );
 CardHeader.displayName = "CardHeader";
@@ -41,7 +44,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
     <h3
       ref={ref}
       className={cn(
-        "font-display text-xl font-bold tracking-[0.12em] uppercase text-primary text-glow",
+        "font-display text-2xl font-black uppercase tracking-tight text-black leading-none",
         className,
       )}
       {...props}
@@ -54,7 +57,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn("text-sm text-muted-foreground leading-relaxed font-mono", className)}
+      className={cn("text-sm text-black/80 font-bold leading-relaxed", className)}
       {...props}
     />
   ),
@@ -62,7 +65,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
 CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-3", className)} {...props} />,
+  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6", className)} {...props} />,
 );
 CardContent.displayName = "CardContent";
 

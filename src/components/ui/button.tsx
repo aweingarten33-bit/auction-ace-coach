@@ -5,38 +5,41 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Cyberpunk Button — chamfered neon panel. Hover fills with neon + glow.
+ * Neo-brutalist Button — bordered sticker. Click presses down onto its shadow.
  */
 const buttonVariants = cva(
   [
     "relative inline-flex items-center justify-center gap-2 whitespace-nowrap",
-    "font-mono uppercase tracking-[0.18em] font-semibold",
-    "cyber-chamfer-sm",
-    "transition-all duration-150 ease-mech",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+    "font-display font-black uppercase tracking-wide",
+    "rounded-none border-4 border-black",
+    "shadow-[4px_4px_0_0_#000]",
+    "transition-all duration-100 ease-linear",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     "disabled:pointer-events-none disabled:opacity-50",
-    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[1.5]",
+    "[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:stroke-[3]",
+    "hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[6px_6px_0_0_#000]",
+    "active:translate-x-[4px] active:translate-y-[4px] active:shadow-none",
   ].join(" "),
   {
     variants: {
       variant: {
         default:
-          "bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-primary-foreground hover:shadow-[var(--glow-primary)] active:shadow-[var(--shadow-pressed)]",
+          "bg-[hsl(var(--primary))] text-black",
         secondary:
-          "bg-transparent text-accent border-2 border-accent hover:bg-accent hover:text-accent-foreground hover:shadow-[var(--glow-accent)]",
+          "bg-[hsl(var(--secondary))] text-black",
         outline:
-          "bg-transparent text-foreground border border-border hover:border-primary hover:text-primary hover:shadow-[var(--glow-primary-sm)]",
+          "bg-white text-black",
         destructive:
-          "bg-destructive text-destructive-foreground border-2 border-destructive hover:brightness-110 hover:shadow-[0_0_18px_hsl(var(--destructive)/0.6)]",
+          "bg-[hsl(var(--primary))] text-black",
         ghost:
-          "bg-transparent text-muted-foreground hover:text-primary hover:bg-primary/10",
+          "bg-transparent text-black border-transparent shadow-none hover:bg-[hsl(var(--secondary))] hover:border-black hover:shadow-[4px_4px_0_0_#000]",
         link:
-          "bg-transparent text-primary underline-offset-4 hover:underline hover:text-glow",
+          "bg-transparent text-black border-transparent shadow-none underline-offset-4 hover:underline hover:translate-x-0 hover:translate-y-0 active:translate-x-0 active:translate-y-0",
       },
       size: {
-        default: "h-12 px-6 text-xs",
-        sm:      "h-10 px-4 text-[11px]",
-        lg:      "h-14 px-8 text-sm",
+        default: "h-12 px-5 text-sm",
+        sm:      "h-10 px-4 text-xs",
+        lg:      "h-14 px-8 text-base",
         icon:    "h-12 w-12",
       },
     },

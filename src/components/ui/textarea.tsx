@@ -5,17 +5,17 @@ import { cn } from "@/lib/utils";
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
 
 /**
- * Cyberpunk Textarea — terminal multiline buffer with neon focus glow.
+ * Neo-brutalist Textarea — bordered paper buffer with yellow focus state.
  */
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(({ className, ...props }, ref) => {
   return (
     <textarea
       className={cn(
-        "flex min-h-[96px] w-full bg-input px-4 py-3 text-base font-mono text-primary",
-        "border border-border cyber-chamfer-sm",
-        "transition-all duration-200",
-        "placeholder:text-muted-foreground placeholder:italic",
-        "focus-visible:outline-none focus-visible:border-primary focus-visible:shadow-[var(--glow-primary)]",
+        "flex min-h-[112px] w-full rounded-none bg-white px-4 py-3 text-base font-bold text-black",
+        "border-4 border-black shadow-[4px_4px_0_0_#000]",
+        "transition-all duration-100 ease-linear",
+        "placeholder:text-black/40 placeholder:font-bold",
+        "focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-[hsl(var(--secondary))] focus-visible:shadow-[6px_6px_0_0_#000]",
         "disabled:cursor-not-allowed disabled:opacity-50",
         className,
       )}
