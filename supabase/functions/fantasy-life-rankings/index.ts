@@ -9,34 +9,40 @@ interface RankList { source: string; label: string; position: string; url: strin
 
 const SOURCES: { source: string; label: string; position: string; url: string }[] = [
   {
-    source: "top50",
-    label: "Top 50 Overall (Kendall)",
-    position: "ALL",
-    url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-2026-top-50-rankings-bijan-robinson-or-jahmyr-gibbs-at-101",
-  },
-  {
     source: "qb",
-    label: "Top QBs",
+    label: "QB",
     position: "QB",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-qb",
   },
   {
     source: "rb",
-    label: "Top RBs",
+    label: "RB",
     position: "RB",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-bijan-robinson-leads-the-top-20",
   },
   {
     source: "wr",
-    label: "Top WRs",
+    label: "WR",
     position: "WR",
     url: "https://www.fantasylife.com/articles/fantasy/2026-fantasy-football-rankings-a-way-too-early-look-at-wr",
   },
   {
     source: "te",
-    label: "Top TEs",
+    label: "TE",
     position: "TE",
     url: "https://www.fantasylife.com/articles/fantasy/2026-tight-end-tiers-for-fantasy-football-harold-fannin",
+  },
+  {
+    source: "k",
+    label: "K",
+    position: "K",
+    url: "https://www.fantasylife.com/articles/fantasy/fantasy-football-kicker-rankings-2025",
+  },
+  {
+    source: "dst",
+    label: "DEF",
+    position: "D/ST",
+    url: "https://www.fantasylife.com/articles/fantasy/2025-fantasy-football-defense-rankings-and-tiers-broncos-eagles-and-more",
   },
 ];
 
@@ -155,6 +161,28 @@ function parseArticleList(md: string, defaultPos: string): Player[] {
       if (seen.has(k)) continue;
       seen.add(k);
       out.push({ rank, name, position: defaultPos, team: "" });
+    }
+  }
+
+  // Pattern G (D/ST tiered article — extract NFL team names in document order)
+  if (defaultPos === "D/ST" && out.length === 0) {
+    const teamMap: Record<string, string> = {
+      Cardinals: "ARI", Falcons: "ATL", Ravens: "BAL", Bills: "BUF", Panthers: "CAR",
+      Bears: "CHI", Bengals: "CIN", Browns: "CLE", Cowboys: "DAL", Broncos: "DEN",
+      Lions: "DET", Packers: "GB", Texans: "HOU", Colts: "IND", Jaguars: "JAX",
+      Chiefs: "KC", Raiders: "LV", Chargers: "LAC", Rams: "LAR", Dolphins: "MIA",
+      Vikings: "MIN", Patriots: "NE", Saints: "NO", Giants: "NYG", Jets: "NYJ",
+      Eagles: "PHI", Steelers: "PIT", Seahawks: "SEA", "49ers": "SF", Niners: "SF",
+      Buccaneers: "TB", Titans: "TEN", Commanders: "WAS",
+    };
+    const reG = /\b(Cardinals|Falcons|Ravens|Bills|Panthers|Bears|Bengals|Browns|Cowboys|Broncos|Lions|Packers|Texans|Colts|Jaguars|Chiefs|Raiders|Chargers|Rams|Dolphins|Vikings|Patriots|Saints|Giants|Jets|Eagles|Steelers|Seahawks|49ers|Niners|Buccaneers|Titans|Commanders)\b/g;
+    let rank = 0;
+    for (const m of clean.matchAll(reG)) {
+      const team = teamMap[m[1]];
+      if (!team || seen.has(team)) continue;
+      seen.add(team);
+      rank += 1;
+      out.push({ rank, name: m[1], position: "D/ST", team });
     }
   }
 
