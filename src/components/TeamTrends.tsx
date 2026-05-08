@@ -97,16 +97,15 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
       {/* Avg spend by position */}
       <div>
         <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Typical $ by position
+          Total $ spent on each position
         </p>
         <p className="mb-1.5 text-[10px] text-muted-foreground">
-          Total they've historically spent at each spot per draft (last {seasons.length} yrs). Tap a row to break it down.
+          What they actually paid at each spot per draft (avg of last {seasons.length} yrs). Tap a row to see how many they draft.
         </p>
         <div className="space-y-1">
           {POS_ORDER.map((pos) => {
             const v = trends.avgByPos[pos] ?? 0;
             const count = trends.avgCountByPos?.[pos] ?? 0;
-            const perPlayer = count > 0 ? Math.round(v / count) : 0;
             const pct = (v / maxSpend) * 100;
             const color = (POS_COLORS as any)[pos] ?? "bg-foreground/40";
             const isOpen = expanded === pos;
@@ -134,8 +133,8 @@ export default function TeamTrends({ teamId, teamName }: { teamId: number; teamN
                 </button>
                 {isOpen && hasData && (
                   <div className="ml-6 mt-0.5 mb-1 rounded-md bg-foreground/5 px-2 py-1 text-[11px] text-foreground/80">
-                    Drafts <strong>{count}</strong> {pos}{count === 1 ? "" : "s"} per year, averaging{" "}
-                    <strong>${perPlayer}</strong> each (${v} total).
+                    Drafts <strong>{count}</strong> {pos}{count === 1 ? "" : "s"} per year, spending{" "}
+                    <strong>${v}</strong> total on the position.
                   </div>
                 )}
               </div>
