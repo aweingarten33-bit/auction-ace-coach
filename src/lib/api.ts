@@ -1,14 +1,10 @@
 // Single source of truth for backend endpoints.
 // Centralizes URLs, auth headers, SSE parsing, and error handling.
-import type { QueueTarget } from "@/components/UpNextQueue";
-import type { AiNomination } from "@/components/NominationCard";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const COACH_URL = `${SUPABASE_URL}/functions/v1/coach`;
-const UPNEXT_URL = `${SUPABASE_URL}/functions/v1/up-next`;
-const NOMINATE_URL = `${SUPABASE_URL}/functions/v1/nominate-suggest`;
 
 const baseHeaders = {
   "Content-Type": "application/json",
@@ -25,16 +21,6 @@ function explain(status: number): string {
   if (status === 429) return "Rate limited. Try again shortly.";
   if (status === 402) return "AI credits exhausted. Add credits in workspace usage.";
   return "Service unavailable.";
-}
-
-async function postJson<T>(url: string, body: unknown): Promise<T> {
-  const resp = await fetch(url, {
-    method: "POST",
-    headers: baseHeaders,
-    body: JSON.stringify(body),
-  });
-  if (!resp.ok) throw new ApiError(resp.status, explain(resp.status));
-  return resp.json() as Promise<T>;
 }
 
 // ---------- coach (streaming) ----------
@@ -55,30 +41,8 @@ export interface CoachInput {
   vetriTakes?: unknown;
   history?: { role: "user" | "assistant"; content: string }[];
   draftedPlayers?: string[];
-  /** When true, force the assistant to spell out the full math behind every recommendation. */
   showMath?: boolean;
-  /** Chosen draft strategy: id + label + coach guidance to pin into the system prompt. */
   strategy?: { id: string; label: string; guidance: string };
-  /**
-   * Decision Engine's deterministic verdict for the player currently in focus.
-   * When present, the Coach is instructed to use these numbers as ground truth
-   * and never contradict the verdict, goUpTo, or stopAt. The Coach can still
-   * add color/context, but the math is non-negotiable.
-   */
-  engineDecision?: {
-    player: string;
-    position?: string;
-    verdict: "BID" | "PASS" | "STOP" | "ONLY IF CHEAP";
-    oneLiner: string;
-    goUpTo: number;
-    stopAt: number;
-    anchorPrice: number;
-    anchorSource: "sheet" | "league" | "espn" | "none";
-    plan: { status: "ok" | "tight" | "broken"; reason: string };
-    better: "buy" | "pass" | "tie";
-    betterReason: string;
-    confidence: "high" | "medium" | "low";
-  };
 }
 
 /**
@@ -122,51 +86,9 @@ export async function streamCoach(
         const c = JSON.parse(json).choices?.[0]?.delta?.content as string | undefined;
         if (c) onChunk(c);
       } catch {
-        // Partial JSON across chunks — restore and wait for more.
         buf = line + "\n" + buf;
         break;
       }
     }
   }
-}
-
-// ---------- targets / queue ----------
-
-export interface TargetsInput {
-  settings: unknown;
-  budget: unknown;
-  myRoster: unknown;
-  rosterRequired: unknown;
-  rosterFilled: unknown;
-  gaps: unknown;
-  events: unknown;
-  prices: unknown;
-  spendByPosition: unknown;
-  recentRuns: unknown;
-  dismissed: string[];
-  watchlist: string[];
-}
-
-export async function fetchTargets(
-  body: TargetsInput
-): Promise<{ targets: QueueTarget[]; openMan?: string }> {
-  const data = await postJson<{ targets?: QueueTarget[]; openMan?: string }>(UPNEXT_URL, body);
-  return { targets: data.targets ?? [], openMan: data.openMan };
-}
-
-// ---------- nomination suggestions ----------
-
-export interface NominationsInput {
-  budget: unknown;
-  gaps: unknown;
-  myRoster: unknown;
-  events: unknown;
-  prices: unknown;
-}
-
-export async function fetchNominations(
-  body: NominationsInput
-): Promise<AiNomination[]> {
-  const data = await postJson<{ suggestions?: AiNomination[] }>(NOMINATE_URL, body);
-  return Array.isArray(data.suggestions) ? data.suggestions : [];
 }

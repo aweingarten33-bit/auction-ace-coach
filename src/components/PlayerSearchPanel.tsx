@@ -3,11 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, X, Pin, PinOff, Gavel } from "lucide-react";
+import { Search, X, Pin, PinOff } from "lucide-react";
 import { DraftEvent, PriceEstimate, Position } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { tierForPosRank } from "@/lib/league-tier-prices";
-import PlayerDecisionOverlay from "@/components/PlayerDecisionOverlay";
+import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import { supabase } from "@/integrations/supabase/client";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -246,15 +246,6 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
               </button>
               <button
                 type="button"
-                disabled={isDrafted}
-                onClick={() => !isDrafted && onPick(p.name, position, p.price)}
-                title="Load into bid form"
-                className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-30"
-              >
-                <Gavel className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
                 onClick={() => (isPinned ? onUnpin(p.name) : onPin(p.name))}
                 className="rounded p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
                 aria-label={isPinned ? "Unpin" : "Pin"}
@@ -273,18 +264,15 @@ export default function PlayerSearchPanel({ prices, events, watchlist, keepers =
         <p>
           Each $ is your league's avg paid for that tier (last 3 drafts), nudged
           up/down by ESPN's per-player value. Drafted players grey out & strike
-          through in real time. Tap a name for details, gavel = load into bid
-          form, pin = watchlist.
+          through. Tap a name to see player details and analyst takes; pin to save.
         </p>
       </div>
 
-      {/* Show the actual decision card (bid/pass/stop + math) on live draft, not the bio popup */}
-      <PlayerDecisionOverlay
+      <PlayerDetailsOverlay
         open={!!detailFor}
         onOpenChange={(o) => !o && setDetailFor(null)}
         name={detailFor?.name ?? ""}
         position={detailFor?.position}
-        price={detailFor?.price}
       />
     </Card>
   );
