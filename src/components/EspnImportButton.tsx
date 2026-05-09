@@ -55,8 +55,8 @@ export default function EspnImportButton({ autoApply = false }: { autoApply?: bo
     try {
       const { data, error } = await supabase.functions.invoke("espn-sync", {});
       if (error || data?.error) {
-        toast.error(data?.error ?? error?.message ?? "ESPN sync failed");
-        return;
+        if (!silent) toast.error(data?.error ?? error?.message ?? "ESPN sync failed");
+        return null;
       }
       const lg = data.league;
       const roster = mapRoster(lg.rosterSlots ?? {});
@@ -72,7 +72,7 @@ export default function EspnImportButton({ autoApply = false }: { autoApply?: bo
         }),
       );
 
-      setPreview({
+      const imported: Imported = {
         budget: lg.budget ?? 200,
         numTeams: lg.size ?? data.teams?.length ?? 12,
         scoring: (lg.scoring as Scoring | null) ?? null,
@@ -80,13 +80,44 @@ export default function EspnImportButton({ autoApply = false }: { autoApply?: bo
         roster,
         leagueName: lg.name,
         keepers: importedKeepers,
-      });
+      };
+      if (!silent) setPreview(imported);
+      return imported;
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to import");
+      if (!silent) toast.error(e instanceof Error ? e.message : "Failed to import");
+      return null;
     } finally {
       setBusy(false);
     }
   };
+
+  const applyImported = (imported: Imported) => {
+    setSettings({
+      totalBudget: imported.budget,
+      numTeams: imported.numTeams,
+      ...(imported.scoring ? { scoring: imported.scoring } : {}),
+      leagueType: imported.leagueType,
+    });
+    (Object.keys(imported.roster) as (keyof RosterSlots)[]).forEach((k) =>
+      setRoster(k, imported.roster[k])
+    );
+    if (imported.keepers.length) setKeepers(imported.keepers);
+  };
+
+  // Auto-pull on mount when caller opts in (used by SetupWizard)
+  useEffect(() => {
+    if (!autoApply || autoApplied) return;
+    let cancelled = false;
+    (async () => {
+      const imported = await fetchEspn(true);
+      if (cancelled || !imported) return;
+      applyImported(imported);
+      setAutoApplied(true);
+      setAutoLeagueName(imported.leagueName ?? null);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoApply]);
 
   const apply = () => {
     if (!preview) return;
