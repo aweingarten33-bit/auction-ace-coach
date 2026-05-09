@@ -43,18 +43,20 @@ function mapRoster(slots: Record<string, number>): RosterSlots {
  * Calls espn-sync, normalizes the response into our LeagueSettings shape,
  * shows a confirmation card with the diff, and applies on accept.
  */
-export default function EspnImportButton() {
+export default function EspnImportButton({ autoApply = false }: { autoApply?: boolean } = {}) {
   const { setSettings, setRoster, setKeepers } = useDraftStore();
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Imported | null>(null);
+  const [autoApplied, setAutoApplied] = useState(false);
+  const [autoLeagueName, setAutoLeagueName] = useState<string | null>(null);
 
-  const fetchEspn = async () => {
+  const fetchEspn = async (silent = false) => {
     setBusy(true);
     try {
       const { data, error } = await supabase.functions.invoke("espn-sync", {});
       if (error || data?.error) {
-        toast.error(data?.error ?? error?.message ?? "ESPN sync failed");
-        return;
+        if (!silent) toast.error(data?.error ?? error?.message ?? "ESPN sync failed");
+        return null;
       }
       const lg = data.league;
       const roster = mapRoster(lg.rosterSlots ?? {});
@@ -70,7 +72,7 @@ export default function EspnImportButton() {
         }),
       );
 
-      setPreview({
+      const imported: Imported = {
         budget: lg.budget ?? 200,
         numTeams: lg.size ?? data.teams?.length ?? 12,
         scoring: (lg.scoring as Scoring | null) ?? null,
@@ -78,13 +80,44 @@ export default function EspnImportButton() {
         roster,
         leagueName: lg.name,
         keepers: importedKeepers,
-      });
+      };
+      if (!silent) setPreview(imported);
+      return imported;
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to import");
+      if (!silent) toast.error(e instanceof Error ? e.message : "Failed to import");
+      return null;
     } finally {
       setBusy(false);
     }
   };
+
+  const applyImported = (imported: Imported) => {
+    setSettings({
+      totalBudget: imported.budget,
+      numTeams: imported.numTeams,
+      ...(imported.scoring ? { scoring: imported.scoring } : {}),
+      leagueType: imported.leagueType,
+    });
+    (Object.keys(imported.roster) as (keyof RosterSlots)[]).forEach((k) =>
+      setRoster(k, imported.roster[k])
+    );
+    if (imported.keepers.length) setKeepers(imported.keepers);
+  };
+
+  // Auto-pull on mount when caller opts in (used by SetupWizard)
+  useEffect(() => {
+    if (!autoApply || autoApplied) return;
+    let cancelled = false;
+    (async () => {
+      const imported = await fetchEspn(true);
+      if (cancelled || !imported) return;
+      applyImported(imported);
+      setAutoApplied(true);
+      setAutoLeagueName(imported.leagueName ?? null);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoApply]);
 
   const apply = () => {
     if (!preview) return;
@@ -108,10 +141,18 @@ export default function EspnImportButton() {
 
   return (
     <div className="space-y-2">
+      {autoApplied && !preview && (
+        <div className="rounded-md border border-primary/40 bg-primary/5 p-2 text-[11px] text-foreground flex items-center gap-2">
+          <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0" />
+          <span>
+            Auto-filled from ESPN{autoLeagueName ? ` · ${autoLeagueName}` : ""}. Edit below if anything looks off.
+          </span>
+        </div>
+      )}
       {!preview && (
-        <Button onClick={fetchEspn} disabled={busy} variant="outline" size="sm" className="w-full">
+        <Button onClick={() => fetchEspn(false)} disabled={busy} variant="outline" size="sm" className="w-full">
           {busy ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Download className="mr-2 h-3.5 w-3.5" />}
-          Auto-fill from ESPN
+          {autoApplied ? "Re-pull from ESPN" : "Auto-fill from ESPN"}
         </Button>
       )}
 

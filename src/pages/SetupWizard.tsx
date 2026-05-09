@@ -132,11 +132,8 @@ export default function SetupWizard() {
           {settingsOpen && (<>
           {step === 0 && (
             <div className="space-y-6">
-              <EspnImportButton />
+              <EspnImportButton autoApply />
 
-              <div className="rounded-md border border-border/60 bg-secondary/30 p-3 text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">Defaults pre-filled:</span> $225 budget · Half PPR · Superflex · Keeper. Change anything below if your league differs.
-              </div>
 
               <section className="space-y-3">
                 <h2 className="text-sm font-semibold text-foreground">League Basics</h2>
