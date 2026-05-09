@@ -28,10 +28,20 @@ export default function EspnSettings() {
   const [verified, setVerified] = useState<string | null>(null);
   const [joinLeagueId, setJoinLeagueId] = useState<string>("");
   const [savedLeagueId, setSavedLeagueId] = useState<number | null>(null);
+  const [inviteUrl, setInviteUrl] = useState<string>("");
 
   // Load existing
   useEffect(() => {
     (async () => {
+      const inviteToken = new URLSearchParams(window.location.search).get("invite");
+      if (inviteToken) {
+        const { data, error } = await supabase.functions.invoke("league-invite-join", { body: { token: inviteToken } });
+        if (!error && data?.league_id) {
+          setSavedLeagueId(Number(data.league_id));
+          setJoinLeagueId(String(data.league_id));
+          toast.success(`Joined league ${data.league_id} from invite`);
+        }
+      }
       const { data: c } = await supabase
         .from("espn_credentials")
         .select("swid, espn_s2, season_id, league_id, team_id, last_verified_at")
@@ -177,6 +187,15 @@ export default function EspnSettings() {
     toast.success("Joined! You'll see your league mate's draft history.");
   };
 
+  const createInvite = async () => {
+    const { data, error } = await supabase.functions.invoke("league-invite-create", {});
+    if (error || data?.error) return toast.error(data?.error ?? error?.message ?? "Couldn't create invite");
+    const url = `${window.location.origin}/espn?invite=${data.token}`;
+    setInviteUrl(url);
+    try { await navigator.clipboard.writeText(url); } catch { /* ignore */ }
+    toast.success("Invite link copied");
+  };
+
   return (
     <div className="mx-auto max-w-3xl p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -230,6 +249,12 @@ export default function EspnSettings() {
             Currently joined to league <span className="font-mono">{savedLeagueId}</span>. Auto-fill on the draft setup page will use this league's shared history.
           </p>
         )}
+        <div className="mt-3 flex gap-2">
+          <Button variant="outline" onClick={createInvite} disabled={!savedLeagueId}>
+            Create invite link
+          </Button>
+          {inviteUrl && <Input value={inviteUrl} readOnly className="font-mono text-[11px]" />}
+        </div>
       </Card>
 
       {/* Path A */}

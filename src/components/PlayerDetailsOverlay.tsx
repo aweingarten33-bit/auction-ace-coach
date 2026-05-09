@@ -106,7 +106,7 @@ export default function PlayerDetailsOverlay({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto p-0 bg-[#f5efe4] border-none">
+      <DialogContent className="w-[calc(100vw-12px)] max-w-md max-h-[94vh] overflow-y-auto overscroll-contain p-0 bg-[#f5efe4] border-none">
         {/* Visually-hidden title for a11y; real header is inside the card */}
         <DialogHeader className="sr-only">
           <DialogTitle>{name}</DialogTitle>
@@ -127,7 +127,7 @@ export default function PlayerDetailsOverlay({
         />
 
         {/* Sleeper meta grid */}
-        <div className="rounded-md border border-border/60 bg-secondary/30 p-3">
+        <div className="mx-2 rounded-md border border-border/60 bg-secondary/30 p-3">
           <p className="mb-2 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
             Player Info {loading && <span className="ml-1 normal-case opacity-60">· loading…</span>}
           </p>
@@ -174,7 +174,7 @@ export default function PlayerDetailsOverlay({
         </div>
 
         {/* AI enrichment */}
-        <div className="space-y-2 text-[11px]">
+        <div className="space-y-2 px-2 pb-2 text-[12px] leading-snug">
           {(matchPct != null || maxBid != null || grade != null) && (
             <div className="flex items-center gap-2">
               {matchPct != null && (

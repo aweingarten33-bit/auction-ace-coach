@@ -19,12 +19,17 @@ export function buildPriceMap(prices: PriceEstimate[]): Map<string, number> {
 /** How much is the room paying vs the user's price sheet? */
 export function computeMarketPulse(events: DraftEvent[], prices: PriceEstimate[]): MarketPulse {
   const map = buildPriceMap(prices);
+  // Ignore $1-$2 noise picks so late bench churn doesn't distort market temp.
+  // We want the pulse to reflect "real market pressure" on meaningful targets.
+  const MIN_SHEET_PRICE = 5;
+  const MIN_PAID_PRICE = 2;
   let paid = 0;
   let sheet = 0;
   let n = 0;
   for (const e of events) {
     const ref = map.get(norm(e.player));
-    if (!ref || ref <= 0) continue;
+    if (!ref || ref < MIN_SHEET_PRICE) continue;
+    if (e.price < MIN_PAID_PRICE) continue;
     paid += e.price;
     sheet += ref;
     n++;
