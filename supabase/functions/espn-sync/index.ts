@@ -145,6 +145,21 @@ Deno.serve(async (req) => {
       ? null
       : recPts >= 0.9 ? "PPR" : recPts >= 0.4 ? "Half PPR" : "Standard";
 
+    // Persist canonical shared snapshot for league members.
+    await sb.from("league_snapshots").upsert({
+      league_id: creds.league_id,
+      season_id: creds.season_id,
+      importer_user_id: u.user.id,
+      league_name: settings.name ?? null,
+      num_teams: settings.size ?? null,
+      scoring: scoringLabel,
+      auction_budget: auctionBudget,
+      roster_slots: roster.lineupSlotCounts ?? {},
+      teams,
+      keeper_summary: keepers,
+      synced_at: new Date().toISOString(),
+    }, { onConflict: "league_id,season_id" });
+
     return j({
       ok: true,
       league: {

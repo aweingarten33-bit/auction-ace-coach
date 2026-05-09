@@ -18,8 +18,63 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const SCALE_MIN = 0.4;
 const SCALE_MAX = 5.0;
 const MIN_SAMPLE = 5; // need ≥5 overlap players for a position to trust the scaler
+const AVAILABILITY_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 export type PosScale = Record<string, number>; // position -> multiplier
+
+type AvailabilityCacheValue = { factor: number; reason: string } | null;
+type AvailabilityCacheEntry = { value: AvailabilityCacheValue; ts: number };
+type AvailabilityCache = Record<string, AvailabilityCacheEntry>;
+
+export function readAvailabilityCache(now = Date.now()): AvailabilityCache {
+  let raw: unknown = {};
+  try {
+    raw = JSON.parse(localStorage.getItem("availability-llm-cache") || "{}");
+  } catch {
+    return {};
+  }
+  if (!raw || typeof raw !== "object") return {};
+
+  const out: AvailabilityCache = {};
+  for (const [key, entry] of Object.entries(raw as Record<string, unknown>)) {
+    if (!entry || typeof entry !== "object") continue;
+    const ts = Number((entry as { ts?: unknown }).ts);
+    if (!Number.isFinite(ts) || ts <= 0) continue;
+    if (now - ts > AVAILABILITY_CACHE_TTL_MS) continue;
+    const value = (entry as { value?: unknown }).value;
+    if (value === null) {
+      out[key] = { value: null, ts };
+      continue;
+    }
+    if (
+      value &&
+      typeof value === "object" &&
+      Number.isFinite((value as { factor?: unknown }).factor) &&
+      typeof (value as { reason?: unknown }).reason === "string"
+    ) {
+      out[key] = {
+        value: { factor: Number((value as { factor: number }).factor), reason: (value as { reason: string }).reason },
+        ts,
+      };
+    }
+  }
+  return out;
+}
+
+export function anchorInjuryFactorFromStatus(status: string | null | undefined, note: string | null | undefined): { factor: number; reason: string | null } {
+  const s = (status || "").toUpperCase().trim();
+  const n = (note || "").toLowerCase();
+  // Keep aligned with injuryMultiplier() in league-tier-prices to avoid
+  // contradictory injury pricing between editor/sheet and anchor decisions.
+  if (s === "OUT") return { factor: 0.55, reason: "OUT" };
+  if (s === "IR" || s === "INJURED_RESERVE" || s === "INJURED RESERVE") return { factor: 0.5, reason: "IR" };
+  if (s === "DOUBTFUL") return { factor: 0.7, reason: "Doubtful" };
+  if (s === "QUESTIONABLE") {
+    if (n.includes("surgery")) return { factor: 0.8, reason: "Questionable (surgery)" };
+    return { factor: 0.9, reason: "Questionable" };
+  }
+  return { factor: 1, reason: null };
+}
 
 export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: PosScale } {
   const [map, setMap] = useState<Record<string, AnchorEntry>>({});
@@ -135,16 +190,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         const injuryFactor = (k: string): { factor: number; reason: string | null } => {
           const inj = injuryMap.get(k);
           if (!inj) return { factor: 1, reason: null };
-          const status = (inj.status || "").toUpperCase().trim();
-          const note = (inj.note || "").toLowerCase();
-          if (status === "OUT") return { factor: 0.3, reason: "OUT" };
-          if (status === "IR" || status === "INJURED_RESERVE" || status === "INJURED RESERVE") return { factor: 0.5, reason: "IR" };
-          if (status === "DOUBTFUL") return { factor: 0.7, reason: "Doubtful" };
-          if (status === "QUESTIONABLE") {
-            if (note.includes("surgery")) return { factor: 0.8, reason: "Questionable (surgery)" };
-            return { factor: 0.9, reason: "Questionable" };
-          }
-          return { factor: 1, reason: null };
+          return anchorInjuryFactorFromStatus(inj.status, inj.note);
         };
 
         // Availability discount — non-injury risks (suspensions, holdouts, PUP/NFI,
@@ -237,16 +283,14 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         //      in localStorage by note hash so we only pay once per unique note.
         const llmMap = new Map<string, { factor: number; reason: string }>();
         const ambigItems: Array<{ id: string; name: string; status: string | null; note: string | null; cacheKey: string }> = [];
-        const cache: Record<string, { factor: number; reason: string } | null> = (() => {
-          try { return JSON.parse(localStorage.getItem("availability-llm-cache") || "{}"); } catch { return {}; }
-        })();
+        const cache = readAvailabilityCache();
         for (const k of injuryMap.keys()) {
           const r = regexAvailability(k);
           if (!r.ambiguous) continue;
           const inj = injuryMap.get(k)!;
           const cacheKey = `${(inj.status || "").trim()}|${(inj.note || "").trim()}`;
           if (cacheKey in cache) {
-            const v = cache[cacheKey];
+            const v = cache[cacheKey]?.value ?? null;
             if (v) llmMap.set(k, v);
             continue;
           }
@@ -264,9 +308,9 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
                 if (c.missing && c.factor < 1) {
                   const v = { factor: c.factor, reason: c.reason };
                   llmMap.set(c.id, v);
-                  cache[item.cacheKey] = v;
+                  cache[item.cacheKey] = { value: v, ts: Date.now() };
                 } else {
-                  cache[item.cacheKey] = null;
+                  cache[item.cacheKey] = { value: null, ts: Date.now() };
                 }
               }
               try { localStorage.setItem("availability-llm-cache", JSON.stringify(cache)); } catch { /* quota */ }

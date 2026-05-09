@@ -269,7 +269,7 @@ export default function AuctionPlayerCard({
       </div>
 
       {/* ── PHOTO + HEADLINE PRICE ─────────────────────── */}
-      <div className="grid grid-cols-[110px_1fr] gap-3 border-b-2 border-[#1b2238]/10 p-3">
+      <div className="grid grid-cols-[96px_1fr] gap-3 border-b-2 border-[#1b2238]/10 p-3 sm:grid-cols-[110px_1fr]">
         <div className="aspect-[3/4] overflow-hidden rounded border-2 border-[#1b2238] bg-[#1b2238]/5">
           {headshot ? (
             <img
@@ -287,11 +287,11 @@ export default function AuctionPlayerCard({
 
         <div className="flex flex-col justify-between">
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-[#d2691e]">
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#d2691e]">
               Berry + Sleeper value
             </p>
             {headlinePrice != null ? (
-              <p className="font-serif text-4xl font-black leading-none">
+              <p className="font-serif text-[42px] font-black leading-none">
                 ${Math.round(headlinePrice)}
               </p>
             ) : (
@@ -305,7 +305,7 @@ export default function AuctionPlayerCard({
           </div>
 
           {/* Compact price stack — every input that drives the headline */}
-          <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px]">
+          <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
             {berryVal != null && (
               <PriceLine label="Matthew Berry" value={`$${Math.round(berryVal)}`} />
             )}
@@ -331,6 +331,24 @@ export default function AuctionPlayerCard({
         </div>
       </div>
 
+      {/* Mobile quick-read strip: keep recommendation visible while scrolling */}
+      <div className="sticky top-0 z-10 border-y border-[#1b2238]/20 bg-[#f5efe4]/95 px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-[#f5efe4]/80">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[#1b2238]/70">Recommendation</p>
+            <p className="truncate text-sm font-black">
+              {valueVerdict ?? "FAIR"}{suggested != null ? ` · target ${fmt(suggested)}` : ""}
+            </p>
+          </div>
+          {maxBid != null && (
+            <div className="rounded border border-[#1b2238]/25 px-2 py-1 text-right">
+              <p className="text-[9px] uppercase tracking-wider text-[#1b2238]/60">Max bid</p>
+              <p className="font-mono text-sm font-bold">{fmt(maxBid)}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* ── CONTENT SECTIONS — personalized to your roster ── */}
       <div className="space-y-2 p-3">
         {myGap && (
@@ -344,8 +362,8 @@ export default function AuctionPlayerCard({
           </div>
         )}
         {valueVerdict && (
-          <div className="flex items-center justify-between rounded border-2 border-[#1b2238] bg-[#f5efe4] px-2.5 py-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#1b2238]/70">
+          <div className="flex items-center justify-between rounded border-2 border-[#1b2238] bg-[#f5efe4] px-3 py-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#1b2238]/70">
               Price vs market
             </span>
             <span className={

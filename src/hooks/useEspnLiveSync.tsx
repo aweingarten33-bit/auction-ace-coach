@@ -46,6 +46,7 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
   // "won" events as YOUR picks (drafter: "me") so the budget math, targets,
   // and decision engine all work without you logging anything by hand.
   const [myTeamId, setMyTeamId] = useState<number | null>(null);
+  const [leagueId, setLeagueId] = useState<number | null>(null);
 
   const seenIds = useRef<Set<string>>(new Set());
   const addEvent = useDraftStore((s) => s.addEvent);
@@ -95,6 +96,15 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
       .then(({ data }) => {
         if (cancelled) return;
         setMyTeamId(typeof data?.team_id === "number" ? data.team_id : null);
+      });
+    supabase
+      .from("profiles")
+      .select("league_id")
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        setLeagueId(typeof data?.league_id === "number" ? data.league_id : null);
       });
     return () => {
       cancelled = true;
@@ -189,7 +199,7 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
 
   // Backfill + realtime subscription
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !leagueId) return;
     setStatus("idle");
 
     let cancelled = false;
@@ -199,7 +209,7 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
       const { data } = await supabase
         .from("live_draft_events")
         .select("id, event_type, player_name, player_position, player_team, price, drafter_team_name, drafter_team_id, occurred_at, created_at")
-        .eq("user_id", userId)
+        .eq("league_id", leagueId)
         .gte("created_at", since)
         .order("created_at", { ascending: true })
         .limit(500);
@@ -211,14 +221,14 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
     })();
 
     const channel = supabase
-      .channel(`live_draft:${userId}`)
+      .channel(`live_draft:league:${leagueId}`)
       .on(
         "postgres_changes",
         {
           event: "INSERT",
           schema: "public",
           table: "live_draft_events",
-          filter: `user_id=eq.${userId}`,
+          filter: `league_id=eq.${leagueId}`,
         },
         (payload) => applyEvent(payload.new),
       )
@@ -232,7 +242,7 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [userId, leagueId]);
 
   // Stale watchdog
   useEffect(() => {
