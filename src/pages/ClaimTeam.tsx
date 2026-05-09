@@ -38,8 +38,8 @@ export default function ClaimTeam() {
         setAlreadyClaimed(true);
         return;
       }
-      // Pull live league teams from ESPN via the existing sync function.
-      const { data, error } = await supabase.functions.invoke("espn-sync");
+      // Pull league teams from canonical shared snapshot.
+      const { data, error } = await supabase.functions.invoke("league-teams");
       const errMsg =
         (data && typeof data === "object" && "error" in data ? (data as any).error : null) ||
         error?.message ||
