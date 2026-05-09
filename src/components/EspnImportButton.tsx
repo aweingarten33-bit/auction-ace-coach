@@ -141,10 +141,18 @@ export default function EspnImportButton({ autoApply = false }: { autoApply?: bo
 
   return (
     <div className="space-y-2">
+      {autoApplied && !preview && (
+        <div className="rounded-md border border-primary/40 bg-primary/5 p-2 text-[11px] text-foreground flex items-center gap-2">
+          <CheckCircle2 className="h-3.5 w-3.5 text-primary shrink-0" />
+          <span>
+            Auto-filled from ESPN{autoLeagueName ? ` · ${autoLeagueName}` : ""}. Edit below if anything looks off.
+          </span>
+        </div>
+      )}
       {!preview && (
-        <Button onClick={fetchEspn} disabled={busy} variant="outline" size="sm" className="w-full">
+        <Button onClick={() => fetchEspn(false)} disabled={busy} variant="outline" size="sm" className="w-full">
           {busy ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Download className="mr-2 h-3.5 w-3.5" />}
-          Auto-fill from ESPN
+          {autoApplied ? "Re-pull from ESPN" : "Auto-fill from ESPN"}
         </Button>
       )}
 
