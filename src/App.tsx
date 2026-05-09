@@ -74,6 +74,7 @@ const App = () => (
               <Route path="/m" element={<Navigate to="/draft-room" replace />} />
               <Route path="/mobile" element={<Navigate to="/draft-room" replace />} />
               <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
+              <Route path="/claim-team" element={<Navigate to="/team" replace />} />
 
               <Route path="/logos" element={<LogoPicker />} />
               <Route path="/zine" element={<Zine />} />
