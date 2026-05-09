@@ -43,12 +43,14 @@ function mapRoster(slots: Record<string, number>): RosterSlots {
  * Calls espn-sync, normalizes the response into our LeagueSettings shape,
  * shows a confirmation card with the diff, and applies on accept.
  */
-export default function EspnImportButton() {
+export default function EspnImportButton({ autoApply = false }: { autoApply?: boolean } = {}) {
   const { setSettings, setRoster, setKeepers } = useDraftStore();
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<Imported | null>(null);
+  const [autoApplied, setAutoApplied] = useState(false);
+  const [autoLeagueName, setAutoLeagueName] = useState<string | null>(null);
 
-  const fetchEspn = async () => {
+  const fetchEspn = async (silent = false) => {
     setBusy(true);
     try {
       const { data, error } = await supabase.functions.invoke("espn-sync", {});
