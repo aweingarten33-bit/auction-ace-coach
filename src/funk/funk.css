@@ -1,0 +1,489 @@
+/* ============================================================
+   FUNK CONTINUUM — Design system
+   Dark / analog / retro-futurist. Isolated from the main app.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&display=swap');
+
+/* -- tokens ------------------------------------------------- */
+:root {
+  --funk-bg:        #0a0804;
+  --funk-surface:   #111008;
+  --funk-surface2:  #191510;
+  --funk-border:    rgba(232, 93, 4, 0.18);
+  --funk-orange:    #E85D04;
+  --funk-amber:     #F48C06;
+  --funk-cream:     #e8dcc8;
+  --funk-muted:     #7a6e5e;
+  --funk-dim:       #4a4238;
+  --funk-font-disp: 'Bebas Neue', 'Space Mono', monospace;
+  --funk-font-body: 'Space Grotesk', ui-sans-serif, sans-serif;
+  --funk-font-mono: 'Space Mono', 'JetBrains Mono', monospace;
+  --funk-tab-h:     52px;
+  --funk-sidebar-w: 320px;
+  --funk-radius:    6px;
+}
+
+/* -- reset for this page ------------------------------------ */
+.funk-root, .funk-root * {
+  box-sizing: border-box;
+}
+
+.funk-root {
+  position: fixed;
+  inset: 0;
+  background: var(--funk-bg);
+  color: var(--funk-cream);
+  font-family: var(--funk-font-body);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 0;
+}
+
+/* -- grain overlay ------------------------------------------ */
+.funk-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+/* -- header / tabs ------------------------------------------ */
+.funk-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  padding: 0 24px;
+  background: var(--funk-bg);
+  border-bottom: 1px solid var(--funk-border);
+  height: var(--funk-tab-h);
+  position: relative;
+  z-index: 10;
+}
+
+.funk-logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-right: 32px;
+  padding-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.funk-logo__text {
+  font-family: var(--funk-font-disp);
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  color: var(--funk-orange);
+  line-height: 1;
+}
+
+.funk-logo__sub {
+  font-family: var(--funk-font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--funk-muted);
+  margin-top: 2px;
+}
+
+/* -- crate tabs (vinyl-divider + file-tab hybrid) ----------- */
+.funk-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  height: 100%;
+  padding-bottom: 0;
+}
+.funk-tabs::-webkit-scrollbar { display: none; }
+
+.funk-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 6px 14px 8px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: var(--funk-surface);
+  color: var(--funk-muted);
+  cursor: pointer;
+  font-family: var(--funk-font-mono);
+  font-size: 0.65rem;
+  text-align: left;
+  min-width: 80px;
+  height: 40px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, height 0.15s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.funk-tab:hover:not(.funk-tab--empty) {
+  background: var(--funk-surface2);
+  color: var(--funk-cream);
+  border-color: var(--funk-border);
+  height: 44px;
+}
+
+.funk-tab--active {
+  background: var(--funk-surface2);
+  color: var(--funk-cream);
+  border-color: var(--tab-color, var(--funk-orange)) !important;
+  border-bottom: 1px solid var(--funk-surface2) !important;
+  height: 46px;
+  margin-bottom: -1px;
+  z-index: 2;
+}
+
+.funk-tab--active .funk-tab__index {
+  color: var(--tab-color, var(--funk-orange));
+}
+
+.funk-tab--empty {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.funk-tab__index {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: var(--funk-dim);
+  line-height: 1;
+}
+
+.funk-tab__name {
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.funk-tab__lock {
+  font-size: 0.55rem;
+  position: absolute;
+  top: 5px;
+  right: 6px;
+}
+
+/* -- main stage --------------------------------------------- */
+.funk-stage {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  position: relative;
+}
+
+/* -- player wrap -------------------------------------------- */
+.funk-player-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.funk-player-frame {
+  height: 100%;
+  max-height: calc(100vh - var(--funk-tab-h) - 32px);
+  aspect-ratio: 9 / 16;
+  position: relative;
+  background: #000;
+  box-shadow:
+    0 0 0 1px rgba(232, 93, 4, 0.12),
+    0 32px 80px rgba(0, 0, 0, 0.8);
+}
+
+.funk-player-frame iframe,
+.funk-player-frame > div,
+.funk-player-frame > div > iframe {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  inset: 0;
+  border: none;
+  display: block;
+}
+
+/* -- nav arrows --------------------------------------------- */
+.funk-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10, 8, 4, 0.7);
+  border: 1px solid var(--funk-border);
+  color: var(--funk-cream);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  opacity: 0.5;
+  backdrop-filter: blur(4px);
+}
+.funk-nav:hover { opacity: 1; border-color: var(--funk-orange); background: rgba(232, 93, 4, 0.15); }
+.funk-nav--prev { left: 16px; }
+.funk-nav--next { right: 16px; }
+
+/* -- play/pause overlay ------------------------------------- */
+.funk-play-overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.funk-play-icon {
+  font-size: 3rem;
+  color: var(--funk-cream);
+  opacity: 0.85;
+  text-shadow: 0 0 32px rgba(232, 93, 4, 0.6);
+  animation: funk-pulse 0.4s ease-out both;
+}
+
+@keyframes funk-pulse {
+  from { opacity: 0; transform: scale(1.5); }
+  to   { opacity: 0.85; transform: scale(1); }
+}
+
+/* -- sidebar ------------------------------------------------ */
+.funk-sidebar {
+  width: var(--funk-sidebar-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 32px 28px;
+  background: linear-gradient(to right, transparent, var(--funk-surface) 20%);
+  border-left: 1px solid var(--funk-border);
+  gap: 24px;
+  overflow: hidden;
+}
+
+/* -- track info --------------------------------------------- */
+.funk-track-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.funk-track-info__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.funk-world-badge {
+  font-family: var(--funk-font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: 1px solid;
+  border-radius: 2px;
+  padding: 3px 8px;
+  opacity: 0.9;
+}
+
+.funk-track-pos {
+  font-family: var(--funk-font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--funk-dim);
+}
+
+.funk-track-info__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.funk-track-title {
+  font-family: var(--funk-font-disp);
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  color: var(--funk-cream);
+  margin: 0;
+}
+
+.funk-track-artist {
+  font-family: var(--funk-font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--funk-muted);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.funk-track-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.funk-tag {
+  font-family: var(--funk-font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  background: rgba(232, 93, 4, 0.1);
+  border: 1px solid rgba(232, 93, 4, 0.22);
+  color: var(--funk-amber);
+}
+
+/* -- key hints ---------------------------------------------- */
+.funk-key-hints {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.funk-key-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--funk-font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--funk-dim);
+  text-transform: uppercase;
+}
+
+.funk-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  min-width: 24px;
+  background: var(--funk-surface2);
+  border: 1px solid var(--funk-border);
+  border-radius: 3px;
+  font-family: var(--funk-font-mono);
+  font-size: 0.6rem;
+  color: var(--funk-cream);
+  font-style: normal;
+}
+
+/* -- progress dots ------------------------------------------ */
+.funk-progress {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 20;
+  max-width: calc(100vw - var(--funk-sidebar-w) - 48px);
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 6px 10px;
+  background: rgba(10, 8, 4, 0.7);
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--funk-border);
+}
+
+.funk-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--funk-dim);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.funk-dot:hover { background: var(--funk-muted); transform: scale(1.3); }
+.funk-dot--active { background: var(--funk-orange); transform: scale(1.4); }
+
+/* -- loading ------------------------------------------------ */
+.funk-loading {
+  position: fixed;
+  inset: 0;
+  background: var(--funk-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  font-family: var(--funk-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--funk-muted);
+}
+
+.funk-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--funk-border);
+  border-top-color: var(--funk-orange);
+  border-radius: 50%;
+  animation: funk-spin 0.8s linear infinite;
+}
+
+@keyframes funk-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* -- vignette on player ------------------------------------- */
+.funk-player-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(10,8,4,0.6) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* -- scanline effect on player ----------------------------- */
+.funk-player-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* -- responsive: hide sidebar below 900px ------------------- */
+@media (max-width: 900px) {
+  .funk-sidebar {
+    display: none;
+  }
+  .funk-progress {
+    max-width: calc(100vw - 48px);
+  }
+}

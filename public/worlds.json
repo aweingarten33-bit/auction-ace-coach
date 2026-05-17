@@ -1,0 +1,51 @@
+{
+  "worlds": [
+    {
+      "id": "funk",
+      "name": "Funk Continuum",
+      "color": "#E85D04",
+      "accent": "#370617",
+      "shorts": [
+        { "youtubeId": "hIa2OJDdp9M", "title": "Give Up the Funk", "artist": "Parliament", "year": "1976", "context": "live" },
+        { "youtubeId": "OJWJE0x7T4s", "title": "Flash Light", "artist": "Parliament", "year": "1977", "context": "live" },
+        { "youtubeId": "zNJ54hzHNoY", "title": "Jungle Boogie", "artist": "Kool & the Gang", "year": "1973", "context": "music-video" },
+        { "youtubeId": "DtmDDETOqgU", "title": "Get Up (I Feel Like Being a) Sex Machine", "artist": "James Brown", "year": "1970", "context": "live" },
+        { "youtubeId": "RCZnGBZ7PXM", "title": "Superstition", "artist": "Stevie Wonder", "year": "1972", "context": "live" },
+        { "youtubeId": "9KGNI2zfTXU", "title": "September", "artist": "Earth, Wind & Fire", "year": "1978", "context": "music-video" },
+        { "youtubeId": "2zNSgSzhBfM", "title": "I Want You Back", "artist": "The Jackson 5", "year": "1969", "context": "live" },
+        { "youtubeId": "dSQ-9rhCeq4", "title": "Brick House", "artist": "Commodores", "year": "1977", "context": "music-video" },
+        { "youtubeId": "tNKy_d3g8ys", "title": "Express Yourself", "artist": "Charles Wright & the Watts 103rd Street Rhythm Band", "year": "1970", "context": "live" },
+        { "youtubeId": "eRlVMzAhNs8", "title": "Papa Was a Rollin' Stone", "artist": "The Temptations", "year": "1972", "context": "music-video" },
+        { "youtubeId": "n_GFN3a0yj0", "title": "Shining Star", "artist": "Earth, Wind & Fire", "year": "1975", "context": "live" },
+        { "youtubeId": "vMT3jCDRsKk", "title": "Strawberry Letter 23", "artist": "Brothers Johnson", "year": "1977", "context": "live" },
+        { "youtubeId": "LwKxV2BuJ3w", "title": "Mothership Connection", "artist": "Parliament", "year": "1975", "context": "live" },
+        { "youtubeId": "qLT6NJUoJj4", "title": "Do It ('Til You're Satisfied)", "artist": "B.T. Express", "year": "1974", "context": "live" },
+        { "youtubeId": "hW8KjMVJGXM", "title": "Pick Up the Pieces", "artist": "Average White Band", "year": "1974", "context": "live" },
+        { "youtubeId": "0hg2gJQd_Gs", "title": "Fire", "artist": "Ohio Players", "year": "1974", "context": "music-video" },
+        { "youtubeId": "v4SEHAnBxSI", "title": "Higher Ground", "artist": "Stevie Wonder", "year": "1973", "context": "live" },
+        { "youtubeId": "8xg3vE8Ie_E", "title": "Tell Me Something Good", "artist": "Rufus ft. Chaka Khan", "year": "1974", "context": "live" },
+        { "youtubeId": "3cShYbLkhBc", "title": "Before I Let Go", "artist": "Maze ft. Frankie Beverly", "year": "1981", "context": "live" },
+        { "youtubeId": "7WMq_JRiMaU", "title": "Got to Give It Up", "artist": "Marvin Gaye", "year": "1977", "context": "live" },
+        { "youtubeId": "D5drYkLiLI8", "title": "Knee Deep", "artist": "Funkadelic", "year": "1979", "context": "live" },
+        { "youtubeId": "cOQDsmEqbKI", "title": "Le Freak", "artist": "Chic", "year": "1978", "context": "music-video" },
+        { "youtubeId": "1ygdAiDxKfI", "title": "Good Times", "artist": "Chic", "year": "1979", "context": "live" },
+        { "youtubeId": "NhWniEzwFpY", "title": "Dance to the Music", "artist": "Sly & the Family Stone", "year": "1968", "context": "live" },
+        { "youtubeId": "bDOvDm8p6Hk", "title": "Everyday People", "artist": "Sly & the Family Stone", "year": "1968", "context": "live" },
+        { "youtubeId": "fJ9rUzIMcZQ", "title": "Bohemian Rhapsody (Funk Edit)", "artist": "Queen vs. Bootsy Collins", "year": "1975", "context": "edit" },
+        { "youtubeId": "i_wYQeJHd4E", "title": "Can You Handle It", "artist": "Sharon Redd", "year": "1981", "context": "nostalgia" },
+        { "youtubeId": "pHqEbE6CMMY", "title": "One Nation Under a Groove", "artist": "Funkadelic", "year": "1978", "context": "live" },
+        { "youtubeId": "8xrOfGDCfOs", "title": "Can't Stop the Funk", "artist": "Bobby Byrd", "year": "1971", "context": "live" },
+        { "youtubeId": "XUwqMQJ3b9E", "title": "Atomic Dog", "artist": "George Clinton", "year": "1982", "context": "music-video" },
+        { "youtubeId": "B8z8_ek_yvY", "title": "Aqua Boogie", "artist": "Parliament", "year": "1978", "context": "live" },
+        { "youtubeId": "HQ-MCoo3V1I", "title": "Superfreak", "artist": "Rick James", "year": "1981", "context": "music-video" },
+        { "youtubeId": "4JkIs37a2JE", "title": "Ain't Nobody", "artist": "Rufus & Chaka Khan", "year": "1983", "context": "live" },
+        { "youtubeId": "6X7Od_ZMQUA", "title": "Keep It in the Family", "artist": "Bootsy's Rubber Band", "year": "1976", "context": "live" },
+        { "youtubeId": "nPvuNsRccVw", "title": "Ffun", "artist": "Con Funk Shun", "year": "1977", "context": "live" }
+      ]
+    },
+    { "id": "psychedelic", "name": "Psychedelic", "color": "#7209B7", "accent": "#240046", "shorts": [] },
+    { "id": "samples",    "name": "Sample Culture", "color": "#3A0CA3", "accent": "#10002B", "shorts": [] },
+    { "id": "latenight",  "name": "Late Night",     "color": "#0D3B66", "accent": "#03071E", "shorts": [] },
+    { "id": "jam",        "name": "JamWorld",        "color": "#2D6A4F", "accent": "#081C15", "shorts": [] }
+  ]
+}
