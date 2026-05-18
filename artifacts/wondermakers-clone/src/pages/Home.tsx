@@ -20,6 +20,10 @@ const SparkleStar = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const Football = ({ className }: { className?: string }) => (
+  <img src="/football.jpeg" alt="" className={className} />
+);
+
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(true);
@@ -54,10 +58,10 @@ export default function Home() {
             className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
           >
             <motion.div
-              animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
             >
-              <SparkleStar className="w-12 h-12 text-[#d4d4d4]" />
+              <Football className="w-20 h-auto" />
             </motion.div>
           </motion.div>
         )}
