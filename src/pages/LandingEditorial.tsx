@@ -54,15 +54,13 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-70 animate-kenburns"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-75 animate-kenburns"
         style={{
-          filter: "brightness(1.35) contrast(0.9) saturate(0.95) blur(0.5px)",
+          filter: "brightness(1.3) contrast(0.9) saturate(0.95)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 40%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+            "radial-gradient(ellipse 95% 90% at center, black 55%, transparent 100%)",
           maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 40%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
-          WebkitMaskComposite: "source-in",
-          maskComposite: "intersect",
+            "radial-gradient(ellipse 95% 90% at center, black 55%, transparent 100%)",
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
