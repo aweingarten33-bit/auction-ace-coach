@@ -418,7 +418,7 @@ export default function DraftRoom() {
                       <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 custom algorithms were created, each serving a specific role in how players get priced.</p>
                       <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring.</p>
                       <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — the trust/blending concept was utilized to determine how much confidence to place in each data source.</p>
-                      <p>• <span className="font-semibold text-foreground">VORP (Value Over Replacement Player)</span> — each player is priced based on how much their projected output exceeds a replacement-level player at their position. The total auction budget is then allocated proportionately across tiers based on those surplus values, then broken down to individual players within each tier by their ESPN ranking.</p>
+                      <p>• <span className="font-semibold text-foreground">VORP (Value Over Replacement Player)</span> — each player's value is calculated by how much their projected output exceeds the best freely available player at their position.</p>
                       <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same concept hedge funds use in financial pricing systems, applied here through data science and quantitative analytics models.</p>
                     </div>
                   )}
