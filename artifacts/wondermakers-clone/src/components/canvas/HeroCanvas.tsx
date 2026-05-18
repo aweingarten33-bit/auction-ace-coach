@@ -10,12 +10,11 @@ export default function HeroCanvas() {
           position: "absolute",
           top: "50%",
           left: "50%",
-          minWidth: "100%",
-          minHeight: "100%",
-          width: "auto",
-          height: "auto",
+          width: "100%",
+          height: "100%",
           transform: "translate(-50%, -50%)",
-          objectFit: "cover",
+          objectFit: "contain",
+          background: "#000",
         }}
       >
         <source src="/edge-video.mp4" type="video/mp4" />
