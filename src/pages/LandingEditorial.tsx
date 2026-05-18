@@ -54,7 +54,7 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-60 blur-2xl scale-110"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-70 blur-3xl scale-125 saturate-150"
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
