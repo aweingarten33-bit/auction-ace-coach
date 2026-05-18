@@ -54,7 +54,13 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-70 blur-lg scale-110 saturate-150"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-40 blur-2xl scale-110 saturate-150"
+        style={{
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
+        }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
