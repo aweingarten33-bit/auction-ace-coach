@@ -47,7 +47,15 @@ function PublicGate({ children }: { children: JSX.Element }) {
 }
 
 function AppShell() {
-  return <AppRoutes />;
+  const [ready, setReady] = useState(false);
+  const handlePreloaderDone = useCallback(() => setReady(true), []);
+
+  return (
+    <>
+      {!ready && <Preloader onDone={handlePreloaderDone} />}
+      <AppRoutes />
+    </>
+  );
 }
 
 function AppRoutes() {

@@ -12,29 +12,79 @@ export default function Preloader({ onDone }: Props) {
       setExiting(true);
       setTimeout(onDone, 820);
     };
-
-    const hardTimeout = setTimeout(dismiss, 4000);
-    document.fonts.ready.then(dismiss);
-
-    return () => clearTimeout(hardTimeout);
+    const minHold = setTimeout(() => {
+      document.fonts.ready.then(dismiss);
+    }, 700);
+    const hardTimeout = setTimeout(dismiss, 3000);
+    return () => {
+      clearTimeout(minHold);
+      clearTimeout(hardTimeout);
+    };
   }, [onDone]);
+
+  const size = 200;
+  const ringSize = size + 90;
+  const textRadius = size / 2 + 30;
+  const ringText = "AUCTION ACE  •  DRAFT ROOM  •  FANTASY FOOTBALL  •  ";
 
   return (
     <div
       className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black ${exiting ? "preloader-exit" : ""}`}
     >
-      <p className="font-bebas text-[clamp(3rem,16vw,10rem)] tracking-[0.15em] text-white">
-        LOADING
-      </p>
-      <div className="mt-4 h-px w-24 overflow-hidden bg-white/10">
-        <div className="h-full animate-[loading-bar_3.8s_linear_forwards] bg-red-600" />
+      <div
+        className="relative flex items-center justify-center"
+        style={{ width: ringSize, height: ringSize }}
+      >
+        {/* Rotating text ring */}
+        <svg
+          className="absolute inset-0"
+          width={ringSize}
+          height={ringSize}
+          viewBox={`0 0 ${ringSize} ${ringSize}`}
+          style={{ animation: "football-orbit 22s linear infinite" }}
+        >
+          <defs>
+            <path
+              id="preloader-ring-path"
+              d={`M ${ringSize / 2},${ringSize / 2} m -${textRadius},0 a ${textRadius},${textRadius} 0 1,1 ${textRadius * 2},0 a ${textRadius},${textRadius} 0 1,1 -${textRadius * 2},0`}
+            />
+          </defs>
+          <text
+            fontSize="10"
+            letterSpacing="3.5"
+            fill="rgba(255,255,255,0.32)"
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              textTransform: "uppercase",
+            }}
+          >
+            <textPath href="#preloader-ring-path">{ringText.repeat(3)}</textPath>
+          </text>
+        </svg>
+
+        {/* Real football, gently wobbling */}
+        <img
+          src={`${import.meta.env.BASE_URL}football-real.png`}
+          alt=""
+          draggable={false}
+          className="relative select-none"
+          style={{
+            width: size,
+            height: "auto",
+            transform: "rotate(-20deg)",
+            animation: "football-wobble 3.6s ease-in-out infinite",
+            transformOrigin: "50% 55%",
+            filter: "drop-shadow(0 18px 32px rgba(0,0,0,0.65))",
+          }}
+        />
       </div>
-      <style>{`
-        @keyframes loading-bar {
-          from { width: 0%; }
-          to   { width: 100%; }
-        }
-      `}</style>
+
+      <p
+        className="mt-12 text-[10px] uppercase tracking-[0.42em] text-white/55"
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      >
+        Loading the auction room
+      </p>
     </div>
   );
 }

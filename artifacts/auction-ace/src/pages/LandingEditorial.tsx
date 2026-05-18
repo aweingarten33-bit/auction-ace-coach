@@ -25,16 +25,48 @@ export default function LandingEditorial() {
   const ghostOpacity = 0.16 + progress * 0.18;
   const heroFade = 1 - progress * 0.4;
 
-  // Stacked HB_A serif wordmark used throughout — drop-in for the original football mark
-  const Wordmark = ({ className = "" }: { className?: string }) => (
+  // HB_A serif wordmark where the "B" is replaced by a football, gently spinning on its long axis
+  const Wordmark = ({
+    className = "",
+    spin = true,
+  }: {
+    className?: string;
+    spin?: boolean;
+  }) => (
     <span
       className={
-        "select-none font-serif italic font-medium leading-none tracking-tight text-white " +
+        "inline-flex items-center select-none font-serif italic font-medium leading-none tracking-tight text-white " +
         className
       }
       style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}
     >
-      HB<span className="not-italic font-light text-white/70">_</span>A
+      <span>H</span>
+      {/* Football "B" — real football photo, sized to cap height */}
+      <span
+        aria-label="B"
+        className="relative inline-block align-baseline"
+        style={{
+          width: "1.05em",
+          height: "0.78em",
+          marginInline: "0.06em",
+          transform: "translateY(0.06em)",
+        }}
+      >
+        <img
+          src={`${import.meta.env.BASE_URL}football-real.png`}
+          alt=""
+          draggable={false}
+          className="absolute inset-0 h-full w-full object-contain"
+          style={{
+            transform: "rotate(-18deg)",
+            animation: spin ? "football-wobble 4.2s ease-in-out infinite" : undefined,
+            transformOrigin: "50% 55%",
+            filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.5))",
+          }}
+        />
+      </span>
+      <span className="not-italic font-light text-white/70">_</span>
+      <span>A</span>
     </span>
   );
 
