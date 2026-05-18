@@ -144,6 +144,22 @@ function StyleTag() {
       @keyframes lando-blob { 0%,100%{ d: path("M60,-50C72,-32,72,-7,64,15C56,37,40,55,18,62C-4,69,-32,64,-50,48C-68,32,-76,4,-69,-20C-62,-44,-40,-64,-15,-70C10,-76,48,-68,60,-50Z"); }
         50%{ d: path("M55,-58C68,-40,72,-15,66,8C60,31,44,52,21,63C-2,74,-32,75,-52,60C-72,45,-82,14,-74,-13C-66,-40,-40,-62,-13,-68C14,-74,42,-76,55,-58Z"); } }
       @keyframes lando-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+      @keyframes lando-spin { to { transform: rotate(360deg); } }
+      @keyframes lando-shard {
+        0% { transform: translate(0,0) scale(1); opacity:1; }
+        100% { transform: translate(var(--dx), var(--dy)) scale(.2); opacity:0; }
+      }
+      @keyframes lando-ring {
+        0% { transform: scale(.3); opacity:.9; }
+        100% { transform: scale(2.4); opacity:0; }
+      }
+      @keyframes lando-shake {
+        0%,100%{transform:translate(0,0)}
+        20%{transform:translate(-3px,2px)}
+        40%{transform:translate(4px,-2px)}
+        60%{transform:translate(-2px,-3px)}
+        80%{transform:translate(3px,2px)}
+      }
 
       .lando-pill {
         display:inline-flex; align-items:center; gap:.5rem;
