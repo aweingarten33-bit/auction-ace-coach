@@ -55,18 +55,25 @@ export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
   const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
   const setStrategyId = useDraftStore((s) => s.setStrategyId);
   const setCustomStrategyRules = useDraftStore((s) => s.setCustomStrategyRules);
+  const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
+  const settings = useDraftStore((s) => s.settings);
   const strategy = getStrategy(strategyId);
+
+  const handleStrategyChange = (id: string) => {
+    setStrategyId(id);
+    // Auto-apply suggested allocations for the new strategy
+    const slots = buildSlots(settings);
+    const suggested = suggestAllocations(settings, id);
+    const next: Record<string, number> = {};
+    for (const slot of slots) next[slot.id] = suggested[slot.id] ?? 1;
+    setSlotAllocations(next);
+  };
 
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          {!compact && (
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Strategy
-            </p>
-          )}
-          <Select value={strategy.id} onValueChange={setStrategyId}>
+          <Select value={strategy.id} onValueChange={handleStrategyChange}>
             <SelectTrigger className="h-9 rounded-lg text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -301,7 +308,7 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   add("WR",        settings.roster.WR,        (i) => `WR${i}`);
   add("TE",        settings.roster.TE,        (i) => settings.roster.TE === 1 ? "TE" : `TE${i}`);
   add("FLEX",      settings.roster.FLEX,      (i) => settings.roster.FLEX === 1 ? "FLEX" : `FLEX${i}`);
-  add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`);
+  add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => settings.roster.SUPERFLEX === 1 ? "SFLX" : `SFLX${i}`);
   add("K",         settings.roster.K,         (i) => settings.roster.K === 1 ? "K" : `K${i}`);
   add("DST",       settings.roster.DST,       (i) => settings.roster.DST === 1 ? "DST" : `DST${i}`);
   add("BENCH",     settings.roster.BENCH,     (i) => `BE${i}`);

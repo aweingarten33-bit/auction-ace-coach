@@ -3,8 +3,7 @@
 // Everything else is one tap away.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCube, Pagination, Navigation } from "swiper/modules";
-import "swiper/css/navigation";
+import { EffectCube, Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/effect-cube";
@@ -233,10 +232,6 @@ export default function DraftRoom() {
           )}
         </div>
 
-        <div className="flex shrink-0 flex-col items-end">
-          <span className="font-mono text-sm font-bold tabular-nums">${budget.remaining} left</span>
-          <span className="text-[10px] text-muted-foreground">max ${budget.maxBid} · {budget.slotsLeft} slots</span>
-        </div>
       </header>
 
       {/* ── SPEND BAR ───────────────────────────────────────── */}
@@ -261,18 +256,22 @@ export default function DraftRoom() {
       </div>
 
       {/* ── CUBE SWIPER ─────────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="min-h-0 flex-1" style={{ perspective: "1200px" }}>
         <Swiper
-          modules={[EffectCube, Pagination, Navigation]}
+          modules={[EffectCube, Pagination]}
           effect="cube"
           cubeEffect={{ slideShadows: false }}
           loop={false}
           pagination={{ clickable: true }}
-          navigation
           onSwiper={(swiper) => { (window as any).__draftSwiper = swiper; }}
           onSlideChange={(swiper) => setSwiperIndex(swiper.activeIndex)}
           className="h-full w-full"
-          style={{ "--swiper-pagination-color": "hsl(var(--primary))", "--swiper-pagination-bullet-inactive-color": "hsl(var(--muted-foreground))" } as React.CSSProperties}
+          style={{
+            "--swiper-pagination-color": "hsl(var(--primary))",
+            "--swiper-pagination-bullet-inactive-color": "hsl(var(--muted-foreground))",
+            "--swiper-navigation-color": "hsl(var(--primary))",
+            overflow: "visible",
+          } as React.CSSProperties}
         >
           {/* ── Slide 1: Plan ── */}
           <SwiperSlide>
