@@ -158,7 +158,7 @@ export default function LandingEditorial() {
             transition: "opacity 200ms linear",
           }}
         >
-          <Football className="h-48 w-48" strokeWidth={0.5} />
+          <Football className="h-64 w-64" />
         </div>
       </section>
 
