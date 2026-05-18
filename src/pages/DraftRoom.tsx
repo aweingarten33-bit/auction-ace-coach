@@ -251,7 +251,7 @@ export default function DraftRoom() {
           onClick={() => setTab("values")}
           className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${tab === "values" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
         >
-          {leagueName ? `${leagueName}'s Top 50` : "Top 50"}
+          {leagueName ? `Top 50 Players According to ${leagueName}` : "Top 50 Players"}
         </button>
       </div>
 
