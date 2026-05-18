@@ -415,24 +415,24 @@ export default function DraftRoom() {
                   {top50InfoOpen && (
                     <div className="mb-4 space-y-3 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
                       <div>
-                        <p className="font-semibold text-foreground">1. Value Over Replacement Player (VORP)</p>
-                        <p className="mt-0.5">The core question isn't "how good is this player" — it's "how much better is he than whoever I'd be forced to take if I missed him?" We set a replacement baseline at each position: the last guy who'd realistically get drafted as a starter across all teams. Everything above that line has real auction value. Everything below it doesn't. That gap is what drives the price.</p>
+                        <p className="font-semibold text-foreground">1. VORP — Proportional Allocation Algorithm</p>
+                        <p className="mt-0.5">We establish a replacement-level baseline at each position — the projected output of the last startable player across all teams. Each player's surplus above that baseline is calculated, then the entire available auction pool is distributed proportionally across all players based on their share of total surplus. This is applied statistics and proportional optimization working together.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">2. Your League Calibrates Itself</p>
-                        <p className="mt-0.5">Generic models price every league the same. Ours doesn't. We compute a separate dollar-per-value rate for each position using what your specific room has actually paid over 3 years. If your league historically overpays for RBs and steals TEs, that's already built into the numbers. The model learns your league — not someone else's.</p>
+                        <p className="font-semibold text-foreground">2. Per-Position Calibration Algorithm</p>
+                        <p className="mt-0.5">Rather than applying one global rate, a separate dollar-per-surplus-point rate is computed for each position using your league's 3-year history. Positions with thin data are blended toward the global rate using a sample-weighted trust score — a technique borrowed from Bayesian statistical modeling, where confidence in a result scales with evidence.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">3. Decline Detection</p>
-                        <p className="mt-0.5">A simple average would lie to you. If a player cost $48 two years ago and $21 last year, averaging those gives you a useless $34. Instead, the model detects meaningful year-over-year drops and shifts weight aggressively toward recent history — so aging players, injury recoveries, and role changes are priced where they are now, not where they used to be.</p>
+                        <p className="font-semibold text-foreground">3. Recency-Weighted Regression Algorithm</p>
+                        <p className="mt-0.5">Instead of a flat average, a custom regression algorithm assigns declining weights across the three seasons — with a built-in anomaly detector. When a player's price drops beyond a statistically meaningful threshold year-over-year, the algorithm shifts aggressively toward recent data to capture real decline rather than smooth it away.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">4. Superflex Scarcity Premium</p>
-                        <p className="mt-0.5">Pure math undersells QBs in superflex because it can't feel the panic in the room when the third-best QB goes. Every team needs two starters, the talent cliff is steep, and people know it. We apply a scarcity premium that reflects the actual auction pressure on elite QBs — not just their projected points.</p>
+                        <p className="font-semibold text-foreground">4. Scarcity Premium Modeling</p>
+                        <p className="mt-0.5">In superflex leagues, standard VORP undervalues QBs because it doesn't account for positional demand across all teams simultaneously. We apply a scarcity multiplier derived from the supply-demand imbalance at QB — similar to how quantitative analysts price assets with constrained supply.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">5. Live Room Temperature</p>
-                        <p className="mt-0.5">No price sheet survives contact with a hot draft room. As picks come in, we continuously measure what managers are actually paying versus what the sheet said they'd pay. If the room is inflated, your remaining prices adjust upward in real time — so you're never bidding with yesterday's data while everyone else is spending today's money.</p>
+                        <p className="font-semibold text-foreground">5. Real-Time Market Signal Algorithm</p>
+                        <p className="mt-0.5">A live ratio algorithm continuously compares actual auction prices to the price sheet as picks come in, producing a market temperature signal. Once statistically significant (enough data points), every remaining price adjusts in real time — the same concept used in dynamic pricing models.</p>
                       </div>
                     </div>
                   )}
