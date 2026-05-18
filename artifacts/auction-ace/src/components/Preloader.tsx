@@ -19,9 +19,12 @@ export default function Preloader({ onDone }: Props) {
   }, [onDone]);
 
   const size = 200;
-  const ringSize = size + 90;
-  const textRadius = size / 2 + 30;
-  const ringText = "BRO WE'RE SENIOR CITIZENS  •  2026–2027 FANTASY FOOTBALL SEASON  •  ";
+  const ringSize = size + 120;
+  const r = size / 2 + 36;
+  const cx = ringSize / 2;
+  const cy = ringSize / 2;
+  const topText = "BRO WE'RE SENIOR CITIZENS";
+  const bottomText = "2026–2027 FANTASY FOOTBALL SEASON";
 
   return (
     <div
@@ -31,30 +34,52 @@ export default function Preloader({ onDone }: Props) {
         className="relative flex items-center justify-center"
         style={{ width: ringSize, height: ringSize }}
       >
-        {/* Rotating text ring */}
+        {/* Static text on top + bottom arcs, white */}
         <svg
           className="absolute inset-0"
           width={ringSize}
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
-          style={{ animation: "football-orbit 22s linear infinite" }}
         >
           <defs>
+            {/* Top arc: left → right across the top (readable upright) */}
             <path
-              id="preloader-ring-path"
-              d={`M ${ringSize / 2},${ringSize / 2} m -${textRadius},0 a ${textRadius},${textRadius} 0 1,1 ${textRadius * 2},0 a ${textRadius},${textRadius} 0 1,1 -${textRadius * 2},0`}
+              id="preloader-top-arc"
+              d={`M ${cx - r},${cy} A ${r},${r} 0 0,1 ${cx + r},${cy}`}
+              fill="none"
+            />
+            {/* Bottom arc: left → right across the bottom (readable upright) */}
+            <path
+              id="preloader-bottom-arc"
+              d={`M ${cx - r},${cy} A ${r},${r} 0 1,0 ${cx + r},${cy}`}
+              fill="none"
             />
           </defs>
           <text
-            fontSize="10"
-            letterSpacing="3.5"
-            fill="rgba(255,255,255,0.32)"
+            fontSize="12"
+            letterSpacing="4"
+            fill="#ffffff"
             style={{
               fontFamily: "'Inter', system-ui, sans-serif",
               textTransform: "uppercase",
             }}
           >
-            <textPath href="#preloader-ring-path">{ringText.repeat(3)}</textPath>
+            <textPath href="#preloader-top-arc" startOffset="50%" textAnchor="middle">
+              {topText}
+            </textPath>
+          </text>
+          <text
+            fontSize="12"
+            letterSpacing="4"
+            fill="#ffffff"
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              textTransform: "uppercase",
+            }}
+          >
+            <textPath href="#preloader-bottom-arc" startOffset="50%" textAnchor="middle">
+              {bottomText}
+            </textPath>
           </text>
         </svg>
 
