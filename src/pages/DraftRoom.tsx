@@ -418,7 +418,7 @@ export default function DraftRoom() {
                       <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 custom algorithms were created, each serving a specific role in how players get priced.</p>
                       <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring.</p>
                       <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — the trust/blending concept was utilized to determine how much confidence to place in each data source.</p>
-                      <p>• <span className="font-semibold text-foreground">VORP (Value Over Replacement Player)</span> — measures the additional $ value a player brings over a replacement-level player at their position, adjusted to our league using the previous 3 auction drafts.</p>
+                      <p>• <span className="font-semibold text-foreground">VORP (Value Over Replacement Player)</span> — measures how many more fantasy points a player is projected to score above the worst starter at their position. In auction drafts, each player's dollar value is determined by their share of the total league-wide VORP pool, adjusted to our league using the previous 3 auction drafts.</p>
                       <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same concept hedge funds use in financial pricing systems, applied here through data science and quantitative analytics models.</p>
                     </div>
                   )}
