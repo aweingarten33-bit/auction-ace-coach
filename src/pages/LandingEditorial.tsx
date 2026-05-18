@@ -55,7 +55,7 @@ export default function LandingEditorial() {
           loop
           muted
           playsInline
-          className="h-full w-auto max-w-[70vw] object-cover opacity-90"
+          className="h-full w-auto max-w-[90vw] object-cover opacity-90"
         >
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
