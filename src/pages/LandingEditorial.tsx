@@ -55,8 +55,8 @@ export default function LandingEditorial() {
         </span>
       </div>
 
-      {/* ── Cream reveal panel underneath (gives wipe its layer) ─ */}
-      <div className="fixed inset-0 z-[99] pointer-events-none" style={{ background: CREAM }} />
+      {/* ── Cream base layer underneath the motion system ─ */}
+      <div className="pointer-events-none fixed inset-0 z-0" style={{ background: CREAM }} />
 
       {/* ── Cursor-following gooey blob ────────────────────────── */}
       <BlobLayer mx={mouse.current.x} my={mouse.current.y} active={phase === "ready"} />
