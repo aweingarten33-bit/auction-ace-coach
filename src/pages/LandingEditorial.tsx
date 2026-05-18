@@ -49,17 +49,15 @@ export default function LandingEditorial() {
       }
     >
       {/* Background video */}
-      <div className="pointer-events-none fixed inset-0 z-0 flex justify-center">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="h-full w-auto max-w-[90vw] object-cover opacity-90"
-        >
-          <source src="/videos/hero.mp4" type="video/mp4" />
-        </video>
-      </div>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-90"
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
       <div
         className={
           "pointer-events-none fixed inset-0 z-0 " +
