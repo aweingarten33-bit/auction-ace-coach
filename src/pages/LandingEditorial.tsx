@@ -161,7 +161,7 @@ export default function LandingEditorial() {
             transition: "opacity 200ms linear",
           }}
         >
-          <Sparkle className="h-48 w-48" strokeWidth={0.5} fill="currentColor" />
+          <Football className="h-48 w-48" strokeWidth={0.5} />
         </div>
       </section>
 
@@ -176,6 +176,7 @@ export default function LandingEditorial() {
         <div>★ Powered by your ESPN league</div>
         <div>★ Read-only · shared view</div>
       </section>
+      </div>
     </div>
   );
 }
