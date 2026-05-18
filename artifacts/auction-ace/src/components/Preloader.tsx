@@ -40,6 +40,10 @@ export default function Preloader({ onDone }: Props) {
           width={ringSize}
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
+          style={{
+            animation: "football-orbit 2.5s linear 2 forwards",
+            transformOrigin: "50% 50%",
+          }}
         >
           <defs>
             {/* Top arc: left → right across the top (readable upright) */}
