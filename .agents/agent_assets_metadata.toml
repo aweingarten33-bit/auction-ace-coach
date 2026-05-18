@@ -76,7 +76,7 @@ title = "generated_image"
 id = "4gt4wCe_ilXBZMjl8QDqg"
 uri = "file://.local/preview/edge-video.mp4"
 type = "video"
-title = "Cleaned video (text removed)"
+title = "Cropped video (text area removed)"
 
 [[outputs]]
 id = "buFDJqZ100m3vbKJj5KHV"
