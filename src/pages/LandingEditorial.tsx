@@ -67,9 +67,9 @@ export default function LandingEditorial() {
         style={{
           filter: "brightness(1.15) contrast(0.95) saturate(1.1) blur(0.5px)",
           WebkitMaskImage:
-            "radial-gradient(ellipse 70% 70% at center, black 55%, transparent 95%)",
+            "linear-gradient(to bottom, transparent 0%, black 38%, black 62%, transparent 100%)",
           maskImage:
-            "radial-gradient(ellipse 70% 70% at center, black 55%, transparent 95%)",
+            "linear-gradient(to bottom, transparent 0%, black 38%, black 62%, transparent 100%)",
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
