@@ -166,8 +166,6 @@ export default function Home() {
                 </button>
               </motion.div>
               
-              <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] pointer-events-none -z-10 mix-blend-screen" />
-              <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] pointer-events-none -z-10 mix-blend-screen" />
             </section>
 
             <div className="bg-background relative">
