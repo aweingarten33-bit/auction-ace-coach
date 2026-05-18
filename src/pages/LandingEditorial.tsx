@@ -54,7 +54,13 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-70 blur-lg scale-110 saturate-150"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-40 blur-2xl scale-110 saturate-150"
+        style={{
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
+        }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
@@ -67,9 +73,9 @@ export default function LandingEditorial() {
         style={{
           filter: "brightness(1.15) contrast(0.95) saturate(1.1) blur(0.5px)",
           WebkitMaskImage:
-            "radial-gradient(ellipse 70% 70% at center, black 55%, transparent 95%)",
+            "linear-gradient(to bottom, transparent 0%, black 38%, black 62%, transparent 100%)",
           maskImage:
-            "radial-gradient(ellipse 70% 70% at center, black 55%, transparent 95%)",
+            "linear-gradient(to bottom, transparent 0%, black 38%, black 62%, transparent 100%)",
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
