@@ -899,6 +899,6 @@
 .norris-link:hover span::after  { transform: translateY(0); opacity: 1; }
 
 @keyframes preloader-sway {
-  0%, 100% { transform: rotate(-28deg); }
-  50%      { transform: rotate(28deg); }
+  0%   { transform: rotate(-170deg); }
+  100% { transform: rotate(170deg); }
 }
