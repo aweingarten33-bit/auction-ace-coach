@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLock } from "@/hooks/useLock";
 
 // Change this to whatever you want your admin passcode to be
-const ADMIN_PASSCODE = "draftking";
+const ADMIN_PASSCODE = "football26";
 
 export default function Passcode() {
   const navigate = useNavigate();
