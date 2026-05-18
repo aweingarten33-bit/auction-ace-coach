@@ -56,9 +56,9 @@ const App = () => (
             <Routes>
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
-              <Route path="/team" element={<PublicGate><TeamPicker /></PublicGate>} />
+              <Route path="/team" element={<TeamPicker />} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
-              <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
+              <Route path="/draft-room" element={<PublicGate><DraftRoom /></PublicGate>} />
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />

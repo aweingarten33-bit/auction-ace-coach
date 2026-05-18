@@ -128,8 +128,8 @@ export default function Admin() {
             </div>
             <p className="mt-1 text-[11px] text-muted-foreground">
               {locked
-                ? "🔒 LOCKED — everyone except you sees a 404. You can still use /admin to unlock."
-                : "Off. Flip on the day before your draft to make the site appear broken (404) to everyone but you."}
+                ? "LOCKED — league mates can't access the draft room. Unlock before the draft so they can use the app."
+                : "OPEN — anyone with the link can open the team picker and use the draft room. Unlock before your draft, lock after."}
             </p>
           </div>
         </div>

@@ -63,7 +63,7 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 // ─────────────────────────────────────────────────────────────────────────────
 export default function DraftRoom() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { team: selectedTeam } = useSelectedTeam();
   const {
     settings,
@@ -83,12 +83,14 @@ export default function DraftRoom() {
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
 
-  // Redirect new users to setup if they have no data yet
+  // Redirect the admin to setup if they have no data yet.
+  // Guests (anonymous sessions) skip this — they're here to watch, not configure.
   useEffect(() => {
-    if (!setupComplete && prices.length === 0 && events.length === 0) {
+    const isGuest = !user || user.is_anonymous;
+    if (!isGuest && !setupComplete && prices.length === 0 && events.length === 0) {
       navigate("/setup", { replace: true });
     }
-  }, [setupComplete, prices.length, events.length, navigate]);
+  }, [user, setupComplete, prices.length, events.length, navigate]);
 
   // Read-only live sync — picks made by the selected team auto-tag as "me"
   useEspnLiveSync({
