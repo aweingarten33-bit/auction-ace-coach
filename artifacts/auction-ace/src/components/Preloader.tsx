@@ -34,12 +34,16 @@ export default function Preloader({ onDone }: Props) {
         className="relative flex items-center justify-center"
         style={{ width: ringSize, height: ringSize }}
       >
-        {/* Static text on top + bottom arcs, white */}
+        {/* Text on top + bottom arcs, white, slowly spinning */}
         <svg
           className="absolute inset-0"
           width={ringSize}
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
+          style={{
+            animation: "football-orbit 18s linear infinite",
+            transformOrigin: "50% 50%",
+          }}
         >
           <defs>
             {/* Top arc: left → right across the top (readable upright) */}
