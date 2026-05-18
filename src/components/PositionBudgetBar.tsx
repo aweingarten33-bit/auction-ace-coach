@@ -73,11 +73,6 @@ export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
     <div className="space-y-2">
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          {!compact && (
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Strategy
-            </p>
-          )}
           <Select value={strategy.id} onValueChange={handleStrategyChange}>
             <SelectTrigger className="h-9 rounded-lg text-sm">
               <SelectValue />
