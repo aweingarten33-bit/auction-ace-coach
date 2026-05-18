@@ -3,7 +3,8 @@
 // Everything else is one tap away.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCube, Autoplay, Pagination } from "swiper/modules";
+import { EffectCube, Pagination, Navigation } from "swiper/modules";
+import "swiper/css/navigation";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/effect-cube";
@@ -81,6 +82,7 @@ export default function DraftRoom() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelId | null>(null);
+  const [swiperIndex, setSwiperIndex] = useState(0);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
@@ -242,14 +244,33 @@ export default function DraftRoom() {
         <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
+      {/* ── PAGE LABELS ─────────────────────────────────────── */}
+      <div className="flex shrink-0 gap-1 border-b border-border/60 bg-background px-3 py-2">
+        <button
+          onClick={() => (window as any).__draftSwiper?.slideTo(0)}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${swiperIndex === 0 ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+        >
+          Plan
+        </button>
+        <button
+          onClick={() => (window as any).__draftSwiper?.slideTo(1)}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${swiperIndex === 1 ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+        >
+          Top 50 Players
+        </button>
+      </div>
+
       {/* ── CUBE SWIPER ─────────────────────────────────────── */}
       <div className="min-h-0 flex-1 overflow-hidden">
         <Swiper
-          modules={[EffectCube, Pagination]}
+          modules={[EffectCube, Pagination, Navigation]}
           effect="cube"
           cubeEffect={{ slideShadows: false }}
           loop={false}
           pagination={{ clickable: true }}
+          navigation
+          onSwiper={(swiper) => { (window as any).__draftSwiper = swiper; }}
+          onSlideChange={(swiper) => setSwiperIndex(swiper.activeIndex)}
           className="h-full w-full"
           style={{ "--swiper-pagination-color": "hsl(var(--primary))", "--swiper-pagination-bullet-inactive-color": "hsl(var(--muted-foreground))" } as React.CSSProperties}
         >
