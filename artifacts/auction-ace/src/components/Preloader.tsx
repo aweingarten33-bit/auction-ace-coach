@@ -21,7 +21,7 @@ export default function Preloader({ onDone }: Props) {
   const size = 200;
   const ringSize = size + 90;
   const textRadius = size / 2 + 30;
-  const ringText = "AUCTION ACE  •  DRAFT ROOM  •  FANTASY FOOTBALL  •  ";
+  const ringText = "BRO WE'RE SENIOR CITIZENS  •  2026–2027 FANTASY FOOTBALL SEASON  •  ";
 
   return (
     <div
