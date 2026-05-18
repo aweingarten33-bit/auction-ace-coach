@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
@@ -8,10 +8,16 @@ import { Link } from "react-router-dom";
  */
 export default function LandingEditorial() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    videoRef.current?.play().catch(() => {});
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.playsInline = true;
+    const tryPlay = () => v.play().catch(() => {});
+    tryPlay();
+    v.addEventListener("loadeddata", tryPlay);
+    return () => v.removeEventListener("loadeddata", tryPlay);
   }, []);
 
   return (
@@ -88,14 +94,13 @@ export default function LandingEditorial() {
             >
               <video
                 ref={videoRef}
-                className={`h-full w-full object-cover transition-opacity duration-1000 ${
-                  loaded ? "opacity-100" : "opacity-0"
-                }`}
+                className="h-full w-full object-cover"
                 autoPlay
                 muted
                 loop
                 playsInline
-                onCanPlay={() => setLoaded(true)}
+                preload="auto"
+                poster=""
               >
                 <source src="/videos/hero.mp4" type="video/mp4" />
               </video>
