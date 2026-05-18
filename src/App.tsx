@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import TeamPicker from "./pages/TeamPicker.tsx";
+import Passcode from "./pages/Passcode.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 import Preloader from "@/components/Preloader";
@@ -73,6 +74,7 @@ function AppRoutes() {
             <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
             <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
+            <Route path="/passcode" element={<Passcode />} />
 
             {/* Legacy redirects */}
             <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
