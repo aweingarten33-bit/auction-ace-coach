@@ -48,14 +48,22 @@ export default function LandingEditorial() {
         (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
       }
     >
-      {/* Background video */}
+      {/* Background video — blurred cover behind, full contain on top */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        poster=""
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain md:object-cover opacity-90"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-60 blur-2xl scale-110"
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-95"
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
