@@ -7,7 +7,10 @@ export default function LandingEditorial() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const isDark = theme === "dark";
   const [scrollY, setScrollY] = useState(0);
+  const [videoStarted, setVideoStarted] = useState(false);
+  const [colorized, setColorized] = useState(false);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -20,6 +23,23 @@ export default function LandingEditorial() {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
     };
+  }, []);
+
+  // Polaroid sequence: hold B&W still for ~1.6s, then "develop" into color and play.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    // Pause on first frame initially
+    v.pause();
+    try { v.currentTime = 0; } catch {}
+
+    const developTimer = setTimeout(() => {
+      setColorized(true);
+      v.play().catch(() => {});
+      setVideoStarted(true);
+    }, 1600);
+
+    return () => clearTimeout(developTimer);
   }, []);
 
   // Scroll-linked transforms for the ghost mark
@@ -48,13 +68,21 @@ export default function LandingEditorial() {
         (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
       }
     >
-      {/* Background video */}
+      {/* Background video — starts as a B&W polaroid still, then "develops" into color */}
       <video
-        autoPlay
+        ref={videoRef}
+        autoPlay={false}
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-90"
+        preload="auto"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover transition-[filter,opacity] duration-[1400ms] ease-out"
+        style={{
+          filter: colorized
+            ? "grayscale(0) sepia(0) contrast(1) saturate(1)"
+            : "grayscale(1) sepia(0.25) contrast(1.05) brightness(0.95)",
+          opacity: 0.9,
+        }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
