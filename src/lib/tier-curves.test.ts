@@ -11,6 +11,10 @@ import type { LeagueSettings } from "./draft-types";
 const settings: LeagueSettings = {
   numTeams: 12,
   leagueType: "Superflex",
+  scoring: "Half PPR",
+  format: "Redraft",
+  keeperIncrease: "",
+  context: "",
   totalBudget: 200,
   roster: {
     QB: 1,
