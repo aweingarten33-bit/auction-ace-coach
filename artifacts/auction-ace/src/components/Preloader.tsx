@@ -12,6 +12,7 @@ export default function Preloader({ onDone }: Props) {
       setExiting(true);
       setTimeout(onDone, 820);
     };
+    // 2 full rotations at 2.5s each = lands upright right before going upside down.
     const hardTimeout = setTimeout(dismiss, 5000);
     return () => {
       clearTimeout(hardTimeout);
@@ -41,7 +42,7 @@ export default function Preloader({ onDone }: Props) {
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
           style={{
-            animation: "preloader-sway 6s ease-in-out infinite",
+            animation: "football-orbit 2.5s linear infinite",
             transformOrigin: "50% 50%",
           }}
         >
