@@ -418,7 +418,7 @@ export default function DraftRoom() {
                       <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 custom algorithms were created, each serving a specific role in how players get priced.</p>
                       <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring.</p>
                       <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — the trust/blending concept was utilized to determine how much confidence to place in each data source.</p>
-                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — three seasons of real prices paid in your league's auction drafts feed into an algorithm that distributes dollar value across player tiers, then down to each individual player. The result is the projected value you see — grounded in what your room has actually spent, not a generic estimate.</p>
+                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — the prices paid in your league's previous 3 auction drafts are used to figure out how dollar value should be spread across player tiers and then to each individual player. That process is what generates the projected value you see next to every name.</p>
                       <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same concept hedge funds use in financial pricing systems, applied here through data science and quantitative analytics models.</p>
                     </div>
                   )}
