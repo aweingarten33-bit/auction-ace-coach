@@ -209,7 +209,7 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
       const { data } = await supabase
         .from("live_draft_events")
         .select("id, event_type, player_name, player_position, player_team, price, drafter_team_name, drafter_team_id, occurred_at, created_at")
-        .eq("league_id", leagueId)
+        .eq("league_id" as any, leagueId)
         .gte("created_at", since)
         .order("created_at", { ascending: true })
         .limit(500);
