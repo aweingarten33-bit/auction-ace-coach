@@ -1,205 +1,114 @@
 import { Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import footballImg from "@/assets/football.jpeg";
 
+/**
+ * HBA-inspired full-bleed video landing.
+ * Tiny serif wordmark top-left, thin spaced nav, search icon top-right.
+ * Video fills the screen; subtle dark vignette for legibility.
+ */
 export default function LandingEditorial() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-  const isDark = theme === "dark";
-  const [scrollY, setScrollY] = useState(0);
-  const ghostRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrollY(window.scrollY));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
+    const v = videoRef.current;
+    if (!v) return;
+    const play = () => v.play().catch(() => {});
+    play();
+    v.addEventListener("loadeddata", () => {
+      setLoaded(true);
+      play();
+    });
   }, []);
 
-  // Scroll-linked transforms for the ghost mark
-  const progress = Math.min(scrollY / 600, 1);
-  const ghostScale = 1 + progress * 2.4;
-  const ghostRotate = progress * 180;
-  const ghostY = -progress * 120;
-  const ghostOpacity = 0.2 + progress * 0.35;
-  const headlineY = progress * -40;
-  const headlineOpacity = 1 - progress * 0.6;
-
-  // Football image (replaces Sparkle)
-  const Football = ({ className = "" }: { className?: string }) => (
-    <img
-      src={footballImg}
-      alt="Football"
-      className={className + " object-contain select-none"}
-      draggable={false}
-    />
-  );
+  const navItems = [
+    { label: "RESEARCH", to: "/draft-room" },
+    { label: "TIERS", to: "/draft-room" },
+    { label: "LEAGUE", to: "/team" },
+    { label: "HISTORY", to: "/draft-room" },
+    { label: "ADMIN", to: "/passcode" },
+  ];
 
   return (
-    <div
-      className={
-        "relative min-h-screen w-full overflow-hidden transition-colors duration-500 " +
-        (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
-      }
-    >
-      {/* Background video — single centered band, faded on all four sides */}
+    <div className="relative h-screen w-full overflow-hidden bg-black text-white">
+      {/* Full-bleed video */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-75 animate-kenburns"
-        style={{
-          filter: "brightness(1.3) contrast(0.9) saturate(0.95)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 95% 90% at center, black 55%, transparent 100%)",
-          maskImage:
-            "radial-gradient(ellipse 95% 90% at center, black 55%, transparent 100%)",
-        }}
+        preload="auto"
+        className={
+          "absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] " +
+          (loaded ? "opacity-100" : "opacity-0")
+        }
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
 
-      {/* Vignette + warm halo */}
+      {/* Subtle darkening for nav legibility (HBA-style soft vignette) */}
       <div
-        className="pointer-events-none fixed inset-0 z-0"
+        className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(255,235,200,0.15) 0%, transparent 45%, rgba(0,0,0,0.55) 100%)",
+            "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.55) 100%)",
         }}
       />
 
-      {/* Edge melt — fades video into page background on all sides */}
-      <div
-        className={
-          "pointer-events-none fixed inset-0 z-0 " +
-          (isDark
-            ? "[background:linear-gradient(to_bottom,hsl(0_0%_4%)_0%,transparent_18%,transparent_82%,hsl(0_0%_4%)_100%),linear-gradient(to_right,hsl(0_0%_4%)_0%,transparent_15%,transparent_85%,hsl(0_0%_4%)_100%)]"
-            : "[background:linear-gradient(to_bottom,hsl(40_30%_98%)_0%,transparent_18%,transparent_82%,hsl(40_30%_98%)_100%),linear-gradient(to_right,hsl(40_30%_98%)_0%,transparent_15%,transparent_85%,hsl(40_30%_98%)_100%)]")
-        }
-      />
-
-      {/* Film grain */}
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.12] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-          backgroundSize: "200px 200px",
-        }}
-      />
-
-      <div className="relative z-10">
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 pt-5 md:px-8 md:pt-7">
-        <Link to="/" aria-label="Home" className="flex items-center">
-          <Football className="h-8 w-8" />
+      {/* Top nav */}
+      <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-6 pt-6 md:px-12 md:pt-8">
+        {/* Serif wordmark */}
+        <Link
+          to="/"
+          aria-label="Auction Ace"
+          className="select-none"
+          style={{ fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif' }}
+        >
+          <span className="text-2xl tracking-[0.15em] text-white/95">A_A</span>
         </Link>
 
-        {/* Theme toggle pill */}
-        <div
-          className={
-            "flex items-center rounded-full border p-1 text-xs font-medium " +
-            (isDark ? "border-white/15 bg-white/5" : "border-neutral-200 bg-white")
-          }
-        >
-          <button
-            onClick={() => setTheme("light")}
-            className={
-              "rounded-full px-5 py-2 transition-colors " +
-              (!isDark ? "bg-neutral-100 text-neutral-900" : "text-white/70")
-            }
-          >
-            Light
-          </button>
-          <button
-            onClick={() => setTheme("dark")}
-            className={
-              "rounded-full px-5 py-2 transition-colors " +
-              (isDark ? "bg-white text-neutral-900" : "text-neutral-500")
-            }
-          >
-            Dark
-          </button>
-        </div>
+        {/* Centered nav — hidden on small screens */}
+        <nav className="hidden flex-1 items-center justify-around px-12 md:flex">
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className="text-[11px] font-light tracking-[0.35em] text-white/85 transition hover:text-white"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
         <button
-          aria-label="Menu"
-          className={
-            "flex h-10 w-10 items-center justify-center rounded-full border " +
-            (isDark ? "border-white/15" : "border-neutral-300")
-          }
+          aria-label="Search"
+          className="flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
         >
-          <Menu className="h-4 w-4" strokeWidth={1.75} />
+          <Search className="h-4 w-4" strokeWidth={1.25} />
         </button>
       </header>
 
-      {/* Hero */}
-      <section className="px-5 pt-16 md:px-8 md:pt-28">
-        <h1 className="mx-auto max-w-6xl text-center text-[14vw] font-bold leading-[0.95] tracking-[-0.04em] md:text-[8rem] lg:text-[10rem]">
-          HIGH-END
-          <br />
-          RESEARCH.
-          <br />
-          AUCTION READY.
-        </h1>
-
-        <p
-          className={
-            "mx-auto mt-10 max-w-2xl text-center text-base leading-relaxed md:text-lg " +
-            (isDark ? "text-white/70" : "text-neutral-600")
-          }
-        >
-          A research room for fantasy football auction leagues. Tiers, values, and
-          trends — pulled from your ESPN league, shared with every member, before
-          the bidding begins.
-        </p>
-
-        <div className="mt-10 flex justify-center">
+      {/* Mobile nav row */}
+      <nav className="absolute inset-x-0 top-20 z-10 flex justify-between px-6 md:hidden">
+        {navItems.slice(0, 4).map((item) => (
           <Link
-            to="/draft-room"
-            className={
-              "rounded-full border px-7 py-3 text-sm font-medium transition-colors " +
-              (isDark
-                ? "border-white/20 hover:bg-white hover:text-neutral-900"
-                : "border-neutral-300 hover:bg-neutral-900 hover:text-white")
-            }
+            key={item.label}
+            to={item.to}
+            className="text-[9px] font-light tracking-[0.3em] text-white/85"
           >
-            Enter draft room →
+            {item.label}
           </Link>
-        </div>
+        ))}
+      </nav>
 
-        {/* Decorative ghost mark — scroll-linked */}
-        <div
-          ref={ghostRef}
-          className="pointer-events-none mx-auto mt-20 flex max-w-md justify-center will-change-transform"
-          style={{
-            transform: `translateY(${ghostY}px) scale(${ghostScale}) rotate(${ghostRotate}deg)`,
-            opacity: ghostOpacity,
-            transition: "opacity 200ms linear",
-          }}
-        >
-          <Football className="h-64 w-64" />
-        </div>
-      </section>
-
-      {/* Badges */}
-      <section
-        className={
-          "mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-6 px-5 pb-16 text-center text-xs uppercase tracking-[0.2em] sm:grid-cols-3 md:px-8 " +
-          (isDark ? "text-white/60" : "text-neutral-500")
-        }
+      {/* Bottom-left tiny meta caption (HBA-style) */}
+      <div
+        className="absolute bottom-6 left-6 z-10 text-[10px] tracking-[0.3em] text-white/60 md:bottom-8 md:left-12"
+        style={{ fontFamily: '"JetBrains Mono", monospace' }}
       >
-        <div>★ Built for league commissioners</div>
-        <div>★ Powered by your ESPN league</div>
-        <div>★ Read-only · shared view</div>
-      </section>
+        AUCTION&nbsp;ACE&nbsp;—&nbsp;DRAFT&nbsp;SEASON&nbsp;2025
       </div>
     </div>
   );
