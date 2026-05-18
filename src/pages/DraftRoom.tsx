@@ -47,6 +47,7 @@ import {
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
+import { getStrategy, buildCoachGuidance } from "@/lib/strategies";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 import BestAvailableBoard from "@/components/BestAvailableBoard";
@@ -73,6 +74,7 @@ export default function DraftRoom() {
     watchlist,
     pinPlayer,
     unpinPlayer,
+    strategyId,
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -348,6 +350,11 @@ export default function DraftRoom() {
                   recentRuns: runs,
                   draftedPlayers: events.map((e) => e.player),
                   showMath: false,
+                  strategy: strategyId ? {
+                    id: strategyId,
+                    label: getStrategy(strategyId).label,
+                    guidance: buildCoachGuidance(strategyId),
+                  } : undefined,
                 })}
               />
             </SheetContent>
