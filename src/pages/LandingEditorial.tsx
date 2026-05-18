@@ -422,3 +422,150 @@ function HandIcon({ className = "" }: { className?: string }) {
     </svg>
   );
 }
+
+/* ── Hero orb: morphing blob with avatar — touch = chaos ────── */
+function HeroOrb({ mx, my, active }: { mx: number; my: number; active: boolean }) {
+  const [bursts, setBursts] = useState<number[]>([]);
+  const [shaking, setShaking] = useState(false);
+  const [hovering, setHovering] = useState(false);
+
+  const triggerBurst = () => {
+    const id = Date.now();
+    setBursts((b) => [...b, id]);
+    setShaking(true);
+    setTimeout(() => setShaking(false), 500);
+    setTimeout(() => setBursts((b) => b.filter((x) => x !== id)), 1200);
+  };
+
+  // cursor-driven warp strength
+  const warp = hovering ? 12 + Math.abs(mx) * 8 : 3;
+  const tilt = `rotate(${mx * 8}deg)`;
+
+  return (
+    <div
+      className="relative mt-10 grid place-items-center"
+      style={{
+        opacity: active ? 1 : 0,
+        transform: active ? "scale(1)" : "scale(0.6)",
+        transition: "opacity 800ms 500ms ease, transform 900ms 500ms cubic-bezier(0.22,1,0.36,1)",
+      }}
+    >
+      {/* radiating rings on burst */}
+      {bursts.map((id) => (
+        <span
+          key={`r-${id}`}
+          className="pointer-events-none absolute h-48 w-48 rounded-full"
+          style={{
+            border: `2px solid ${LIME}`,
+            animation: "lando-ring 900ms cubic-bezier(0.22,1,0.36,1) forwards",
+          }}
+        />
+      ))}
+
+      {/* shards on burst */}
+      {bursts.map((id) =>
+        Array.from({ length: 14 }).map((_, i) => {
+          const angle = (i / 14) * Math.PI * 2;
+          const dist = 140 + Math.random() * 80;
+          return (
+            <span
+              key={`s-${id}-${i}`}
+              className="pointer-events-none absolute h-2 w-2 rounded-sm"
+              style={{
+                background: i % 2 ? LIME : INK,
+                ["--dx" as any]: `${Math.cos(angle) * dist}px`,
+                ["--dy" as any]: `${Math.sin(angle) * dist}px`,
+                animation: `lando-shard 900ms cubic-bezier(0.22,1,0.36,1) forwards`,
+              }}
+            />
+          );
+        })
+      )}
+
+      <button
+        type="button"
+        onPointerEnter={() => setHovering(true)}
+        onPointerLeave={() => setHovering(false)}
+        onPointerDown={triggerBurst}
+        className="relative h-48 w-48 cursor-none"
+        style={{
+          background: "transparent",
+          border: 0,
+          padding: 0,
+          transform: shaking ? undefined : tilt,
+          animation: shaking ? "lando-shake 500ms ease-in-out" : undefined,
+          transition: "transform 400ms cubic-bezier(0.22,1,0.36,1)",
+        }}
+        aria-label="Interact"
+      >
+        <svg
+          viewBox="-100 -100 200 200"
+          className="h-full w-full"
+          style={{ animation: "lando-spin 22s linear infinite" }}
+        >
+          <defs>
+            <filter id="orb-warp">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency={hovering ? "0.025" : "0.012"}
+                numOctaves="2"
+                seed={bursts.length}
+              >
+                <animate attributeName="baseFrequency" dur="6s" values="0.01;0.03;0.01" repeatCount="indefinite" />
+              </feTurbulence>
+              <feDisplacementMap in="SourceGraphic" scale={warp} />
+            </filter>
+            <radialGradient id="orb-fill" cx="35%" cy="35%">
+              <stop offset="0%" stopColor={LIME} />
+              <stop offset="55%" stopColor="#aacc00" />
+              <stop offset="100%" stopColor={INK} />
+            </radialGradient>
+            <clipPath id="orb-clip">
+              <path d="M75,-55C82,-32,72,-3,60,22C48,47,33,69,10,76C-14,83,-46,75,-62,57C-78,39,-78,11,-72,-15C-66,-41,-54,-65,-32,-74C-10,-83,21,-77,45,-72C69,-67,68,-78,75,-55Z" />
+            </clipPath>
+          </defs>
+
+          <g filter="url(#orb-warp)">
+            <path
+              d="M75,-55C82,-32,72,-3,60,22C48,47,33,69,10,76C-14,83,-46,75,-62,57C-78,39,-78,11,-72,-15C-66,-41,-54,-65,-32,-74C-10,-83,21,-77,45,-72C69,-67,68,-78,75,-55Z"
+              fill="url(#orb-fill)"
+            />
+            {/* football inside */}
+            <g clipPath="url(#orb-clip)">
+              <ellipse cx="0" cy="0" rx="55" ry="30" fill="#3a1f10" />
+              <ellipse cx="0" cy="0" rx="55" ry="30" fill="none" stroke="#f3efe6" strokeWidth="2" />
+              <line x1="-22" y1="0" x2="22" y2="0" stroke="#f3efe6" strokeWidth="3" />
+              {[-14, -7, 0, 7, 14].map((x) => (
+                <line key={x} x1={x} y1="-5" x2={x} y2="5" stroke="#f3efe6" strokeWidth="2" />
+              ))}
+            </g>
+          </g>
+
+          {/* orbiting label */}
+          <g style={{ animation: "lando-spin 14s linear infinite reverse", transformOrigin: "0 0" }}>
+            <path id="orb-text-path" d="M 0,0 m -88,0 a 88,88 0 1,1 176,0 a 88,88 0 1,1 -176,0" fill="none" />
+            <text fontSize="9" fontFamily='"JetBrains Mono", monospace' fontWeight="700" letterSpacing="4" fill={INK}>
+              <textPath href="#orb-text-path">
+                TOUCH · ME · TOUCH · ME · TOUCH · ME · TOUCH · ME ·
+              </textPath>
+            </text>
+          </g>
+        </svg>
+
+        {/* RGB split echo when hovering */}
+        {hovering && (
+          <>
+            <span className="pointer-events-none absolute inset-0 mix-blend-screen" style={{
+              boxShadow: `inset 0 0 0 2px ${LIME}`, borderRadius: "50%", transform: "translate(3px,0)",
+              opacity: 0.4,
+            }} />
+            <span className="pointer-events-none absolute inset-0 mix-blend-multiply" style={{
+              boxShadow: "inset 0 0 0 2px #ff2a2a", borderRadius: "50%", transform: "translate(-3px,0)",
+              opacity: 0.3,
+            }} />
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
