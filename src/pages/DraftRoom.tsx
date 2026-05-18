@@ -413,27 +413,13 @@ export default function DraftRoom() {
                     {top50InfoOpen ? "Hide" : "What math? →"}
                   </button>
                   {top50InfoOpen && (
-                    <div className="mb-4 space-y-3 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
-                      <div>
-                        <p className="font-semibold text-foreground">1. VORP — Proportional Allocation Algorithm</p>
-                        <p className="mt-0.5">We establish a replacement-level baseline at each position — the projected output of the last startable player across all teams. Each player's surplus above that baseline is calculated, then the entire available auction pool is distributed proportionally across all players based on their share of total surplus. This is applied statistics and proportional optimization working together.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">2. Per-Position Calibration Algorithm</p>
-                        <p className="mt-0.5">Rather than applying one global rate, a separate dollar-per-surplus-point rate is computed for each position using your league's 3-year history. Positions with thin data are blended toward the global rate using a sample-weighted trust score — a technique borrowed from Bayesian statistical modeling, where confidence in a result scales with evidence.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">3. Recency-Weighted Regression Algorithm</p>
-                        <p className="mt-0.5">Instead of a flat average, a custom regression algorithm assigns declining weights across the three seasons — with a built-in anomaly detector. When a player's price drops beyond a statistically meaningful threshold year-over-year, the algorithm shifts aggressively toward recent data to capture real decline rather than smooth it away.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">4. Scarcity Premium Modeling</p>
-                        <p className="mt-0.5">In superflex leagues, standard VORP undervalues QBs because it doesn't account for positional demand across all teams simultaneously. We apply a scarcity multiplier derived from the supply-demand imbalance at QB — similar to how quantitative analysts price assets with constrained supply.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">5. Real-Time Market Signal Algorithm</p>
-                        <p className="mt-0.5">A live ratio algorithm continuously compares actual auction prices to the price sheet as picks come in, producing a market temperature signal. Once statistically significant (enough data points), every remaining price adjusts in real time — the same concept used in dynamic pricing models.</p>
-                      </div>
+                    <div className="mb-4 space-y-2.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
+                      <p className="font-semibold text-foreground">What type of mathematics was applied:</p>
+                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 proprietary algorithms were built specifically for this system, each handling a distinct part of the pricing model.</p>
+                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring across 3 seasons of your league's draft data.</p>
+                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — a trust/blending framework that determines how much weight to give each data source based on the amount of evidence available.</p>
+                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — the actual prices paid in your league's previous 3 auction drafts are used to calibrate how value gets distributed across players, so the numbers reflect your room specifically.</p>
+                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same foundational concepts used in financial pricing systems and data science analytics models, applied to real-time auction conditions as the draft moves.</p>
                     </div>
                   )}
                   <Top100List
