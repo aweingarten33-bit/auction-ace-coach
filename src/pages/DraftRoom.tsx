@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 import { useAuth } from "@/hooks/useAuth";
+import { useLock } from "@/hooks/useLock";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { supabase } from "@/integrations/supabase/client";
@@ -61,6 +62,7 @@ type TabId = "plan" | "board";
 export default function DraftRoom() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isAdmin } = useLock();
   const { team: selectedTeam } = useSelectedTeam();
   const {
     settings,
@@ -201,19 +203,21 @@ export default function DraftRoom() {
         className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 py-2"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
       >
-        <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Menu">
-              <Menu className="h-5 w-5" strokeWidth={2} />
-            </Button>
-          </SheetTrigger>
-          <SettingsDrawer
-            onClose={() => setDrawerOpen(false)}
-            onSignOut={async () => { await signOut(); navigate("/auth"); }}
-            onGoToSetup={() => navigate("/setup")}
-            onGoToEspn={() => navigate("/espn")}
-          />
-        </Sheet>
+        {isAdmin && (
+          <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Menu">
+                <Menu className="h-5 w-5" strokeWidth={2} />
+              </Button>
+            </SheetTrigger>
+            <SettingsDrawer
+              onClose={() => setDrawerOpen(false)}
+              onSignOut={async () => { await signOut(); navigate("/"); }}
+              onGoToSetup={() => navigate("/setup")}
+              onGoToEspn={() => navigate("/espn")}
+            />
+          </Sheet>
+        )}
 
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate text-sm font-semibold leading-tight">
