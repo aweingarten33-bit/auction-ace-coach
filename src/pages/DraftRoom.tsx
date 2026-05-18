@@ -52,7 +52,8 @@ import BestAvailableBoard from "@/components/BestAvailableBoard";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "search" | "top50" | "budget" | "recent";
+type PanelId = "search" | "top50" | "recent";
+type TabId = "plan" | "board";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Page
@@ -73,6 +74,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tab, setTab] = useState<TabId>("plan");
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
@@ -194,12 +196,11 @@ export default function DraftRoom() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      {/* ── COMPACT HEADER ─────────────────────────────────── */}
+      {/* ── HEADER ─────────────────────────────────────────── */}
       <header
         className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 py-2"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
       >
-        {/* Menu */}
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Menu">
@@ -214,7 +215,6 @@ export default function DraftRoom() {
           />
         </Sheet>
 
-        {/* League / team name */}
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate text-sm font-semibold leading-tight">
             {leagueName || selectedTeam?.name || "Draft Room"}
@@ -224,56 +224,95 @@ export default function DraftRoom() {
           )}
         </div>
 
-        {/* Budget pills — tap to open budget panel */}
-        <button
-          onClick={() => setPanel("budget")}
-          className="flex shrink-0 flex-col items-center rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 leading-tight hover:bg-secondary/70"
-        >
-          <span className="font-mono text-sm font-bold tabular-nums">${budget.remaining}</span>
-          <span className="text-[9px] text-muted-foreground">left</span>
-        </button>
-        <button
-          onClick={() => setPanel("budget")}
-          className="flex shrink-0 flex-col items-center rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 leading-tight hover:bg-secondary/70"
-        >
-          <span className="font-mono text-sm tabular-nums">${budget.maxBid}</span>
-          <span className="text-[9px] text-muted-foreground">max</span>
-        </button>
+        <div className="flex shrink-0 flex-col items-end">
+          <span className="font-mono text-sm font-bold tabular-nums">${budget.remaining} left</span>
+          <span className="text-[10px] text-muted-foreground">max ${budget.maxBid} · {budget.slotsLeft} slots</span>
+        </div>
       </header>
 
-      {/* ── SPEND BAR ─────────────────────────────────────── */}
+      {/* ── SPEND BAR ───────────────────────────────────────── */}
       <div className="h-1 shrink-0 bg-secondary/50">
         <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
-      {/* ── NEXT TARGET (always visible) ──────────────────── */}
-      {selectedTeam && (
-        <div className="shrink-0 border-b border-border/40 px-3 py-2">
-          <NextTargetCard
-            settings={settings}
-            gaps={gaps}
-            spend={spend}
-            remaining={budget.remaining}
+      {/* ── TAB TOGGLE ──────────────────────────────────────── */}
+      <div className="flex shrink-0 gap-1 border-b border-border/60 bg-background px-3 py-2">
+        <button
+          onClick={() => setTab("plan")}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${
+            tab === "plan"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Plan
+        </button>
+        <button
+          onClick={() => setTab("board")}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${
+            tab === "board"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Board {liveBid && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-warning align-middle" />}
+        </button>
+      </div>
+
+      {/* ── PLAN TAB ────────────────────────────────────────── */}
+      {tab === "plan" && (
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
+          <div className="space-y-4">
+            {/* Budget summary */}
+            {selectedTeam && (
+              <BudgetSnapshot
+                teamName={selectedTeam.name}
+                remaining={budget.remaining}
+                total={budget.totalBudget}
+                maxBid={budget.maxBid}
+                slotsLeft={budget.slotsLeft}
+                gaps={gaps}
+              />
+            )}
+            {/* Strategy picker + per-slot budget allocations */}
+            <PositionBudgetBar />
+            {/* Next target recommendation */}
+            {selectedTeam && (
+              <NextTargetCard
+                settings={settings}
+                gaps={gaps}
+                spend={spend}
+                remaining={budget.remaining}
+                prices={adjustedPrices}
+                events={events}
+                pulse={pulse}
+              />
+            )}
+            {/* Last pick delta */}
+            {events.length > 0 && (
+              <LastPickImpact settings={settings} keepers={keepers} events={events} />
+            )}
+            {/* Opponent spending heatmap */}
+            <OpponentHeatmap settings={settings} />
+          </div>
+        </div>
+      )}
+
+      {/* ── BOARD TAB ───────────────────────────────────────── */}
+      {tab === "board" && (
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <BestAvailableBoard
             prices={adjustedPrices}
             events={events}
-            pulse={pulse}
+            maxBid={budget.maxBid}
+            remaining={budget.remaining}
+            liveBid={liveBid}
+            onSelect={openDetails}
           />
         </div>
       )}
 
-      {/* ── BEST AVAILABLE BOARD — fills the screen ─────── */}
-      <div className="min-h-0 flex-1 overflow-hidden">
-        <BestAvailableBoard
-          prices={adjustedPrices}
-          events={events}
-          maxBid={budget.maxBid}
-          remaining={budget.remaining}
-          liveBid={liveBid}
-          onSelect={openDetails}
-        />
-      </div>
-
-      {/* ── BOTTOM ACTION BAR ─────────────────────────────── */}
+      {/* ── BOTTOM BAR ──────────────────────────────────────── */}
       <div
         className="shrink-0 border-t border-border/60 bg-background/95 backdrop-blur-sm"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -346,7 +385,7 @@ export default function DraftRoom() {
         </div>
       </div>
 
-      {/* ── SLIDE-IN PANEL ────────────────────────────────── */}
+      {/* ── SLIDE-IN PANEL (search / top50 / recent) ────────── */}
       {panel && (
         <>
           <div
@@ -372,7 +411,6 @@ export default function DraftRoom() {
               <h2 className="text-base font-semibold">
                 {panel === "search" && "Find a player"}
                 {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
-                {panel === "budget" && "Budget"}
                 {panel === "recent" && "Recent picks"}
               </h2>
             </div>
@@ -392,26 +430,6 @@ export default function DraftRoom() {
                   events={events}
                   onPick={openDetails}
                 />
-              )}
-              {panel === "budget" && (
-                <div className="space-y-4">
-                  {selectedTeam && (
-                    <BudgetSnapshot
-                      teamName={selectedTeam.name}
-                      remaining={budget.remaining}
-                      total={budget.totalBudget}
-                      maxBid={budget.maxBid}
-                      slotsLeft={budget.slotsLeft}
-                      gaps={gaps}
-                    />
-                  )}
-                  <PositionBudgetBar />
-                  <DraftStrategyPanel />
-                  {events.length > 0 && (
-                    <LastPickImpact settings={settings} keepers={keepers} events={events} />
-                  )}
-                  <OpponentHeatmap settings={settings} />
-                </div>
               )}
               {panel === "recent" && (
                 <div className="space-y-4">

@@ -1,61 +1,139 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import SpinningFootball from "@/components/SpinningFootball";
+
+// ── Kinetic word: chars slide up on mount ────────────────────────────────────
+function KineticWord({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) {
+  return (
+    <span className={`char-reveal ${className}`} aria-label={text}>
+      {text.split("").map((ch, i) => (
+        <span
+          key={i}
+          style={{ animationDelay: `${delay + i * 0.04}s` }}
+        >
+          {ch === " " ? " " : ch}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// ── Scrolling marquee strip ───────────────────────────────────────────────────
+function MarqueeStrip() {
+  const content = "AUCTION DRAFT · BUDGET MATH · LEAGUE HISTORY · TIER MAPPING · SMART BIDS · ";
+  const repeated = content.repeat(4);
+  return (
+    <div className="pointer-events-none overflow-hidden border-y border-white/10 py-2.5">
+      <div className="marquee-track whitespace-nowrap text-[11px] font-semibold tracking-[0.25em] text-white/30">
+        {repeated}
+      </div>
+    </div>
+  );
+}
 
 export default function Landing() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => {});
+  }, []);
+
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-black text-white">
-      {/* Fullscreen looping hero video */}
+    <div className="grain relative min-h-screen overflow-x-hidden bg-black text-white">
+
+      {/* ── Background video ───────────────────────────────────────────────── */}
       <video
-        className="absolute inset-0 h-full w-full object-cover"
-        src="/video/hero.mp4"
+        ref={videoRef}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${videoLoaded ? "opacity-30" : "opacity-0"}`}
         autoPlay
-        loop
         muted
+        loop
         playsInline
-        preload="auto"
-      />
+        onCanPlay={() => setVideoLoaded(true)}
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+        <source src="/videos/draft.mp4" type="video/mp4" />
+        <source src="/videos/stadium.mp4" type="video/mp4" />
+      </video>
 
-      {/* Darkening overlay for legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/80" />
+      {/* ── Gradient overlay ──────────────────────────────────────────────── */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black" />
 
-      {/* Content */}
-      <div className="relative z-10 flex min-h-screen flex-col">
-        {/* Top bar */}
-        <header className="flex items-center justify-between px-6 py-5 md:px-10">
-          <span className="font-condensed text-sm uppercase tracking-[0.3em] text-white/80">
-            The Auction Room
-          </span>
+      {/* ── Floating location badge ───────────────────────────────────────── */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2">
+        <span
+          className="block text-[9px] font-bold tracking-[0.4em] text-white/20"
+          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+        >
+          DRAFT ROOM
+        </span>
+      </div>
+
+      {/* ── Main content ──────────────────────────────────────────────────── */}
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-24">
+
+        {/* Spinning football */}
+        <div className="mb-6 opacity-90">
+          <SpinningFootball size={180} speed={10} />
+        </div>
+
+        {/* Headline */}
+        <h1 className="mb-0 text-center font-bebas leading-none tracking-wider">
+          <KineticWord
+            text="AUCTION"
+            className="block text-[clamp(3.5rem,18vw,9rem)] text-white"
+            delay={0.2}
+          />
+          <KineticWord
+            text="ACE"
+            className="block text-[clamp(3.5rem,18vw,9rem)] text-red-500"
+            delay={0.5}
+          />
+        </h1>
+
+        {/* Tagline */}
+        <p
+          className="mb-10 mt-6 max-w-xs text-center text-sm leading-relaxed text-white/50"
+          style={{ animation: "fade-in 0.6s 1s ease-out both" }}
+        >
+          Budget-path planning grounded in your league's 3-year price history.
+          Know exactly what to spend and on who.
+        </p>
+
+        {/* CTA buttons */}
+        <div
+          className="flex w-full max-w-xs flex-col gap-3"
+          style={{ animation: "fade-in 0.6s 1.2s ease-out both" }}
+        >
+          <Link
+            to="/team"
+            className="block w-full border border-red-500 bg-red-600 py-3.5 text-center font-bebas text-lg tracking-widest text-white transition hover:bg-red-500"
+          >
+            GET STARTED
+          </Link>
           <Link
             to="/auth"
-            className="font-condensed text-xs uppercase tracking-[0.25em] text-white/80 hover:text-white"
+            className="block w-full border border-white/20 py-3.5 text-center font-bebas text-lg tracking-widest text-white/70 transition hover:border-white/40 hover:text-white"
           >
-            Enter →
+            CONNECT ESPN
           </Link>
-        </header>
+        </div>
 
-        {/* Hero copy — bottom-anchored, F&B style */}
-        <main className="mt-auto px-6 pb-16 md:px-10 md:pb-24">
-          <h1 className="font-heading text-[14vw] font-black uppercase leading-[0.85] tracking-tight md:text-[10vw]">
-            Built<br />For The<br />Draft.
-          </h1>
-          <p className="mt-6 max-w-md font-condensed text-base uppercase tracking-[0.2em] text-white/70 md:text-lg">
-            Football. Auctions. Decisions in seconds.
-          </p>
+        {/* Version stamp */}
+        <p
+          className="mt-10 text-[10px] font-mono tracking-widest text-white/20"
+          style={{ animation: "fade-in 0.6s 1.5s ease-out both" }}
+        >
+          AUCTION ACE — DRAFT SEASON 2025
+        </p>
+      </div>
 
-          <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              to="/team"
-              className="rounded-full bg-white px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black transition hover:bg-white/90"
-            >
-              Get started
-            </Link>
-            <Link
-              to="/auth"
-              className="rounded-full border border-white/40 px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white transition hover:bg-white/10"
-            >
-              Connect ESPN
-            </Link>
-          </div>
-        </main>
+      {/* ── Marquee strip at bottom ───────────────────────────────────────── */}
+      <div className="relative mt-auto">
+        <MarqueeStrip />
       </div>
     </div>
   );

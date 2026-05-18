@@ -139,46 +139,45 @@
   }
 
   .dark {
-    /* DICE — pure black, white text, electric yellow accent. */
+    /* GRINDHOUSE — pure black, white text, signal-red accent. */
     --background:        0 0% 0%;
-    --background-alt:    0 0% 6%;
-    --foreground:        0 0% 100%;
+    --background-alt:    0 0% 5%;
+    --foreground:        0 0% 96%;
     --muted-bg:          0 0% 8%;
 
-    --card:              0 0% 8%;
-    --card-foreground:   0 0% 100%;
-    --popover:           0 0% 10%;
-    --popover-foreground:0 0% 100%;
+    --card:              0 0% 7%;
+    --card-foreground:   0 0% 96%;
+    --popover:           0 0% 9%;
+    --popover-foreground:0 0% 96%;
 
-    /* Primary = electric yellow-green (DICE "New" badge color) */
-    --primary:           66 100% 55%;
-    --primary-foreground: 0 0% 4%;
-    --primary-glow:      66 100% 65%;
+    /* Primary = signal red */
+    --primary:           0 90% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow:      0 90% 60%;
 
-    --secondary:         0 0% 12%;
-    --secondary-foreground: 0 0% 100%;
-    --muted:             0 0% 14%;
-    --muted-foreground:  0 0% 64%;
+    --secondary:         0 0% 11%;
+    --secondary-foreground: 0 0% 96%;
+    --muted:             0 0% 13%;
+    --muted-foreground:  0 0% 50%;
 
-    --accent:            66 100% 55%;
-    --accent-foreground: 0 0% 4%;
+    --accent:            0 90% 50%;
+    --accent-foreground: 0 0% 100%;
     --accent-secondary:  0 0% 100%;
 
-    --destructive:       0 80% 55%;
+    --destructive:       0 80% 50%;
     --destructive-foreground: 0 0% 100%;
     --warning:           38 92% 56%;
     --success:           140 60% 50%;
 
-    --border:            0 0% 14%;
-    --input:             0 0% 10%;
-    --ring:              66 100% 55%;
+    --border:            0 0% 13%;
+    --input:             0 0% 9%;
+    --ring:              0 90% 50%;
 
-    --surface:           0 0% 8%;
-    --surface-2:         0 0% 12%;
+    --surface:           0 0% 7%;
+    --surface-2:         0 0% 11%;
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    /* Flatten the neumorphic depth — DICE is flat */
     --neu-extruded:       0 1px 0 rgba(255,255,255,0.04);
     --neu-extruded-hover: 0 8px 24px rgba(0,0,0,0.6);
     --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04);
@@ -186,28 +185,27 @@
     --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.08);
     --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.05);
 
-    /* Legacy aliases */
     --bone:              0 0% 100%;
-    --paper:             0 0% 64%;
+    --paper:             0 0% 50%;
     --void:              0 0% 0%;
     --ink:               0 0% 0%;
     --charcoal:          0 0% 8%;
-    --gunmetal:          0 0% 14%;
-    --blood:             0 80% 55%;
-    --signal-red:        0 80% 55%;
-    --dirty-gold:        66 100% 55%;
+    --gunmetal:          0 0% 13%;
+    --blood:             0 90% 50%;
+    --signal-red:        0 90% 50%;
+    --dirty-gold:        0 90% 50%;
     --warning-yellow:    38 92% 56%;
-    --parchment:         0 0% 100%;
-    --ink-faded:         0 0% 64%;
-    --steel:             0 0% 64%;
+    --parchment:         0 0% 96%;
+    --ink-faded:         0 0% 50%;
+    --steel:             0 0% 50%;
 
     --sidebar-background: 0 0% 4%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 66 100% 55%;
-    --sidebar-primary-foreground: 0 0% 4%;
-    --sidebar-accent: 0 0% 10%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-ring: 66 100% 55%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 0 90% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 9%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-ring: 0 90% 50%;
   }
 
   * { border-color: hsl(var(--border)); }
@@ -755,3 +753,86 @@
   100% { transform: scale(1); }
 }
 .icon-tap-pulse { animation: icon-tap-pulse 0.55s cubic-bezier(0.34, 1.4, 0.64, 1); }
+
+/* ── Grindhouse additions ─────────────────────────────────────────────── */
+
+/* Grain overlay */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  pointer-events: none;
+  z-index: 9999;
+  animation: grain-shift 0.5s steps(2) infinite;
+}
+
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-2%, -3%); }
+  50%  { transform: translate(3%, 1%); }
+  75%  { transform: translate(-1%, 2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Preloader */
+@keyframes preloader-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+.preloader-exit { animation: preloader-up 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+
+/* Kinetic char reveal */
+@keyframes char-up {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.char-reveal {
+  overflow: hidden;
+  display: inline-block;
+}
+.char-reveal span {
+  display: inline-block;
+  animation: char-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Football spin */
+@keyframes football-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes football-counter {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes football-wobble {
+  0%   { transform: perspective(300px) rotateY(-20deg) rotateX(10deg); }
+  50%  { transform: perspective(300px) rotateY(20deg) rotateX(-10deg); }
+  100% { transform: perspective(300px) rotateY(-20deg) rotateX(10deg); }
+}
+
+/* Shimmer on hover for cards */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Text marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 18s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grain::after,
+  .preloader-exit,
+  .char-reveal span,
+  .marquee-track { animation: none !important; }
+}
+
+/* Bebas display util */
+.font-bebas { font-family: "Bebas Neue", "Anton", "Oswald", sans-serif; letter-spacing: 0.04em; }
