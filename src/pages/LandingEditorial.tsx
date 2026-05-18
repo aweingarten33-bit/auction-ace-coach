@@ -64,6 +64,7 @@ export default function LandingEditorial() {
         muted
         playsInline
         className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-95"
+        style={{ filter: "brightness(1.15) contrast(0.95) saturate(1.1) blur(0.5px)" }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
@@ -71,7 +72,7 @@ export default function LandingEditorial() {
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)",
+            "radial-gradient(ellipse at center, rgba(255,235,200,0.15) 0%, transparent 45%, rgba(0,0,0,0.55) 100%)",
         }}
       />
       <div
