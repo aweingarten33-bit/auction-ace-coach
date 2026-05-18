@@ -63,16 +63,9 @@ const App = () => (
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
 
-              {/* Legacy redirects → research view */}
+              {/* Legacy redirects */}
               <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/draft-v2" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/draft-os" element={<Navigate to="/draft-room" replace />} />
               <Route path="/dashboard" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/planner" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/studio" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/card-preview" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/m" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/mobile" element={<Navigate to="/draft-room" replace />} />
               <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
               <Route path="/claim-team" element={<Navigate to="/team" replace />} />
 

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Activity, AlertTriangle, CheckCircle2, RefreshCw, WifiOff } from "lucide-react";
 
 interface CredRow {
@@ -45,12 +47,14 @@ function ago(iso?: string | null) {
  *  - Recent parse errors (events the webhook stored with raw.error or unknown shape)
  */
 export default function ConnectorStatus() {
+  const navigate = useNavigate();
   const [cred, setCred] = useState<CredRow | null>(null);
   const [token, setToken] = useState<TokenRow | null>(null);
   const [league, setLeague] = useState<LeagueInfo | null>(null);
   const [recent, setRecent] = useState<EventRow[]>([]);
   const [errors, setErrors] = useState<ParseError[]>([]);
   const [loading, setLoading] = useState(false);
+  const [reverifying, setReverifying] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -105,6 +109,34 @@ export default function ConnectorStatus() {
     }
   };
 
+  const reverify = async () => {
+    setReverifying(true);
+    const { data: c } = await supabase
+      .from("espn_credentials")
+      .select("swid, espn_s2, season_id")
+      .maybeSingle();
+    if (!c?.swid || !c?.espn_s2) {
+      setReverifying(false);
+      navigate("/espn");
+      return;
+    }
+    const { data, error } = await supabase.functions.invoke("espn-connect", {
+      body: { swid: c.swid, espn_s2: c.espn_s2, season: c.season_id ?? new Date().getFullYear(), save: false },
+    });
+    setReverifying(false);
+    if (error || data?.error) {
+      toast.error("ESPN session expired — copy fresh cookies from your browser, then go to ESPN Settings.");
+      navigate("/espn");
+    } else {
+      await supabase
+        .from("espn_credentials")
+        .update({ last_verified_at: new Date().toISOString() })
+        .eq("swid", c.swid);
+      toast.success("ESPN connection verified");
+      load();
+    }
+  };
+
   useEffect(() => {
     load();
     const id = setInterval(load, 30_000);
@@ -130,15 +162,26 @@ export default function ConnectorStatus() {
 
       {/* Top-level health row */}
       <div className="mb-4 grid gap-2 sm:grid-cols-2">
-        <StatusRow
-          ok={cookieOk}
-          label="ESPN cookies (Path A)"
-          detail={
-            cookieOk
-              ? `Last verified ${ago(cred?.last_verified_at)}`
-              : "Not connected — paste SWID + espn_s2 above"
-          }
-        />
+        <div className="relative">
+          <StatusRow
+            ok={cookieOk}
+            label="ESPN cookies (Path A)"
+            detail={
+              cookieOk
+                ? `Last verified ${ago(cred?.last_verified_at)}`
+                : "Not connected — paste SWID + espn_s2 above"
+            }
+          />
+          {cookieOk && (
+            <button
+              onClick={reverify}
+              disabled={reverifying}
+              className="absolute right-2 top-2 text-[10px] text-muted-foreground hover:text-foreground underline underline-offset-2"
+            >
+              {reverifying ? "Verifying…" : "Re-verify"}
+            </button>
+          )}
+        </div>
         <StatusRow
           ok={extOk}
           label="Chrome extension (Path B)"

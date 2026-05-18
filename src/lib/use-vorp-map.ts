@@ -31,10 +31,12 @@ export interface VorpEntry {
 }
 
 const STARTER_FOR: Record<Position, (s: LeagueSettings) => number> = {
-  QB: (s) => s.roster.QB + (s.leagueType !== "Standard" ? s.roster.SUPERFLEX : 0),
-  RB: (s) => s.roster.RB + Math.ceil(s.roster.FLEX * 0.45),
-  WR: (s) => s.roster.WR + Math.ceil(s.roster.FLEX * 0.45),
-  TE: (s) => s.roster.TE + Math.ceil(s.roster.FLEX * 0.10),
+  // FLEX treated as super flex (2nd QB slot) — QB replacement level rises accordingly.
+  // SUPERFLEX field handled separately for leagues that label it explicitly.
+  QB: (s) => s.roster.QB + s.roster.FLEX + (s.leagueType !== "Standard" ? s.roster.SUPERFLEX : 0),
+  RB: (s) => s.roster.RB,
+  WR: (s) => s.roster.WR,
+  TE: (s) => s.roster.TE,
   K:  (s) => s.roster.K,
   DST:(s) => s.roster.DST,
 };

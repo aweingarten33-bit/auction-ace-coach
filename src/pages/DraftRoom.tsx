@@ -83,6 +83,13 @@ export default function DraftRoom() {
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
 
+  // Redirect new users to setup if they have no data yet
+  useEffect(() => {
+    if (!setupComplete && prices.length === 0 && events.length === 0) {
+      navigate("/setup", { replace: true });
+    }
+  }, [setupComplete, prices.length, events.length, navigate]);
+
   // Read-only live sync — picks made by the selected team auto-tag as "me"
   useEspnLiveSync({
     expectingEvents: setupComplete,
