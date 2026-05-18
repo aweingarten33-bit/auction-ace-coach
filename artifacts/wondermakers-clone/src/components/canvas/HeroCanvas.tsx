@@ -1,6 +1,6 @@
 export default function HeroCanvas() {
   return (
-    <div className="fixed inset-0 z-[-1] pointer-events-none">
+    <div className="fixed inset-0 z-[-1] pointer-events-none bg-black">
       <video
         autoPlay
         loop
@@ -13,7 +13,7 @@ export default function HeroCanvas() {
           width: "100%",
           height: "100%",
           transform: "translate(-50%, -50%)",
-          objectFit: "cover",
+          objectFit: "contain",
         }}
       >
         <source src="/edge-video.mp4" type="video/mp4" />
