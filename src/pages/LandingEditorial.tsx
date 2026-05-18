@@ -83,7 +83,7 @@ export default function LandingEditorial() {
           className="select-none"
           style={{ fontFamily: '"Cormorant Garamond", "Playfair Display", Georgia, serif' }}
         >
-          <span className="text-2xl tracking-[0.15em] text-white/95">A_A</span>
+          <span className="text-2xl tracking-[0.15em] text-neutral-900">A_A</span>
         </Link>
 
         {/* Centered nav — hidden on small screens */}
@@ -92,7 +92,7 @@ export default function LandingEditorial() {
             <Link
               key={item.label}
               to={item.to}
-              className="text-[11px] font-light tracking-[0.35em] text-white/85 transition hover:text-white"
+              className="text-[11px] font-light tracking-[0.35em] text-neutral-700 transition hover:text-neutral-950"
             >
               {item.label}
             </Link>
@@ -101,7 +101,7 @@ export default function LandingEditorial() {
 
         <button
           aria-label="Search"
-          className="flex h-9 w-9 items-center justify-center text-white/85 transition hover:text-white"
+          className="flex h-9 w-9 items-center justify-center text-neutral-700 transition hover:text-neutral-950"
         >
           <Search className="h-4 w-4" strokeWidth={1.25} />
         </button>
@@ -113,7 +113,7 @@ export default function LandingEditorial() {
           <Link
             key={item.label}
             to={item.to}
-            className="text-[9px] font-light tracking-[0.3em] text-white/85"
+            className="text-[9px] font-light tracking-[0.3em] text-neutral-700"
           >
             {item.label}
           </Link>
@@ -122,7 +122,7 @@ export default function LandingEditorial() {
 
       {/* Bottom-left tiny meta caption (HBA-style) */}
       <div
-        className="absolute bottom-6 left-6 z-10 text-[10px] tracking-[0.3em] text-white/60 md:bottom-8 md:left-12"
+        className="absolute bottom-6 left-6 z-10 text-[10px] tracking-[0.3em] text-neutral-500 md:bottom-8 md:left-12"
         style={{ fontFamily: '"JetBrains Mono", monospace' }}
       >
         AUCTION&nbsp;ACE&nbsp;—&nbsp;DRAFT&nbsp;SEASON&nbsp;2025
