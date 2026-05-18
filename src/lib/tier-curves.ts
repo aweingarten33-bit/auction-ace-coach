@@ -1,21 +1,28 @@
-// Tier-based price curves derived from 3-year league auction history.
+// Rank-curve price model derived from 3-year league auction history.
 //
-// Philosophy: prices come from tiers, not individual players.
-// "What does your league pay for the QB1 slot?" is more durable than
-// "What did your league pay for Patrick Mahomes?" — because next year
-// that slot might be occupied by someone with no history.
+// Philosophy: prices come from the RANK SLOT, not from tier buckets.
+// "What does your league pay for the QB1 slot?" is answered by looking at
+// what was actually paid for the highest-priced QB each season — not the
+// average of the entire first tier.
+//
+// Bug fixed: the old tier-average approach conflated QB1 money with QB8
+// money. buildTierCurves() stored the mean of 8 players in tier 1 (~$46),
+// so getTierPrice(rank=1) returned $46 instead of the actual QB1 price
+// (~$66). Rank 6 interpolated toward ~$22 instead of the correct ~$34.
+//
+// Fix: build a per-rank curve — rank_curve[i] = recency-weighted average
+// of what was paid for the rank-(i+1) player across seasons. This gives
+// rank 1 → real QB1 money ($66), rank 6 → real QB6 money ($34).
 //
 // We only have bid amounts (no stored rank at draft time), so we derive
 // positional rank from bid amount: the highest-paid QB in a given year
 // was the perceived QB1. This is a sound approximation across 3 seasons.
-//
-// Output: smooth interpolated $ values across the tier curve so there are
-// no price cliffs at tier boundaries.
 
 import type { LeagueSettings } from "./draft-types";
 
-const NUM_TIERS = 3;
-const MIN_PLAYERS_PER_TIER = 2; // skip a tier if too few data points
+const WEIGHTS_3 = [0.5, 0.3, 0.2] as const;
+const WEIGHTS_2 = [0.65, 0.35] as const;
+const WEIGHTS_1 = [1.0] as const;
 
 /** Total starter slots per position — must stay in sync with VORP formula. */
 export function starterSlotsFor(pos: string, s: LeagueSettings): number {
@@ -36,12 +43,15 @@ export function starterSlotsFor(pos: string, s: LeagueSettings): number {
 }
 
 /**
- * Build tier price curves from 3-year league auction history.
+ * Build per-rank price curves from 3-year league auction history.
  *
- * Returns curves[pos] = [tier1_avg, tier2_avg, tier3_avg] in dollars,
- * recency-weighted (50/30/20 for 3 seasons, 65/35 for 2, 100 for 1).
+ * Returns curves[pos] = number[] where index i = recency-weighted average
+ * price paid for the (i+1)-ranked player at that position.
+ * Length = totalSlots for that position (all starter slots across all teams).
+ *
+ * Weights: 50/30/20 for 3 seasons, 65/35 for 2, 100 for 1 (most-recent first).
  */
-export function buildTierCurves(
+export function buildRankCurves(
   leagueAgg: Map<string, { bySeason: Map<number, number>; pos: string | null }>,
   settings: LeagueSettings,
 ): Record<string, number[]> {
@@ -53,14 +63,14 @@ export function buildTierCurves(
   const sortedSeasons = Array.from(seasons).sort((a, b) => b - a);
 
   // Per season per position: players ranked by bid descending
-  type Ranked = { key: string; bid: number };
+  type Ranked = { bid: number };
   const bySeasonPos = new Map<number, Map<string, Ranked[]>>();
   for (const season of sortedSeasons) {
     const byPos = new Map<string, Ranked[]>();
-    for (const [key, { bySeason, pos }] of leagueAgg) {
+    for (const [, { bySeason, pos }] of leagueAgg) {
       if (!pos || !bySeason.has(season)) continue;
       const arr = byPos.get(pos) ?? [];
-      arr.push({ key, bid: bySeason.get(season)! });
+      arr.push({ bid: bySeason.get(season)! });
       byPos.set(pos, arr);
     }
     for (const [pos, arr] of byPos) {
@@ -75,45 +85,40 @@ export function buildTierCurves(
   for (const pos of positions) {
     const totalSlots = starterSlotsFor(pos, settings);
     if (totalSlots <= 0) continue;
-    const tierSize = Math.max(1, Math.ceil(totalSlots / NUM_TIERS));
 
-    // Tier averages per season
-    const seasonAvgs: Array<{ avgs: number[] }> = [];
+    // Collect per-season rank arrays (index = rank - 1, value = bid)
+    const seasonRanks: Array<number[]> = [];
     for (const season of sortedSeasons) {
       const players = bySeasonPos.get(season)?.get(pos) ?? [];
-      const avgs: number[] = [];
-      let hasData = false;
-      for (let t = 0; t < NUM_TIERS; t++) {
-        const slice = players.slice(t * tierSize, (t + 1) * tierSize);
-        if (slice.length < MIN_PLAYERS_PER_TIER) {
-          avgs.push(0);
-          continue;
-        }
-        avgs.push(slice.reduce((s, p) => s + p.bid, 0) / slice.length);
-        hasData = true;
-      }
-      if (hasData) seasonAvgs.push({ avgs });
+      if (players.length === 0) continue;
+      seasonRanks.push(players.map((p) => p.bid));
     }
 
-    if (seasonAvgs.length === 0) continue;
+    if (seasonRanks.length === 0) continue;
 
     const weights =
-      seasonAvgs.length >= 3 ? [0.5, 0.3, 0.2] :
-      seasonAvgs.length === 2 ? [0.65, 0.35] :
-                                [1.0];
+      seasonRanks.length >= 3 ? WEIGHTS_3 :
+      seasonRanks.length === 2 ? WEIGHTS_2 :
+                                 WEIGHTS_1;
 
-    const final: number[] = Array(NUM_TIERS).fill(0);
-    for (let t = 0; t < NUM_TIERS; t++) {
-      let wSum = 0;
-      for (let i = 0; i < Math.min(seasonAvgs.length, weights.length); i++) {
-        const w = weights[i];
-        final[t] += (seasonAvgs[i].avgs[t] ?? 0) * w;
-        wSum += w;
+    // Build rank curve: for each rank slot 0..totalSlots-1, compute
+    // the recency-weighted average bid across seasons that had that rank.
+    const curve: number[] = [];
+    for (let r = 0; r < totalSlots; r++) {
+      let weightedSum = 0;
+      let weightTotal = 0;
+      for (let i = 0; i < Math.min(seasonRanks.length, weights.length); i++) {
+        const bid = seasonRanks[i][r];
+        if (bid == null) continue; // season didn't have this many players
+        weightedSum += bid * weights[i];
+        weightTotal += weights[i];
       }
-      if (wSum > 0) final[t] /= wSum;
+      // If no season had data at this rank, carry forward the last known price
+      // (degrades gracefully for thin-roster leagues).
+      curve.push(weightTotal > 0 ? weightedSum / weightTotal : (curve[r - 1] ?? 1));
     }
 
-    curves[pos] = final;
+    curves[pos] = curve;
   }
 
   return curves;
@@ -122,31 +127,43 @@ export function buildTierCurves(
 /**
  * Interpolated price for a player at 1-based `rank` within their position.
  *
- * Smoothly interpolates between tier averages so there are no price cliffs at
- * tier boundaries. A QB at the bottom of Tier 1 trends toward the top of Tier 2.
+ * Uses the rank curve directly (no tier bucketing). For ranks between two
+ * data points, linearly interpolates. This is mostly a no-op since we have
+ * a data point per rank, but provides smooth falloff for ranks beyond the
+ * curve length.
  *
  * Returns 0 if no curve data exists for this position (caller should fall back).
  * Returns $1 minimum for bench players (rank > totalSlots).
  */
-export function getTierPrice(
-  curves: Record<string, number[]>,
+export function getRankPrice(
+  rankCurves: Record<string, number[]>,
   pos: string,
   rank: number,
   totalSlots: number,
 ): number {
-  const avgs = curves[pos];
-  if (!avgs || avgs.every((v) => v === 0)) return 0;
+  const curve = rankCurves[pos];
+  if (!curve || curve.length === 0) return 0;
   if (rank > totalSlots) return 1;
 
-  const tierSize = Math.max(1, Math.ceil(totalSlots / NUM_TIERS));
-  const tIdx = Math.min(NUM_TIERS - 1, Math.floor((rank - 1) / tierSize));
+  // rank is 1-based; curve index is 0-based
+  const idx = rank - 1;
 
-  // How far into this tier is the player? 0 = top, approaching 1 = bottom
-  const tierStart = tIdx * tierSize;
-  const posInTier = Math.min(0.99, (rank - 1 - tierStart) / tierSize);
+  // Exact hit
+  if (idx < curve.length) return Math.max(1, curve[idx]);
 
-  const thisAvg = avgs[tIdx] ?? 1;
-  const nextAvg = avgs[Math.min(NUM_TIERS - 1, tIdx + 1)] ?? thisAvg;
-
-  return Math.max(1, thisAvg + (nextAvg - thisAvg) * posInTier);
+  // Beyond curve data: extrapolate linearly downward from last two points
+  const last = curve[curve.length - 1] ?? 1;
+  const secondLast = curve[curve.length - 2] ?? last;
+  const step = last - secondLast; // typically negative (prices fall)
+  const beyond = idx - (curve.length - 1);
+  return Math.max(1, last + step * beyond);
 }
+
+// ---------------------------------------------------------------------------
+// Legacy shims — kept so any remaining imports don't break at compile time.
+// Use buildRankCurves / getRankPrice for new code.
+// ---------------------------------------------------------------------------
+/** @deprecated Use buildRankCurves instead. */
+export const buildTierCurves = buildRankCurves;
+/** @deprecated Use getRankPrice instead. */
+export const getTierPrice = getRankPrice;

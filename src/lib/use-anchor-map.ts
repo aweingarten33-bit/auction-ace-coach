@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "./decision-engine";
 import { useVorpMap } from "./use-vorp-map";
 import { useDraftStore } from "./draft-store";
-import { buildTierCurves, getTierPrice, starterSlotsFor } from "./tier-curves";
+import { buildRankCurves, getRankPrice, starterSlotsFor } from "./tier-curves";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -283,9 +283,9 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         // Derived from 3-year league history: sort players within each position
         // by bid amount per season → the highest-paid player = perceived #1 that year.
         // Tier size = total starter slots / 3 (three equal tiers).
-        const curves = buildTierCurves(leagueAgg, settings);
-        console.info("[useAnchorMap] tier curves",
-          Object.fromEntries(Object.entries(curves).map(([p, a]) => [p, a.map(Math.round)])));
+        const curves = buildRankCurves(leagueAgg, settings);
+        console.info("[useAnchorMap] rank curves",
+          Object.fromEntries(Object.entries(curves).map(([p, a]) => [p, a.slice(0, 8).map(Math.round)])));
 
         // Current-season rank within position: sort all players by their blended/
         // ESPN/Sleeper value descending → rank 1 = best player available this year.
@@ -315,7 +315,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const rank = currentRankMap.get(k);
           if (!rank) return 0;
           const slots = starterSlotsFor(pos, settings);
-          return slots > 0 ? getTierPrice(curves, pos, rank, slots) : 0;
+          return slots > 0 ? getRankPrice(curves, pos, rank, slots) : 0;
         };
 
         // 3.5) LLM tiebreaker — for any player whose note has an ambiguous trigger
