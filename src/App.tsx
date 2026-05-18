@@ -65,7 +65,8 @@ function AppRoutes() {
       <AuthProvider>
         <LockProvider>
           <Routes>
-            <Route path="/" element={<PublicGate><Index /></PublicGate>} />
+            <Route path="/" element={<PublicGate><Landing /></PublicGate>} />
+            <Route path="/index" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/team" element={<TeamPicker />} />
             <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
