@@ -256,7 +256,7 @@ export default function DraftRoom() {
             </div>
           )}
 
-          <PositionBudgetBar />
+          <PositionBudgetBar onOpenCoach={() => setAiOpen(true)} />
 
           {selectedTeam && (
             <NextTargetCard

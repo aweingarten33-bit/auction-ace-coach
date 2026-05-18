@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -96,7 +96,7 @@ export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
 }
 
 // ── Main budget planner ───────────────────────────────────────────────────
-export default function PositionBudgetBar() {
+export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () => void }) {
   const settings = useDraftStore((s) => s.settings);
   const keepers = useDraftStore((s) => s.keepers);
   const events = useDraftStore((s) => s.events);
@@ -158,16 +158,18 @@ export default function PositionBudgetBar() {
           <span className="w-12 shrink-0" />
           <span className="flex-1" />
           <div className="flex shrink-0 items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-6 gap-1 rounded-lg px-2 text-[10px] text-muted-foreground"
-              onClick={() => setSlotAllocations(suggested)}
-            >
-              <Sparkles className="h-3 w-3" />
-              Suggest
-            </Button>
+            {onOpenCoach && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 gap-1 rounded-lg px-2 text-[10px] text-muted-foreground hover:text-primary"
+                onClick={onOpenCoach}
+              >
+                <Sparkles className="h-3 w-3" />
+                Ask
+              </Button>
+            )}
             <Button
               type="button"
               variant="ghost"
