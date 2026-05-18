@@ -68,11 +68,18 @@ export default function LandingEditorial() {
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
       <div
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%)",
+        }}
+      />
+      <div
         className={
           "pointer-events-none fixed inset-0 z-0 " +
           (isDark
-            ? "bg-gradient-to-b from-neutral-950/40 via-neutral-950/20 to-neutral-950/70"
-            : "bg-gradient-to-b from-white/20 via-white/10 to-white/40")
+            ? "bg-gradient-to-b from-neutral-950/30 via-transparent to-neutral-950/60"
+            : "bg-gradient-to-b from-white/20 via-transparent to-white/40")
         }
       />
 
