@@ -1,17 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 /**
  * Editorial Stadium — Option A (full-bleed video)
- * Same type system, same accent, but video is the entire viewport.
- * Headline floats over the footage; cream rail descends below the fold.
  */
 export default function LandingFullBleed() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    videoRef.current?.play().catch(() => {});
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = true;
+    v.playsInline = true;
+    const tryPlay = () => v.play().catch(() => {});
+    tryPlay();
+    v.addEventListener("loadeddata", tryPlay);
+    return () => v.removeEventListener("loadeddata", tryPlay);
   }, []);
 
   return (
@@ -20,14 +24,12 @@ export default function LandingFullBleed() {
       <section className="relative h-screen w-full overflow-hidden bg-black">
         <video
           ref={videoRef}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${
-            loaded ? "opacity-100" : "opacity-0"
-          }`}
+          className="absolute inset-0 h-full w-full object-cover"
           autoPlay
           muted
           loop
           playsInline
-          onCanPlay={() => setLoaded(true)}
+          preload="auto"
         >
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
