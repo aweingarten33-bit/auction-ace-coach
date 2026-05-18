@@ -1,0 +1,74 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "BW1kR2xrHwqPl7zrzMWeg"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/build-1.png"
+type = "image"
+title = "Websites Experience Dark"
+
+[[generated]]
+id = "Tu0DlZspbQCIKhKxB8SiL"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/build-2.png"
+type = "image"
+title = "Apps Platforms Systems"
+
+[[generated]]
+id = "EfhTRKvRU-bWUM6zLunkG"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/build-3.png"
+type = "image"
+title = "Ecommerce Product Story"
+
+[[generated]]
+id = "KfxM9aEGCXyhBXcLa1XTD"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/build-4.png"
+type = "image"
+title = "Web3 On Chain Platforms"
+
+[[generated]]
+id = "U7jckwT_niEWFTYkVPaNb"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/edge-1.png"
+type = "image"
+title = "Design Strategic Value"
+
+[[generated]]
+id = "9Kce7GaFR9L7fnbheYxqJ"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/edge-2.png"
+type = "image"
+title = "Fluid Scaling UI"
+
+[[generated]]
+id = "79BFQUWGMTA4U2aXIoAWw"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/edge-3.png"
+type = "image"
+title = "Business Driven Engineering"
+
+[[generated]]
+id = "7Go_gwg9cRpgQQONVsSNp"
+uri = "file://artifacts/wondermakers-clone/src/assets/images/edge-4.png"
+type = "image"
+title = "Purposeful Immersion"
+
+[[generated]]
+id = "d7Rns94ZQXk44vwazb7fQ"
+uri = "file://attached_assets/generated_images/abstract_3d_geometric_motion_d6e8.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "e-4H5AH30kU-3fpsoZDBL"
+uri = "file://attached_assets/generated_images/premium_luxury_product_flat_d32a.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "mq4f7JnTP6OzcCjbi6drH"
+uri = "file://attached_assets/generated_images/abstract_3d_geometric_motion_0ade.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "iZlYRpCb-PRo4f_aqX8-c"
+uri = "file://attached_assets/generated_images/premium_luxury_e_commerce_1356.png"
+type = "image"
+title = "generated_image"
