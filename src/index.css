@@ -836,3 +836,6 @@
 
 /* Bebas display util */
 .font-bebas { font-family: "Bebas Neue", "Anton", "Oswald", sans-serif; letter-spacing: 0.04em; }
+
+@media (prefers-reduced-motion: reduce) { .neu-pressable, .neu-pressable:hover, .neu-pressable:active { transition: none !important; transform: none !important; box-shadow: var(--neu-extruded) !important; } [class*="animate-"] { animation: none !important; transition: none !important; } }
+:root { --mouse-x: 50%; --mouse-y: 50%; }
