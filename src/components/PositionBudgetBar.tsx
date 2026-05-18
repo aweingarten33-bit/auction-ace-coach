@@ -58,7 +58,6 @@ export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
 
   const handleStrategyChange = (id: string) => {
     setStrategyId(id);
-    // Auto-apply suggested allocations for the new strategy
     const slots = buildSlots(settings);
     const suggested = suggestAllocations(settings, id);
     const next: Record<string, number> = {};
@@ -67,30 +66,24 @@ export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          <Select value={strategy.id} onValueChange={handleStrategyChange}>
-            <SelectTrigger className="h-9 rounded-lg text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STRATEGIES.map((s) => (
-                <SelectItem key={s.id} value={s.id} className="text-sm">
-                  {s.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+    <div className="space-y-3">
+      <Select value={strategy.id} onValueChange={handleStrategyChange}>
+        <SelectTrigger className="h-11 rounded-xl border-2 text-base font-semibold">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {STRATEGIES.map((s) => (
+            <SelectItem key={s.id} value={s.id} className="text-sm">
+              {s.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       {!compact && (
-        <>
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-3 py-2.5">
+          <p className="mb-1 text-sm font-semibold text-foreground">{strategy.short}</p>
           <p className="text-xs leading-relaxed text-muted-foreground">{strategy.description}</p>
-          <p className="text-xs text-muted-foreground/70">
-            Pick a strategy to auto-fill the amounts below — or just edit any number yourself and everything else will update automatically.
-          </p>
-        </>
+        </div>
       )}
     </div>
   );
@@ -146,115 +139,90 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
 
       {/* ── Strategy section ─────────────────────────── */}
       <div className="border-b border-border/50 px-4 py-4">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Draft strategy
+        <p className="mb-3 text-xs font-bold uppercase tracking-widest text-foreground">
+          Draft Strategy
         </p>
         <DraftStrategyPanel />
       </div>
 
       {/* ── Slot breakdown ────────────────────────────── */}
-      <div className="px-4 py-4">
-        {/* Column header row */}
-        <div className="mb-2 flex items-center gap-2.5">
-          <span className="w-12 shrink-0" />
-          <span className="flex-1" />
-          <div className="flex shrink-0 items-center gap-1">
-            {onOpenCoach && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-6 gap-1 rounded-lg px-2 text-[10px] text-muted-foreground hover:text-primary"
-                onClick={onOpenCoach}
-              >
-                <Sparkles className="h-3 w-3" />
-                Ask
-              </Button>
-            )}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-6 gap-1 rounded-lg px-2 text-[10px] text-muted-foreground hover:text-destructive"
-              onClick={() => {
-                const zeroed: Record<string, number> = {};
-                for (const slot of slots) zeroed[slot.id] = 0;
-                setSlotAllocations(zeroed);
-              }}
-            >
-              <Trash2 className="h-3 w-3" />
-              Clear
+      <div className="px-4 pb-2 pt-0">
+
+        {/* Action buttons */}
+        <div className="mb-3 flex items-center justify-end gap-1">
+          {onOpenCoach && (
+            <Button type="button" variant="ghost" size="sm"
+              className="h-7 gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-primary"
+              onClick={onOpenCoach}>
+              <Sparkles className="h-3 w-3" /> Ask
             </Button>
-            <span className="w-16 text-center text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              $ / slot
-            </span>
-          </div>
+          )}
+          <Button type="button" variant="ghost" size="sm"
+            className="h-7 gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-destructive"
+            onClick={() => {
+              const zeroed: Record<string, number> = {};
+              for (const slot of slots) zeroed[slot.id] = 0;
+              setSlotAllocations(zeroed);
+            }}>
+            <Trash2 className="h-3 w-3" /> Clear
+          </Button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {slots.map((slot) => {
             const value = allocations[slot.id] ?? 0;
-            const barPct = maxAllocation > 0 ? (value / maxAllocation) * 100 : 0;
             const groupData = spentByGroup[slot.group];
             const isFirstInGroup = slot.index === 1;
             const groupSpent = groupData?.spent ?? 0;
 
             return (
-              <div key={slot.id} className="flex items-center gap-2.5">
+              <div key={slot.id} className="flex items-center gap-3">
                 {/* Position badge */}
-                <span
-                  className={cn(
-                    "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center text-[10px] font-bold",
-                    GROUP_COLOR[slot.group],
-                  )}
-                >
+                <span className={cn(
+                  "w-14 shrink-0 rounded-md border py-1 text-center text-xs font-bold",
+                  GROUP_COLOR[slot.group],
+                )}>
                   {slot.label}
                 </span>
 
-                {/* Visual bar */}
-                <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-secondary/40">
-                  <div
-                    className={cn("h-full rounded-md transition-all", GROUP_BAR[slot.group])}
-                    style={{ width: `${barPct}%`, opacity: 0.7 }}
-                  />
-                  {isFirstInGroup && groupSpent > 0 && (
-                    <div
-                      className="absolute left-0 top-0 h-full rounded-md bg-white/20"
-                      style={{ width: `${Math.min(100, (groupSpent / Math.max(1, groupData?.planned ?? 1)) * 100)}%` }}
-                    />
-                  )}
-                </div>
+                {/* Spent badge */}
+                <span className="w-16 shrink-0 text-xs text-muted-foreground">
+                  {isFirstInGroup && groupSpent > 0 ? `$${groupSpent} spent` : ""}
+                </span>
 
-                {/* Dollar input — editing one slot auto-redistributes the rest */}
-                <Input
-                  inputMode="numeric"
-                  value={String(value)}
-                  onChange={(e) => {
-                    const newVal = Math.max(0, Math.min(settings.totalBudget, Number(e.target.value.replace(/[^0-9]/g, "")) || 0));
-                    const otherSlots = slots.filter((s) => s.id !== slot.id);
-                    const otherTotal = otherSlots.reduce((sum, s) => sum + (allocations[s.id] ?? 0), 0);
-                    const remaining = Math.max(0, settings.totalBudget - newVal);
-                    const next: Record<string, number> = { [slot.id]: newVal };
-                    if (otherTotal === 0) {
-                      const each = Math.floor(remaining / (otherSlots.length || 1));
-                      otherSlots.forEach((s) => { next[s.id] = each; });
-                    } else {
-                      let distributed = 0;
-                      otherSlots.forEach((s, i) => {
-                        if (i === otherSlots.length - 1) {
-                          next[s.id] = Math.max(0, remaining - distributed);
-                        } else {
-                          const share = Math.round(((allocations[s.id] ?? 0) / otherTotal) * remaining);
-                          next[s.id] = Math.max(0, share);
-                          distributed += next[s.id];
-                        }
-                      });
-                    }
-                    setSlotAllocations(next);
-                  }}
-                  className="h-8 w-16 shrink-0 rounded-lg px-2 text-right font-mono text-sm"
-                  aria-label={`${slot.label} allocation`}
-                />
+                {/* Dollar input — big and obvious */}
+                <div className="flex flex-1 items-center justify-end gap-1">
+                  <span className="text-lg font-bold text-muted-foreground">$</span>
+                  <Input
+                    inputMode="numeric"
+                    value={String(value)}
+                    onChange={(e) => {
+                      const newVal = Math.max(0, Math.min(settings.totalBudget, Number(e.target.value.replace(/[^0-9]/g, "")) || 0));
+                      const otherSlots = slots.filter((s) => s.id !== slot.id);
+                      const otherTotal = otherSlots.reduce((sum, s) => sum + (allocations[s.id] ?? 0), 0);
+                      const remaining = Math.max(0, settings.totalBudget - newVal);
+                      const next: Record<string, number> = { [slot.id]: newVal };
+                      if (otherTotal === 0) {
+                        const each = Math.floor(remaining / (otherSlots.length || 1));
+                        otherSlots.forEach((s) => { next[s.id] = each; });
+                      } else {
+                        let distributed = 0;
+                        otherSlots.forEach((s, i) => {
+                          if (i === otherSlots.length - 1) {
+                            next[s.id] = Math.max(0, remaining - distributed);
+                          } else {
+                            const share = Math.round(((allocations[s.id] ?? 0) / otherTotal) * remaining);
+                            next[s.id] = Math.max(0, share);
+                            distributed += next[s.id];
+                          }
+                        });
+                      }
+                      setSlotAllocations(next);
+                    }}
+                    className="h-10 w-20 rounded-lg px-2 text-right font-mono text-xl font-bold"
+                    aria-label={`${slot.label} allocation`}
+                  />
+                </div>
               </div>
             );
           })}
@@ -262,14 +230,14 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
       </div>
 
       {/* ── Footer totals ─────────────────────────────── */}
-      <div className="border-t border-border/50 px-4 py-3">
+      <div className="border-t border-border/50 px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-muted-foreground">Planned</span>
-            <span className="font-mono font-semibold">${plannedTotal}</span>
+          <div>
+            <p className="text-xs text-muted-foreground">Total planned</p>
+            <p className="font-mono text-2xl font-bold">${plannedTotal}</p>
           </div>
           <div className={cn(
-            "rounded-full border px-3 py-0.5 text-xs font-semibold",
+            "rounded-xl border px-4 py-2 text-sm font-bold",
             delta === 0
               ? "border-success/40 bg-success/10 text-success"
               : delta > 0
@@ -277,9 +245,9 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
                 : "border-warning/40 bg-warning/10 text-warning",
           )}>
             {delta === 0
-              ? "✓ Balanced"
+              ? "✓ On budget"
               : delta > 0
-                ? `$${delta} over budget`
+                ? `$${delta} over`
                 : `$${Math.abs(delta)} unspent`}
           </div>
         </div>
