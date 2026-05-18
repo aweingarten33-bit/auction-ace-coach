@@ -29,17 +29,34 @@ export default function LandingEditorial() {
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    // Pause on first frame initially
-    v.pause();
-    try { v.currentTime = 0; } catch {}
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
-    const developTimer = setTimeout(() => {
-      setColorized(true);
-      v.play().catch(() => {});
-      setVideoStarted(true);
-    }, 1600);
+    const begin = () => {
+      // Hold on first frame (B&W polaroid) briefly
+      try { v.pause(); v.currentTime = 0; } catch {}
+      timer = setTimeout(() => {
+        setColorized(true);
+        const p = v.play();
+        if (p && typeof p.then === "function") {
+          p.catch(() => {
+            // Autoplay blocked — try once more on next tick
+            setTimeout(() => v.play().catch(() => {}), 50);
+          });
+        }
+        setVideoStarted(true);
+      }, 1600);
+    };
 
-    return () => clearTimeout(developTimer);
+    if (v.readyState >= 2) {
+      begin();
+    } else {
+      v.addEventListener("loadeddata", begin, { once: true });
+    }
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      v.removeEventListener("loadeddata", begin);
+    };
   }, []);
 
   // Scroll-linked transforms for the ghost mark
