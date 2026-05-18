@@ -1,5 +1,4 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "BW1kR2xrHwqPl7zrzMWeg"
@@ -72,3 +71,15 @@ id = "iZlYRpCb-PRo4f_aqX8-c"
 uri = "file://attached_assets/generated_images/premium_luxury_e_commerce_1356.png"
 type = "image"
 title = "generated_image"
+
+[[outputs]]
+id = "4gt4wCe_ilXBZMjl8QDqg"
+uri = "file://.local/preview/edge-video.mp4"
+type = "video"
+title = "Cleaned video (text removed)"
+
+[[outputs]]
+id = "buFDJqZ100m3vbKJj5KHV"
+uri = "file://.local/preview/video_frame.png"
+type = "image"
+title = "Sample frame"
