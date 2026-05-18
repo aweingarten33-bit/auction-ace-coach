@@ -365,6 +365,7 @@ export default function Home() {
                     { title: "Design as strategic value", desc: "Design is more than aesthetics. It sharpens positioning, increases perceived value, and drives measurable results.", img: edge1 },
                     { title: "Fluid Scaling UI", desc: "Beyond responsive design. Our Fluid Scaling Systems keep interfaces consistent across every screen size while maintaining performance and clean code.", img: edge2 },
                     { title: "Business-driven engineering", desc: "We start with your business goals. From rapid MVP launches to long-term scalability, we choose technologies that balance speed, cost, and future growth.", img: edge3 },
+                    { title: "Purposeful Immersion", desc: "We use 3D, motion, and interaction design to create meaningful engagement and tell your story – without compromising usability or performance.", img: edge4 },
                   ].map((edge, i) => (
                     <motion.div
                       key={i}
@@ -382,29 +383,6 @@ export default function Home() {
                       </div>
                     </motion.div>
                   ))}
-
-                  {/* Video card */}
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="min-w-[85vw] md:min-w-[400px] h-[600px] relative rounded-3xl overflow-hidden snap-center shrink-0 border border-border/50 group"
-                  >
-                    <video
-                      src="/edge-video.mov"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                    <div className="absolute bottom-0 left-0 p-8 text-white">
-                      <h3 className="text-2xl font-bold mb-4">Purposeful Immersion</h3>
-                      <p className="opacity-80 leading-relaxed">We use 3D, motion, and interaction design to create meaningful engagement and tell your story – without compromising usability or performance.</p>
-                    </div>
-                  </motion.div>
                 </div>
               </section>
 
