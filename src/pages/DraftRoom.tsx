@@ -415,11 +415,11 @@ export default function DraftRoom() {
                   {top50InfoOpen && (
                     <div className="mb-4 space-y-2.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
                       <p className="font-semibold text-foreground">What type of mathematics was applied:</p>
-                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 proprietary algorithms were built specifically for this system, each handling a distinct part of the pricing model.</p>
-                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring across 3 seasons of your league's draft data.</p>
-                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — a trust/blending framework that determines how much weight to give each data source based on the amount of evidence available.</p>
-                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — the actual prices paid in your league's previous 3 auction drafts are used to calibrate how value gets distributed across players, so the numbers reflect your room specifically.</p>
-                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same foundational concepts used in financial pricing systems and data science analytics models, applied to real-time auction conditions as the draft moves.</p>
+                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 custom algorithms were created, each serving a specific role in how players get priced.</p>
+                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring.</p>
+                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — the trust/blending concept was utilized to determine how much confidence to place in each data source.</p>
+                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — the prices paid across your league's previous 3 auction drafts are used to determine how value gets distributed across players.</p>
+                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same concept hedge funds use in financial pricing systems, applied here through data science and quantitative analytics models.</p>
                     </div>
                   )}
                   <Top100List
