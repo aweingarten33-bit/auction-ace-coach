@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import { Menu, Sparkle } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import footballImg from "@/assets/football.jpeg";
 
 export default function LandingEditorial() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
