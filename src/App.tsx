@@ -11,8 +11,6 @@ import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
-import LogoPicker from "./pages/LogoPicker.tsx";
-import Zine from "./pages/Zine.tsx";
 import TeamPicker from "./pages/TeamPicker.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
@@ -69,8 +67,6 @@ const App = () => (
               <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
               <Route path="/claim-team" element={<Navigate to="/team" replace />} />
 
-              <Route path="/logos" element={<LogoPicker />} />
-              <Route path="/zine" element={<Zine />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </LockProvider>

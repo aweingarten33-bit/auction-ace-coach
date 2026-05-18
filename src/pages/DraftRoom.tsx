@@ -1,7 +1,6 @@
-// DraftRoom.tsx — research-only home page.
-// Read-only by default. No bidding, no nominating, no "what to bid" logic.
-// Surfaces: player search, top-100 board, market heat, opponent room,
-// Fantasy Life feed, watchlist, AI coach Q&A.
+// DraftRoom.tsx — live auction sidecar.
+// Primary view: available players within your budget, updating in real time.
+// Everything else is one tap away.
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,11 +13,7 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  ListOrdered,
-  TrendingUp,
-  ExternalLink,
-  Calculator,
-  Star,
+  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
@@ -47,17 +42,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import MarketHeat from "@/components/MarketHeat";
 import OpponentHeatmap from "@/components/OpponentHeatmap";
 import AiQuickPanel from "@/components/AiQuickPanel";
-import FantasyLifeFeed from "@/components/FantasyLifeFeed";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
-import TeamTrends from "@/components/TeamTrends";
 import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
+import BestAvailableBoard from "@/components/BestAvailableBoard";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+type PanelId = "search" | "top50" | "budget" | "recent";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Page
@@ -78,14 +73,12 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  type ToolId = "lookup" | "top100" | "market" | "budget" | "strategy" | "fantasylife";
-  const [toolPage, setToolPage] = useState<ToolId | null>(null);
+  const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
 
-  // Redirect the admin to setup if they have no data yet.
-  // Guests (anonymous sessions) skip this — they're here to watch, not configure.
+  // Redirect to setup if no data yet (admin only; guests can view).
   useEffect(() => {
     const isGuest = !user || user.is_anonymous;
     if (!isGuest && !setupComplete && prices.length === 0 && events.length === 0) {
@@ -93,13 +86,13 @@ export default function DraftRoom() {
     }
   }, [user, setupComplete, prices.length, events.length, navigate]);
 
-  // Read-only live sync — picks made by the selected team auto-tag as "me"
-  useEspnLiveSync({
+  // Live sync — picks auto-tag as "me", nominations show the current bid climbing
+  const { liveBid } = useEspnLiveSync({
     expectingEvents: setupComplete,
     teamIdOverride: selectedTeam?.id ?? null,
   });
 
-  // Pull league name from ESPN (via league-teams edge fn), with cache fallback
+  // Pull league name from ESPN, with cache fallback
   useEffect(() => {
     (async () => {
       const cached = localStorage.getItem("league_name_cache");
@@ -113,7 +106,6 @@ export default function DraftRoom() {
           return;
         }
       } catch { /* fall through */ }
-      // Fallback: try to find league name on a recent live event payload
       const { data: ev } = await supabase
         .from("live_draft_events")
         .select("raw")
@@ -128,10 +120,9 @@ export default function DraftRoom() {
     })();
   }, []);
 
-  // Anchor price map: league 3yr avg + ESPN auction value (research data)
   const { map: anchorMap } = useAnchorMap();
 
-  // ── Engines ────────────────────────────────────────────────────────────
+  // ── Computed ────────────────────────────────────────────────────────────
   const budget = useMemo(
     () => computeBudget(settings, keepers, events),
     [settings, keepers, events],
@@ -161,8 +152,7 @@ export default function DraftRoom() {
   const spend = useMemo(() => spendByPosition(events), [events]);
   const runs = useMemo(() => recentRuns(events, 6), [events]);
   const pulse = useMemo(() => computeMarketPulse(events, prices), [events, prices]);
-  // Re-price undrafted players in real time: as players come off the board,
-  // remaining players at the same position move up in rank and their values adjust.
+  // Re-price undrafted players in real time as players come off the board.
   const adjustedPrices = useMemo(() => adjustPricesForDrafted(prices, events), [prices, events]);
 
   const requiredCount = {
@@ -195,297 +185,199 @@ export default function DraftRoom() {
 
   const openDetails = (name: string, position?: Position) => {
     setDetailFor({ name, position });
-    setToolPage(null);
   };
 
+  const spentPct =
+    budget.totalBudget > 0
+      ? Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / budget.totalBudget) * 100))
+      : 0;
+
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      <div
-        className="origin-center"
-        style={{
-          transform: toolPage ? "scale(0.94) translateX(-18px)" : "none",
-          transition: "transform 850ms cubic-bezier(0.22, 1, 0.36, 1)",
-          willChange: "transform",
-        }}
+    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+      {/* ── COMPACT HEADER ─────────────────────────────────── */}
+      <header
+        className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 py-2"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
       >
-        {/* ── LEAGUE TITLE ─────────────────────────────────────────── */}
-        <div
-          className="relative px-5 pt-10 pb-4 text-left"
-          style={{ paddingTop: "calc(env(safe-area-inset-top) + 2rem)" }}
-        >
-          <h1 className="text-[34px] leading-[1.05] font-semibold tracking-tight text-foreground">
-            {leagueName || "\u00a0"}
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {selectedTeam ? (
-              <>
-                Personalized for{" "}
-                <button
-                  type="button"
-                  onClick={() => navigate("/team")}
-                  className="font-semibold text-foreground underline-offset-2 hover:underline"
-                >
-                  {selectedTeam.name}
-                </button>
-              </>
-            ) : (
-              <button
-                type="button"
-                onClick={() => navigate("/team")}
-                className="underline-offset-2 hover:underline"
-              >
-                Pick your team for personalized recommendations →
-              </button>
-            )}
-          </p>
-        </div>
-
-        {/* ── ICON RAIL ─────────────────────────────────────────── */}
-        <div className="relative px-5 pb-4">
-          <div className="-mx-5 px-5 flex gap-6 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-            {[
-              { id: "lookup" as const,      icon: Search,       label: "Find" },
-              { id: "top100" as const,      icon: ListOrdered,  label: leagueName ? `${leagueName}'s Top 50` : "Top 50" },
-              { id: "market" as const,      icon: TrendingUp,   label: "Market" },
-              { id: "budget" as const,      icon: Calculator,   label: "Budget planner" },
-              { id: "strategy" as const,    icon: Star,         label: "Draft strategy" },
-              { id: "fantasylife" as const, icon: ExternalLink, label: "News" },
-            ].map(({ id, icon: Icon, label }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setToolPage(id)}
-                className="flex w-[96px] shrink-0 flex-col items-center gap-2 text-foreground active:opacity-70 transition"
-              >
-                <Icon strokeWidth={1.25} className="size-9" />
-                <span className="max-w-[5.75rem] whitespace-normal text-center text-[12px] font-normal leading-tight [overflow-wrap:anywhere]">{label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Hamburger drawer ─────────────────────────────────────── */}
+        {/* Menu */}
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Open menu"
-              className="fixed left-4 z-40 h-14 w-14 rounded-full border border-border/60 bg-background/85 backdrop-blur-md text-foreground shadow-[0_8px_24px_rgba(0,0,0,0.45)] hover:bg-foreground/10 hover:text-foreground focus-visible:ring-foreground/30"
-              style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}
-            >
-              <Menu className="h-7 w-7" strokeWidth={2.5} />
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Menu">
+              <Menu className="h-5 w-5" strokeWidth={2} />
             </Button>
           </SheetTrigger>
           <SettingsDrawer
             onClose={() => setDrawerOpen(false)}
-            onSignOut={async () => {
-              await signOut();
-              navigate("/auth");
-            }}
+            onSignOut={async () => { await signOut(); navigate("/auth"); }}
             onGoToSetup={() => navigate("/setup")}
             onGoToEspn={() => navigate("/espn")}
           />
         </Sheet>
 
-        {/* ── MAIN ─────────────────────────────────────────── */}
-        <main className="mx-auto max-w-3xl space-y-3 px-3 pt-2 pb-24">
-          {/* Budget snapshot — read-only, personalized to selected team */}
-          {selectedTeam && (
-            <BudgetSnapshot
-              teamName={selectedTeam.name}
-              remaining={budget.remaining}
-              total={budget.totalBudget}
-              maxBid={budget.maxBid}
-              slotsLeft={budget.slotsLeft}
-              gaps={gaps}
-            />
+        {/* League / team name */}
+        <div className="min-w-0 flex-1 leading-tight">
+          <p className="truncate text-sm font-semibold leading-tight">
+            {leagueName || selectedTeam?.name || "Draft Room"}
+          </p>
+          {selectedTeam && leagueName && (
+            <p className="truncate text-[10px] text-muted-foreground">{selectedTeam.name}</p>
           )}
+        </div>
 
+        {/* Budget pills — tap to open budget panel */}
+        <button
+          onClick={() => setPanel("budget")}
+          className="flex shrink-0 flex-col items-center rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 leading-tight hover:bg-secondary/70"
+        >
+          <span className="font-mono text-sm font-bold tabular-nums">${budget.remaining}</span>
+          <span className="text-[9px] text-muted-foreground">left</span>
+        </button>
+        <button
+          onClick={() => setPanel("budget")}
+          className="flex shrink-0 flex-col items-center rounded-md border border-border/60 bg-secondary/40 px-2.5 py-1 leading-tight hover:bg-secondary/70"
+        >
+          <span className="font-mono text-sm tabular-nums">${budget.maxBid}</span>
+          <span className="text-[9px] text-muted-foreground">max</span>
+        </button>
+      </header>
 
-          {/* Next-target suggestion (read-only) */}
-          {selectedTeam && (
-            <NextTargetCard
-              settings={settings}
-              gaps={gaps}
-              spend={spend}
-              remaining={budget.remaining}
-              prices={adjustedPrices}
-              events={events}
-              pulse={pulse}
-            />
-          )}
-
-          {/* Last imported pick — before/after delta */}
-          {events.length > 0 && (
-            <LastPickImpact settings={settings} keepers={keepers} events={events} />
-          )}
-
-          {/* Personalized 3-year drafting trends */}
-          {selectedTeam && (
-            <TeamTrends teamId={selectedTeam.id} teamName={selectedTeam.name} />
-          )}
-
-          {/* Recent picks (read-only live ticker) */}
-          {events.length > 0 && (
-            <section>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Recent picks
-              </p>
-              <RecentPicksList events={events.slice(-8).reverse()} onPick={openDetails} />
-            </section>
-          )}
-
-          {/* Roster snapshot */}
-          {myItems.length > 0 && (
-            <section>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Your roster ({myItems.length})
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {myItems.map((it) => (
-                  <button
-                    key={it.player}
-                    type="button"
-                    onClick={() => openDetails(it.player, it.position)}
-                    className="flex items-center gap-1.5 rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs hover:bg-secondary/60"
-                  >
-                    {it.position && (
-                      <span className={`text-[9px] font-semibold ${POS_COLORS[it.position] ?? ""}`}>
-                        {it.position}
-                      </span>
-                    )}
-                    <span className="font-medium">{it.player}</span>
-                    {it.price != null && (
-                      <span className="font-mono text-[10px] text-muted-foreground">${it.price}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Watchlist */}
-          {watchlist.length > 0 && (
-            <section>
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Pinned ({watchlist.length})
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {watchlist.map((name) => (
-                  <button
-                    key={name}
-                    type="button"
-                    onClick={() => openDetails(name)}
-                    className="rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs font-medium hover:bg-secondary/60"
-                  >
-                    {name}
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Empty state */}
-          {events.length === 0 && watchlist.length === 0 && myItems.length === 0 && (
-            <div className="rounded-lg border border-dashed border-border/60 bg-secondary/20 p-8 text-center text-sm text-muted-foreground">
-              <p className="mb-2 font-semibold text-foreground">Welcome to your draft research dossier.</p>
-              <p>Tap <span className="font-semibold">Find</span> to look up any player, <span className="font-semibold">Top 50</span> for the value board, or <span className="font-semibold">Market</span> for room pulse.</p>
-            </div>
-          )}
-        </main>
-
-        {/* AI Tools FAB */}
-        <Sheet open={aiOpen} onOpenChange={setAiOpen}>
-          <SheetTrigger asChild>
-            <button
-              type="button"
-              aria-label="Open AI tools"
-              className="fixed bottom-5 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#1c1c1c]/95 backdrop-blur text-white shadow-[0_10px_30px_rgba(0,0,0,0.7)] active:scale-95 transition"
-              style={{ marginBottom: "env(safe-area-inset-bottom)" }}
-            >
-              <Sparkles className="h-6 w-6" strokeWidth={1.5} />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
-            <SheetHeader className="border-b border-border/60 px-4 py-3">
-              <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
-                <Sparkles className="h-4 w-4 text-primary" />
-                Ask the Coach
-              </SheetTitle>
-            </SheetHeader>
-            <AiQuickPanel
-              coachContext={() => ({
-                settings: {
-                  totalBudget: settings.totalBudget,
-                  numTeams: settings.numTeams,
-                  scoring: settings.scoring,
-                  leagueType: settings.leagueType,
-                  format: settings.format,
-                  context: settings.context,
-                },
-                budget,
-                keepers,
-                myRoster: myItems,
-                rosterRequired: requiredCount,
-                rosterFilled: myCount,
-                events,
-                prices: adjustedPrices,
-                spendByPosition: spend,
-                recentRuns: runs,
-                draftedPlayers: events.map((e) => e.player),
-                showMath: false,
-              })}
-            />
-          </SheetContent>
-        </Sheet>
+      {/* ── SPEND BAR ─────────────────────────────────────── */}
+      <div className="h-1 shrink-0 bg-secondary/50">
+        <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
-      {/* ── SLIDE-IN TOOL PANEL ───────────────────────────────────────── */}
-      {toolPage && (
+      {/* ── NEXT TARGET (always visible) ──────────────────── */}
+      {selectedTeam && (
+        <div className="shrink-0 border-b border-border/40 px-3 py-2">
+          <NextTargetCard
+            settings={settings}
+            gaps={gaps}
+            spend={spend}
+            remaining={budget.remaining}
+            prices={adjustedPrices}
+            events={events}
+            pulse={pulse}
+          />
+        </div>
+      )}
+
+      {/* ── BEST AVAILABLE BOARD — fills the screen ─────── */}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <BestAvailableBoard
+          prices={adjustedPrices}
+          events={events}
+          maxBid={budget.maxBid}
+          remaining={budget.remaining}
+          liveBid={liveBid}
+          onSelect={openDetails}
+        />
+      </div>
+
+      {/* ── BOTTOM ACTION BAR ─────────────────────────────── */}
+      <div
+        className="shrink-0 border-t border-border/60 bg-background/95 backdrop-blur-sm"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="flex items-center px-3 py-2">
+          <button
+            onClick={() => setPanel("search")}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+          >
+            <Search className="h-4 w-4" />
+            <span className="text-xs font-medium">Find</span>
+          </button>
+          <button
+            onClick={() => setPanel("top50")}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+          >
+            <span className="text-xs font-medium">Top 50</span>
+          </button>
+          <button
+            onClick={() => setPanel("recent")}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+          >
+            <Clock className="h-4 w-4" />
+            <span className="text-xs font-medium">Recent</span>
+          </button>
+
+          {/* Coach FAB */}
+          <Sheet open={aiOpen} onOpenChange={setAiOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label="Ask the Coach"
+                className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-lg active:scale-95 transition"
+              >
+                <Sparkles className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
+              <SheetHeader className="border-b border-border/60 px-4 py-3">
+                <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Ask the Coach
+                </SheetTitle>
+              </SheetHeader>
+              <AiQuickPanel
+                coachContext={() => ({
+                  settings: {
+                    totalBudget: settings.totalBudget,
+                    numTeams: settings.numTeams,
+                    scoring: settings.scoring,
+                    leagueType: settings.leagueType,
+                    format: settings.format,
+                    context: settings.context,
+                  },
+                  budget,
+                  keepers,
+                  myRoster: myItems,
+                  rosterRequired: requiredCount,
+                  rosterFilled: myCount,
+                  events,
+                  prices: adjustedPrices,
+                  spendByPosition: spend,
+                  recentRuns: runs,
+                  draftedPlayers: events.map((e) => e.player),
+                  showMath: false,
+                })}
+              />
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      {/* ── SLIDE-IN PANEL ────────────────────────────────── */}
+      {panel && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-lg animate-fade-in"
-            style={{ animationDuration: "0.7s" }}
-            onClick={() => setToolPage(null)}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+            onClick={() => setPanel(null)}
             aria-hidden
           />
           <div
-            className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-1/2 bg-background text-foreground shadow-[-20px_0_80px_rgba(0,0,0,0.85)] overflow-y-auto"
-            style={{
-              animation: "tool-panel-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) both",
-              transformOrigin: "right center",
-            }}
+            className="fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col bg-background shadow-[-20px_0_60px_rgba(0,0,0,0.8)] sm:w-[min(100%,460px)]"
+            style={{ animation: "tool-panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           >
-            <div className="px-5" style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}>
+            <div
+              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-3 py-3"
+              style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+            >
               <button
-                type="button"
-                onClick={() => setToolPage(null)}
-                aria-label="Back"
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1c1c1c] text-foreground active:scale-95 hover:bg-[#262626] transition"
+                onClick={() => setPanel(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/40 hover:bg-secondary/80"
+                aria-label="Close"
               >
-                <ChevronLeft className="h-6 w-6" strokeWidth={2} />
+                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
-              <h1 className="mt-8 mb-2 text-[36px] leading-[1.02] font-semibold tracking-tight [overflow-wrap:anywhere] sm:text-[44px]">
-                {toolPage === "lookup" && "Find"}
-                {toolPage === "top100" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
-                {toolPage === "market" && "Market"}
-                {toolPage === "budget" && "Budget planner"}
-                {toolPage === "strategy" && "Draft strategy"}
-                {toolPage === "fantasylife" && "News"}
-              </h1>
-              <p className="mb-6 text-sm text-muted-foreground">
-                {toolPage === "lookup" && "Search any player or dollar amount."}
-                {toolPage === "top100" && "Best-value board, math-backed."}
-                {toolPage === "market" && "Room pulse plus opponent scan."}
-                {toolPage === "budget" && "Full slot-by-slot budget plan for your roster build."}
-                {toolPage === "strategy" && "Your saved draft shape and spending rules."}
-                {toolPage === "fantasylife" && "Latest from fantasylife.com."}
-              </p>
+              <h2 className="text-base font-semibold">
+                {panel === "search" && "Find a player"}
+                {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
+                {panel === "budget" && "Budget"}
+                {panel === "recent" && "Recent picks"}
+              </h2>
             </div>
-
-            <div className="px-3 pb-24">
-              {toolPage === "lookup" && (
+            <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
+              {panel === "search" && (
                 <LookupSection
                   prices={adjustedPrices}
                   anchorMap={anchorMap}
@@ -493,7 +385,7 @@ export default function DraftRoom() {
                   onPick={openDetails}
                 />
               )}
-              {toolPage === "top100" && (
+              {panel === "top50" && (
                 <Top100List
                   prices={adjustedPrices}
                   anchorMap={anchorMap}
@@ -501,22 +393,84 @@ export default function DraftRoom() {
                   onPick={openDetails}
                 />
               )}
-              {toolPage === "market" && (
-                <div className="space-y-3">
-                  <MarketHeat
-                    events={events}
-                    prices={adjustedPrices}
-                    gaps={gaps}
-                    maxBid={budget.maxBid}
-                    remaining={budget.remaining}
-                    pulseMultiplier={pulse.multiplier}
-                  />
+              {panel === "budget" && (
+                <div className="space-y-4">
+                  {selectedTeam && (
+                    <BudgetSnapshot
+                      teamName={selectedTeam.name}
+                      remaining={budget.remaining}
+                      total={budget.totalBudget}
+                      maxBid={budget.maxBid}
+                      slotsLeft={budget.slotsLeft}
+                      gaps={gaps}
+                    />
+                  )}
+                  <PositionBudgetBar />
+                  <DraftStrategyPanel />
+                  {events.length > 0 && (
+                    <LastPickImpact settings={settings} keepers={keepers} events={events} />
+                  )}
                   <OpponentHeatmap settings={settings} />
                 </div>
               )}
-              {toolPage === "budget" && <PositionBudgetBar />}
-              {toolPage === "strategy" && <DraftStrategyPanel />}
-              {toolPage === "fantasylife" && <FantasyLifeFeed />}
+              {panel === "recent" && (
+                <div className="space-y-4">
+                  {events.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-muted-foreground">No picks yet.</p>
+                  ) : (
+                    <RecentPicksList
+                      events={events.slice(-20).reverse()}
+                      onPick={(n, p) => { setPanel(null); openDetails(n, p); }}
+                    />
+                  )}
+                  {myItems.length > 0 && (
+                    <section>
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Your roster ({myItems.length})
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {myItems.map((it) => (
+                          <button
+                            key={it.player}
+                            type="button"
+                            onClick={() => { setPanel(null); openDetails(it.player, it.position); }}
+                            className="flex items-center gap-1.5 rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs hover:bg-secondary/60"
+                          >
+                            {it.position && (
+                              <span className={`text-[9px] font-semibold ${POS_COLORS[it.position] ?? ""}`}>
+                                {it.position}
+                              </span>
+                            )}
+                            <span className="font-medium">{it.player}</span>
+                            {it.price != null && (
+                              <span className="font-mono text-[10px] text-muted-foreground">${it.price}</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                  {watchlist.length > 0 && (
+                    <section>
+                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        Pinned ({watchlist.length})
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {watchlist.map((name) => (
+                          <button
+                            key={name}
+                            type="button"
+                            onClick={() => { setPanel(null); openDetails(name); }}
+                            className="rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs font-medium hover:bg-secondary/60"
+                          >
+                            {name}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </>
@@ -557,7 +511,7 @@ export default function DraftRoom() {
         );
       })()}
 
-      {/* Pin/unpin chip strip when a detail is open */}
+      {/* Pin controls */}
       {detailFor && (
         <PinControls
           name={detailFor.name}
@@ -582,12 +536,8 @@ function PinControls({
   onPin: (n: string) => void;
   onUnpin: (n: string) => void;
 }) {
-  // Floating quick-action strip beneath the modal — non-blocking.
   return (
-    <div
-      className="fixed bottom-24 left-1/2 z-[60] -translate-x-1/2"
-      style={{ pointerEvents: "auto" }}
-    >
+    <div className="fixed bottom-24 left-1/2 z-[60] -translate-x-1/2" style={{ pointerEvents: "auto" }}>
       <Button
         size="sm"
         variant={isPinned ? "secondary" : "default"}
@@ -765,7 +715,8 @@ function LookupSection({
   return (
     <div className="space-y-3">
       <div className="rounded-md border border-border/50 bg-secondary/20 p-2.5 text-xs text-muted-foreground">
-        Type a <span className="font-semibold text-foreground">player name</span> or a <span className="font-semibold text-foreground">dollar amount</span>. Tap a result to see details and analyst takes.
+        Type a <span className="font-semibold text-foreground">player name</span> or a{" "}
+        <span className="font-semibold text-foreground">dollar amount</span>. Tap a result to see details.
       </div>
       <Input
         value={input}
@@ -869,9 +820,7 @@ function Top100List({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BudgetSnapshot — read-only personalization. Shows what the selected team has
-// left in the budget, max bid headroom, slots remaining, and position gaps.
-// This is RESEARCH (planning), not bidding. No "what to bid" verdicts.
+// BudgetSnapshot — read-only summary shown inside the Budget panel.
 // ─────────────────────────────────────────────────────────────────────────────
 function BudgetSnapshot({
   teamName,
@@ -891,51 +840,51 @@ function BudgetSnapshot({
   const spent = Math.max(0, total - remaining);
   const pct = total > 0 ? Math.min(100, Math.round((spent / total) * 100)) : 0;
 
-  const SEV_LABEL: Record<string, string> = {
-    critical: "CRITICAL",
-    need: "NEED",
-    depth: "DEPTH",
-    done: "DONE",
-  };
-  const SEV_TONE: Record<string, string> = {
-    critical: "border-destructive/50 bg-destructive/10 text-destructive",
-    need: "border-warning/50 bg-warning/10 text-warning",
-    depth: "border-border bg-secondary/40 text-muted-foreground",
-    done: "border-success/40 bg-success/10 text-success",
-  };
-
   return (
     <section className="rounded-lg border border-border bg-secondary/20 p-4">
       <div className="mb-3 flex items-baseline justify-between gap-2">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           {teamName}
         </p>
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          Snapshot
-        </p>
+        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Budget</p>
       </div>
 
-      {/* Big number row */}
       <div className="mb-3 grid grid-cols-3 gap-2">
         <Stat label="Remaining" value={`$${remaining}`} hero />
         <Stat label="Max bid" value={`$${maxBid}`} />
         <Stat label="Slots left" value={String(slotsLeft)} />
       </div>
 
-      {/* Spend bar */}
       <div className="mb-3">
         <div className="mb-1 flex items-center justify-between text-[10px] text-muted-foreground">
           <span>Spent ${spent} of ${total}</span>
           <span className="font-mono">{pct}%</span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
-          <div
-            className="h-full bg-primary transition-all"
-            style={{ width: `${pct}%` }}
-          />
+          <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
         </div>
       </div>
 
+      {gaps.filter((g) => g.severity !== "done").length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {gaps
+            .filter((g) => g.severity !== "done")
+            .map((g) => (
+              <span
+                key={g.pos}
+                className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${
+                  g.severity === "critical"
+                    ? "border-destructive/50 bg-destructive/10 text-destructive"
+                    : g.severity === "need"
+                      ? "border-warning/50 bg-warning/10 text-warning"
+                      : "border-border bg-secondary/40 text-muted-foreground"
+                }`}
+              >
+                {g.pos} -{g.starterShort}
+              </span>
+            ))}
+        </div>
+      )}
     </section>
   );
 }
