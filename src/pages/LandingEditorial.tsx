@@ -69,13 +69,13 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-95 animate-kenburns"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-60 animate-kenburns"
         style={{
-          filter: "brightness(1.15) contrast(0.95) saturate(1.1) blur(0.5px)",
+          filter: "brightness(1.4) contrast(0.85) saturate(0.9) blur(1px)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 38%, black 62%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.85) 58%, transparent 100%)",
           maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 38%, black 62%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.85) 58%, transparent 100%)",
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
