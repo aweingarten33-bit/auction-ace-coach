@@ -48,34 +48,21 @@ export default function LandingEditorial() {
         (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
       }
     >
-      {/* Background video — blurred backdrop + centered video with Ken Burns + edge melt + grain */}
+      {/* Background video — single centered band, faded on all four sides */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-40 blur-2xl scale-110 saturate-150"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-70 animate-kenburns"
         style={{
+          filter: "brightness(1.35) contrast(0.9) saturate(0.95) blur(0.5px)",
           WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, black 40%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
           maskImage:
-            "linear-gradient(to bottom, transparent 0%, black 35%, black 65%, transparent 100%)",
-        }}
-      >
-        <source src="/videos/hero.mp4" type="video/mp4" />
-      </video>
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-60 animate-kenburns"
-        style={{
-          filter: "brightness(1.4) contrast(0.85) saturate(0.9) blur(1px)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.85) 58%, transparent 100%)",
-          maskImage:
-            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.85) 58%, transparent 100%)",
+            "linear-gradient(to bottom, transparent 0%, black 40%, black 60%, transparent 100%), linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)",
+          WebkitMaskComposite: "source-in",
+          maskComposite: "intersect",
         }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
