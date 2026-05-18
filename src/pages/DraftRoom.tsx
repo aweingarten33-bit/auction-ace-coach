@@ -1,7 +1,12 @@
 // DraftRoom.tsx — live auction sidecar.
 // Primary view: available players within your budget, updating in real time.
 // Everything else is one tap away.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { EffectCube, Autoplay, Pagination } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+import "swiper/css";
+import "swiper/css/effect-cube";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -237,44 +242,74 @@ export default function DraftRoom() {
         <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
-      {/* ── MAIN SCROLL AREA ────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
-        <div className="space-y-4">
+      {/* ── CUBE SWIPER ─────────────────────────────────────── */}
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <Swiper
+          modules={[EffectCube, Pagination]}
+          effect="cube"
+          cubeEffect={{ slideShadows: false }}
+          loop={false}
+          pagination={{ clickable: true }}
+          className="h-full w-full"
+          style={{ "--swiper-pagination-color": "hsl(var(--primary))", "--swiper-pagination-bullet-inactive-color": "hsl(var(--muted-foreground))" } as React.CSSProperties}
+        >
+          {/* ── Slide 1: Plan ── */}
+          <SwiperSlide>
+            <div className="h-full overflow-y-auto px-3 pb-24 pt-3">
+              <div className="space-y-4">
 
-          {budget.totalBudget > 0 && (
-            <div className="rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-sm font-semibold">${budget.remaining} left</span>
-                <span className="text-xs text-muted-foreground">${Math.max(0, budget.totalBudget - budget.remaining)} of ${budget.totalBudget} spent</span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
-                <div
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${budget.totalBudget > 0 ? Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / budget.totalBudget) * 100)) : 0}%` }}
-                />
+                {budget.totalBudget > 0 && (
+                  <div className="rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <span className="text-sm font-semibold">${budget.remaining} left</span>
+                      <span className="text-xs text-muted-foreground">${Math.max(0, budget.totalBudget - budget.remaining)} of ${budget.totalBudget} spent</span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
+                      <div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / Math.max(1, budget.totalBudget)) * 100))}%` }} />
+                    </div>
+                  </div>
+                )}
+
+                <PositionBudgetBar onOpenCoach={() => setAiOpen(true)} />
+
+                {selectedTeam && (
+                  <NextTargetCard
+                    settings={settings}
+                    gaps={gaps}
+                    spend={spend}
+                    remaining={budget.remaining}
+                    prices={adjustedPrices}
+                    events={events}
+                    pulse={pulse}
+                  />
+                )}
+
+                {events.length > 0 && (
+                  <LastPickImpact settings={settings} keepers={keepers} events={events} />
+                )}
+
               </div>
             </div>
-          )}
+          </SwiperSlide>
 
-          <PositionBudgetBar onOpenCoach={() => setAiOpen(true)} />
-
-          {selectedTeam && (
-            <NextTargetCard
-              settings={settings}
-              gaps={gaps}
-              spend={spend}
-              remaining={budget.remaining}
-              prices={adjustedPrices}
-              events={events}
-              pulse={pulse}
-            />
-          )}
-
-          {events.length > 0 && (
-            <LastPickImpact settings={settings} keepers={keepers} events={events} />
-          )}
-
-        </div>
+          {/* ── Slide 2: Top 50 ── */}
+          <SwiperSlide>
+            <div className="h-full overflow-y-auto px-3 pb-24 pt-3">
+              <p className="mb-1 text-base font-semibold">
+                {leagueName ? `Top 50 Players According to ${leagueName}` : "Top 50 Players"}
+              </p>
+              <p className="mb-4 text-xs leading-relaxed text-muted-foreground">
+                What players actually went for in your last 3 drafts — not ESPN's generic rankings. Use these as your anchor when bidding.
+              </p>
+              <Top100List
+                prices={adjustedPrices}
+                anchorMap={anchorMap}
+                events={events}
+                onPick={openDetails}
+              />
+            </div>
+          </SwiperSlide>
+        </Swiper>
       </div>
 
       {/* ── BOTTOM BAR ──────────────────────────────────────── */}
@@ -344,26 +379,7 @@ export default function DraftRoom() {
         </div>
       </div>
 
-      {/* ── TOP 50 SIDE TAB ─────────────────────────────────── */}
-      <button
-        onClick={() => setPanel("top50")}
-        className="fixed right-0 top-1/2 z-30 -translate-y-1/2 flex items-center justify-center bg-primary text-primary-foreground shadow-lg"
-        style={{
-          writingMode: "vertical-rl",
-          transform: "translateY(-50%)",
-          borderRadius: "6px 0 0 6px",
-          padding: "16px 10px",
-          fontSize: "11px",
-          fontWeight: 700,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-        }}
-        aria-label="Open Top 50"
-      >
-        Top 50 Players
-      </button>
-
-      {/* ── SLIDE-IN PANEL (search / top50 / recent) ────────── */}
+      {/* ── SLIDE-IN PANEL (search / recent) ───────────────── */}
       {panel && (
         <>
           <div
