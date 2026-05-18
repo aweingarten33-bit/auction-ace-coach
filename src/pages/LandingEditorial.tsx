@@ -1,10 +1,34 @@
 import { Link } from "react-router-dom";
 import { Menu, Sparkle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function LandingEditorial() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const isDark = theme === "dark";
+  const [scrollY, setScrollY] = useState(0);
+  const ghostRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setScrollY(window.scrollY));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Scroll-linked transforms for the ghost mark
+  const progress = Math.min(scrollY / 600, 1);
+  const ghostScale = 1 + progress * 2.4;
+  const ghostRotate = progress * 180;
+  const ghostY = -progress * 120;
+  const ghostOpacity = 0.2 + progress * 0.35;
+  const headlineY = progress * -40;
+  const headlineOpacity = 1 - progress * 0.6;
 
   return (
     <div
@@ -92,9 +116,17 @@ export default function LandingEditorial() {
           </Link>
         </div>
 
-        {/* Decorative ghost mark */}
-        <div className="mx-auto mt-20 flex max-w-md justify-center opacity-20">
-          <Sparkle className="h-48 w-48" strokeWidth={0.5} />
+        {/* Decorative ghost mark — scroll-linked */}
+        <div
+          ref={ghostRef}
+          className="pointer-events-none mx-auto mt-20 flex max-w-md justify-center will-change-transform"
+          style={{
+            transform: `translateY(${ghostY}px) scale(${ghostScale}) rotate(${ghostRotate}deg)`,
+            opacity: ghostOpacity,
+            transition: "opacity 200ms linear",
+          }}
+        >
+          <Sparkle className="h-48 w-48" strokeWidth={0.5} fill="currentColor" />
         </div>
       </section>
 
