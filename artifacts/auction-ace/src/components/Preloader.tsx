@@ -41,7 +41,7 @@ export default function Preloader({ onDone }: Props) {
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
           style={{
-            animation: "football-orbit 2.5s linear 2 forwards",
+            animation: "preloader-sway 6s ease-in-out infinite",
             transformOrigin: "50% 50%",
           }}
         >

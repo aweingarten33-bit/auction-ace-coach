@@ -897,3 +897,8 @@
 .norris-link span::after  { transform: translateY(100%); opacity: 0; }
 .norris-link:hover span::before { transform: translateY(-100%); opacity: 0; }
 .norris-link:hover span::after  { transform: translateY(0); opacity: 1; }
+
+@keyframes preloader-sway {
+  0%, 100% { transform: rotate(-28deg); }
+  50%      { transform: rotate(28deg); }
+}
