@@ -115,7 +115,7 @@ export default function Landing() {
             GET STARTED
           </Link>
           <Link
-            to="/auth"
+            to="/espn"
             className="block w-full border border-white/20 py-3.5 text-center font-bebas text-lg tracking-widest text-white/70 transition hover:border-white/40 hover:text-white"
           >
             CONNECT ESPN
