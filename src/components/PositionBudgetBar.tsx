@@ -153,16 +153,16 @@ export default function PositionBudgetBar() {
 
       {/* ── Slot breakdown ────────────────────────────── */}
       <div className="px-4 py-4">
-        <div className="mb-3 flex items-center justify-between">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            $ per roster slot
-          </p>
-          <div className="flex items-center gap-1">
+        {/* Column header row */}
+        <div className="mb-2 flex items-center gap-2.5">
+          <span className="w-12 shrink-0" />
+          <span className="flex-1" />
+          <div className="flex shrink-0 items-center gap-1">
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              className="h-7 gap-1 rounded-lg px-2 text-xs text-muted-foreground"
+              className="h-6 gap-1 rounded-lg px-2 text-[10px] text-muted-foreground"
               onClick={() => setSlotAllocations(suggested)}
             >
               <Sparkles className="h-3 w-3" />
@@ -172,12 +172,15 @@ export default function PositionBudgetBar() {
               type="button"
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive"
+              className="h-6 w-6 rounded-lg text-muted-foreground hover:text-destructive"
               onClick={clearSlotAllocations}
               title="Clear edits"
             >
-              <Trash2 className="h-3.5 w-3.5" />
+              <Trash2 className="h-3 w-3" />
             </Button>
+            <span className="w-16 text-center text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              $ / slot
+            </span>
           </div>
         </div>
 
@@ -186,7 +189,6 @@ export default function PositionBudgetBar() {
             const value = allocations[slot.id] ?? 0;
             const barPct = maxAllocation > 0 ? (value / maxAllocation) * 100 : 0;
             const groupData = spentByGroup[slot.group];
-            // Show spent on the first slot of each group only
             const isFirstInGroup = slot.index === 1;
             const groupSpent = groupData?.spent ?? 0;
 
@@ -208,7 +210,6 @@ export default function PositionBudgetBar() {
                     className={cn("h-full rounded-md transition-all", GROUP_BAR[slot.group])}
                     style={{ width: `${barPct}%`, opacity: 0.7 }}
                   />
-                  {/* Spent indicator — only on first slot of group */}
                   {isFirstInGroup && groupSpent > 0 && (
                     <div
                       className="absolute left-0 top-0 h-full rounded-md bg-white/20"
@@ -217,27 +218,36 @@ export default function PositionBudgetBar() {
                   )}
                 </div>
 
-                {/* Dollar input */}
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <span className="text-sm text-muted-foreground">$</span>
-                  <Input
-                    inputMode="numeric"
-                    value={String(value)}
-                    onChange={(e) => {
-                      const n = Number(e.target.value.replace(/[^0-9]/g, ""));
-                      setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
-                    }}
-                    className="h-8 w-16 rounded-lg px-2 text-right font-mono text-sm"
-                    aria-label={`${slot.label} allocation`}
-                  />
-                </div>
-
-                {/* Spent badge on first slot of group */}
-                {isFirstInGroup && groupSpent > 0 && (
-                  <span className="shrink-0 text-[10px] text-muted-foreground">
-                    ${groupSpent} spent
-                  </span>
-                )}
+                {/* Dollar input — editing one slot auto-redistributes the rest */}
+                <Input
+                  inputMode="numeric"
+                  value={String(value)}
+                  onChange={(e) => {
+                    const newVal = Math.max(0, Math.min(settings.totalBudget, Number(e.target.value.replace(/[^0-9]/g, "")) || 0));
+                    const otherSlots = slots.filter((s) => s.id !== slot.id);
+                    const otherTotal = otherSlots.reduce((sum, s) => sum + (allocations[s.id] ?? 0), 0);
+                    const remaining = Math.max(0, settings.totalBudget - newVal);
+                    const next: Record<string, number> = { [slot.id]: newVal };
+                    if (otherTotal === 0) {
+                      const each = Math.floor(remaining / (otherSlots.length || 1));
+                      otherSlots.forEach((s) => { next[s.id] = each; });
+                    } else {
+                      let distributed = 0;
+                      otherSlots.forEach((s, i) => {
+                        if (i === otherSlots.length - 1) {
+                          next[s.id] = Math.max(0, remaining - distributed);
+                        } else {
+                          const share = Math.round(((allocations[s.id] ?? 0) / otherTotal) * remaining);
+                          next[s.id] = Math.max(0, share);
+                          distributed += next[s.id];
+                        }
+                      });
+                    }
+                    setSlotAllocations(next);
+                  }}
+                  className="h-8 w-16 shrink-0 rounded-lg px-2 text-right font-mono text-sm"
+                  aria-label={`${slot.label} allocation`}
+                />
               </div>
             );
           })}
