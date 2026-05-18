@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { AnchorEntry } from "./decision-engine";
 import { useVorpMap } from "./use-vorp-map";
 import { useDraftStore } from "./draft-store";
+import { buildRankCurves, getRankPrice, starterSlotsFor } from "./tier-curves";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -278,6 +279,45 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
         console.info("[useAnchorMap] league→market position scaling", scales);
 
+        // ─── Tier curves ──────────────────────────────────────────────────────
+        // Derived from 3-year league history: sort players within each position
+        // by bid amount per season → the highest-paid player = perceived #1 that year.
+        // Tier size = total starter slots / 3 (three equal tiers).
+        const curves = buildRankCurves(leagueAgg, settings);
+        console.info("[useAnchorMap] rank curves",
+          Object.fromEntries(Object.entries(curves).map(([p, a]) => [p, a.slice(0, 8).map(Math.round)])));
+
+        // Current-season rank within position: sort all players by their blended/
+        // ESPN/Sleeper value descending → rank 1 = best player available this year.
+        // Used to look up which tier a player belongs to for tier-based pricing.
+        const currentRankMap = new Map<string, number>();
+        {
+          const byPos = new Map<string, Array<{ key: string; val: number }>>();
+          const addToRank = (key: string, val: number, pos: string | null) => {
+            if (!pos || val <= 0) return;
+            const arr = byPos.get(pos) ?? [];
+            if (!arr.some((p) => p.key === key)) arr.push({ key, val });
+            byPos.set(pos, arr);
+          };
+          for (const [k, v] of blendedMap) addToRank(k, v.val, v.pos);
+          for (const [k, v] of espnMap)    addToRank(k, v.val, v.pos);
+          for (const [k, v] of sleeperMap) addToRank(k, v.val, v.pos);
+          for (const arr of byPos.values()) {
+            arr.sort((a, b) => b.val - a.val);
+            arr.forEach(({ key }, i) => currentRankMap.set(key, i + 1));
+          }
+        }
+
+        // Helper: tier-anchored price for any player by their current-season rank.
+        // Returns 0 if tier data is unavailable (caller falls back to old logic).
+        const tierAnchor = (k: string, pos: string | null): number => {
+          if (!pos) return 0;
+          const rank = currentRankMap.get(k);
+          if (!rank) return 0;
+          const slots = starterSlotsFor(pos, settings);
+          return slots > 0 ? getRankPrice(curves, pos, rank, slots) : 0;
+        };
+
         // 3.5) LLM tiebreaker — for any player whose note has an ambiguous trigger
         //      word but no clean phrase match, ask Lovable AI to classify. Cached
         //      in localStorage by note hash so we only pay once per unique note.
@@ -330,64 +370,49 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const mv = marketConsensus(k);
           const vv = vorpMap[k];
 
-          // ─── Variance-aware blending ────────────────────────────────────
-          // The OLD behavior used fixed league weights (0.85/0.6/0.4) regardless
-          // of how much league history and current market sources disagreed.
-          // That's why a player like Mahomes whose league bid history was
-          // $60-$63 stayed pinned to ~$62 even when ESPN/Sleeper had moved to
-          // $38 — the static weight ignored the disagreement.
+          // ─── Tier-first pricing ──────────────────────────────────────────
+          // Primary anchor = what your league has historically paid for THIS TIER
+          // (e.g. "QB Tier 1 costs $52"), not what they paid for this specific player.
+          // Player history nudges the tier price (30%) rather than dominating it.
           //
-          // NEW: keep the same base league weight (3+ seasons of YOUR money is
-          // still gospel) but DECAY it proportionally to the gap between your
-          // historical price and the current market consensus. The bigger the
-          // gap, the more we treat the league number as stale.
+          // This fixes the core problem: a player like Jaxson Dart with no league
+          // history gets priced correctly because the tier IS the anchor.
+          // A player like Mahomes, if injury drops him to a Tier-2 rank this year,
+          // automatically prices closer to the Tier-2 curve.
           //
-          // Examples (3-season player, base league weight 0.85):
-          //   league $62, market $60 → disagreement 0.03 → weight 0.85 (no change)
-          //   league $62, market $50 → disagreement 0.19 → weight 0.76
-          //   league $62, market $38 → disagreement 0.39 → weight 0.65
-          //   league $62, market $20 → disagreement 0.68 → weight 0.50 (floor)
-          // We cap the decay so league can never drop below 0.50 — your
-          // multi-year league data is still the strongest signal we have.
-          let final = leaguePrice;
+          // When no tier data is available (thin history at the position), we fall
+          // back to the previous variance-aware blending — same behavior as before.
           const seasonsCount = v.bySeason.size;
-          const baseLeagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
+          const tierPrice = tierAnchor(k, v.pos ?? mv?.pos ?? null);
 
-          // Disagreement scalar in [0, 1]: how far apart are league and market?
-          // 0 = perfect agreement, 1 = one is double the other.
-          let disagreement = 0;
-          if (mv && mv.val > 0 && leaguePrice > 0) {
-            const hi = Math.max(mv.val, leaguePrice);
-            const lo = Math.min(mv.val, leaguePrice);
-            disagreement = Math.min(1, (hi - lo) / hi);
-          }
-          // Decay coefficient — how much the disagreement is allowed to chip
-          // away at the league weight. 0.6 means a 50% disagreement reduces
-          // league weight by 30 percentage points. Clamped so league weight
-          // never falls below 0.5 (your league data still wins ties).
-          const DECAY = 0.6;
-          const FLOOR = seasonsCount >= 3 ? 0.5 : seasonsCount === 2 ? 0.4 : 0.3;
-          const adjustedLeagueWeight = Math.max(
-            FLOOR,
-            baseLeagueWeight * (1 - disagreement * DECAY),
-          );
-
-          if (vv && vv.price > 0) {
-            // Blend league w/ VORP using the variance-adjusted weight
-            final = leaguePrice * adjustedLeagueWeight + vv.price * (1 - adjustedLeagueWeight);
-          }
-          if (mv && mv.val > 0) {
-            const ratio = mv.val / Math.max(1, final);
-            // Existing market-disagreement nudge — kept as a SECOND pass on top
-            // of the variance-aware blend above. With 3+ seasons, market can
-            // only push UP (catches breakouts). With <3 seasons, market can
-            // also push down (younger players, less data).
-            if (seasonsCount >= 3) {
-              if (ratio >= 1.5) final = final * 0.7 + mv.val * 0.3;
-              // ratio <= 0.5 path intentionally removed for veteran data
-            } else {
-              if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
-              else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
+          let final: number;
+          if (tierPrice > 0) {
+            // Tier-first: 70% what the tier costs + 30% your league's history with this player
+            final = 0.70 * tierPrice + 0.30 * leaguePrice;
+          } else {
+            // Fallback: variance-aware blending (original behavior)
+            const baseLeagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
+            let disagreement = 0;
+            if (mv && mv.val > 0 && leaguePrice > 0) {
+              const hi = Math.max(mv.val, leaguePrice);
+              const lo = Math.min(mv.val, leaguePrice);
+              disagreement = Math.min(1, (hi - lo) / hi);
+            }
+            const DECAY = 0.6;
+            const FLOOR = seasonsCount >= 3 ? 0.5 : seasonsCount === 2 ? 0.4 : 0.3;
+            const adjustedLeagueWeight = Math.max(FLOOR, baseLeagueWeight * (1 - disagreement * DECAY));
+            final = leaguePrice;
+            if (vv && vv.price > 0) {
+              final = leaguePrice * adjustedLeagueWeight + vv.price * (1 - adjustedLeagueWeight);
+            }
+            if (mv && mv.val > 0) {
+              const ratio = mv.val / Math.max(1, final);
+              if (seasonsCount >= 3) {
+                if (ratio >= 1.5) final = final * 0.7 + mv.val * 0.3;
+              } else {
+                if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
+                else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
+              }
             }
           }
           // Market-crash override: if BOTH ESPN and Sleeper have dropped this player
@@ -426,36 +451,47 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           };
         }
 
-        // 5) VORP — #2 priority for any projected player without league history.
+        // 5) Players with projections but no league history.
+        //    Tier price (if available) → VORP fallback.
         for (const [k, v] of Object.entries(vorpMap)) {
           if (out[k]) continue;
+          const pos = espnMap.get(k)?.pos ?? sleeperMap.get(k)?.pos ?? null;
+          const tp = tierAnchor(k, pos);
+          const basePrice = tp > 0 ? tp : v.price;
           const inj = combinedFactor(k, llmMap.get(k));
-          const finalPrice = Math.max(1, Math.round(v.price * inj.factor));
+          const finalPrice = Math.max(1, Math.round(basePrice * inj.factor));
           out[k] = {
             price: finalPrice,
             source: "espn",
-            marketPrice: v.price,
+            marketPrice: Math.max(1, Math.round(basePrice)),
             marketSources: {
               espn: espnMap.get(k)?.val,
               sleeper: sleeperMap.get(k)?.val,
               berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
-              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: v.price }
+              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: Math.round(basePrice) }
               : undefined,
           };
         }
 
-        // 6) Market consensus — last fallback for non-projected players (K, DST, etc.)
+        // 6) Market consensus — last fallback (K, DST, players with only market data).
+        //    Tier price (if available) → position-scaled market fallback.
         const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys(), ...berryMap.keys(), ...blendedMap.keys()]);
         for (const k of allMarketKeys) {
           if (out[k]) continue;
           const mv = marketConsensus(k);
           if (!mv) continue;
-          const rawScale = (mv.pos && scales[mv.pos]) || 1;
-          const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
-          const effScale = 1 + (rawScale - 1) * fade;
-          const adj = Math.max(1, Math.round(mv.val * effScale));
+          const tp = tierAnchor(k, mv.pos);
+          let adj: number;
+          if (tp > 0) {
+            adj = Math.max(1, Math.round(tp));
+          } else {
+            const rawScale = (mv.pos && scales[mv.pos]) || 1;
+            const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
+            const effScale = 1 + (rawScale - 1) * fade;
+            adj = Math.max(1, Math.round(mv.val * effScale));
+          }
           const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(adj * inj.factor));
           out[k] = {

@@ -11,8 +11,6 @@ import NotFound from "./pages/NotFound.tsx";
 import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
-import LogoPicker from "./pages/LogoPicker.tsx";
-import Zine from "./pages/Zine.tsx";
 import TeamPicker from "./pages/TeamPicker.tsx";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
@@ -56,28 +54,19 @@ const App = () => (
             <Routes>
               <Route path="/" element={<PublicGate><Index /></PublicGate>} />
               <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
-              <Route path="/team" element={<PublicGate><TeamPicker /></PublicGate>} />
+              <Route path="/team" element={<TeamPicker />} />
               <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
-              <Route path="/draft-room" element={<Protected><DraftRoom /></Protected>} />
+              <Route path="/draft-room" element={<PublicGate><DraftRoom /></PublicGate>} />
               <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
               <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
               <Route path="/admin" element={<Protected allowWhenLocked><Admin /></Protected>} />
 
-              {/* Legacy redirects → research view */}
+              {/* Legacy redirects */}
               <Route path="/draft" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/draft-v2" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/draft-os" element={<Navigate to="/draft-room" replace />} />
               <Route path="/dashboard" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/planner" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/studio" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/card-preview" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/m" element={<Navigate to="/draft-room" replace />} />
-              <Route path="/mobile" element={<Navigate to="/draft-room" replace />} />
               <Route path="/claim" element={<Navigate to="/draft-room" replace />} />
               <Route path="/claim-team" element={<Navigate to="/team" replace />} />
 
-              <Route path="/logos" element={<LogoPicker />} />
-              <Route path="/zine" element={<Zine />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </LockProvider>
