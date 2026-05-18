@@ -171,12 +171,16 @@ export default function PositionBudgetBar() {
             <Button
               type="button"
               variant="ghost"
-              size="icon"
-              className="h-6 w-6 rounded-lg text-muted-foreground hover:text-destructive"
-              onClick={clearSlotAllocations}
-              title="Clear edits"
+              size="sm"
+              className="h-6 gap-1 rounded-lg px-2 text-[10px] text-muted-foreground hover:text-destructive"
+              onClick={() => {
+                const zeroed: Record<string, number> = {};
+                for (const slot of slots) zeroed[slot.id] = 0;
+                setSlotAllocations(zeroed);
+              }}
             >
               <Trash2 className="h-3 w-3" />
+              Clear
             </Button>
             <span className="w-16 text-center text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
               $ / slot
