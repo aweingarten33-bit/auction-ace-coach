@@ -240,12 +240,15 @@ export default function DraftRoom() {
         {/* Top 50 side tab */}
         <button
           onClick={() => setPanel("top50")}
-          className="fixed right-0 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-l-xl border border-r-0 border-border bg-card px-1.5 py-4 shadow-lg hover:bg-secondary/60 active:scale-95 transition"
+          className="fixed right-0 z-30 flex flex-col items-center justify-center gap-1.5 rounded-l-2xl border border-r-0 border-primary/40 bg-primary px-2 py-5 shadow-xl active:scale-95 transition"
           aria-label="Top 50 Players"
-          style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
+          style={{ top: "120px" }}
         >
-          <Trophy className="h-4 w-4 text-primary mb-1" style={{ writingMode: "horizontal-tb" }} />
-          <span className="text-[11px] font-bold tracking-widest uppercase text-primary" style={{ writingMode: "vertical-rl", letterSpacing: "0.12em" }}>
+          <Trophy className="h-5 w-5 text-primary-foreground" />
+          <span
+            className="text-[11px] font-extrabold uppercase tracking-widest text-primary-foreground"
+            style={{ writingMode: "vertical-rl", letterSpacing: "0.15em" }}
+          >
             Top 50
           </span>
         </button>
