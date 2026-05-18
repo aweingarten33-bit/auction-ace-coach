@@ -55,7 +55,7 @@ export default function LandingEditorial() {
         muted
         playsInline
         poster=""
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-40"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-90"
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
@@ -63,8 +63,8 @@ export default function LandingEditorial() {
         className={
           "pointer-events-none fixed inset-0 z-0 " +
           (isDark
-            ? "bg-gradient-to-b from-neutral-950/70 via-neutral-950/50 to-neutral-950"
-            : "bg-gradient-to-b from-neutral-50/70 via-neutral-50/60 to-neutral-50")
+            ? "bg-gradient-to-b from-neutral-950/40 via-neutral-950/20 to-neutral-950/70"
+            : "bg-gradient-to-b from-white/20 via-white/10 to-white/40")
         }
       />
 
