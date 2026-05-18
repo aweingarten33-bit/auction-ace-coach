@@ -55,7 +55,7 @@ export default function LandingEditorial() {
         muted
         playsInline
         poster=""
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-90"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-90 scale-75"
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
