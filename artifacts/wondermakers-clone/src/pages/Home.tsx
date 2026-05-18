@@ -137,35 +137,16 @@ export default function Home() {
 
           <main className="relative z-10">
             {/* HERO */}
-            <section className="h-screen w-full flex flex-col justify-between px-6 pb-12 pt-32">
-              <div className="flex-1 flex flex-col items-center justify-center pointer-events-none">
-                <motion.h1 
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="text-[40px] md:text-[80px] lg:text-[100px] leading-[1.1] font-bold text-center tracking-tighter mix-blend-difference text-white dark:text-white"
-                >
-                  High-end design.<br />Crafted code.
-                </motion.h1>
-              </div>
-
-              <motion.div 
+            <section className="h-screen w-full flex flex-col justify-end items-center px-6 pb-12 pt-32">
+              <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1, delay: 0.6 }}
-                className="flex flex-col items-center gap-8 max-w-2xl mx-auto text-center mix-blend-difference text-white dark:text-white"
+                onClick={scrollToAbout}
+                className="w-14 h-14 rounded-full bg-accent flex items-center justify-center text-accent-foreground hover:scale-110 transition-transform"
               >
-                <p className="text-sm md:text-lg font-medium opacity-80 max-w-lg">
-                  We are a digital product studio for teams who see design and engineering as their competitive advantage. From flagship websites to scalable applications, we build products where world-class aesthetics meet robust infrastructure.
-                </p>
-                <button 
-                  onClick={scrollToAbout}
-                  className="w-14 h-14 rounded-full bg-accent flex items-center justify-center text-accent-foreground hover:scale-110 transition-transform mix-blend-normal"
-                >
-                  <ArrowDown className="w-6 h-6" />
-                </button>
-              </motion.div>
-              
+                <ArrowDown className="w-6 h-6" />
+              </motion.button>
             </section>
 
             <div className="bg-background relative">
