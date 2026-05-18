@@ -78,6 +78,7 @@ export default function DraftRoom() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
+  const [top50InfoOpen, setTop50InfoOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
 
@@ -394,9 +395,23 @@ export default function DraftRoom() {
               )}
               {panel === "top50" && (
                 <>
-                  <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
-                    What players actually went for in your last 3 drafts — not ESPN's generic rankings. Use these as your anchor when bidding.
+                  <p className="mb-2 text-sm leading-relaxed text-foreground/80">
+                    Players ranked by what they're actually worth <em>in your league</em> — based on 3 years of draft history, adjusted live as the draft moves.
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => setTop50InfoOpen((v) => !v)}
+                    className="mb-3 text-xs font-semibold text-primary underline-offset-2 hover:underline"
+                  >
+                    {top50InfoOpen ? "Hide" : "How this is calculated →"}
+                  </button>
+                  {top50InfoOpen && (
+                    <div className="mb-4 space-y-1.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
+                      <p>• <span className="font-semibold text-foreground">3 years of your league's real auction prices</span>, weighted toward recent drafts</p>
+                      <p>• Adjusted for <span className="font-semibold text-foreground">positional scarcity</span> — how many good players exist vs. how many starting spots need to be filled across the room</p>
+                      <p>• Prices <span className="font-semibold text-foreground">shift live</span> as players come off the board during the draft</p>
+                    </div>
+                  )}
                   <Top100List
                     prices={adjustedPrices}
                     anchorMap={anchorMap}

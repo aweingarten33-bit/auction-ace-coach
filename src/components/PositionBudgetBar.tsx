@@ -229,29 +229,6 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
         </div>
       </div>
 
-      {/* ── Footer totals ─────────────────────────────── */}
-      <div className="border-t border-border/50 px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-muted-foreground">Total planned</p>
-            <p className="font-mono text-2xl font-bold">${plannedTotal}</p>
-          </div>
-          <div className={cn(
-            "rounded-xl border px-4 py-2 text-sm font-bold",
-            delta === 0
-              ? "border-success/40 bg-success/10 text-success"
-              : delta > 0
-                ? "border-destructive/40 bg-destructive/10 text-destructive"
-                : "border-warning/40 bg-warning/10 text-warning",
-          )}>
-            {delta === 0
-              ? "✓ On budget"
-              : delta > 0
-                ? `$${delta} over`
-                : `$${Math.abs(delta)} unspent`}
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
