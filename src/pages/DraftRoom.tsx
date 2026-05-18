@@ -53,6 +53,7 @@ import BestAvailableBoard from "@/components/BestAvailableBoard";
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 type PanelId = "search" | "top50" | "recent";
+type TabId = "plan" | "values";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -75,6 +76,7 @@ export default function DraftRoom() {
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [tab, setTab] = useState<TabId>("plan");
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
@@ -237,50 +239,82 @@ export default function DraftRoom() {
         <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
-      {/* ── MAIN SCROLL AREA ────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
-        <div className="space-y-4">
-
-          {/* Slim budget bar */}
-          {budget.totalBudget > 0 && (
-            <div className="rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-sm font-semibold">${budget.remaining} left</span>
-                <span className="text-xs text-muted-foreground">${Math.max(0, budget.totalBudget - budget.remaining)} of ${budget.totalBudget} spent</span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
-                <div
-                  className="h-full bg-primary transition-all"
-                  style={{ width: `${budget.totalBudget > 0 ? Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / budget.totalBudget) * 100)) : 0}%` }}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Strategy + per-slot budget allocations */}
-          <PositionBudgetBar />
-
-          {/* Next target recommendation */}
-          {selectedTeam && (
-            <NextTargetCard
-              settings={settings}
-              gaps={gaps}
-              spend={spend}
-              remaining={budget.remaining}
-              prices={adjustedPrices}
-              events={events}
-              pulse={pulse}
-            />
-          )}
-
-          {/* Last pick impact */}
-          {events.length > 0 && (
-            <LastPickImpact settings={settings} keepers={keepers} events={events} />
-          )}
-
-
-</div>
+      {/* ── TAB TOGGLE ──────────────────────────────────────── */}
+      <div className="flex shrink-0 gap-1 border-b border-border/60 bg-background px-3 py-2">
+        <button
+          onClick={() => setTab("plan")}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${tab === "plan" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          Plan
+        </button>
+        <button
+          onClick={() => setTab("values")}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${tab === "values" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          {leagueName ? `${leagueName}'s Top 50` : "Top 50"}
+        </button>
       </div>
+
+      {/* ── PLAN TAB ────────────────────────────────────────── */}
+      {tab === "plan" && (
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
+          <div className="space-y-4">
+
+            {/* Slim budget bar */}
+            {budget.totalBudget > 0 && (
+              <div className="rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-sm font-semibold">${budget.remaining} left</span>
+                  <span className="text-xs text-muted-foreground">${Math.max(0, budget.totalBudget - budget.remaining)} of ${budget.totalBudget} spent</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
+                  <div
+                    className="h-full bg-primary transition-all"
+                    style={{ width: `${budget.totalBudget > 0 ? Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / budget.totalBudget) * 100)) : 0}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <PositionBudgetBar />
+
+            {selectedTeam && (
+              <NextTargetCard
+                settings={settings}
+                gaps={gaps}
+                spend={spend}
+                remaining={budget.remaining}
+                prices={adjustedPrices}
+                events={events}
+                pulse={pulse}
+              />
+            )}
+
+            {events.length > 0 && (
+              <LastPickImpact settings={settings} keepers={keepers} events={events} />
+            )}
+
+          </div>
+        </div>
+      )}
+
+      {/* ── VALUES TAB ──────────────────────────────────────── */}
+      {tab === "values" && (
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
+          <div className="mb-4 rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
+            <p className="text-sm font-semibold text-foreground">Your league's player values</p>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              These prices are what players actually went for in your last 3 drafts — not ESPN's generic rankings. Use these as your anchor when bidding.
+            </p>
+          </div>
+          <Top100List
+            prices={adjustedPrices}
+            anchorMap={anchorMap}
+            events={events}
+            onPick={openDetails}
+          />
+        </div>
+      )}
 
       {/* ── BOTTOM BAR ──────────────────────────────────────── */}
       <div
