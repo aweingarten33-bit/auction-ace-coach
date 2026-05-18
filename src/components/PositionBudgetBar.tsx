@@ -229,6 +229,24 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
         </div>
       </div>
 
+      {/* ── Delta pill ────────────────────────────────── */}
+      <div className="flex justify-end border-t border-border/50 px-4 py-2">
+        <span className={cn(
+          "rounded-full border px-3 py-1 text-xs font-semibold",
+          delta === 0
+            ? "border-success/40 bg-success/10 text-success"
+            : delta > 0
+              ? "border-destructive/40 bg-destructive/10 text-destructive"
+              : "border-warning/40 bg-warning/10 text-warning",
+        )}>
+          {delta === 0
+            ? "✓ On budget"
+            : delta > 0
+              ? `$${delta} over budget`
+              : `$${Math.abs(delta)} unspent`}
+        </span>
+      </div>
+
     </div>
   );
 }
