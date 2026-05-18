@@ -12,12 +12,8 @@ export default function Preloader({ onDone }: Props) {
       setExiting(true);
       setTimeout(onDone, 820);
     };
-    const minHold = setTimeout(() => {
-      document.fonts.ready.then(dismiss);
-    }, 700);
-    const hardTimeout = setTimeout(dismiss, 3000);
+    const hardTimeout = setTimeout(dismiss, 5000);
     return () => {
-      clearTimeout(minHold);
       clearTimeout(hardTimeout);
     };
   }, [onDone]);
