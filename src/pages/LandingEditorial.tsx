@@ -30,17 +30,52 @@ export default function LandingEditorial() {
   const headlineY = progress * -40;
   const headlineOpacity = 1 - progress * 0.6;
 
+  // Football SVG mark (replaces Sparkle)
+  const Football = ({ className = "", strokeWidth = 1.5 }: { className?: string; strokeWidth?: number }) => (
+    <svg viewBox="0 0 64 64" className={className} fill="currentColor" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+      <ellipse cx="32" cy="32" rx="28" ry="16" transform="rotate(-30 32 32)" fill="currentColor" fillOpacity="0.9" />
+      <g stroke="#fff" strokeWidth={1.5} fill="none">
+        <line x1="20" y1="40" x2="44" y2="24" />
+        <line x1="26" y1="34" x2="30" y2="32" />
+        <line x1="30" y1="32" x2="34" y2="34" />
+        <line x1="34" y1="30" x2="38" y2="32" />
+        <line x1="22" y1="38" x2="26" y2="40" />
+      </g>
+    </svg>
+  );
+
   return (
     <div
       className={
-        "min-h-screen w-full transition-colors duration-500 " +
+        "relative min-h-screen w-full overflow-hidden transition-colors duration-500 " +
         (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
       }
     >
+      {/* Background video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        poster=""
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-40"
+      >
+        <source src="/hero-football.mp4" type="video/mp4" />
+      </video>
+      <div
+        className={
+          "pointer-events-none fixed inset-0 z-0 " +
+          (isDark
+            ? "bg-gradient-to-b from-neutral-950/70 via-neutral-950/50 to-neutral-950"
+            : "bg-gradient-to-b from-neutral-50/70 via-neutral-50/60 to-neutral-50")
+        }
+      />
+
+      <div className="relative z-10">
       {/* Header */}
       <header className="flex items-center justify-between px-5 pt-5 md:px-8 md:pt-7">
         <Link to="/" aria-label="Home" className="flex items-center">
-          <Sparkle className="h-7 w-7" strokeWidth={1.5} fill="currentColor" />
+          <Football className="h-8 w-8" />
         </Link>
 
         {/* Theme toggle pill */}
