@@ -7,7 +7,10 @@ export default function LandingEditorial() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const isDark = theme === "dark";
   const [scrollY, setScrollY] = useState(0);
+  const [videoStarted, setVideoStarted] = useState(false);
+  const [colorized, setColorized] = useState(false);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -20,6 +23,23 @@ export default function LandingEditorial() {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
     };
+  }, []);
+
+  // Polaroid sequence: hold B&W still for ~1.6s, then "develop" into color and play.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    // Pause on first frame initially
+    v.pause();
+    try { v.currentTime = 0; } catch {}
+
+    const developTimer = setTimeout(() => {
+      setColorized(true);
+      v.play().catch(() => {});
+      setVideoStarted(true);
+    }, 1600);
+
+    return () => clearTimeout(developTimer);
   }, []);
 
   // Scroll-linked transforms for the ghost mark
