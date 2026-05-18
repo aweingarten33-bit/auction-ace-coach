@@ -3,8 +3,7 @@
 // Everything else is one tap away.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCube, Pagination, Navigation } from "swiper/modules";
-import "swiper/css/navigation";
+import { EffectCube, Pagination } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/effect-cube";
@@ -259,12 +258,11 @@ export default function DraftRoom() {
       {/* ── CUBE SWIPER ─────────────────────────────────────── */}
       <div className="min-h-0 flex-1" style={{ perspective: "1200px" }}>
         <Swiper
-          modules={[EffectCube, Pagination, Navigation]}
+          modules={[EffectCube, Pagination]}
           effect="cube"
           cubeEffect={{ slideShadows: false }}
           loop={false}
           pagination={{ clickable: true }}
-          navigation
           onSwiper={(swiper) => { (window as any).__draftSwiper = swiper; }}
           onSlideChange={(swiper) => setSwiperIndex(swiper.activeIndex)}
           className="h-full w-full"
