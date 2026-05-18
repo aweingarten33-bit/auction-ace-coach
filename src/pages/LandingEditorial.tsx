@@ -57,7 +57,7 @@ export default function LandingEditorial() {
         poster=""
         className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-40"
       >
-        <source src="/hero-football.mp4" type="video/mp4" />
+        <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
       <div
         className={
