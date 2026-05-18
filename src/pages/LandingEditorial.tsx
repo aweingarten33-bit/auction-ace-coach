@@ -48,7 +48,7 @@ export default function LandingEditorial() {
         (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
       }
     >
-      {/* Background video — blurred cover behind, full contain on top */}
+      {/* Background video — blurred backdrop + centered video with Ken Burns + edge melt + grain */}
       <video
         autoPlay
         loop
@@ -63,11 +63,19 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-95"
-        style={{ filter: "brightness(1.15) contrast(0.95) saturate(1.1) blur(0.5px)" }}
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain opacity-95 animate-kenburns"
+        style={{
+          filter: "brightness(1.15) contrast(0.95) saturate(1.1) blur(0.5px)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 70% 70% at center, black 55%, transparent 95%)",
+          maskImage:
+            "radial-gradient(ellipse 70% 70% at center, black 55%, transparent 95%)",
+        }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
+
+      {/* Vignette + warm halo */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
@@ -75,13 +83,25 @@ export default function LandingEditorial() {
             "radial-gradient(ellipse at center, rgba(255,235,200,0.15) 0%, transparent 45%, rgba(0,0,0,0.55) 100%)",
         }}
       />
+
+      {/* Edge melt — fades video into page background on all sides */}
       <div
         className={
           "pointer-events-none fixed inset-0 z-0 " +
           (isDark
-            ? "bg-gradient-to-b from-neutral-950/30 via-transparent to-neutral-950/60"
-            : "bg-gradient-to-b from-white/20 via-transparent to-white/40")
+            ? "[background:linear-gradient(to_bottom,hsl(0_0%_4%)_0%,transparent_18%,transparent_82%,hsl(0_0%_4%)_100%),linear-gradient(to_right,hsl(0_0%_4%)_0%,transparent_15%,transparent_85%,hsl(0_0%_4%)_100%)]"
+            : "[background:linear-gradient(to_bottom,hsl(40_30%_98%)_0%,transparent_18%,transparent_82%,hsl(40_30%_98%)_100%),linear-gradient(to_right,hsl(40_30%_98%)_0%,transparent_15%,transparent_85%,hsl(40_30%_98%)_100%)]")
         }
+      />
+
+      {/* Film grain */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.12] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          backgroundSize: "200px 200px",
+        }}
       />
 
       <div className="relative z-10">
