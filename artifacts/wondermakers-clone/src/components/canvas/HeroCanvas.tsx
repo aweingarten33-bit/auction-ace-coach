@@ -16,7 +16,7 @@ export default function HeroCanvas() {
           transform: "translate(-50%, -50%) scale(1.2)",
           objectFit: "cover",
           filter: "blur(40px) saturate(1.1)",
-          opacity: 0.45,
+          opacity: 0.25,
         }}
       >
         <source src="/edge-video.mp4" type="video/mp4" />
@@ -34,7 +34,7 @@ export default function HeroCanvas() {
           height: "100%",
           transform: "translate(-50%, -50%)",
           objectFit: "contain",
-          opacity: 0.55,
+          opacity: 0.35,
         }}
       >
         <source src="/edge-video.mp4" type="video/mp4" />
