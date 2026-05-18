@@ -47,6 +47,7 @@ import {
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
+import { getStrategy, buildCoachGuidance } from "@/lib/strategies";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 import BestAvailableBoard from "@/components/BestAvailableBoard";
@@ -73,6 +74,7 @@ export default function DraftRoom() {
     watchlist,
     pinPlayer,
     unpinPlayer,
+    strategyId,
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -348,6 +350,11 @@ export default function DraftRoom() {
                   recentRuns: runs,
                   draftedPlayers: events.map((e) => e.player),
                   showMath: false,
+                  strategy: strategyId ? {
+                    id: strategyId,
+                    label: getStrategy(strategyId).label,
+                    guidance: buildCoachGuidance(strategyId),
+                  } : undefined,
                 })}
               />
             </SheetContent>
@@ -396,20 +403,23 @@ export default function DraftRoom() {
               {panel === "top50" && (
                 <>
                   <p className="mb-2 text-sm leading-relaxed text-foreground/80">
-                    Players ranked by what they're actually worth <em>in your league</em> — based on 3 years of draft history, adjusted live as the draft moves.
+                    Players ranked by what they're actually worth in your league — based primarily on the previous 3 seasons of draft history combined with some pretty intense math, adjusted live as the draft moves.
                   </p>
                   <button
                     type="button"
                     onClick={() => setTop50InfoOpen((v) => !v)}
                     className="mb-3 text-xs font-semibold text-primary underline-offset-2 hover:underline"
                   >
-                    {top50InfoOpen ? "Hide" : "How this is calculated →"}
+                    {top50InfoOpen ? "Hide" : "What math? →"}
                   </button>
                   {top50InfoOpen && (
-                    <div className="mb-4 space-y-1.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
-                      <p>• <span className="font-semibold text-foreground">3 years of your league's real auction prices</span>, weighted toward recent drafts</p>
-                      <p>• Adjusted for <span className="font-semibold text-foreground">positional scarcity</span> — how many good players exist vs. how many starting spots need to be filled across the room</p>
-                      <p>• Prices <span className="font-semibold text-foreground">shift live</span> as players come off the board during the draft</p>
+                    <div className="mb-4 space-y-2.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
+                      <p className="font-semibold text-foreground">What type of mathematics was applied:</p>
+                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 custom algorithms were created, each serving a specific role in how players get priced.</p>
+                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring.</p>
+                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — the trust/blending concept was utilized to determine how much confidence to place in each data source.</p>
+                      <p>• <span className="font-semibold text-foreground">VORP (Value Over Replacement Player)</span> — VORP adjusted to our league using the previous 3 auction drafts.</p>
+                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same concept hedge funds use in financial pricing systems, applied here through data science and quantitative analytics models.</p>
                     </div>
                   )}
                   <Top100List
