@@ -27,6 +27,7 @@ import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  adjustPricesForDrafted,
   computeBudget,
   countByPosition,
   spendByPosition,
@@ -160,6 +161,9 @@ export default function DraftRoom() {
   const spend = useMemo(() => spendByPosition(events), [events]);
   const runs = useMemo(() => recentRuns(events, 6), [events]);
   const pulse = useMemo(() => computeMarketPulse(events, prices), [events, prices]);
+  // Re-price undrafted players in real time: as players come off the board,
+  // remaining players at the same position move up in rank and their values adjust.
+  const adjustedPrices = useMemo(() => adjustPricesForDrafted(prices, events), [prices, events]);
 
   const requiredCount = {
     QB: settings.roster.QB + (settings.leagueType !== "Standard" ? settings.roster.SUPERFLEX : 0),
@@ -306,7 +310,7 @@ export default function DraftRoom() {
               gaps={gaps}
               spend={spend}
               remaining={budget.remaining}
-              prices={prices}
+              prices={adjustedPrices}
               events={events}
               pulse={pulse}
             />
@@ -426,7 +430,7 @@ export default function DraftRoom() {
                 rosterRequired: requiredCount,
                 rosterFilled: myCount,
                 events,
-                prices,
+                prices: adjustedPrices,
                 spendByPosition: spend,
                 recentRuns: runs,
                 draftedPlayers: events.map((e) => e.player),
@@ -483,7 +487,7 @@ export default function DraftRoom() {
             <div className="px-3 pb-24">
               {toolPage === "lookup" && (
                 <LookupSection
-                  prices={prices}
+                  prices={adjustedPrices}
                   anchorMap={anchorMap}
                   events={events}
                   onPick={openDetails}
@@ -491,7 +495,7 @@ export default function DraftRoom() {
               )}
               {toolPage === "top100" && (
                 <Top100List
-                  prices={prices}
+                  prices={adjustedPrices}
                   anchorMap={anchorMap}
                   events={events}
                   onPick={openDetails}
@@ -501,7 +505,7 @@ export default function DraftRoom() {
                 <div className="space-y-3">
                   <MarketHeat
                     events={events}
-                    prices={prices}
+                    prices={adjustedPrices}
                     gaps={gaps}
                     maxBid={budget.maxBid}
                     remaining={budget.remaining}

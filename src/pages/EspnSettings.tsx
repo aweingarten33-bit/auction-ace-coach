@@ -176,6 +176,39 @@ export default function EspnSettings() {
 
   const webhookUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/draft-webhook`;
 
+  const bookmarkletHref = (() => {
+    if (!token || !webhookUrl) return "#";
+    // Self-contained script: hooks ESPN fetch/XHR + DOM for live picks/bids,
+    // posts directly to draft-webhook with this user's token. No extension needed.
+    const code = `(function(){
+if(window.__ac_bm)return;window.__ac_bm=true;
+var WH=${JSON.stringify(webhookUrl)},TK=${JSON.stringify(token)};
+var POS={1:'QB',2:'RB',3:'WR',4:'TE',5:'K',16:'DST'},C={};
+function post(ev){fetch(WH,{method:'POST',headers:{'Content-Type':'application/json','X-Extension-Token':TK},body:JSON.stringify(ev)}).catch(function(){});}
+function rp(p){if(p&&p.id&&p.fullName)C[p.id]={name:p.fullName,pos:POS[p.defaultPositionId]||null,team:p.proTeamAbbreviation||null};}
+function parse(d){
+  if(Array.isArray(d&&d.players))d.players.forEach(function(pp){rp(pp.player);});
+  if(Array.isArray(d&&d.teams))d.teams.forEach(function(t){(t.roster&&t.roster.entries||[]).forEach(function(e){rp(e.playerPoolEntry&&e.playerPoolEntry.player);});});
+  var pk=d&&d.draftDetail&&d.draftDetail.picks;
+  if(!Array.isArray(pk))return;
+  pk.forEach(function(p){if(p.__s)return;p.__s=true;var pl=C[p.playerId]||{};post({event_type:'won',player_name:pl.name,player_position:pl.pos,player_team:pl.team,espn_player_id:p.playerId,price:p.bidAmount,drafter_team_id:p.teamId,occurred_at:new Date().toISOString()});});
+}
+var _f=window.fetch;
+window.fetch=function(){var a=arguments;return _f.apply(this,a).then(function(r){try{var u=typeof a[0]==='string'?a[0]:(a[0]&&a[0].url||'');if(u.indexOf('/apis/v3/games/ffl/')>-1||u.indexOf('/draftRecap')>-1)r.clone().json().then(parse).catch(function(){});}catch(e){}return r;});};
+var _o=XMLHttpRequest.prototype.open,_s=XMLHttpRequest.prototype.send;
+XMLHttpRequest.prototype.open=function(m,u){this.__u=u;return _o.apply(this,arguments);};
+XMLHttpRequest.prototype.send=function(){var self=this;this.addEventListener('load',function(){try{var u=self.__u||'';if(u.indexOf('/apis/v3/games/ffl/')<0&&u.indexOf('/draftRecap')<0)return;parse(JSON.parse(self.responseText));}catch(e){}});return _s.apply(this,arguments);};
+var lb={p:null,pr:null};new MutationObserver(function(){try{
+  var n=document.querySelector("[class*='nominee'] [class*='playerName'],[class*='Nominee'] [class*='playerName']");
+  var b=document.querySelector("[class*='currentBid'],[class*='CurrentBid']");
+  if(!n||!b)return;var pl=(n.textContent||'').trim(),m=(b.textContent||'').match(/\\$?(\\d+)/),pr=m?Number(m[1]):null;
+  if(!pl||pr==null||pl===lb.p&&pr===lb.pr)return;var isN=pl!==lb.p;lb={p:pl,pr:pr};
+  post({event_type:isN?'nomination':'bid',player_name:pl,price:pr,occurred_at:new Date().toISOString()});
+}catch(e){}}).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+alert('✓ Auction Coach live sync active!');})();`;
+    return `javascript:${encodeURIComponent(code)}`;
+  })();
+
   const joinLeague = async () => {
     if (!user) return toast.error("Please sign in first");
     const id = Number(joinLeagueId);
@@ -343,33 +376,62 @@ export default function EspnSettings() {
       <Card className="p-5">
         <div className="mb-3 flex items-center gap-2">
           <Badge variant="outline" className="border-warning/40 bg-warning/10 text-warning">Path B</Badge>
-          <h2 className="font-semibold">Live draft sync via Chrome extension</h2>
+          <h2 className="font-semibold">Live draft sync — bookmarklet (easiest)</h2>
         </div>
-        <ol className="mb-4 list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
-          <li>Download the extension below</li>
-          <li>Unzip → open <code className="rounded bg-secondary px-1">chrome://extensions</code> → enable Developer mode → "Load unpacked"</li>
-          <li>Open the extension popup, paste your token below</li>
-          <li>Open your ESPN draft room — picks and live bids stream into this app automatically</li>
-        </ol>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Drag the button below to your Chrome bookmarks bar. On draft day, open your ESPN draft room and click it once — picks, bids, and nominations stream to everyone's screen automatically. No extension install, no developer mode.
+        </p>
 
-        <div className="space-y-3">
-          <div>
-            <Label className="text-xs">Your extension token (keep secret)</Label>
-            <div className="flex gap-2">
-              <Input readOnly value={token} className="font-mono text-[10px]" />
-              <Button size="sm" variant="outline" onClick={copyToken}>
-                <Copy className="h-3.5 w-3.5" />
+        <div className="mb-4 flex items-start gap-4">
+          {token ? (
+            <a
+              href={bookmarkletHref}
+              className="inline-flex shrink-0 cursor-grab items-center gap-1.5 rounded-lg border-2 border-dashed border-primary/50 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/20 active:cursor-grabbing"
+              onClick={(e) => e.preventDefault()}
+              title="Drag this to your bookmarks bar"
+            >
+              ⚡ Auction Coach Live Sync
+            </a>
+          ) : (
+            <span className="text-xs text-muted-foreground">Loading token…</span>
+          )}
+          <div className="text-[11px] text-muted-foreground leading-relaxed">
+            <p className="font-medium text-foreground mb-0.5">How to use:</p>
+            <ol className="list-decimal pl-4 space-y-0.5">
+              <li>Drag the button to your Chrome bookmarks bar</li>
+              <li>Open your ESPN draft room</li>
+              <li>Click the bookmark — done</li>
+            </ol>
+          </div>
+        </div>
+
+        <details className="text-xs text-muted-foreground">
+          <summary className="cursor-pointer hover:text-foreground">Prefer the Chrome extension instead?</summary>
+          <div className="mt-3 space-y-3 pl-3 border-l border-border">
+            <p>Same functionality, persists across page refreshes. Setup takes ~2 minutes.</p>
+            <ol className="list-decimal space-y-1 pl-5">
+              <li>Download the extension below</li>
+              <li>Open <code className="rounded bg-secondary px-1">chrome://extensions</code> → enable Developer mode → "Load unpacked"</li>
+              <li>Click the extension icon and paste your token + webhook URL</li>
+            </ol>
+            <div className="space-y-2">
+              <div>
+                <Label className="text-xs">Your extension token</Label>
+                <div className="flex gap-2">
+                  <Input readOnly value={token} className="font-mono text-[10px]" />
+                  <Button size="sm" variant="outline" onClick={copyToken}><Copy className="h-3.5 w-3.5" /></Button>
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs">Webhook URL</Label>
+                <Input readOnly value={webhookUrl} className="font-mono text-[10px]" />
+              </div>
+              <Button variant="outline" size="sm" onClick={() => downloadExtension()}>
+                <Download className="mr-1 h-3.5 w-3.5" /> Download extension (.zip)
               </Button>
             </div>
           </div>
-          <div>
-            <Label className="text-xs">Webhook URL (already wired into the extension)</Label>
-            <Input readOnly value={webhookUrl} className="font-mono text-[10px]" />
-          </div>
-          <Button onClick={() => downloadExtension()}>
-            <Download className="mr-1 h-3.5 w-3.5" /> Download Chrome extension (.zip)
-          </Button>
-        </div>
+        </details>
       </Card>
     </div>
   );
