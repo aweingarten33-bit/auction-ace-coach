@@ -67,6 +67,16 @@ export default function HeroCanvas() {
         }}
       />
 
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 18%, rgba(255,255,255,0) 82%, rgba(255,255,255,0.95) 100%)",
+        }}
+      />
+
       <svg
         aria-hidden
         style={{
