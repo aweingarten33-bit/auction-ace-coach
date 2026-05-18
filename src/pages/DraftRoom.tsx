@@ -291,12 +291,6 @@ export default function DraftRoom() {
             <span className="text-xs font-medium">Find</span>
           </button>
           <button
-            onClick={() => setPanel("top50")}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-          >
-            <span className="text-xs font-medium">Top 50</span>
-          </button>
-          <button
             onClick={() => setPanel("recent")}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
@@ -349,6 +343,25 @@ export default function DraftRoom() {
           </Sheet>
         </div>
       </div>
+
+      {/* ── TOP 50 SIDE TAB ─────────────────────────────────── */}
+      <button
+        onClick={() => setPanel("top50")}
+        className="fixed right-0 top-1/2 z-30 -translate-y-1/2 flex items-center justify-center bg-primary text-primary-foreground shadow-lg"
+        style={{
+          writingMode: "vertical-rl",
+          transform: "translateY(-50%)",
+          borderRadius: "6px 0 0 6px",
+          padding: "16px 10px",
+          fontSize: "11px",
+          fontWeight: 700,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}
+        aria-label="Open Top 50"
+      >
+        Top 50 Players
+      </button>
 
       {/* ── SLIDE-IN PANEL (search / top50 / recent) ────────── */}
       {panel && (
