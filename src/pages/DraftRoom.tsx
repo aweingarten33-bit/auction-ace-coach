@@ -261,7 +261,7 @@ export default function DraftRoom() {
       </div>
 
       {/* ── CUBE SWIPER ─────────────────────────────────────── */}
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="min-h-0 flex-1" style={{ perspective: "1200px" }}>
         <Swiper
           modules={[EffectCube, Pagination, Navigation]}
           effect="cube"
@@ -272,7 +272,12 @@ export default function DraftRoom() {
           onSwiper={(swiper) => { (window as any).__draftSwiper = swiper; }}
           onSlideChange={(swiper) => setSwiperIndex(swiper.activeIndex)}
           className="h-full w-full"
-          style={{ "--swiper-pagination-color": "hsl(var(--primary))", "--swiper-pagination-bullet-inactive-color": "hsl(var(--muted-foreground))" } as React.CSSProperties}
+          style={{
+            "--swiper-pagination-color": "hsl(var(--primary))",
+            "--swiper-pagination-bullet-inactive-color": "hsl(var(--muted-foreground))",
+            "--swiper-navigation-color": "hsl(var(--primary))",
+            overflow: "visible",
+          } as React.CSSProperties}
         >
           {/* ── Slide 1: Plan ── */}
           <SwiperSlide>
