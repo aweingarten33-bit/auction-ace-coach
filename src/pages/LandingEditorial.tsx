@@ -107,6 +107,9 @@ export default function LandingEditorial() {
         >
           DRAFT&nbsp;ROOM&nbsp;SINCE&nbsp;2025
         </p>
+
+        {/* ── The orb — touch it, crazy shit happens ───────────── */}
+        <HeroOrb mx={mouse.current.x} my={mouse.current.y} active={phase === "ready"} />
       </div>
 
       {/* ── Magnetic action button ────────────────────────────── */}
