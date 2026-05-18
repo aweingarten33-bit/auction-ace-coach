@@ -408,24 +408,24 @@ export default function DraftRoom() {
                   {top50InfoOpen && (
                     <div className="mb-4 space-y-3 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
                       <div>
-                        <p className="font-semibold text-foreground">1. VORP → Dollars</p>
-                        <p className="mt-0.5">Every player gets a replacement-level baseline: the projected points of the last startable player at their position across the whole league (e.g. QB24 in a 12-team superflex). <span className="font-mono text-foreground">VORP = max(0, projection − replacement)</span>. The entire surplus auction pool (total budget × teams − $1 minimums) is then divided proportionally: <span className="font-mono text-foreground">price = $1 + VORP × (surplus pool ÷ total VORP)</span>.</p>
+                        <p className="font-semibold text-foreground">1. Value Over Replacement (VORP)</p>
+                        <p className="mt-0.5">Each player is compared against the last startable player at their position across the whole league — the guy you'd be stuck with if you waited too long. The bigger the gap between a player's projected output and that baseline, the more auction dollars they're worth.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">2. League-Calibrated $/VORP by Position</p>
-                        <p className="mt-0.5">A global $/VORP rate would over-price RBs and under-price QBs vs. what your league actually pays. So for each position, we compute a separate rate from your 3-year history: <span className="font-mono text-foreground">posDPV = Σ(weighted avg bid − $1) ÷ Σ(VORP)</span> across players appearing in both history and current projections. If sample size is thin (&lt;8 players), it blends toward the global rate: <span className="font-mono text-foreground">blended = raw × (n÷25) + global × (1 − n÷25)</span>.</p>
+                        <p className="font-semibold text-foreground">2. Position-by-Position Calibration</p>
+                        <p className="mt-0.5">Raw VORP would over-price some positions and under-price others relative to what your league actually pays. We calibrate each position's dollar rate separately using your 3-year history, so the numbers reflect your room's real behavior — not a generic model.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">3. Recency-Weighted Bid Averaging</p>
-                        <p className="mt-0.5">With 3 years of data, each player's "true price" uses a declining-weight average. Normal: <span className="font-mono text-foreground">50% most recent + 30% prior + 20% oldest</span>. If last year dropped &gt;15% vs. the year before (injury, age cliff), it switches to fade-detection mode: <span className="font-mono text-foreground">80% most recent + 15% prior + 5% oldest</span> — so declining players aren't artificially propped up.</p>
+                        <p className="font-semibold text-foreground">3. Fade Detection</p>
+                        <p className="mt-0.5">If a player's price dropped significantly from one season to the next — injury, age, role change — the model detects that trend and weights recent history more heavily. Declining players aren't propped up by what they used to cost.</p>
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">4. Superflex Scarcity Tax</p>
-                        <p className="mt-0.5">In superflex leagues, VORP alone undersells QBs because every team needs two. A <span className="font-mono text-foreground">1.25× multiplier</span> is applied to all QB prices to close the gap between pure projection value and actual auction behavior.</p>
+                        <p className="font-semibold text-foreground">4. Superflex Scarcity Premium</p>
+                        <p className="mt-0.5">In superflex leagues every team needs two QBs, so elite QBs are worth more than pure projection math suggests. A scarcity premium is applied on top of VORP to reflect that reality.</p>
                       </div>
                       <div>
                         <p className="font-semibold text-foreground">5. Live Market Pulse</p>
-                        <p className="mt-0.5">As the draft runs, we track what the room is paying vs. the price sheet in real time: <span className="font-mono text-foreground">multiplier = Σ(actual paid) ÷ Σ(sheet price)</span> across all picks priced ≥$5. If the room is running hot (overpaying), your remaining prices scale up. If it's cold, they scale down. Requires 8+ picks to activate.</p>
+                        <p className="mt-0.5">As the draft moves, we measure whether the room is paying above or below the price sheet in real time. If managers are running hot, your remaining prices adjust up. If it's quiet, they come down. Kicks in once enough real picks have been made.</p>
                       </div>
                     </div>
                   )}
