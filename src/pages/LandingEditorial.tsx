@@ -31,8 +31,8 @@ export default function LandingEditorial() {
   ];
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black text-white">
-      {/* Full-bleed video */}
+    <div className="relative h-screen w-full overflow-hidden bg-neutral-50 text-neutral-900">
+      {/* Heavenly dream video — washed out, transparent, fades into page */}
       <video
         ref={videoRef}
         autoPlay
@@ -41,19 +41,36 @@ export default function LandingEditorial() {
         playsInline
         preload="auto"
         className={
-          "absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] " +
-          (loaded ? "opacity-100" : "opacity-0")
+          "pointer-events-none absolute inset-0 h-full w-full object-cover animate-kenburns transition-opacity duration-[1200ms] " +
+          (loaded ? "opacity-70" : "opacity-0")
         }
+        style={{
+          filter: "brightness(1.35) contrast(0.88) saturate(0.9)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 95% 90% at center, black 55%, transparent 100%)",
+          maskImage:
+            "radial-gradient(ellipse 95% 90% at center, black 55%, transparent 100%)",
+        }}
       >
         <source src="/videos/hero.mp4" type="video/mp4" />
       </video>
 
-      {/* Subtle darkening for nav legibility (HBA-style soft vignette) */}
+      {/* Warm halo + vignette */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.55) 100%)",
+            "radial-gradient(ellipse at center, rgba(255,235,200,0.18) 0%, transparent 45%, rgba(0,0,0,0.25) 100%)",
+        }}
+      />
+
+      {/* Film grain */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.10] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+          backgroundSize: "200px 200px",
         }}
       />
 
