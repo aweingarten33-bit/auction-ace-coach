@@ -5,7 +5,6 @@
 // "none" = no preset; baseline weights are used as-is.
 
 export type StrategyId =
-  | "none"
   | "balanced"
   | "stars-and-scrubs"
   | "elite-qbs"
@@ -14,8 +13,7 @@ export type StrategyId =
   | "hero-rb"
   | "zero-rb"
   | "robust-rb"
-  | "modified-zero-rb"
-  | "custom";
+  | "modified-zero-rb";
 
 export interface Strategy {
   id: StrategyId;
@@ -36,29 +34,24 @@ export interface Strategy {
 
 export const STRATEGIES: Strategy[] = [
   {
-    id: "none",
-    label: "No strategy (default)",
-    short: "Spread the budget evenly by position weight.",
-    description:
-      "No specific build. The tool just splits your budget by standard superflex position value (2 QBs matter a LOT) — works fine if you want to stay flexible and react to value as it comes.",
-    weights: {},
-    coachGuidance:
-      "User has no fixed strategy. This is a SUPERFLEX league — QBs are gold because most teams start 2. Judge bids on raw value and roster gaps. Don't lecture about plans, but never let them get stuck with only 1 QB at a fair price.",
-  },
-  {
     id: "balanced",
-    label: "Balanced (Superflex)",
-    short: "2 solid QBs, 2 RBs, 2 WRs, no holes.",
+    label: "Balanced — spread evenly",
+    short: "Split your budget equally across every roster slot.",
     description:
-      "Spend across 2 startable QBs, 2 RBs, and 2 WRs. No one stud, no one bargain — just no weaknesses at any starting spot.",
+      "Every roster spot gets the same dollar amount. No position is prioritized — pure even split. Good starting point if you want to adjust manually from there.",
     weights: {
-      QB: [1.4, 1.2, 0.5],
-      RB: [1.0, 0.95, 0.85],
-      WR: [1.0, 0.95, 0.85],
-      TE: [1.0],
+      QB:        [1, 1, 1],
+      RB:        [1, 1, 1, 1, 1],
+      WR:        [1, 1, 1, 1, 1],
+      TE:        [1, 1],
+      FLEX:      [1, 1],
+      SUPERFLEX: [1, 1],
+      K:         [1],
+      DST:       [1],
+      BENCH:     [1, 1, 1, 1, 1, 1, 1, 1],
     },
     coachGuidance:
-      "User is going Balanced in a SUPERFLEX league: 2 startable QBs, 2 strong RBs, 2 strong WRs, mid-tier TE. Don't approve overpays on a single stud at the cost of a weak roster spot. Make sure they lock in TWO real QBs — one-QB rosters lose superflex.",
+      "User is using an even split across all roster slots. Help them adjust from that baseline based on roster gaps and remaining budget. This is a SUPERFLEX league — make sure they end up with 2 real QBs.",
   },
   {
     id: "stars-and-scrubs",
@@ -181,16 +174,6 @@ export const STRATEGIES: Strategy[] = [
     coachGuidance:
       "User is going Anchor RB in a SUPERFLEX (a softer Zero RB — one mid-tier RB anchor, not pure zero): one RB anchor (~10–15% of budget), TWO startable QBs, then heavy WR + TE. Approve ONE moderate RB buy, then fade RBs. Push WR depth hard but never at the cost of QB2.",
   },
-  {
-    id: "custom",
-    label: "Custom (your own rules)",
-    short: "Write your own plan. The app follows it.",
-    description:
-      "Type your own draft rules in plain English (e.g. 'Spend $80 on 2 elite WRs, never pay over $5 for a QB, target a TE in the $8-12 range'). The AI coach uses your text as its guidance.",
-    weights: {},
-    coachGuidance:
-      "User has written their own custom strategy. Follow their rules exactly as written — do not override them with conventional wisdom. If their rules conflict with sound roster construction (e.g. ending up with no QB in superflex), gently flag it but defer to their stated plan.",
-  },
 ];
 
 export const getStrategy = (id: string | undefined | null): Strategy =>
@@ -198,15 +181,5 @@ export const getStrategy = (id: string | undefined | null): Strategy =>
 
 // Build the actual coach guidance for a given strategy id, optionally merging
 // user-supplied custom rules text (used when id === "custom").
-export const buildCoachGuidance = (
-  id: string | undefined | null,
-  customRules?: string | null,
-): string => {
-  const s = getStrategy(id);
-  if (s.id === "custom") {
-    const rules = (customRules ?? "").trim();
-    if (!rules) return s.coachGuidance + " (User has not written any rules yet — ask them to fill in their custom plan.)";
-    return `${s.coachGuidance}\n\nUSER'S CUSTOM RULES (follow these):\n${rules}`;
-  }
-  return s.coachGuidance;
-};
+export const buildCoachGuidance = (id: string | undefined | null): string =>
+  getStrategy(id).coachGuidance;

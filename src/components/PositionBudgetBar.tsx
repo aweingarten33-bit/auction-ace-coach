@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -52,9 +51,7 @@ const GROUP_BAR: Record<SlotGroup, string> = {
 // ── DraftStrategyPanel (exported for external use) ────────────────────────
 export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
   const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
   const setStrategyId = useDraftStore((s) => s.setStrategyId);
-  const setCustomStrategyRules = useDraftStore((s) => s.setCustomStrategyRules);
   const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
   const settings = useDraftStore((s) => s.settings);
   const strategy = getStrategy(strategyId);
@@ -88,15 +85,12 @@ export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
         </div>
       </div>
       {!compact && (
-        <p className="text-xs leading-relaxed text-muted-foreground">{strategy.description}</p>
-      )}
-      {strategy.id === "custom" && (
-        <Textarea
-          value={customStrategyRules}
-          onChange={(e) => setCustomStrategyRules(e.target.value.slice(0, 700))}
-          placeholder="Write the rules this planner should follow."
-          className="min-h-20 text-xs"
-        />
+        <>
+          <p className="text-xs leading-relaxed text-muted-foreground">{strategy.description}</p>
+          <p className="text-xs text-muted-foreground/70">
+            Pick a strategy to auto-fill the amounts below — or just edit any number yourself and everything else will update automatically.
+          </p>
+        </>
       )}
     </div>
   );
