@@ -85,7 +85,7 @@ function makeNoiseTexture() {
 
 function HeroPlane() {
   const matRef = useRef<THREE.ShaderMaterial>(null);
-  const progress = useRef(1.0);
+  const progress = useRef(0.0);
   const smoothMouse = useRef(new THREE.Vector2());
   const rawMouse = useRef(new THREE.Vector2());
   const { viewport, size } = useThree();
@@ -96,7 +96,7 @@ function HeroPlane() {
     uTime:        { value: 0 },
     uResolution:  { value: new THREE.Vector2(size.width, size.height) },
     uMouse:       { value: new THREE.Vector2(0, 0) },
-    uProgress:    { value: 1.0 },
+    uProgress:    { value: 0.0 },
     uImageAspect: { value: 0.6 },
     uHeroTexture: { value: heroTex },
     uDepthTexture:{ value: makeDepthTexture() },
