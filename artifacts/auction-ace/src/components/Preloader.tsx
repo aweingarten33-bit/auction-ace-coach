@@ -41,10 +41,6 @@ export default function Preloader({ onDone }: Props) {
           width={ringSize}
           height={ringSize}
           viewBox={`0 0 ${ringSize} ${ringSize}`}
-          style={{
-            animation: "preloader-sway 5s linear 1 forwards",
-            transformOrigin: "50% 50%",
-          }}
         >
           <defs>
             {/* Top arc: left → right across the top (readable upright) */}
