@@ -67,9 +67,8 @@ export default function Preloader({ onDone }: Props) {
           style={{
             width: size,
             height: "auto",
-            transform: "rotate(-20deg)",
-            animation: "football-wobble 3.6s ease-in-out infinite",
-            transformOrigin: "50% 55%",
+            animation: "football-orbit 6s linear infinite",
+            transformOrigin: "50% 50%",
             filter: "drop-shadow(0 18px 32px rgba(0,0,0,0.65))",
           }}
         />
