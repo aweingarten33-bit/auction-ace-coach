@@ -7,10 +7,7 @@ export default function LandingEditorial() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const isDark = theme === "dark";
   const [scrollY, setScrollY] = useState(0);
-  const [videoStarted, setVideoStarted] = useState(false);
-  const [colorized, setColorized] = useState(false);
   const ghostRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -22,40 +19,6 @@ export default function LandingEditorial() {
     return () => {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  // Polaroid sequence: hold B&W still for ~1.6s, then "develop" into color and play.
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    const begin = () => {
-      // Hold on first frame (B&W polaroid) briefly
-      try { v.pause(); v.currentTime = 0; } catch {}
-      timer = setTimeout(() => {
-        setColorized(true);
-        const p = v.play();
-        if (p && typeof p.then === "function") {
-          p.catch(() => {
-            // Autoplay blocked — try once more on next tick
-            setTimeout(() => v.play().catch(() => {}), 50);
-          });
-        }
-        setVideoStarted(true);
-      }, 1600);
-    };
-
-    if (v.readyState >= 2) {
-      begin();
-    } else {
-      v.addEventListener("loadeddata", begin, { once: true });
-    }
-
-    return () => {
-      if (timer) clearTimeout(timer);
-      v.removeEventListener("loadeddata", begin);
     };
   }, []);
 
@@ -85,18 +48,17 @@ export default function LandingEditorial() {
         (isDark ? "bg-neutral-950 text-white" : "bg-neutral-50 text-neutral-950")
       }
     >
-      {/* Background video — full bleed, color, autoplay */}
+      {/* Background video */}
       <video
-        ref={videoRef}
         autoPlay
         loop
         muted
         playsInline
-        preload="auto"
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover"
-        src="/videos/hero.mp4"
-      />
-
+        poster=""
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover opacity-90"
+      >
+        <source src="/videos/hero.mp4" type="video/mp4" />
+      </video>
       <div
         className={
           "pointer-events-none fixed inset-0 z-0 " +

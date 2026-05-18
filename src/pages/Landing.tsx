@@ -31,17 +31,10 @@ export default function Landing() {
   return (
     <div className="grain relative min-h-screen overflow-x-hidden bg-black text-white">
 
-      {/* ── Full-screen background video ─────────────────────────────────── */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        preload="auto"
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover"
-        src="/videos/hero.mp4"
-      />
-
+      {/* ── WebGL hero background ─────────────────────────────────────────── */}
+      <div className="absolute inset-0 z-0">
+        <HeroWebGL />
+      </div>
 
       {/* ── Gradient overlay — fades image into black at bottom ──────────── */}
       <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-b from-black/40 via-transparent to-black" />
