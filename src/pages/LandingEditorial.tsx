@@ -1,342 +1,173 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 /**
- * Editorial Stadium — Option B (contained video)
- * Cream zine base · oversized condensed display · refined serif accents ·
- * video lives as a contained square panel inside the editorial grid.
+ * Landing — Lando Norris–inspired.
+ * Cream canvas, topographic texture, lime accent, serif+sans split wordmark.
  */
 export default function LandingEditorial() {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = true;
-    v.playsInline = true;
-    const tryPlay = () => v.play().catch(() => {});
-    tryPlay();
-    v.addEventListener("loadeddata", tryPlay);
-    return () => v.removeEventListener("loadeddata", tryPlay);
+    const t = setTimeout(() => setLoaded(true), 1600);
+    return () => clearTimeout(t);
   }, []);
 
   return (
     <div
-      className="min-h-screen w-full overflow-x-hidden"
-      style={{ background: "#f1ebe0", color: "#171413" }}
+      className="relative min-h-screen w-full overflow-hidden"
+      style={{ background: "#f3efe6", color: "#0e0e0e" }}
     >
-      {/* ── Top bar ────────────────────────────────────────────── */}
-      <header className="flex items-center justify-between px-6 pt-6 md:px-12 md:pt-8">
-        <div
-          className="text-[11px] font-semibold tracking-[0.3em]"
+      {/* ── Preloader ─────────────────────────────────────────── */}
+      <div
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center transition-opacity duration-700"
+        style={{
+          background: "#d4ff00",
+          opacity: loaded ? 0 : 1,
+          pointerEvents: loaded ? "none" : "auto",
+        }}
+      >
+        <Monogram className="h-12 w-12 text-black animate-pulse" />
+        <span
+          className="absolute bottom-8 text-[11px] font-bold tracking-[0.25em] text-black"
           style={{ fontFamily: '"JetBrains Mono", monospace' }}
         >
-          AUCTION&nbsp;ACE&nbsp;/&nbsp;Ξ&nbsp;25
-        </div>
-        <div
-          className="hidden text-[11px] tracking-[0.3em] md:block"
-          style={{ fontFamily: '"JetBrains Mono", monospace' }}
+          LOAD ACE
+        </span>
+      </div>
+
+      {/* ── Topographic background ───────────────────────────── */}
+      <TopoBackground />
+
+      {/* ── Top bar ──────────────────────────────────────────── */}
+      <header className="relative z-10 flex items-center justify-between px-5 pt-5">
+        <Link
+          to="/team"
+          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-bold tracking-[0.2em] text-black transition hover:opacity-90"
+          style={{ background: "#d4ff00", fontFamily: '"JetBrains Mono", monospace' }}
         >
-          A&nbsp;FANTASY&nbsp;FOOTBALL&nbsp;RESEARCH&nbsp;ROOM
-        </div>
+          <BagIcon className="h-3.5 w-3.5" />
+          ENTER
+        </Link>
         <Link
           to="/passcode"
-          className="text-[11px] tracking-[0.3em] underline-offset-4 hover:underline"
-          style={{ fontFamily: '"JetBrains Mono", monospace' }}
+          className="grid h-10 w-10 place-items-center rounded-xl border border-black/30 text-black transition hover:bg-black hover:text-[#d4ff00]"
+          aria-label="Menu"
         >
-          ADMIN
+          <span className="block h-px w-4 bg-current" />
         </Link>
       </header>
 
-      {/* ── Hairline ───────────────────────────────────────────── */}
-      <div className="mx-6 mt-6 h-px md:mx-12" style={{ background: "#171413" }} />
-
-      {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="px-6 pt-10 md:px-12 md:pt-16">
-        {/* Issue caption */}
-        <div className="mb-8 flex items-baseline justify-between">
-          <span
-            className="text-[11px] tracking-[0.3em]"
-            style={{ fontFamily: '"JetBrains Mono", monospace' }}
-          >
-            ISSUE&nbsp;Nº&nbsp;01&nbsp;—&nbsp;DRAFT&nbsp;SEASON
-          </span>
-          <span
-            className="hidden text-[11px] tracking-[0.3em] md:inline"
-            style={{ fontFamily: '"JetBrains Mono", monospace' }}
-          >
-            EST.&nbsp;MMXXV
-          </span>
-        </div>
-
-        {/* Headline */}
+      {/* ── Wordmark block ───────────────────────────────────── */}
+      <div className="relative z-10 mt-6 flex flex-col items-center px-5 text-center">
+        <Monogram className="h-8 w-8 text-black" />
         <h1
-          className="font-bebas leading-[0.82] tracking-tight"
-          style={{
-            fontFamily: '"Bebas Neue", "Anton", sans-serif',
-            fontSize: "clamp(4rem, 18vw, 14rem)",
-          }}
+          className="mt-3 leading-none"
+          style={{ fontSize: "clamp(2.25rem, 11vw, 6rem)" }}
         >
-          WHERE THE
-          <br />
-          <span style={{ color: "#b8431f" }}>BIDDING</span>
-          <br />
-          GOES QUIET.
+          <span style={{ fontFamily: '"Playfair Display", "DM Serif Display", serif', fontWeight: 400, fontStyle: "italic" }}>
+            Auction
+          </span>
+          <span
+            className="font-black"
+            style={{ fontFamily: '"Inter", "DM Sans", sans-serif', letterSpacing: "-0.02em" }}
+          >
+            ACE
+          </span>
         </h1>
-
-        {/* Below-hero grid: video + tagline */}
-        <div className="mt-12 grid grid-cols-1 gap-8 md:mt-16 md:grid-cols-12 md:gap-12">
-          {/* Contained square video */}
-          <figure className="md:col-span-7">
-            <div
-              className="relative aspect-square w-full overflow-hidden"
-              style={{ background: "#0a0908" }}
-            >
-              <video
-                ref={videoRef}
-                className="h-full w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="auto"
-                poster=""
-              >
-                <source src="/videos/hero.mp4" type="video/mp4" />
-              </video>
-              {/* subtle vignette */}
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "radial-gradient(120% 80% at 50% 50%, transparent 55%, rgba(0,0,0,0.45) 100%)",
-                }}
-              />
-              {/* corner caption */}
-              <div
-                className="absolute bottom-4 left-4 text-[10px] tracking-[0.3em] text-white/70"
-                style={{ fontFamily: '"JetBrains Mono", monospace' }}
-              >
-                FILM&nbsp;001&nbsp;·&nbsp;THE&nbsp;ROOM
-              </div>
-            </div>
-            <figcaption
-              className="mt-3 text-[11px] tracking-[0.25em]"
-              style={{ fontFamily: '"JetBrains Mono", monospace', color: "#5a534b" }}
-            >
-              ↳&nbsp;LOOPING&nbsp;FILM,&nbsp;NO&nbsp;SOUND
-            </figcaption>
-          </figure>
-
-          {/* Tagline column */}
-          <aside className="md:col-span-5 md:pt-6">
-            <p
-              className="text-[11px] tracking-[0.3em]"
-              style={{ fontFamily: '"JetBrains Mono", monospace', color: "#5a534b" }}
-            >
-              ED.&nbsp;NOTE
-            </p>
-            <p
-              className="mt-4 text-2xl leading-[1.15] md:text-3xl"
-              style={{
-                fontFamily: '"Playfair Display", serif',
-                fontWeight: 700,
-                fontStyle: "italic",
-              }}
-            >
-              A research room for the league
-              commissioner — three years of price
-              history, every player, no noise.
-            </p>
-            <p
-              className="mt-6 max-w-md text-base leading-relaxed"
-              style={{ fontFamily: '"DM Sans", sans-serif', color: "#2a2520" }}
-            >
-              Built for the moments before the gavel. Tier maps,
-              budget paths, opponent rosters — assembled quietly
-              so the room can stay loud.
-            </p>
-
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/team"
-                className="group inline-flex items-center justify-between gap-6 px-7 py-4 text-[12px] tracking-[0.3em] transition"
-                style={{
-                  fontFamily: '"JetBrains Mono", monospace',
-                  background: "#171413",
-                  color: "#f1ebe0",
-                }}
-              >
-                ENTER&nbsp;THE&nbsp;ROOM
-                <span aria-hidden className="transition-transform group-hover:translate-x-1">
-                  →
-                </span>
-              </Link>
-              <Link
-                to="/full-bleed"
-                className="group inline-flex items-center justify-between gap-6 px-7 py-4 text-[12px] tracking-[0.3em] transition hover:bg-black/5"
-                style={{
-                  fontFamily: '"JetBrains Mono", monospace',
-                  border: "1px solid #171413",
-                  color: "#171413",
-                }}
-              >
-                VIEW&nbsp;FULL&nbsp;BLEED
-                <span aria-hidden>↗</span>
-              </Link>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      {/* ── Marquee divider ───────────────────────────────────── */}
-      <div className="mt-24 overflow-hidden border-y py-4" style={{ borderColor: "#171413" }}>
-        <div
-          className="whitespace-nowrap text-[14px] tracking-[0.4em]"
-          style={{
-            fontFamily: '"Bebas Neue", sans-serif',
-            animation: "marquee-scroll 40s linear infinite",
-          }}
+        <p
+          className="mt-3 text-[11px] font-bold tracking-[0.25em] text-black"
+          style={{ fontFamily: '"JetBrains Mono", monospace' }}
         >
-          {"TIER MAPS  ·  BUDGET PATHS  ·  3-YEAR PRICE HISTORY  ·  OPPONENT ROSTERS  ·  SHARED RESEARCH  ·  ".repeat(
-            6,
-          )}
-        </div>
+          DRAFT&nbsp;ROOM&nbsp;SINCE&nbsp;2025
+        </p>
       </div>
 
-      {/* ── Editorial trio ────────────────────────────────────── */}
-      <section className="px-6 py-20 md:px-12 md:py-28">
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
-          {[
-            {
-              n: "01",
-              kicker: "TIERS",
-              title: "Tiered, not ranked.",
-              body: "Players grouped by replacement value — see the cliff before you fall off it.",
-            },
-            {
-              n: "02",
-              kicker: "HISTORY",
-              title: "Three winters of receipts.",
-              body: "Every nomination, every winning bid, every overpay — surfaced as you research.",
-            },
-            {
-              n: "03",
-              kicker: "ROOM",
-              title: "Shared with the league.",
-              body: "One link, twelve teams. Commissioner owns the connection, members see the board.",
-            },
-          ].map((card) => (
-            <article key={card.n}>
-              <div
-                className="mb-6 flex items-baseline justify-between border-b pb-3"
-                style={{ borderColor: "#171413" }}
-              >
-                <span
-                  className="text-[11px] tracking-[0.3em]"
-                  style={{ fontFamily: '"JetBrains Mono", monospace' }}
-                >
-                  {card.kicker}
-                </span>
-                <span
-                  className="font-bebas text-3xl"
-                  style={{ fontFamily: '"Bebas Neue", sans-serif' }}
-                >
-                  {card.n}
-                </span>
-              </div>
-              <h3
-                className="text-3xl leading-tight md:text-4xl"
-                style={{
-                  fontFamily: '"Playfair Display", serif',
-                  fontWeight: 700,
-                }}
-              >
-                {card.title}
-              </h3>
-              <p
-                className="mt-4 text-base leading-relaxed"
-                style={{ fontFamily: '"DM Sans", sans-serif', color: "#2a2520" }}
-              >
-                {card.body}
-              </p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Closing band ──────────────────────────────────────── */}
-      <section
-        className="relative px-6 py-20 md:px-12 md:py-28"
-        style={{ background: "#0a0908", color: "#f1ebe0" }}
+      {/* ── Bottom action pill ───────────────────────────────── */}
+      <Link
+        to="/draft-room"
+        className="group fixed bottom-5 right-5 z-10 grid h-16 w-16 place-items-center rounded-full text-black shadow-lg transition hover:scale-105"
+        style={{ background: "#d4ff00" }}
+        aria-label="Enter draft room"
       >
-        <div className="mx-auto max-w-5xl">
-          <span
-            className="text-[11px] tracking-[0.3em]"
-            style={{ fontFamily: '"JetBrains Mono", monospace', color: "#c9a878" }}
-          >
-            COLOPHON
-          </span>
-          <h2
-            className="mt-6 font-bebas leading-[0.9] tracking-tight"
-            style={{
-              fontFamily: '"Bebas Neue", sans-serif',
-              fontSize: "clamp(2.5rem, 9vw, 7rem)",
-            }}
-          >
-            QUIET ROOM.
-            <br />
-            <span style={{ color: "#c9a878" }}>LOUD&nbsp;NIGHT.</span>
-          </h2>
-          <div className="mt-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <p
-              className="max-w-md text-base leading-relaxed"
-              style={{ fontFamily: '"DM Sans", sans-serif', color: "#cfc7b8" }}
-            >
-              Built for one league, sharpened over three drafts.
-              No bidding bots. No nomination AI. Just the receipts.
-            </p>
-            <Link
-              to="/team"
-              className="inline-flex items-center gap-6 px-7 py-4 text-[12px] tracking-[0.3em]"
-              style={{
-                fontFamily: '"JetBrains Mono", monospace',
-                background: "#c9a878",
-                color: "#0a0908",
-              }}
-            >
-              OPEN&nbsp;THE&nbsp;ROOM <span aria-hidden>→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Footer ────────────────────────────────────────────── */}
-      <footer
-        className="flex flex-col items-center justify-between gap-4 px-6 py-8 md:flex-row md:px-12"
-        style={{ background: "#f1ebe0", color: "#5a534b" }}
-      >
+        <HandIcon className="h-7 w-7 transition-transform group-hover:rotate-6" />
         <span
-          className="text-[10px] tracking-[0.3em]"
+          className="pointer-events-none absolute -top-7 right-1 text-[9px] font-bold tracking-[0.25em] text-black/60"
           style={{ fontFamily: '"JetBrains Mono", monospace' }}
         >
-          AUCTION&nbsp;ACE&nbsp;—&nbsp;DRAFT&nbsp;SEASON&nbsp;2025
+          TAP&nbsp;TO&nbsp;DRAFT
         </span>
-        <span
-          className="text-[10px] tracking-[0.3em]"
+      </Link>
+
+      {/* ── Footer marker ────────────────────────────────────── */}
+      <div className="relative z-10 mt-auto px-5 pb-5 pt-24">
+        <div
+          className="flex items-center justify-between text-[10px] tracking-[0.3em] text-black/50"
           style={{ fontFamily: '"JetBrains Mono", monospace' }}
         >
-          ISSUE&nbsp;01&nbsp;/&nbsp;PRINTED&nbsp;IN&nbsp;THE&nbsp;CLOUD
-        </span>
-      </footer>
-
-      {/* Marquee keyframes */}
-      <style>{`
-        @keyframes marquee-scroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
+          <span>AUCTION&nbsp;ACE</span>
+          <span>EST.&nbsp;2025</span>
+        </div>
+      </div>
     </div>
+  );
+}
+
+/* ── L7-style monogram ─────────────────────────────────────── */
+function Monogram({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 60 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+      <path
+        d="M10 6 L10 46 L26 46 L26 38 L18 38 L18 6 Z M30 6 L52 6 L42 46 L34 46 L42 14 L30 14 Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/* ── Icons ─────────────────────────────────────────────────── */
+function BagIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+      <path d="M5 8h14l-1.2 12.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8Z" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    </svg>
+  );
+}
+
+function HandIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
+      <path d="M11 2a1.5 1.5 0 0 0-1.5 1.5V11l-1.4-1.4a1.5 1.5 0 1 0-2.1 2.1l4.2 4.6a4 4 0 0 0 2.95 1.3H17a3 3 0 0 0 3-3v-4a1.5 1.5 0 0 0-3 0 1.5 1.5 0 0 0-3 0V3.5A1.5 1.5 0 0 0 12.5 2 1.5 1.5 0 0 0 11 3.5v-1Z" />
+    </svg>
+  );
+}
+
+/* ── Background topographic lines ──────────────────────────── */
+function TopoBackground() {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox="0 0 400 800"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      <g fill="none" stroke="#0e0e0e" strokeOpacity="0.08" strokeWidth="1">
+        <path d="M-50 200 Q 80 140 200 220 T 460 200" />
+        <path d="M-50 260 Q 80 200 200 280 T 460 260" />
+        <path d="M-50 320 Q 80 260 200 340 T 460 320" />
+        <path d="M-50 420 Q 100 360 220 440 T 460 420" />
+        <path d="M-50 500 Q 120 440 240 520 T 460 500" />
+        <path d="M-50 580 Q 120 520 240 600 T 460 580" />
+        <path d="M-50 660 Q 140 600 260 680 T 460 660" />
+        <ellipse cx="60" cy="380" rx="55" ry="35" />
+        <ellipse cx="60" cy="380" rx="35" ry="22" />
+        <ellipse cx="320" cy="360" rx="70" ry="48" />
+        <ellipse cx="320" cy="360" rx="48" ry="32" />
+        <ellipse cx="320" cy="360" rx="26" ry="18" />
+        <ellipse cx="90" cy="640" rx="60" ry="40" />
+        <ellipse cx="90" cy="640" rx="38" ry="24" />
+      </g>
+    </svg>
   );
 }
