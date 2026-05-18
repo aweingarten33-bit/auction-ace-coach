@@ -9,7 +9,6 @@ import Landing from "./pages/Landing.tsx";
 import DraftRoom from "./pages/DraftRoom.tsx";
 import SetupWizard from "./pages/SetupWizard.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import AuthPage from "./pages/Auth.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
 import TeamPicker from "./pages/TeamPicker.tsx";
@@ -69,7 +68,7 @@ function AppRoutes() {
             <Route path="/index" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/team" element={<TeamPicker />} />
-            <Route path="/auth" element={<PublicGate><AuthPage /></PublicGate>} />
+            <Route path="/auth" element={<Navigate to="/espn" replace />} />
             <Route path="/draft-room" element={<PublicGate><DraftRoom /></PublicGate>} />
             <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
             <Route path="/espn" element={<Protected><EspnSettings /></Protected>} />
