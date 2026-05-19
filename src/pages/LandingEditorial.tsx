@@ -274,10 +274,6 @@ export default function LandingEditorial() {
           {/* Spacer preserving the vertical position of content below the removed eyebrow + headline */}
           <div aria-hidden style={{ height: "calc(2rem + 3 * clamp(3.5rem, 11vw, 10rem) * 0.92)" }} />
 
-          <p className="mx-auto mt-12 max-w-xl text-center text-base leading-relaxed text-white/65 md:text-[17px]">
-            Tiers, values, and trends — pulled from your ESPN league, shared with
-            every member, before the bidding begins.
-          </p>
 
           <div className="mt-14 flex justify-center">
             <Link
