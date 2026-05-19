@@ -60,10 +60,36 @@ export default function LandingEditorial() {
 
   return (
     <div style={{
-      background: "linear-gradient(160deg, #020c1b 0%, #050f22 40%, #03091a 70%, #010812 100%)",
+      background: "linear-gradient(170deg, #dce8f2 0%, #eef5fa 35%, #e6f0f8 65%, #d5e6f0 100%)",
       minHeight: "100vh",
+      position: "relative",
+      overflow: "hidden",
       fontFamily: "'Playfair Display', Georgia, serif",
     }}>
+
+      {/* Crystal lattice — diagonal slabs like the 1978 Fortress of Solitude */}
+      {([
+        { w: "70vw", h: "16px", top: "0%",    left: "-18%",  rot: "36deg",  op: 0.55 },
+        { w: "55vw", h: "10px", top: "5%",    right: "-14%", rot: "-40deg", op: 0.45 },
+        { w: "80vw", h: "22px", top: "-1%",   left: "-22%",  rot: "28deg",  op: 0.3  },
+        { w: "48vw", h: "12px", top: "10%",   right: "-8%",  rot: "-32deg", op: 0.4  },
+        { w: "65vw", h: "14px", bottom: "2%", left: "-16%",  rot: "38deg",  op: 0.5  },
+        { w: "58vw", h: "18px", bottom: "7%", right: "-18%", rot: "-36deg", op: 0.42 },
+        { w: "42vw", h: "9px",  bottom: "0%", right: "-6%",  rot: "-28deg", op: 0.35 },
+        { w: "50vw", h: "11px", bottom: "12%",left: "-10%",  rot: "42deg",  op: 0.38 },
+      ] as Array<{w:string;h:string;top?:string;bottom?:string;left?:string;right?:string;rot:string;op:number}>).map((s, i) => (
+        <div key={i} style={{
+          position: "absolute",
+          width: s.w, height: s.h,
+          top: s.top, left: s.left, right: s.right, bottom: s.bottom,
+          background: "linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(190,218,242,0.75) 30%, rgba(255,255,255,0.95) 50%, rgba(190,218,242,0.75) 70%, rgba(255,255,255,0.05) 100%)",
+          transform: `rotate(${s.rot})`,
+          opacity: s.op,
+          pointerEvents: "none",
+          borderRadius: 3,
+          boxShadow: "0 1px 8px rgba(180,210,240,0.4)",
+        }} />
+      ))}
 
       {/* ── HERO CARD ──────────────────────────────────────────────────────── */}
       <div
@@ -77,7 +103,7 @@ export default function LandingEditorial() {
           willChange: "transform, filter",
           transform: panelOpen ? "scale(0.95) translateX(-2%)" : "scale(1) translateX(0)",
           filter:    panelOpen ? "brightness(0.5)"              : "brightness(1)",
-          boxShadow: panelOpen ? "none" : "0 0 60px rgba(80,160,255,0.18), 0 0 120px rgba(40,100,200,0.10)",
+          boxShadow: panelOpen ? "none" : "0 0 60px rgba(190,220,245,0.6), 0 0 130px rgba(160,205,240,0.3), inset 0 0 0 1px rgba(255,255,255,0.25)",
         }}
       >
         {/* Video */}
