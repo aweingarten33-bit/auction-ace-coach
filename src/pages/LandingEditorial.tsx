@@ -89,7 +89,7 @@ export default function LandingEditorial() {
           opacity: 0.4,
         }}
       >
-        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+        <source src={`${import.meta.env.BASE_URL}video-output-0AF95F42-1823-4CCB-83D5-A4D004535139-1.mov`} type="video/quicktime" />
       </video>
 
       {/* Subtle dark vignette over bg */}
@@ -256,7 +256,7 @@ export default function LandingEditorial() {
               pointerEvents: "none",
             }}
           >
-            <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+            <source src={`${import.meta.env.BASE_URL}video-output-0AF95F42-1823-4CCB-83D5-A4D004535139-1.mov`} type="video/quicktime" />
           </video>
 
           {/* Bottom gradient for text */}
