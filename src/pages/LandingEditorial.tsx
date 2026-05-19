@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
-  const [polaroidActive, setPolaroidActive] = useState(false);
-  const [showPolaroid, setShowPolaroid] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+  const [colorOn, setColorOn] = useState(false);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoZoom, setVideoZoom] = useState<number>(() => {
@@ -17,39 +17,29 @@ export default function LandingEditorial() {
     try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
   }, [videoZoom]);
 
+  // Preload video, hold paused at frame 0 in B&W until reveal triggers the flash.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    try { v.currentTime = 0; } catch {}
+    v.load();
+  }, []);
+
   useEffect(() => {
     const reveal = () => {
-      setShowPolaroid(true);
-      requestAnimationFrame(() => setPolaroidActive(true));
+      // Camera flash: bright pop, then color + play simultaneously at peak.
+      setFlashOn(true);
+      window.setTimeout(() => {
+        setColorOn(true);
+        const v = videoRef.current;
+        if (v) { try { v.currentTime = 0; } catch {} void v.play().catch(() => {}); }
+      }, 110);
+      window.setTimeout(() => setFlashOn(false), 420);
     };
-
     window.addEventListener("landing:visible", reveal, { once: true });
     return () => window.removeEventListener("landing:visible", reveal);
   }, []);
 
-  // Start immediately when the landing page mounts; the Polaroid still covers any browser warm-up.
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    let cancelled = false;
-
-    const start = () => {
-      if (cancelled) return;
-      void v.play().catch(() => {});
-    };
-
-    try { v.currentTime = 0; } catch {}
-    v.load();
-    if (v.readyState >= 2) start();
-    v.addEventListener("loadeddata", start, { once: true });
-    v.addEventListener("canplay", start, { once: true });
-
-    return () => {
-      cancelled = true;
-      v.removeEventListener("loadeddata", start);
-      v.removeEventListener("canplay", start);
-    };
-  }, []);
 
   useEffect(() => {
     let raf = 0;
