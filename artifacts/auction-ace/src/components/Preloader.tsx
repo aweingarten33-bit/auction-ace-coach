@@ -13,7 +13,129 @@ const TEAMS = [
 ];
 
 const LOGO_URL = (t: string) => `https://a.espncdn.com/i/teamlogos/nfl/500/${t}.png`;
-const NFL_SHIELD = "https://a.espncdn.com/i/teamlogos/leagues/500/nfl.png";
+
+// NFL-style shield emblazoned with the league name
+function LeagueShield() {
+  return (
+    <svg viewBox="0 0 360 440" className="h-full w-full">
+      <defs>
+        <linearGradient id="shieldNavy" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#1a2548" />
+          <stop offset="100%" stopColor="#0a1230" />
+        </linearGradient>
+        <linearGradient id="shieldRed" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#e0223a" />
+          <stop offset="100%" stopColor="#a8132a" />
+        </linearGradient>
+        <linearGradient id="shieldGold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f4d27a" />
+          <stop offset="100%" stopColor="#c9943a" />
+        </linearGradient>
+        {/* Shield clip-path */}
+        <clipPath id="shieldClip">
+          <path d="M180 8 L344 56 L344 240 Q344 340 180 432 Q16 340 16 240 L16 56 Z" />
+        </clipPath>
+      </defs>
+
+      {/* Outer gold trim */}
+      <path
+        d="M180 0 L352 50 L352 242 Q352 348 180 442 Q8 348 8 242 L8 50 Z"
+        fill="url(#shieldGold)"
+      />
+      {/* Navy body */}
+      <path
+        d="M180 12 L340 58 L340 240 Q340 338 180 426 Q20 338 20 240 L20 58 Z"
+        fill="url(#shieldNavy)"
+      />
+
+      {/* Red top band with stars */}
+      <g clipPath="url(#shieldClip)">
+        <rect x="0" y="40" width="360" height="62" fill="url(#shieldRed)" />
+        {/* Hairline separators */}
+        <rect x="0" y="38" width="360" height="2" fill="#f4d27a" />
+        <rect x="0" y="102" width="360" height="2" fill="#f4d27a" />
+        {/* Stars in the red band */}
+        {[60, 110, 160, 210, 260, 310].map((cx) => (
+          <Star key={cx} cx={cx} cy={71} size={9} fill="#ffffff" />
+        ))}
+      </g>
+
+      {/* League name — main lockup */}
+      <g textAnchor="middle" style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}>
+        <text x="180" y="158" fill="#f4d27a" fontSize="22" fontWeight="700" letterSpacing="3">
+          BRO WE&apos;RE
+        </text>
+        <text x="180" y="198" fill="#ffffff" fontSize="34" fontWeight="800" letterSpacing="2.5">
+          SENIOR
+        </text>
+        <text x="180" y="234" fill="#ffffff" fontSize="34" fontWeight="800" letterSpacing="2.5">
+          CITIZENS
+        </text>
+      </g>
+
+      {/* Hairline divider */}
+      <line x1="80" y1="252" x2="280" y2="252" stroke="#f4d27a" strokeWidth="1.2" />
+
+      {/* Sub-lockup */}
+      <g
+        textAnchor="middle"
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      >
+        <text x="180" y="280" fill="#f4d27a" fontSize="13" fontWeight="700" letterSpacing="5">
+          FANTASY FOOTBALL
+        </text>
+        <text x="180" y="304" fill="#ffffff" fontSize="11" letterSpacing="4" opacity="0.85">
+          AUCTION LEAGUE
+        </text>
+      </g>
+
+      {/* Bottom Roman numeral / season */}
+      <g textAnchor="middle">
+        <text
+          x="180"
+          y="348"
+          fill="#f4d27a"
+          fontSize="24"
+          fontWeight="700"
+          letterSpacing="6"
+          style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}
+        >
+          MMXXVI
+        </text>
+        <text
+          x="180"
+          y="376"
+          fill="#ffffff"
+          fontSize="10"
+          letterSpacing="6"
+          opacity="0.75"
+          style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+        >
+          2026 — 2027 SEASON
+        </text>
+      </g>
+
+      {/* Inner hairline trim along shield */}
+      <path
+        d="M180 24 L328 64 L328 240 Q328 332 180 414 Q32 332 32 240 L32 64 Z"
+        fill="none"
+        stroke="#f4d27a"
+        strokeWidth="0.8"
+        opacity="0.55"
+      />
+    </svg>
+  );
+}
+
+function Star({ cx, cy, size, fill }: { cx: number; cy: number; size: number; fill: string }) {
+  const pts: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 === 0 ? size : size / 2.4;
+    const a = (Math.PI / 5) * i - Math.PI / 2;
+    pts.push(`${cx + Math.cos(a) * r},${cy + Math.sin(a) * r}`);
+  }
+  return <polygon points={pts.join(" ")} fill={fill} />;
+}
 
 // Phase timings (ms)
 const FLIP_DURATION = 3000;   // total time for team-logo montage
@@ -85,23 +207,20 @@ export default function Preloader({ onDone }: Props) {
           />
         ))}
 
-        {/* PHASE 2: NFL shield big reveal */}
-        <img
-          src={NFL_SHIELD}
-          alt=""
-          draggable={false}
-          crossOrigin="anonymous"
+        {/* PHASE 2: Custom league shield big reveal */}
+        <div
           className="absolute select-none pointer-events-none"
           style={{
             width: 360,
-            height: 360,
-            objectFit: "contain",
+            height: 440,
             opacity: 0,
             transform: "scale(0.6)",
             filter: "drop-shadow(0 0 50px rgba(255,255,255,0.45))",
             animation: `pl-shield-in 900ms cubic-bezier(.2,.8,.2,1) ${SHIELD_AT}ms forwards, pl-shield-out 600ms ease-in ${SHIELD_AT + SHIELD_HOLD}ms forwards`,
           }}
-        />
+        >
+          <LeagueShield />
+        </div>
       </div>
 
       {/* PHASE 3: TITLE REVEAL — "BRO WE'RE / SENIOR CITIZENS" */}
