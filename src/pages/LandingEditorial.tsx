@@ -1,16 +1,11 @@
 import { Link } from "react-router-dom";
-
 import { useEffect, useRef, useState } from "react";
 
 export default function LandingEditorial() {
-  const [scrollY, setScrollY] = useState(0);
   const [sketchVisible, setSketchVisible] = useState(true);
-  const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const videoZoom = 1.59;
 
-
-  // Keep the video parked at frame 0 while the preloader runs, then start when visible.
+  // Hold video at frame 0 until preloader finishes, then play + drop sketch filter.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -21,7 +16,6 @@ export default function LandingEditorial() {
       try { v.pause(); } catch {}
       try { v.currentTime = 0; } catch {}
     };
-
     const start = () => {
       shouldPlay = true;
       window.clearTimeout(sketchTimer);
@@ -35,10 +29,7 @@ export default function LandingEditorial() {
     v.addEventListener("loadedmetadata", resetToStart, { once: true });
     v.addEventListener("canplay", () => { if (shouldPlay) void v.play().catch(() => {}); });
     window.addEventListener("landing:visible", start, { once: true });
-
-    if ((window as typeof window & { __landingVisible?: boolean }).__landingVisible) {
-      start();
-    }
+    if ((window as typeof window & { __landingVisible?: boolean }).__landingVisible) start();
 
     return () => {
       window.clearTimeout(sketchTimer);
@@ -47,277 +38,180 @@ export default function LandingEditorial() {
     };
   }, []);
 
-
-
-
-
-
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setScrollY(window.scrollY));
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  const progress = Math.min(scrollY / 600, 1);
-  const ghostScale = 1 + progress * 1.4;
-  const ghostY = -progress * 80;
-  const ghostOpacity = 0.16 + progress * 0.18;
-  const heroFade = 1 - progress * 0.4;
-
-  const Wordmark = ({
-    className = "",
-    spin = true,
-  }: {
-    className?: string;
-    spin?: boolean;
-  }) => (
-    <span
-      className={
-        "inline-flex items-center select-none font-serif italic font-medium leading-none tracking-tight text-white " +
-        className
-      }
-      style={{ fontFamily: "'Playfair Display', 'Times New Roman', serif" }}
-    >
-      <span>H</span>
-      <span
-        aria-label="B"
-        className="relative inline-block align-baseline"
-        style={{
-          width: "1.05em",
-          height: "0.78em",
-          marginInline: "0.06em",
-          transform: "translateY(0.06em)",
-        }}
-      >
-        <img
-          src={`${import.meta.env.BASE_URL}football-real.png`}
-          alt=""
-          draggable={false}
-          className="absolute inset-0 h-full w-full object-contain"
-          style={{
-            transform: "rotate(-18deg)",
-            animation: spin ? "football-wobble 4.2s ease-in-out infinite" : undefined,
-            transformOrigin: "50% 55%",
-            filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.5))",
-          }}
-        />
-      </span>
-      <span className="not-italic font-light text-white/70">_</span>
-      <span>A</span>
-    </span>
-  );
+  const MARQUEE = "AUCTION ROOM · BUDGET MATH · LEAGUE HISTORY · TIER MAPPING · DRAFT 2025 · ";
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-hidden bg-black text-white"
+      className="relative min-h-screen w-full overflow-x-hidden bg-[#0a0a0a] text-white"
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer.
-          Uses morphology-based edge detection (works on <video> in Chrome/Safari, unlike feConvolveMatrix). */}
+      {/* a-ha sketch filter */}
       <svg aria-hidden width="0" height="0" style={{ position: "absolute" }}>
         <defs>
           <filter id="ahaSketch" colorInterpolationFilters="sRGB">
-            {/* 1. Desaturate */}
-            <feColorMatrix
-              in="SourceGraphic"
-              type="matrix"
-              values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"
-              result="gray"
-            />
-            {/* 2. Edge detect: dilated - eroded = outline */}
+            <feColorMatrix in="SourceGraphic" type="matrix"
+              values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0" result="gray" />
             <feMorphology in="gray" operator="dilate" radius="1.2" result="dilated" />
             <feMorphology in="gray" operator="erode" radius="1.2" result="eroded" />
             <feComposite in="dilated" in2="eroded" operator="arithmetic" k1="0" k2="1" k3="-1" k4="0" result="edge" />
-            {/* 3. Boost contrast + invert → black ink lines on white paper */}
             <feComponentTransfer in="edge" result="edgeBoost">
               <feFuncR type="linear" slope="6" intercept="0" />
               <feFuncG type="linear" slope="6" intercept="0" />
               <feFuncB type="linear" slope="6" intercept="0" />
             </feComponentTransfer>
-            <feColorMatrix
-              in="edgeBoost"
-              type="matrix"
-              values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0"
-              result="ink"
-            />
-            {/* 4. Animated turbulence → hand-drawn shimmer */}
+            <feColorMatrix in="edgeBoost" type="matrix"
+              values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0" result="ink" />
             <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="noise">
               <animate attributeName="seed" values="1;4;7;2;9;5" dur="0.35s" repeatCount="indefinite" calcMode="discrete" />
             </feTurbulence>
-            {/* 5. Wobble the ink lines with the noise */}
             <feDisplacementMap in="ink" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
           </filter>
         </defs>
       </svg>
 
+      {/* Top bar */}
+      <header className="relative z-20 flex items-center justify-between px-5 pt-5 md:px-10 md:pt-7">
+        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/55">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span>Live · 2025</span>
+        </div>
+        <div className="text-[10px] uppercase tracking-[0.32em] text-white/55">Vol. I</div>
+      </header>
 
+      <div className="mx-5 mt-4 h-px bg-white/10 md:mx-10" />
 
-      {/* Single hero video — sketch filter during intro, then live color */}
-      <video
-        ref={videoRef}
-        loop
-        muted
-        playsInline
-        preload="auto"
-        poster={`${import.meta.env.BASE_URL}hero-poster.png`}
-        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain"
-        style={{
-          filter: sketchVisible
-            ? "url(#ahaSketch)"
-            : "brightness(0.7) contrast(1.05) saturate(0.85)",
-          objectPosition: "center",
-          transform: `scale(${videoZoom})`,
-          transformOrigin: "center center",
-        }}
-      >
-        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-      </video>
+      {/* ── Editorial hero ─────────────────────────────────────────────── */}
+      <section className="relative z-10 px-5 pt-8 md:px-10 md:pt-12">
+        {/* Oversized wordmark, broken into two lines */}
+        <h1 className="font-serif italic leading-[0.82] tracking-[-0.04em] text-white"
+            style={{ fontFamily: "'Playfair Display', serif" }}>
+          <span className="block text-[clamp(4.5rem,22vw,16rem)]">Auction</span>
+          <span className="block text-[clamp(4.5rem,22vw,16rem)] pl-[18%] text-white/35">Room.</span>
+        </h1>
 
+        {/* Meta row */}
+        <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/10 pt-4">
+          <p className="max-w-[20rem] text-[12px] leading-relaxed text-white/65">
+            A shared research desk for your league — three years of price history, tiered values, zero noise.
+          </p>
+          <div className="shrink-0 text-right text-[9px] font-mono uppercase tracking-[0.28em] text-white/40">
+            №&nbsp;001<br />HB_A
+          </div>
+        </div>
+      </section>
 
-      {/* Paper grain overlay during the sketch phase */}
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[3] mix-blend-multiply"
-        style={{
-          opacity: sketchVisible ? 0.35 : 0,
-          transition: "opacity 900ms ease-in",
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.93  0 0 0 0 0.88  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>\")",
-          backgroundSize: "240px 240px",
-        }}
-      />
-
-
-
-
-
-
-      <div
-        className="pointer-events-none absolute inset-0 z-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 22%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.92) 100%)",
-        }}
-      />
-
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.10] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-          backgroundSize: "200px 200px",
-        }}
-      />
-
-      <div className="relative z-10">
-        <header className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
-          <Link to="/" aria-label="Home" className="flex items-center" />
-
-
-          <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.32em] text-white/55">
-            <span>Est. 2025</span>
-            <span className="h-px w-8 bg-white/25" />
-            <span>Auction Room</span>
-            <span className="h-px w-8 bg-white/25" />
-            <span>Vol. I</span>
+      {/* ── Video panel ────────────────────────────────────────────────── */}
+      <section className="relative z-10 mt-8 px-5 md:px-10">
+        <div className="relative">
+          {/* Corner labels */}
+          <div className="absolute -top-3 left-0 z-20 bg-[#0a0a0a] px-2 text-[9px] font-mono uppercase tracking-[0.32em] text-white/55">
+            ▸ Reel / 00:00
+          </div>
+          <div className="absolute -top-3 right-0 z-20 bg-[#0a0a0a] px-2 text-[9px] font-mono uppercase tracking-[0.32em] text-red-500">
+            ● REC
           </div>
 
-        </header>
-
-        <div className="mx-6 mt-6 h-px bg-white/10 md:mx-10" />
-
-        <section
-          className="px-6 pt-24 md:px-10 md:pt-32"
-          style={{ opacity: heroFade }}
-        >
-          {/* Spacer preserving the vertical position of content below the removed eyebrow + headline */}
-          <div aria-hidden style={{ height: "calc(2rem + 3 * clamp(3.5rem, 11vw, 10rem) * 0.92)" }} />
-
-
-          <div className="mt-[55vh] flex justify-center md:mt-[60vh]">
-            <Link
-              to="/team"
-              className="group inline-flex items-center gap-3 rounded-full border border-white/25 px-8 py-3.5 text-[11px] uppercase tracking-[0.32em] text-white/90 transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+          <div className="relative aspect-[4/5] w-full overflow-hidden border border-white/15 bg-black sm:aspect-video">
+            <video
+              ref={videoRef}
+              loop muted playsInline preload="auto"
+              poster={`${import.meta.env.BASE_URL}hero-poster.png`}
+              className="absolute inset-0 h-full w-full object-cover"
+              style={{
+                filter: sketchVisible
+                  ? "url(#ahaSketch)"
+                  : "brightness(0.78) contrast(1.06) saturate(0.9)",
+                transition: "filter 600ms ease",
+              }}
             >
-              Enter draft room
-              <span className="transition-transform duration-300 group-hover:translate-x-1">
-                →
-              </span>
-            </Link>
-          </div>
+              <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+            </video>
 
-          <div
-            ref={ghostRef}
-            className="pointer-events-none mx-auto mt-24 flex max-w-md justify-center will-change-transform"
-            style={{
-              transform: `translateY(${ghostY}px) scale(${ghostScale})`,
-              opacity: ghostOpacity,
-              transition: "opacity 200ms linear",
-            }}
-          >
-            <Wordmark className="text-[14rem] md:text-[20rem]" />
-          </div>
-        </section>
-
-        <section className="mx-auto mt-6 grid max-w-5xl grid-cols-1 gap-0 px-6 pb-20 sm:grid-cols-3 md:px-10">
-          {[
-            { num: "I.", label: "Built for league commissioners" },
-            { num: "II.", label: "Powered by your ESPN league" },
-            { num: "III.", label: "Read-only · shared view" },
-          ].map((item, i) => (
+            {/* Paper grain during sketch */}
             <div
-              key={item.num}
-              className={
-                "flex flex-col items-center gap-3 py-8 text-center " +
-                (i > 0 ? "sm:border-l sm:border-white/10" : "")
-              }
-            >
-              <span
-                className="text-2xl font-serif italic text-white/40"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                {item.num}
-              </span>
-              <span className="text-[10px] uppercase tracking-[0.32em] text-white/55">
-                {item.label}
-              </span>
-            </div>
-          ))}
-        </section>
+              aria-hidden
+              className="pointer-events-none absolute inset-0 mix-blend-multiply"
+              style={{
+                opacity: sketchVisible ? 0.35 : 0,
+                transition: "opacity 900ms ease-in",
+                backgroundImage:
+                  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.93  0 0 0 0 0.88  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>\")",
+                backgroundSize: "240px 240px",
+              }}
+            />
 
-        <div className="mx-6 h-px bg-white/10 md:mx-10" />
-        <footer className="flex flex-col items-center justify-between gap-3 px-6 py-6 text-[10px] uppercase tracking-[0.3em] text-white/40 md:flex-row md:px-10">
-          <span>HB_A · Auction Ace Coach</span>
-          <span>© 2025 — All bids final</span>
-        </footer>
-      </div>
+            {/* Bottom gradient + caption inside the frame */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black to-transparent" />
+            <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between text-[9px] font-mono uppercase tracking-[0.3em] text-white/75">
+              <span>The Draft Tape</span>
+              <span>2025 · HB_A</span>
+            </div>
+          </div>
+
+          {/* Bottom corner labels */}
+          <div className="mt-2 flex items-center justify-between text-[9px] font-mono uppercase tracking-[0.32em] text-white/40">
+            <span>Auto-loop</span>
+            <span>Read-only · Shared view</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Marquee ────────────────────────────────────────────────────── */}
+      <section className="relative z-10 mt-10 overflow-hidden border-y border-white/10 py-3">
+        <div className="marquee-track whitespace-nowrap font-serif italic text-[clamp(1.5rem,5vw,2.5rem)] text-white/30"
+             style={{ fontFamily: "'Playfair Display', serif" }}>
+          {MARQUEE.repeat(6)}
+        </div>
+      </section>
+
+      {/* ── CTA + index list ───────────────────────────────────────────── */}
+      <section className="relative z-10 px-5 pt-10 md:px-10">
+        <Link
+          to="/team"
+          className="group inline-flex w-full items-center justify-between gap-3 border border-white/25 px-6 py-5 text-[11px] uppercase tracking-[0.32em] text-white transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
+        >
+          <span>Enter the draft room</span>
+          <span className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+        </Link>
+
+        <ol className="mt-10 divide-y divide-white/10 border-y border-white/10">
+          {[
+            { num: "01", label: "Built for league commissioners", meta: "Admin" },
+            { num: "02", label: "Powered by your ESPN league", meta: "Sync" },
+            { num: "03", label: "Read-only · Shared view", meta: "Public" },
+          ].map((item) => (
+            <li key={item.num} className="flex items-center justify-between gap-4 py-5">
+              <div className="flex items-baseline gap-4">
+                <span className="font-mono text-[10px] tracking-[0.32em] text-white/40">{item.num}</span>
+                <span className="font-serif italic text-[clamp(1.1rem,4.5vw,1.6rem)] text-white"
+                      style={{ fontFamily: "'Playfair Display', serif" }}>
+                  {item.label}
+                </span>
+              </div>
+              <span className="shrink-0 text-[9px] font-mono uppercase tracking-[0.3em] text-white/40">
+                {item.meta}
+              </span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <footer className="relative z-10 mt-10 flex items-center justify-between px-5 py-6 text-[9px] font-mono uppercase tracking-[0.3em] text-white/40 md:px-10">
+        <span>HB_A · Auction Ace</span>
+        <span>© 2025 — All bids final</span>
+      </footer>
 
       <style>{`
-        @keyframes football-wobble {
-          0%, 100% { transform: rotate(-18deg) scale(1); }
-          25% { transform: rotate(-12deg) scale(1.04); }
-          75% { transform: rotate(-22deg) scale(0.97); }
+        .marquee-track {
+          animation: marquee 38s linear infinite;
+          will-change: transform;
         }
-        @keyframes hero-polaroid-reveal {
-          0% { opacity: 0; transform: translate3d(-42vw, -38vh, 0) rotate(-16deg) scale(0.72); }
-          16% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-5deg) scale(0.94); }
-          36% { opacity: 1; transform: translate3d(0, 0, 0) rotate(2deg) scale(1); }
-          62% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg) scale(1.03); filter: grayscale(1); }
-          100% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg) scale(${videoZoom}); filter: grayscale(0); }
-        }
-        .hero-polaroid-frame {
-          animation: hero-polaroid-reveal 1800ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-          will-change: transform, opacity, filter;
+        @keyframes marquee {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .hero-polaroid-frame { animation-duration: 600ms; }
+          .marquee-track { animation: none; }
         }
       `}</style>
     </div>
