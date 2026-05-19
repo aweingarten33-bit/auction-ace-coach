@@ -69,7 +69,7 @@ export default function TeamPicker() {
             <ChevronRight className="h-3.5 w-3.5 rotate-180" strokeWidth={2} />
             Back
           </Link>
-          <span className="text-[13px] font-medium text-[#1d1d1f]">Auction Ace</span>
+          <span className="text-[13px] font-medium text-[#1d1d1f]">Ace</span>
           <button
             onClick={skip}
             className="text-[13px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"

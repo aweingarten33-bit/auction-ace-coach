@@ -7,7 +7,7 @@ export default function SpinningFootball({ size = 220, speed = 12 }: Props) {
   const r = size / 2;
   const textRadius = r + 28;
   const circumference = 2 * Math.PI * textRadius;
-  const ringText = "AUCTION ACE  •  DRAFT ROOM  •  FANTASY FOOTBALL  •  ";
+  const ringText = "ACE  •  DRAFT ROOM  •  FANTASY FOOTBALL  •  ";
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: size + 80, height: size + 80 }}>

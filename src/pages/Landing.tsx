@@ -102,7 +102,7 @@ export default function Landing() {
           className="mt-2 text-[10px] font-mono tracking-widest text-white/20"
           style={{ animation: "fade-in 0.6s 1.6s ease-out both" }}
         >
-          AUCTION ACE — DRAFT SEASON 2025
+          ACE — DRAFT SEASON 2025
         </p>
       </div>
 
