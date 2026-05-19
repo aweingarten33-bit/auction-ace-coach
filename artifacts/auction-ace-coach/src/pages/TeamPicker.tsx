@@ -84,18 +84,6 @@ export default function TeamPicker() {
           <source src={videoSrc} type="video/mp4" />
         </video>
 
-        <video
-          autoPlay loop muted playsInline
-          className="tp-kb"
-          style={{
-            position: "absolute", top: "50%", left: "50%",
-            width: "100%", height: "100%", objectFit: "contain",
-            opacity: 1,
-          }}
-        >
-          <source src={videoSrc} type="video/mp4" />
-        </video>
-
         <div
           aria-hidden
           style={{
