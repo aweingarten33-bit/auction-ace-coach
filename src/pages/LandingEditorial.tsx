@@ -1,5 +1,5 @@
-import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import TeamPickerPanel from "@/components/TeamPickerPanel";
 
 export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
