@@ -102,10 +102,11 @@ export default function LandingEditorial() {
       className="relative min-h-screen w-full overflow-hidden bg-black text-white"
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer (edge-detect ink on paper) */}
+      {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer.
+          Uses morphology-based edge detection (works on <video> in Chrome/Safari, unlike feConvolveMatrix). */}
       <svg aria-hidden width="0" height="0" style={{ position: "absolute" }}>
         <defs>
-          <filter id="ahaSketch" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+          <filter id="ahaSketch" colorInterpolationFilters="sRGB">
             {/* 1. Desaturate */}
             <feColorMatrix
               in="SourceGraphic"
@@ -113,30 +114,32 @@ export default function LandingEditorial() {
               values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"
               result="gray"
             />
-            {/* 2. Edge detect (Laplacian) */}
-            <feConvolveMatrix
-              in="gray"
-              order="3"
-              preserveAlpha="true"
-              kernelMatrix="1 1 1  1 -8 1  1 1 1"
-              result="edges"
-            />
-            {/* 3. Invert + crank contrast → black ink lines on white paper */}
+            {/* 2. Edge detect: dilated - eroded = outline */}
+            <feMorphology in="gray" operator="dilate" radius="1.2" result="dilated" />
+            <feMorphology in="gray" operator="erode" radius="1.2" result="eroded" />
+            <feComposite in="dilated" in2="eroded" operator="arithmetic" k1="0" k2="1" k3="-1" k4="0" result="edge" />
+            {/* 3. Boost contrast + invert → black ink lines on white paper */}
+            <feComponentTransfer in="edge" result="edgeBoost">
+              <feFuncR type="linear" slope="6" intercept="0" />
+              <feFuncG type="linear" slope="6" intercept="0" />
+              <feFuncB type="linear" slope="6" intercept="0" />
+            </feComponentTransfer>
             <feColorMatrix
-              in="edges"
+              in="edgeBoost"
               type="matrix"
-              values="-6 0 0 0 1  0 -6 0 0 1  0 0 -6 0 1  0 0 0 1 0"
+              values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0"
               result="ink"
             />
-            {/* 4. Animated turbulence for the hand-drawn shimmer */}
+            {/* 4. Animated turbulence → hand-drawn shimmer */}
             <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="noise">
-              <animate attributeName="seed" values="1;4;7;2;9;5" dur="0.4s" repeatCount="indefinite" calcMode="discrete" />
+              <animate attributeName="seed" values="1;4;7;2;9;5" dur="0.35s" repeatCount="indefinite" calcMode="discrete" />
             </feTurbulence>
-            {/* 5. Displace the ink with the noise → wobbly pencil strokes */}
-            <feDisplacementMap in="ink" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
+            {/* 5. Wobble the ink lines with the noise */}
+            <feDisplacementMap in="ink" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
           </filter>
         </defs>
       </svg>
+
 
 
       {/* Single hero video — sketch filter during intro, then live color */}
