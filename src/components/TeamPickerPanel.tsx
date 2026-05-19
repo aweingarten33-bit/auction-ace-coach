@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, ArrowRight } from "lucide-react";
-import helmetImg from "@/assets/choose-team-helmet.jpeg";
+import helmetImg from "@/assets/choose-team-helmet.png";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
