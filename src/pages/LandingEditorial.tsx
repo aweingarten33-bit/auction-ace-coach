@@ -6,6 +6,14 @@ export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoZoom, setVideoZoom] = useState<number>(() => {
+    if (typeof window === "undefined") return 1;
+    const v = parseFloat(localStorage.getItem("heroVideoZoom") || "1");
+    return Number.isFinite(v) && v > 0 ? v : 1;
+  });
+  useEffect(() => {
+    try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
+  }, [videoZoom]);
 
   // Sync video start with preloader end (~6.5s) so it doesn't begin mid-clip.
   useEffect(() => {
