@@ -1,10 +1,20 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import TeamPickerPanel from "@/components/TeamPickerPanel";
+import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 
 export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [morphing, setMorphing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const nav = useNavigate();
+  const { team } = useSelectedTeam();
+
+  // If a team was already picked in a previous session, skip the landing.
+  useEffect(() => {
+    if (team) nav("/draft-room", { replace: true });
+  }, [team, nav]);
 
   // Hold video at frame 0 until preloader finishes, then play + drop sketch filter.
   useEffect(() => {
