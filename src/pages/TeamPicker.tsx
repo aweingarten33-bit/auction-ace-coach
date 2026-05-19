@@ -68,13 +68,14 @@ export default function TeamPicker() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#f6f4ef] text-[#0a0a0a]">
+      <BackButton to="/" />
       <main
-        className="mx-auto max-w-md px-5 pt-12 pb-32"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 3rem)" }}
+        className="mx-auto max-w-md px-5 pt-20 pb-32"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 5rem)" }}
       >
         <div className="mb-8">
-          <Trophy className="mb-4 h-10 w-10 text-primary" strokeWidth={1.5} />
+          <Trophy className="mb-4 h-10 w-10 text-red-500" strokeWidth={1.5} />
           <h1 className="mb-3 text-[34px] leading-[1.05] font-semibold tracking-tight">
             Which team are you?
           </h1>
