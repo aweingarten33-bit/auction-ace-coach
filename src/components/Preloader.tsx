@@ -110,7 +110,7 @@ function LeagueShield() {
 }
 
 const FLIP_DURATION = 3000;
-const PER_LOGO = FLIP_DURATION / TEAMS.length;
+const PER_LOGO = FLIP_DURATION / NFL_TEAMS.length;
 const SHIELD_AT = FLIP_DURATION;
 const SHIELD_HOLD = 1100;
 const TITLE_AT = SHIELD_AT + 900;
