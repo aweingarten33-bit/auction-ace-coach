@@ -100,14 +100,6 @@ export default function LandingEditorial() {
                 "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
             }}
           >
-
-            style={{
-              WebkitMaskImage:
-                "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
-              maskImage:
-                "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
-            }}
-          >
             <video
               ref={videoRef}
               loop muted playsInline preload="auto"
