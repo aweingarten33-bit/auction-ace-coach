@@ -2,9 +2,19 @@ import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+const VIDEO_SCALE_KEY = "landing-video-scale";
+
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const [videoScale, setVideoScale] = useState(() => {
+    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1"); } catch { return 1; }
+  });
+  const [showSlider, setShowSlider] = useState(false);
+
+  useEffect(() => {
+    try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {}
+  }, [videoScale]);
 
   useEffect(() => {
     let raf = 0;
@@ -78,8 +88,8 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain"
-        style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
+        style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)", transform: `scale(${videoScale})`, transformOrigin: "center center" }}
       >
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
@@ -204,9 +214,26 @@ export default function LandingEditorial() {
 
         <div className="mx-6 h-px bg-white/10 md:mx-10" />
         <footer className="flex flex-col items-center justify-between gap-3 px-6 py-6 text-[10px] uppercase tracking-[0.3em] text-white/40 md:flex-row md:px-10">
-          <span>HB_A · Auction Ace Coach</span>
+          <span
+            className="cursor-pointer select-none hover:text-white/60 transition"
+            onClick={() => setShowSlider(v => !v)}
+          >HB_A · Auction Ace Coach</span>
           <span>© 2025 — All bids final</span>
         </footer>
+
+        {showSlider && (
+          <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 flex flex-col items-center gap-3 rounded-2xl bg-black/80 backdrop-blur px-6 py-4 ring-1 ring-white/20 w-72">
+            <p className="text-[10px] uppercase tracking-widest text-white/50">Video zoom</p>
+            <input
+              type="range" min="0.5" max="2" step="0.05"
+              value={videoScale}
+              onChange={e => setVideoScale(parseFloat(e.target.value))}
+              className="w-full accent-white"
+            />
+            <p className="text-[11px] text-white/40">{Math.round(videoScale * 100)}%</p>
+          </div>
+        )}
+
       </div>
 
       <style>{`
