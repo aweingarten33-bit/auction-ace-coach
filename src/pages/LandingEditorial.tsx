@@ -117,16 +117,15 @@ export default function LandingEditorial() {
             }}
             onMouseEnter={() => { if (!morphing) setMorphing(true); }}
             onMouseLeave={() => { if (!menuOpen) window.setTimeout(() => setMorphing(false), 200); }}
-            className="group relative block overflow-hidden outline-none"
+            className="group relative block bg-transparent outline-none"
           >
             <img
               src={helmetImg}
               alt=""
               draggable={false}
-              className={`block h-auto w-[180px] select-none transition-transform duration-500 ease-out md:w-[240px] ${
+              className={`block h-auto w-[180px] select-none bg-transparent transition-transform duration-500 ease-out md:w-[240px] ${
                 morphing ? "scale-[1.06]" : "scale-100 group-hover:scale-[1.03]"
               }`}
-              style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.55))" }}
             />
           </button>
 
