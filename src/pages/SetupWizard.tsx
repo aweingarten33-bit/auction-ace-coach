@@ -86,38 +86,42 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <BackButton to="/" />
-      <div className="mx-auto max-w-2xl">
-        <header className="mb-6 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary">
-              <Trophy className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold">Draft Setup</h1>
-              <p className="text-xs text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              onClick={() => navigate("/espn")}
-              className="bg-[#D40026] text-white shadow-glow hover:bg-[#b8001f]"
-            >
-              Connect
-              <span className="ml-1.5 font-extrabold italic tracking-tighter">ESPN</span>
-            </Button>
-            {setupComplete && (
-              <Button size="sm" variant="outline" onClick={() => navigate("/draft-room")}>
-                Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            )}
-          </div>
-        </header>
+    <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>
+      {/* Nav */}
+      <nav className="fixed top-0 inset-x-0 z-50 h-12 flex items-center border-b border-black/[0.07] bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto w-full max-w-2xl px-5 flex items-center justify-between">
+          <button onClick={() => navigate("/")} className="text-[13px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors flex items-center gap-1">
+            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} /> Back
+          </button>
+          <span className="text-[13px] font-medium text-[#1d1d1f]">Draft Setup</span>
+          {setupComplete && (
+            <button onClick={() => navigate("/draft-room")} className="text-[13px] font-medium text-[#eb0000] hover:underline">
+              Draft Room →
+            </button>
+          )}
+          {!setupComplete && (
+            <button onClick={() => navigate("/espn")} className="text-[13px] font-medium text-[#eb0000] hover:underline">
+              Connect ESPN
+            </button>
+          )}
+        </div>
+      </nav>
 
+      <div className="mx-auto max-w-2xl px-5 pt-20 pb-24">
+        {/* Step indicator */}
+        <div className="mb-8 mt-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[11px] uppercase tracking-[0.3em] text-[#6e6e73]">
+              Step {step + 1} of {STEPS.length} — {STEPS[step]}
+            </p>
+            <p className="text-[11px] text-[#6e6e73]">{Math.round(progress)}%</p>
+          </div>
+          <div className="h-[2px] bg-[#f5f5f7] rounded-full overflow-hidden">
+            <div className="h-full bg-[#1d1d1f] rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
 
-        <Progress value={progress} className="mb-6 h-1.5" />
+        <Progress value={progress} className="hidden" />
 
         <Card className="p-5 md:p-6">
           <button

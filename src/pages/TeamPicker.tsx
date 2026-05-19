@@ -1,16 +1,11 @@
-// TeamPicker — front door. No login required. Visitor picks which team they
-// identify as so the dossier (budget remaining, roster, slot needs, coach
-// recommendations) is personalized to them. Selection is saved locally.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Loader2, Trophy, ArrowRight } from "lucide-react";
-import BackButton from "@/components/BackButton";
+import { Loader2, ChevronRight, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 interface Team { id: number; name: string; abbrev?: string }
 
@@ -24,19 +19,14 @@ export default function TeamPicker() {
 
   useEffect(() => {
     (async () => {
-      // Ensure visitors have a Supabase session (anonymous is fine) so they can
-      // call edge functions. This is a no-op if they're already signed in.
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        await supabase.auth.signInAnonymously();
-      }
+      if (!session) await supabase.auth.signInAnonymously();
 
       try {
         const { data, error: invokeErr } = await supabase.functions.invoke("league-teams");
         const errMsg =
           (data && typeof data === "object" && "error" in data ? (data as any).error : null) ||
-          invokeErr?.message ||
-          null;
+          invokeErr?.message || null;
         if (errMsg) {
           setError(typeof errMsg === "string" ? errMsg : "Couldn't load teams.");
           setLoading(false);
@@ -68,88 +58,130 @@ export default function TeamPicker() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f4ef] text-[#0a0a0a]">
-      <BackButton to="/" />
-      <main
-        className="mx-auto max-w-md px-5 pt-20 pb-32"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 5rem)" }}
-      >
-        <div className="mb-8">
-          <Trophy className="mb-4 h-10 w-10 text-red-500" strokeWidth={1.5} />
-          <h1 className="mb-3 text-[34px] leading-[1.05] font-semibold tracking-tight">
-            Which team are you?
+    <div
+      className="min-h-screen bg-white text-[#1d1d1f]"
+      style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
+    >
+      {/* Nav */}
+      <nav className="fixed top-0 inset-x-0 z-50 h-12 flex items-center border-b border-black/[0.07] bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto w-full max-w-4xl px-5 flex items-center justify-between">
+          <Link to="/" className="text-[13px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors flex items-center gap-1">
+            <ChevronRight className="h-3.5 w-3.5 rotate-180" strokeWidth={2} />
+            Back
+          </Link>
+          <span className="text-[13px] font-medium text-[#1d1d1f]">Auction Ace</span>
+          <button
+            onClick={skip}
+            className="text-[13px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+          >
+            Skip
+          </button>
+        </div>
+      </nav>
+
+      <main className="pt-24 pb-24 px-5 mx-auto max-w-md">
+        {/* Header */}
+        <div className="mb-10">
+          <p className="text-[11px] uppercase tracking-[0.32em] text-[#6e6e73] mb-4">
+            Step 1
+          </p>
+          <h1
+            className="text-[#1d1d1f] font-bold leading-tight mb-4"
+            style={{ fontSize: "clamp(2rem, 8vw, 2.8rem)", letterSpacing: "-0.03em" }}
+          >
+            Which team
+            <br />
+            are you?
           </h1>
-          <p className="text-sm leading-relaxed text-black/60">
-            Pick your team to personalize the dossier — budget remaining, roster needs,
-            and AI recommendations get tailored to your specific roster and gaps.
+          <p className="text-[15px] leading-relaxed text-[#6e6e73] font-light">
+            Pick your team to personalize budget, roster gaps, and AI recommendations.
           </p>
         </div>
 
+        {/* Loading */}
         {loading && (
-          <div className="flex items-center gap-2 py-12 text-sm text-muted-foreground">
+          <div className="flex items-center gap-3 py-12 text-[14px] text-[#6e6e73]">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading league teams…
           </div>
         )}
 
+        {/* Error */}
         {error && !loading && (
-          <Card className="border-destructive/40 bg-destructive/5 p-4 text-xs text-destructive">
-            <p className="mb-1 font-semibold">Couldn't load teams.</p>
-            <p className="text-destructive/80">
-              {error}. The league commissioner may need to connect ESPN first.
-            </p>
-            <Button variant="outline" size="sm" className="mt-3" onClick={skip}>
+          <div className="rounded-xl border border-[#d2d2d7] p-6 text-[14px]">
+            <p className="font-semibold text-[#1d1d1f] mb-1">Couldn't load teams</p>
+            <p className="text-[#6e6e73] mb-4 leading-relaxed">{error}. The league commissioner may need to connect ESPN first.</p>
+            <button
+              onClick={skip}
+              className="text-[13px] font-medium text-[#eb0000] hover:underline"
+            >
               Continue without picking →
-            </Button>
-          </Card>
+            </button>
+          </div>
         )}
 
+        {/* Team list */}
         {!loading && !error && teams.length > 0 && (
-          <>
-            <div className="space-y-1.5">
-              {teams.map((t) => {
-                const isPicked = picked?.id === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setPicked(t)}
-                    className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${
-                      isPicked
-                        ? "border-red-500 bg-red-500/10"
-                        : "border-black/10 bg-white/60 hover:bg-white"
-                    }`}
-                  >
-                    {t.abbrev && (
-                      <span className="font-mono text-[11px] font-semibold text-black/50">
-                        {t.abbrev}
-                      </span>
-                    )}
-                    <span className="flex-1 text-sm font-medium">{t.name}</span>
-                    {isPicked && <ArrowRight className="h-4 w-4 text-red-500" />}
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-6 flex gap-2">
-              <Button onClick={confirm} disabled={!picked} className="flex-1">
-                {picked ? `Continue as ${picked.name}` : "Pick a team"}
-              </Button>
-              <Button variant="ghost" onClick={skip}>
-                Skip
-              </Button>
-            </div>
-          </>
+          <div className="space-y-1.5">
+            {teams.map((t) => {
+              const isPicked = picked?.id === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setPicked(t)}
+                  className={`w-full flex items-center gap-4 rounded-xl px-5 py-3.5 text-left transition-all ${
+                    isPicked
+                      ? "bg-[#1d1d1f] text-white"
+                      : "bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#ebebeb]"
+                  }`}
+                >
+                  {t.abbrev && (
+                    <span
+                      className={`font-mono text-[11px] font-semibold w-8 shrink-0 ${
+                        isPicked ? "text-white/50" : "text-[#6e6e73]"
+                      }`}
+                    >
+                      {t.abbrev}
+                    </span>
+                  )}
+                  <span className="flex-1 text-[15px] font-medium">{t.name}</span>
+                  {isPicked && <Check className="h-4 w-4 shrink-0" strokeWidth={2.5} />}
+                </button>
+              );
+            })}
+          </div>
         )}
 
+        {/* Empty */}
         {!loading && !error && teams.length === 0 && (
-          <Card className="border-warning/40 bg-warning/5 p-4 text-xs">
-            <p>No teams found yet. The league admin needs to connect ESPN first.</p>
-            <Button variant="outline" size="sm" className="mt-3" onClick={skip}>
+          <div className="rounded-xl border border-[#d2d2d7] p-6 text-[14px]">
+            <p className="text-[#1d1d1f] font-semibold mb-1">No teams found</p>
+            <p className="text-[#6e6e73] mb-4">The league admin needs to connect ESPN first.</p>
+            <button
+              onClick={skip}
+              className="text-[13px] font-medium text-[#eb0000] hover:underline"
+            >
               Continue anyway →
-            </Button>
-          </Card>
+            </button>
+          </div>
+        )}
+
+        {/* Confirm */}
+        {!loading && !error && teams.length > 0 && (
+          <div className="mt-6">
+            <button
+              onClick={confirm}
+              disabled={!picked}
+              className={`w-full rounded-full py-4 text-[15px] font-semibold transition-all ${
+                picked
+                  ? "bg-[#1d1d1f] text-white hover:bg-[#2d2d2d]"
+                  : "bg-[#f5f5f7] text-[#6e6e73] cursor-not-allowed"
+              }`}
+            >
+              {picked ? `Continue as ${picked.name}` : "Select a team above"}
+            </button>
+          </div>
         )}
       </main>
     </div>

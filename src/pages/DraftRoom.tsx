@@ -207,10 +207,10 @@ export default function DraftRoom() {
   }, [spentPct]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-screen flex-col overflow-hidden bg-white text-[#1d1d1f]" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>
       {/* ── HEADER ─────────────────────────────────────────── */}
       <header
-        className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-3 py-3"
+        className="flex shrink-0 items-center gap-2 border-b border-black/[0.08] bg-white/90 backdrop-blur-xl px-3 py-3"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
       >
         <Button

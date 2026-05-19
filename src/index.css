@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=Delius+Swash+Caps&family=Permanent+Marker&family=Caveat:wght@500;700&family=Architects+Daughter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,112 +14,97 @@
 
 @layer base {
   :root {
-    /* ---------- CORE SURFACE ---------- */
-    /* ---------- CORE SURFACE — "Returns" suit, light mode ----------
-       Cool clay base subtly tinted toward suit-navy. Foreground = the
-       deep midnight-blue of the bodysuit. Accent = muted shield ochre.
-       Maroon = trunks/cape lining. */
-    --background:        220 24% 89%;
-    --background-alt:    220 24% 89%;
-    --foreground:        222 55% 16%;        /* suit midnight navy */
-    --muted-bg:          220 24% 89%;
+    /* ── APPLE-CLEAN LIGHT MODE ─────────────────────────────────────────── */
+    --background:        0 0% 100%;          /* #ffffff */
+    --background-alt:    240 5% 97%;         /* #f5f5f7 */
+    --foreground:        0 0% 11%;           /* #1d1d1f */
+    --muted-bg:          240 5% 97%;
 
-    --card:              220 24% 89%;
-    --card-foreground:   222 55% 16%;
+    --card:              0 0% 100%;
+    --card-foreground:   0 0% 11%;
 
-    --popover:           220 24% 89%;
-    --popover-foreground:222 55% 16%;
+    --popover:           0 0% 100%;
+    --popover-foreground: 0 0% 11%;
 
-    /* ---------- ACCENTS — Superman: navy / gold-ochre / maroon ---------- */
-    --primary:           222 60% 24%;        /* shield navy */
-    --primary-foreground: 42 90% 92%;
-    --primary-glow:      222 55% 38%;
+    --primary:           355 100% 46%;       /* #eb0000 — signal red */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow:      355 100% 58%;
 
-    --secondary:         220 24% 89%;
-    --secondary-foreground: 222 55% 16%;
+    --secondary:         240 5% 97%;         /* #f5f5f7 */
+    --secondary-foreground: 0 0% 11%;
 
-    --accent:            38 78% 46%;         /* shield gold / belt buckle */
-    --accent-foreground: 222 60% 12%;
-    --accent-secondary:  354 58% 30%;        /* maroon — trunks / cape lining */
+    --accent:            355 100% 46%;
+    --accent-foreground: 0 0% 100%;
+    --accent-secondary:  355 80% 36%;
 
-    --muted:             220 24% 89%;
-    --muted-foreground:  220 18% 34%;
+    --muted:             240 5% 97%;
+    --muted-foreground:  240 2% 44%;         /* #6e6e73 */
 
-    --destructive:       354 65% 36%;        /* maroon-red */
-    --destructive-foreground: 42 90% 92%;
+    --destructive:       355 80% 46%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning:           38 88% 50%;
-    --warning-foreground: 222 60% 12%;
+    --warning:           38 92% 50%;
+    --warning-foreground: 0 0% 10%;
 
-    --success:           38 78% 46%;
-    --success-foreground: 222 60% 12%;
+    --success:           142 71% 36%;
+    --success-foreground: 0 0% 100%;
 
-    --border:            transparent;
-    --input:             220 24% 89%;
-    --ring:              38 78% 46%;
+    --border:            240 4% 84%;         /* #d2d2d7 */
+    --input:             240 5% 97%;
+    --ring:              355 100% 46%;
 
-    --radius: 1rem;
+    --radius: 0.75rem;
 
-    /* ---------- NEUMORPHIC TOKENS ---------- */
-    --surface:           220 24% 89%;
-    --surface-2:         220 24% 89%;
+    /* ── CLEAN SHADOWS (no neumorphism) ─────────────────────────────────── */
+    --surface:           0 0% 100%;
+    --surface-2:         240 5% 97%;
     --shadow-light-rgb:  255, 255, 255;
-    --shadow-dark-rgb:   150, 162, 188;       /* cool blue-grey, suit-tinted */
+    --shadow-dark-rgb:   0, 0, 0;
 
-    /* Shadow recipes — composed from RGBA pairs */
-    --neu-extruded:      9px 9px 16px rgba(var(--shadow-dark-rgb), 0.6),
-                         -9px -9px 16px rgba(var(--shadow-light-rgb), 0.5);
-    --neu-extruded-hover: 12px 12px 20px rgba(var(--shadow-dark-rgb), 0.7),
-                          -12px -12px 20px rgba(var(--shadow-light-rgb), 0.6);
-    --neu-extruded-sm:   5px 5px 10px rgba(var(--shadow-dark-rgb), 0.6),
-                         -5px -5px 10px rgba(var(--shadow-light-rgb), 0.5);
-    --neu-inset:         inset 6px 6px 10px rgba(var(--shadow-dark-rgb), 0.6),
-                         inset -6px -6px 10px rgba(var(--shadow-light-rgb), 0.5);
-    --neu-inset-deep:    inset 10px 10px 20px rgba(var(--shadow-dark-rgb), 0.7),
-                         inset -10px -10px 20px rgba(var(--shadow-light-rgb), 0.6);
-    --neu-inset-sm:      inset 3px 3px 6px rgba(var(--shadow-dark-rgb), 0.6),
-                         inset -3px -3px 6px rgba(var(--shadow-light-rgb), 0.5);
+    --neu-extruded:      0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    --neu-extruded-hover: 0 4px 12px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.08);
+    --neu-extruded-sm:   0 1px 2px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+    --neu-inset:         inset 0 1px 3px rgba(0,0,0,0.07);
+    --neu-inset-deep:    inset 0 2px 6px rgba(0,0,0,0.10);
+    --neu-inset-sm:      inset 0 1px 2px rgba(0,0,0,0.06);
 
-    /* ---------- LEGACY ALIASES (re-routed to neutral neumorphic palette) ----------
-       The codebase contains many Frank-Miller era tokens. We keep the names
-       so old components don't crash, but route them all to the soft surface.
-    */
-    --bone:              212 16% 28%;
-    --paper:             220 9% 46%;
-    --void:              218 23% 90%;
-    --ink:               218 23% 90%;
-    --charcoal:          218 23% 90%;
-    --gunmetal:          218 23% 90%;
-    --steel-blue:        222 44% 26%;
-    --blood:             350 48% 30%;
-    --signal-red:        350 48% 30%;
-    --dirty-gold:        36 50% 42%;
-    --warning-yellow:    36 65% 48%;
-    --signal:            36 50% 42%;
-    --brass:             36 50% 42%;
-    --brass-light:       36 55% 56%;
-    --brass-dark:        36 50% 32%;
-    --crimson:           350 48% 30%;
-    --crimson-spatter:   350 48% 30%;
-    --parchment:         222 44% 18%;
-    --ink-faded:         220 14% 38%;
-    --wood-grain:        220 24% 89%;
-    --bloodred:          350 48% 30%;
-    --steel:             220 14% 38%;
-    --sungold:           36 50% 42%;
-    --sungold-2:         36 55% 56%;
-    --krypton:           220 24% 89%;
-    --kryptonite:        36 50% 42%;
+    /* ── LEGACY ALIASES ─────────────────────────────────────────────────── */
+    --bone:              0 0% 96%;
+    --paper:             240 2% 44%;
+    --void:              0 0% 100%;
+    --ink:               0 0% 11%;
+    --charcoal:          0 0% 20%;
+    --gunmetal:          0 0% 32%;
+    --steel-blue:        213 27% 50%;
+    --blood:             355 100% 46%;
+    --signal-red:        355 100% 46%;
+    --dirty-gold:        38 80% 50%;
+    --warning-yellow:    38 92% 56%;
+    --signal:            355 100% 46%;
+    --brass:             38 80% 50%;
+    --brass-light:       38 85% 62%;
+    --brass-dark:        38 75% 38%;
+    --crimson:           355 100% 46%;
+    --crimson-spatter:   355 100% 46%;
+    --parchment:         0 0% 97%;
+    --ink-faded:         240 2% 55%;
+    --wood-grain:        240 5% 97%;
+    --bloodred:          355 100% 46%;
+    --steel:             240 2% 55%;
+    --sungold:           38 80% 50%;
+    --sungold-2:         38 85% 62%;
+    --krypton:           240 5% 97%;
+    --kryptonite:        355 100% 46%;
 
-    /* Legacy shadow aliases → neumorphic equivalents */
+    /* Legacy shadow aliases */
     --shadow-card:       var(--neu-extruded);
     --shadow-floating:   var(--neu-extruded-hover);
     --shadow-pressed:    var(--neu-inset);
     --shadow-recessed:   var(--neu-inset-sm);
     --shadow-sharp:      var(--neu-extruded);
-    --shadow-glow:       0 0 0 2px hsl(var(--primary) / 0.4), var(--neu-extruded);
+    --shadow-glow:       0 0 0 3px hsl(var(--primary) / 0.2);
     --shadow-primary:    var(--neu-extruded);
-    --shadow-led-green:  0 0 14px hsl(var(--accent-secondary) / 0.5);
+    --shadow-led-green:  0 0 14px hsl(142 71% 36% / 0.4);
     --shadow-engraved:   var(--neu-inset);
     --shadow-wax-seal:   var(--neu-extruded);
     --shadow-brut-sm:    var(--neu-extruded-sm);
@@ -128,11 +113,11 @@
     --shadow-brut-xl:    var(--neu-extruded-hover);
 
     /* Sidebar */
-    --sidebar-background: 220 24% 89%;
-    --sidebar-foreground: 222 44% 18%;
-    --sidebar-primary: 222 44% 26%;
-    --sidebar-primary-foreground: 40 35% 92%;
-    --sidebar-accent: 220 24% 89%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 11%;
+    --sidebar-primary: 355 100% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 97%;
     --sidebar-accent-foreground: 222 44% 18%;
     --sidebar-border: transparent;
     --sidebar-ring: 222 44% 26%;
@@ -220,7 +205,7 @@
   body {
     @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
-    font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.5;
     background-color: hsl(var(--background));
@@ -234,7 +219,7 @@
   .dark .min-h-screen.bg-background::before { content: none !important; }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
