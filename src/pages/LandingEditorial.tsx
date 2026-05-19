@@ -97,6 +97,9 @@ export default function LandingEditorial() {
 
   return (
     <div
+      className="relative min-h-screen w-full overflow-hidden bg-black text-white"
+      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+    >
       {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer */}
       <svg aria-hidden width="0" height="0" style={{ position: "absolute" }}>
         <defs>
