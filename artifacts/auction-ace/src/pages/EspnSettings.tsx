@@ -105,10 +105,10 @@ export default function EspnSettings() {
       toast.error(data?.error ?? error?.message ?? "Failed");
       return;
     }
-    setLeagues(data.leagues ?? []);
+    setLeagues(data?.leagues ?? []);
     setSelected(null);
     setVerified(new Date().toISOString());
-    const count = data.leagues?.length ?? 0;
+    const count = data?.leagues?.length ?? 0;
     if (count === 0) {
       toast.warning(data?.hint ?? "No leagues found. Re-copy the full espn_s2 cookie from espn.com, then verify again.");
     } else {
