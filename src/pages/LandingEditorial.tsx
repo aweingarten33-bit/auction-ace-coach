@@ -67,11 +67,26 @@ export default function LandingEditorial() {
         }}
       />
 
-      {/* Gradient overlay — dark at edges, lets image breathe in center */}
+      {/* Gradient overlay */}
       <div style={{
         position: "absolute", inset: 0, pointerEvents: "none",
         background: "linear-gradient(to bottom, rgba(4,10,22,0.45) 0%, rgba(4,10,22,0) 30%, rgba(4,10,22,0) 55%, rgba(4,10,22,0.82) 100%)",
       }} />
+
+      {/* Ghost video — Jor-El style, floats over the Fortress */}
+      <video
+        autoPlay loop muted playsInline
+        style={{
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          pointerEvents: "none",
+          mixBlendMode: "screen",
+          opacity: 0.35,
+        }}
+      >
+        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+      </video>
 
       {/* ── UI LAYER ──────────────────────────────────────────────────────── */}
       <div style={{ position: "relative", zIndex: 10, minHeight: "100svh", display: "flex", flexDirection: "column" }}>
