@@ -98,13 +98,8 @@ export default function LandingEditorial() {
 
       {/* ── Floating top nav: wordmark + single CTA ─────────────────── */}
       <header className="fixed inset-x-3 top-3 z-50 md:inset-x-6 md:top-5">
-        <div className="flex items-center justify-between gap-3 px-1 py-1">
-          <span
-            aria-label="Auction Ace"
-            className="font-bebas text-[18px] tracking-[0.32em] text-white md:text-[22px]"
-          >
-            AUCTION&nbsp;ACE
-          </span>
+        <div className="flex items-center justify-end gap-3 px-1 py-1">
+
 
           <button
             type="button"
