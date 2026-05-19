@@ -111,40 +111,24 @@ export default function LandingEditorial() {
             onClick={() => {
               if (morphing) return;
               setMorphing(true);
-              window.setTimeout(() => setMenuOpen(true), 750);
-              window.setTimeout(() => setMorphing(false), 1100);
+              window.setTimeout(() => setMenuOpen(true), 600);
+              window.setTimeout(() => setMorphing(false), 1000);
             }}
             onMouseEnter={() => { if (!morphing) setMorphing(true); }}
             onMouseLeave={() => { if (!menuOpen) window.setTimeout(() => setMorphing(false), 200); }}
-            className={`group relative inline-flex h-9 items-center gap-2 overflow-hidden rounded-full px-4 font-bebas text-[12px] tracking-[0.28em] text-white outline-none ring-1 transition-all duration-500 ease-out md:text-[13px] ${
-              morphing
-                ? "bg-red-500 ring-red-300/70 shadow-[0_0_28px_-4px_rgba(239,68,68,0.95)]"
-                : "bg-white/5 ring-white/20 hover:bg-white/10"
-            }`}
+            className="group relative block overflow-hidden outline-none"
           >
-            {/* shine sweep on activation */}
-            <span
-              aria-hidden
-              className={`pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-[900ms] ease-out ${
-                morphing ? "translate-x-full" : "-translate-x-full"
+            <img
+              src={helmetImg}
+              alt=""
+              draggable={false}
+              className={`block h-auto w-[180px] select-none transition-transform duration-500 ease-out md:w-[240px] ${
+                morphing ? "scale-[1.06]" : "scale-100 group-hover:scale-[1.03]"
               }`}
-            />
-            {/* indicator dot */}
-            <span
-              aria-hidden
-              className={`relative inline-block h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                morphing
-                  ? "bg-white shadow-[0_0_10px_2px_rgba(255,255,255,0.9)]"
-                  : "bg-red-500 shadow-[0_0_8px_1px_rgba(239,68,68,0.8)]"
-              }`}
-            />
-            <ScrambleText
-              text="CHOOSE YOUR TEAMS"
-              play={morphing}
-              duration={750}
-              className="relative whitespace-nowrap"
+              style={{ filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.55))" }}
             />
           </button>
+
         </div>
       </header>
 
