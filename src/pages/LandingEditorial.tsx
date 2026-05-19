@@ -113,7 +113,7 @@ export default function LandingEditorial() {
       <div
         aria-hidden
         onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 z-30 bg-black/50 backdrop-blur-md transition-opacity duration-500 ${
+        className={`fixed inset-0 z-30 bg-black/25 backdrop-blur-sm transition-opacity duration-[1100ms] ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       />
