@@ -1,9 +1,35 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
+const NAV_LINKS: { label: string; to: string }[] = [
+  { label: "Home", to: "/" },
+  { label: "Teams", to: "/team" },
+  { label: "Draft Room", to: "/draftroom" },
+  { label: "Admin", to: "/passcode" },
+];
+
+const SOCIAL_LINKS: { label: string; to: string }[] = [
+  { label: "ESPN", to: "/espn-settings" },
+  { label: "Setup", to: "/admin" },
+];
+
 export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Lock scroll when menu open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  // Close on ESC
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // Hold video at frame 0 until preloader finishes, then play + drop sketch filter.
   useEffect(() => {
