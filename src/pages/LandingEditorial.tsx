@@ -20,7 +20,7 @@ export default function LandingEditorial() {
 
   // Expand card on load
   useEffect(() => {
-    const t = setTimeout(() => setCardExpanded(true), 120);
+    const t = setTimeout(() => setCardExpanded(true), 800);
     return () => clearTimeout(t);
   }, []);
 
@@ -78,7 +78,7 @@ export default function LandingEditorial() {
 
       {/* Football video — full screen, ghosted over the Fortress */}
       <video
-        autoPlay loop muted playsInline
+        autoPlay loop muted playsInline preload="auto"
         style={{
           position: "fixed", inset: 0,
           width: "100%", height: "100%",
@@ -256,7 +256,7 @@ export default function LandingEditorial() {
         }}>
           {/* Football video plays inside the card */}
           <video
-            autoPlay loop muted playsInline
+            autoPlay loop muted playsInline preload="auto"
             style={{
               position: "absolute", inset: 0,
               width: "100%", height: "100%",
