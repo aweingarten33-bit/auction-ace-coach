@@ -93,42 +93,18 @@ export default function LandingEditorial() {
 
           <button
             type="button"
+            aria-label="Choose your team"
             onClick={() => setMenuOpen(true)}
-            className="group relative overflow-hidden rounded-sm px-3 py-2 font-bebas text-[12px] tracking-[0.22em] text-white ring-1 ring-red-400/40 shadow-[0_0_24px_-6px_rgba(239,68,68,0.85)] transition-all duration-300 hover:ring-red-300/70 hover:shadow-[0_0_36px_-4px_rgba(239,68,68,1)] hover:-translate-y-px active:translate-y-0 md:px-4 md:text-[13px]"
-            style={{
-              backgroundImage:
-                "linear-gradient(120deg, #b91c1c 0%, #ef4444 45%, #f97316 100%)",
-            }}
+            className="relative h-9 w-9 outline-none"
           >
-            {/* animated red pulse halo */}
             <span
-              aria-hidden
-              className="pointer-events-none absolute -inset-px rounded-sm opacity-70"
-              style={{
-                background:
-                  "radial-gradient(60% 120% at 50% 50%, rgba(255,80,80,0.55), transparent 70%)",
-                animation: "pulse 2.6s ease-in-out infinite",
-              }}
+              className="absolute left-1/2 top-1/2 block h-px w-6 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+              style={{ transform: "translate(-50%,-50%) translateY(-4px)" }}
             />
-            {/* sweeping shine on hover */}
             <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
+              className="absolute left-1/2 top-1/2 block h-px w-6 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+              style={{ transform: "translate(-50%,-50%) translateY(4px)" }}
             />
-            <span className="relative z-10 flex items-center gap-2">
-              <span
-                aria-hidden
-                className="inline-block h-1.5 w-1.5 rounded-full bg-white shadow-[0_0_10px_2px_rgba(255,255,255,0.9)]"
-              />
-              CHOOSE&nbsp;YOUR&nbsp;TEAM
-              <svg
-                width="10" height="10" viewBox="0 0 10 10"
-                className="transition-transform duration-300 group-hover:translate-x-1"
-                fill="none" aria-hidden
-              >
-                <path d="M1 5h8M5 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
           </button>
         </div>
       </header>
@@ -137,14 +113,14 @@ export default function LandingEditorial() {
       <div
         aria-hidden
         onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 z-30 bg-black/50 backdrop-blur-md transition-opacity duration-500 ${
+        className={`fixed inset-0 z-30 bg-black/25 backdrop-blur-sm transition-opacity duration-[1100ms] ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       />
 
       <aside
         aria-hidden={!menuOpen}
-        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-[#0f0f0f]/95 backdrop-blur-2xl ring-1 ring-white/10 shadow-[-20px_0_60px_rgba(0,0,0,0.6)] transition-transform duration-[650ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-black/25 backdrop-blur-xl ring-1 ring-white/10 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
