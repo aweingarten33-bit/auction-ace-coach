@@ -9,6 +9,7 @@ export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [morphing, setMorphing] = useState(false);
+  const [videoControlsOpen, setVideoControlsOpen] = useState(false);
   const [videoHeight, setVideoHeight] = useState(100);
   const [videoZoom, setVideoZoom] = useState(118);
   const [videoY, setVideoY] = useState(100);
@@ -197,7 +198,19 @@ export default function LandingEditorial() {
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
 
-        <div className="absolute left-4 top-4 z-20 w-[min(92vw,360px)] rounded-lg bg-black/45 p-3 text-white shadow-2xl ring-1 ring-white/15 backdrop-blur-md md:left-6 md:top-6">
+        <div className="absolute left-4 top-28 z-20 w-[min(88vw,360px)] text-white md:left-6 md:top-32">
+          <button
+            type="button"
+            onClick={() => setVideoControlsOpen((open) => !open)}
+            className="rounded-md bg-black/45 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/85 ring-1 ring-white/15 backdrop-blur-md transition hover:bg-black/55"
+          >
+            Video sizing
+          </button>
+          <div
+            className={`mt-2 rounded-lg bg-black/45 p-3 shadow-2xl ring-1 ring-white/15 backdrop-blur-md transition duration-300 ${
+              videoControlsOpen ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
+            }`}
+          >
           <div className="mb-3 flex items-center justify-between gap-3">
             <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">Video sizing</span>
             <button
@@ -245,6 +258,7 @@ export default function LandingEditorial() {
               className="mt-2 block w-full accent-white"
             />
           </label>
+          </div>
         </div>
 
         {/* Modus-style overlay gradient: heavy bottom for type */}
