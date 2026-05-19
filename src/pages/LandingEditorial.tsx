@@ -140,7 +140,8 @@ export default function LandingEditorial() {
       </div>
 
       {/* ── Full-bleed hero video ──────────────────────────────────── */}
-      <section className="relative h-[100svh] min-h-[600px] w-full overflow-hidden">
+      {/* HERO — tweak `aspectRatio` to control video height (e.g. "1.59 / 1", "16 / 9", "4 / 5") */}
+      <section className="relative w-full overflow-hidden" style={{ aspectRatio: "1.59 / 1" }}>
         <video
           ref={videoRef}
           loop muted playsInline preload="auto"
@@ -172,6 +173,14 @@ export default function LandingEditorial() {
             backgroundSize: "240px 240px",
           }}
         />
+        {/* Status badge */}
+        <div className="absolute left-5 top-24 z-10 inline-flex items-center gap-2 rounded-full bg-black/40 px-3 py-1.5 backdrop-blur-md ring-1 ring-white/15 md:left-12 md:top-28">
+          <span className="relative inline-flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+          </span>
+          <span className="text-[10px] uppercase tracking-[0.32em] text-white/85">Draft Season 2026</span>
+        </div>
 
         {/* Headline — Modus scale: massive condensed, two stacked lines, second line ghosted for depth (sits visually "behind" subject) */}
         <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 md:px-12 md:pb-16">
