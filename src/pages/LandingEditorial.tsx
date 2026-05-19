@@ -114,9 +114,11 @@ export default function LandingEditorial() {
         muted
         playsInline
         preload="auto"
-        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain transition-transform duration-150"
+        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain transition-[filter] duration-500"
         style={{
-          filter: "brightness(0.7) contrast(1.05) saturate(0.85)",
+          filter: colorOn
+            ? "brightness(0.7) contrast(1.05) saturate(0.85)"
+            : "grayscale(1) contrast(1.15) brightness(0.78)",
           objectPosition: "center",
           transform: `scale(${videoZoom})`,
           transformOrigin: "center center",
@@ -125,22 +127,17 @@ export default function LandingEditorial() {
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
 
-      {showPolaroid && (
-        <div className="pointer-events-none fixed inset-0 z-[1] grid place-items-center overflow-hidden">
-          <div
-            className={`w-[min(78vw,520px)] bg-white p-3 pb-10 shadow-[0_24px_80px_rgba(0,0,0,0.55)] md:w-[min(56vw,660px)] md:p-4 md:pb-14 ${polaroidActive ? "hero-polaroid-frame" : "opacity-0"}`}
-            onAnimationEnd={() => setShowPolaroid(false)}
-          >
-            <img
-              src={`${import.meta.env.BASE_URL}hero-polaroid.jpg`}
-              alt=""
-              draggable={false}
-              className="aspect-video w-full object-contain grayscale"
-              style={{ filter: "grayscale(1) contrast(1.08) brightness(0.9)" }}
-            />
-          </div>
-        </div>
-      )}
+      {/* Camera flash overlay */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-[2] bg-white transition-opacity"
+        style={{
+          opacity: flashOn ? 1 : 0,
+          transitionDuration: flashOn ? "90ms" : "320ms",
+          transitionTimingFunction: flashOn ? "ease-out" : "ease-in",
+        }}
+      />
+
 
       {/* Hero video zoom slider */}
       <div
