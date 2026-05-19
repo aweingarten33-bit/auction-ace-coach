@@ -81,10 +81,7 @@ export default function LandingEditorial() {
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "22px 22px",
         }}>
-          {/* Logo */}
-          <div style={{ color: "white", lineHeight: 1.05, fontWeight: 700, fontSize: "21px", textShadow: "0 1px 12px rgba(0,0,0,0.5)" }}>
-            Ace
-          </div>
+          <div />
 
           {/* CTA — frosted glass pill */}
           <button
