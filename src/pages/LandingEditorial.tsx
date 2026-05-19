@@ -7,7 +7,6 @@ export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const sketchVideoRef = useRef<HTMLVideoElement>(null);
   const [videoZoom, setVideoZoom] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
     const v = parseFloat(localStorage.getItem("heroVideoZoom") || "1");
@@ -20,15 +19,14 @@ export default function LandingEditorial() {
   useEffect(() => {
     const reveal = () => {
       const v = videoRef.current;
-      const s = sketchVideoRef.current;
       if (v) { try { v.currentTime = 0; } catch {} void v.play().catch(() => {}); }
-      if (s) { try { s.currentTime = 0; } catch {} void s.play().catch(() => {}); }
-      // Hold the a-ha sketch shimmer, then dissolve to color (Take On Me).
+      // a-ha "Take On Me": hold the sketch shimmer, then snap to live color.
       window.setTimeout(() => setSketchVisible(false), 1700);
     };
     window.addEventListener("landing:visible", reveal, { once: true });
     return () => window.removeEventListener("landing:visible", reveal);
   }, []);
+
 
 
 
@@ -137,7 +135,7 @@ export default function LandingEditorial() {
       </svg>
 
 
-      {/* Bottom layer: real color hero video */}
+      {/* Single hero video — sketch filter during intro, then live color */}
       <video
         ref={videoRef}
         loop
@@ -146,7 +144,9 @@ export default function LandingEditorial() {
         preload="auto"
         className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain"
         style={{
-          filter: "brightness(0.7) contrast(1.05) saturate(0.85)",
+          filter: sketchVisible
+            ? "url(#ahaSketch)"
+            : "brightness(0.7) contrast(1.05) saturate(0.85)",
           objectPosition: "center",
           transform: `scale(${videoZoom})`,
           transformOrigin: "center center",
@@ -155,26 +155,6 @@ export default function LandingEditorial() {
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
 
-      {/* Top layer: same video, rotoscoped pencil sketch — fades out into the color video */}
-      <video
-        ref={sketchVideoRef}
-        loop
-        muted
-        playsInline
-        preload="auto"
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[2] h-screen w-screen object-contain"
-        style={{
-          filter: "url(#ahaSketch)",
-          objectPosition: "center",
-          transform: `scale(${videoZoom})`,
-          transformOrigin: "center center",
-          opacity: sketchVisible ? 1 : 0,
-          transition: "opacity 900ms ease-in",
-        }}
-      >
-        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-      </video>
 
       {/* Paper grain overlay during the sketch phase */}
       <div
