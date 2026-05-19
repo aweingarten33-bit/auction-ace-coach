@@ -83,8 +83,7 @@ export default function LandingEditorial() {
 
       {/* ── Floating top nav (Modus-style: translucent pill) ─────────── */}
       <header className="fixed inset-x-3 top-3 z-50 md:inset-x-6 md:top-5">
-        <div className="flex items-center justify-between gap-3 rounded-md bg-black/35 px-3 py-2.5 backdrop-blur-md ring-1 ring-white/10 md:px-5 md:py-3">
-          {/* left: hamburger (mobile) — desktop could add nav items later */}
+        <div className="flex items-center justify-between gap-3 rounded-md bg-white/55 px-3 py-2.5 backdrop-blur-xl ring-1 ring-black/10 md:px-5 md:py-3">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -94,26 +93,24 @@ export default function LandingEditorial() {
               className="relative h-9 w-9 outline-none"
             >
               <span
-                className="absolute left-1/2 top-1/2 block h-px w-6 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+                className="absolute left-1/2 top-1/2 block h-px w-6 bg-[#0a0a0a] transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
                 style={{ transform: menuOpen ? "translate(-50%,-50%) rotate(45deg)" : "translate(-50%,-50%) translateY(-4px)" }}
               />
               <span
-                className="absolute left-1/2 top-1/2 block h-px w-6 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+                className="absolute left-1/2 top-1/2 block h-px w-6 bg-[#0a0a0a] transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
                 style={{ transform: menuOpen ? "translate(-50%,-50%) rotate(-45deg)" : "translate(-50%,-50%) translateY(4px)" }}
               />
             </button>
           </div>
 
-          {/* center: wordmark */}
           <Link
             to="/"
             aria-label="Auction Ace home"
-            className="absolute left-1/2 -translate-x-1/2 font-bebas text-[18px] tracking-[0.32em] text-white md:text-[22px]"
+            className="absolute left-1/2 -translate-x-1/2 font-bebas text-[18px] tracking-[0.32em] text-[#0a0a0a] md:text-[22px]"
           >
             AUCTION&nbsp;ACE
           </Link>
 
-          {/* right: CTA */}
           <Link
             to="/team"
             className="rounded-sm bg-red-500 px-3 py-2 font-bebas text-[12px] tracking-[0.22em] text-white transition hover:bg-red-400 md:px-4 md:text-[13px]"
