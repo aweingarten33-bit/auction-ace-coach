@@ -157,8 +157,8 @@ export default function LandingEditorial() {
           {[
             { label: "Home", to: "/" },
             { label: "Teams", to: "/team" },
-            { label: "Draft Room", to: "/draftroom" },
-            { label: "Admin", to: "/passcode" },
+            { label: "Draft Room", to: "/draft-room" },
+            { label: "Admin", to: "/admin" },
           ].map((link, i) => (
             <Link
               key={link.to}
