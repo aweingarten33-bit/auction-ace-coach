@@ -110,48 +110,39 @@ export default function LandingEditorial() {
             onClick={() => {
               if (morphing) return;
               setMorphing(true);
-              window.setTimeout(() => setMenuOpen(true), 520);
-              window.setTimeout(() => setMorphing(false), 1400);
+              window.setTimeout(() => setMenuOpen(true), 750);
+              window.setTimeout(() => setMorphing(false), 1100);
             }}
-            className={`group relative flex h-9 items-center overflow-hidden rounded-full outline-none ring-1 transition-all duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+            onMouseEnter={() => { if (!morphing) setMorphing(true); }}
+            onMouseLeave={() => { if (!menuOpen) window.setTimeout(() => setMorphing(false), 200); }}
+            className={`group relative inline-flex h-9 items-center gap-2 overflow-hidden rounded-full px-4 font-bebas text-[12px] tracking-[0.28em] text-white outline-none ring-1 transition-all duration-500 ease-out md:text-[13px] ${
               morphing
-                ? "w-[210px] bg-red-500 ring-red-300/60 shadow-[0_0_24px_-4px_rgba(239,68,68,0.9)]"
-                : "w-9 bg-transparent ring-white/0 hover:ring-white/20"
+                ? "bg-red-500 ring-red-300/70 shadow-[0_0_28px_-4px_rgba(239,68,68,0.95)]"
+                : "bg-white/5 ring-white/20 hover:bg-white/10"
             }`}
           >
+            {/* shine sweep on activation */}
             <span
               aria-hidden
-              className="absolute left-1/2 top-1/2 block h-px bg-white transition-all duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
-              style={{
-                width: morphing ? "190px" : "24px",
-                opacity: morphing ? 0 : 1,
-                transform: morphing
-                  ? "translate(-50%,-50%) translateY(0)"
-                  : "translate(-50%,-50%) translateY(-4px)",
-                transitionDelay: morphing ? "60ms" : "0ms",
-              }}
+              className={`pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent transition-transform duration-[900ms] ease-out ${
+                morphing ? "translate-x-full" : "-translate-x-full"
+              }`}
             />
+            {/* indicator dot */}
             <span
               aria-hidden
-              className="absolute left-1/2 top-1/2 block h-px bg-white transition-all duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
-              style={{
-                width: morphing ? "190px" : "24px",
-                opacity: morphing ? 0 : 1,
-                transform: morphing
-                  ? "translate(-50%,-50%) translateY(0)"
-                  : "translate(-50%,-50%) translateY(4px)",
-              }}
+              className={`relative inline-block h-1.5 w-1.5 rounded-full transition-all duration-300 ${
+                morphing
+                  ? "bg-white shadow-[0_0_10px_2px_rgba(255,255,255,0.9)]"
+                  : "bg-red-500 shadow-[0_0_8px_1px_rgba(239,68,68,0.8)]"
+              }`}
             />
-            <span
-              className="pointer-events-none absolute inset-0 flex items-center justify-center whitespace-nowrap font-bebas text-[12px] tracking-[0.28em] text-white transition-all duration-500 ease-out md:text-[13px]"
-              style={{
-                opacity: morphing ? 1 : 0,
-                transform: morphing ? "translateY(0)" : "translateY(6px)",
-                transitionDelay: morphing ? "380ms" : "0ms",
-              }}
-            >
-              CHOOSE&nbsp;YOUR&nbsp;TEAMS
-            </span>
+            <ScrambleText
+              text="CHOOSE YOUR TEAMS"
+              play={morphing}
+              duration={750}
+              className="relative whitespace-nowrap"
+            />
           </button>
         </div>
       </header>
