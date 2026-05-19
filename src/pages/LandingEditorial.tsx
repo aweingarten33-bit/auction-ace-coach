@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Menu } from "lucide-react";
+
 import { useEffect, useRef, useState } from "react";
 
 export default function LandingEditorial() {
