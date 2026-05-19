@@ -140,7 +140,7 @@ export default function LandingEditorial() {
       </div>
 
       {/* ── Full-bleed hero video ──────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden pt-20 md:pt-24" style={{ aspectRatio: "1.59 / 1" }}>
+      <section className="relative h-[100svh] min-h-[600px] w-full overflow-hidden">
         <video
           ref={videoRef}
           loop muted playsInline preload="auto"
@@ -149,15 +149,16 @@ export default function LandingEditorial() {
           style={{
             filter: sketchVisible
               ? "url(#ahaSketch)"
-              : "brightness(0.7) contrast(1.05) saturate(0.95)",
+              : "brightness(0.72) contrast(1.06) saturate(0.95)",
             transition: "filter 600ms ease",
           }}
         >
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
 
-        {/* dark gradient for headline legibility */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-black/40" />
+        {/* Modus-style overlay gradients: heavy bottom for type, soft top behind nav */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
         {/* paper grain during sketch */}
         <div
@@ -172,28 +173,37 @@ export default function LandingEditorial() {
           }}
         />
 
-        {/* corner status */}
-        <div className="absolute left-4 top-24 z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/70 md:left-10 md:top-28">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-          <span>Draft Season 2025</span>
-        </div>
-
-        {/* Headline — bottom-left, huge condensed, two lines with depth fade */}
-        <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-8 md:px-10 md:pb-12">
+        {/* Headline — Modus scale: massive condensed, two stacked lines, second line ghosted for depth (sits visually "behind" subject) */}
+        <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 md:px-12 md:pb-16">
           <h1
-            className="font-bebas leading-[0.92] tracking-[0.005em] text-white"
-            style={{ fontSize: "clamp(3rem, 14vw, 12rem)" }}
+            className="font-bebas uppercase leading-[0.86] tracking-[0.005em] text-white"
+            style={{ fontSize: "clamp(3.25rem, 15vw, 13rem)" }}
           >
-            <span className="block">DRAFT&nbsp;SMARTER,</span>
-            <span className="block text-white/35 mix-blend-screen">BID&nbsp;SHARPER.</span>
+            <span className="block">Draft&nbsp;smarter,</span>
+            <span
+              className="block text-transparent"
+              style={{
+                WebkitTextStroke: "1px rgba(255,255,255,0.55)",
+                color: "rgba(255,255,255,0.06)",
+              }}
+            >
+              bid&nbsp;sharper.
+            </span>
           </h1>
 
-          <p className="mt-5 max-w-md text-[13px] leading-relaxed text-white/75 md:text-[14px]">
+          <p className="mt-6 max-w-lg text-[13px] leading-relaxed text-white/80 md:text-[15px]">
             Three years of league price history, tiered values, and shared
             research — built for your commissioner's draft room.
           </p>
         </div>
+
+        {/* scroll cue */}
+        <div className="absolute bottom-5 right-5 z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/55 md:bottom-7 md:right-10">
+          <span>Scroll</span>
+          <span aria-hidden className="inline-block h-px w-8 bg-white/50" />
+        </div>
       </section>
+
 
       <footer className="relative z-10 flex items-center justify-between px-5 py-6 text-[9px] font-mono uppercase tracking-[0.3em] text-white/40 md:px-10">
         <span>HB_A · Auction Ace</span>
