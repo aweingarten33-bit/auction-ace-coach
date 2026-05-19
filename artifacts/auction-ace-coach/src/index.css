@@ -1,393 +1,878 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@plugin "@tailwindcss/typography";
-
-@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-border: hsl(var(--card-border));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-popover-border: hsl(var(--popover-border));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-primary-border: var(--primary-border);
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-secondary-border: var(--secondary-border);
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-muted-border: var(--muted-border);
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-accent-border: var(--accent-border);
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-destructive-border: var(--destructive-border);
-
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
-
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-primary-border: var(--sidebar-primary-border);
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-accent-border: var(--sidebar-accent-border);
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
-
-  --font-sans: var(--app-font-sans);
-  --font-serif: var(--app-font-serif);
-  --font-mono: var(--app-font-mono);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --radius: 0.75rem;
 }
 
-/* LIGHT MODE */
-:root {
-  --button-outline: rgba(0,0,0, .10);
-  --badge-outline: rgba(0,0,0, .05);
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-  /* Automatic computation of border around primary / danger buttons */
-  --opaque-button-border-intensity: -8; /* In terms of percentages */
 
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(0,0,0, .03);
-  --elevate-2: rgba(0,0,0, .08);
 
-  --background: red; /*replace with H S L */
 
-  --foreground: red; /*replace with H S L */
 
-  --border: red; /*replace with H S L */
-
-  --card: red; /*replace with H S L */
-
-  --card-foreground: red; /*replace with H S L */
-
-  --card-border: red; /*replace with H S L */
-
-  --sidebar: red; /*replace with H S L */
-
-  --sidebar-foreground: red; /*replace with H S L */
-
-  --sidebar-border: red; /*replace with H S L */
-
-  --sidebar-primary: red; /*replace with H S L */
-
-  --sidebar-primary-foreground: red; /*replace with H S L */
-
-  --sidebar-accent: red; /*replace with H S L */
-
-  --sidebar-accent-foreground: red; /*replace with H S L */
-
-  --sidebar-ring: red; /*replace with H S L */
-
-  --popover: red; /*replace with H S L */
-
-  --popover-foreground: red; /*replace with H S L */
-
-  --popover-border: red; /*replace with H S L */
-
-  --primary: red; /*replace with H S L */
-
-  --primary-foreground: red; /*replace with H S L */
-
-  --secondary: red; /*replace with H S L */
-
-  --secondary-foreground: red; /*replace with H S L */
-
-  --muted: red; /*replace with H S L */
-
-  --muted-foreground: red; /*replace with H S L */
-
-  --accent: red; /*replace with H S L */
-
-  --accent-foreground: red; /*replace with H S L */
-
-  --destructive: red; /*replace with H S L */
-
-  --destructive-foreground: red; /*replace with H S L */
-
-  --input: red; /*replace with H S L */
-  --ring: red; /*replace with H S L */
-  --chart-1: red; /*replace with H S L */
-  --chart-2: red; /*replace with H S L */
-  --chart-3: red; /*replace with H S L */
-  --chart-4: red; /*replace with H S L */
-  --chart-5: red; /*replace with H S L */
-
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
-  --app-font-mono: Menlo, monospace;
-  --radius: .5rem; /* 8px */
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00); /*replace with H S L */
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00); /*replace with H S L */
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-
-  /* Automatically computed borders - intensity can be controlled by the user by the --opaque-button-border-intensity setting */
-
-  /* Fallback for older browsers */
-  --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --sidebar-accent-border: hsl(var(--sidebar-accent));
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --primary-border: hsl(var(--primary));
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --secondary-border: hsl(var(--secondary));
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --muted-border: hsl(var(--muted));
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --accent-border: hsl(var(--accent));
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-
-  /* Fallback for older browsers */
-  --destructive-border: hsl(var(--destructive));
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-}
-
-.dark {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-
-  --opaque-button-border-intensity: 9;  /* In terms of percentages */
-
-  /* Backgrounds applied on top of other backgrounds when hovered/active */
-  --elevate-1: rgba(255,255,255, .04);
-  --elevate-2: rgba(255,255,255, .09);
-
-  --background: red; /*replace with H S L */
-
-  --foreground: red; /*replace with H S L */
-
-  --border: red; /*replace with H S L */
-
-  --card: red; /*replace with H S L */
-
-  --card-foreground: red; /*replace with H S L */
-
-  --card-border: red; /*replace with H S L */
-
-  --sidebar: red; /*replace with H S L */
-
-  --sidebar-foreground: red; /*replace with H S L */
-
-  --sidebar-border: red; /*replace with H S L */
-
-  --sidebar-primary: red; /*replace with H S L */
-
-  --sidebar-primary-foreground: red; /*replace with H S L */
-
-  --sidebar-accent: red; /*replace with H S L */
-
-  --sidebar-accent-foreground: red; /*replace with H S L */
-
-  --sidebar-ring: red; /*replace with H S L */
-
-  --popover: red; /*replace with H S L */
-
-  --popover-foreground: red; /*replace with H S L */
-
-  --popover-border: red; /*replace with H S L */
-
-  --primary: red; /*replace with H S L */
-
-  --primary-foreground: red; /*replace with H S L */
-
-  --secondary: red; /*replace with H S L */
-
-  --secondary-foreground: red; /*replace with H S L */
-
-  --muted: red; /*replace with H S L */
-
-  --muted-foreground: red; /*replace with H S L */
-
-  --accent: red; /*replace with H S L */
-
-  --accent-foreground: red; /*replace with H S L */
-
-  --destructive: red; /*replace with H S L */
-
-  --destructive-foreground: red; /*replace with H S L */
-
-  /* Used as the border around inputs. Dark mode: Should be a border that is light enough to have high contrast when rendered on a --card background. More contrast than standard --border */
-  --input: red; /*replace with H S L */
-  --ring: red; /*replace with H S L */
-  --chart-1: red; /*replace with H S L */
-  --chart-2: red; /*replace with H S L */
-  --chart-3: red; /*replace with H S L */
-  --chart-4: red; /*replace with H S L */
-  --chart-5: red; /*replace with H S L */
-
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
-
-}
+/* =====================================================================
+   NEUMORPHISM — Soft UI (Cool Grey)
+   ---------------------------------------------------------------------
+   Single monochromatic surface. All depth from dual opposing shadows
+   (top-left light, bottom-right dark). No borders, no flat fills.
+   Light + dark variants. Same physics, inverted lighting.
+   ===================================================================== */
 
 @layer base {
-  * {
-    @apply border-border;
+  :root {
+    /* ── APPLE-CLEAN LIGHT MODE ─────────────────────────────────────────── */
+    --background:        0 0% 100%;          /* #ffffff */
+    --background-alt:    240 5% 97%;         /* #f5f5f7 */
+    --foreground:        0 0% 11%;           /* #1d1d1f */
+    --muted-bg:          240 5% 97%;
+
+    --card:              0 0% 100%;
+    --card-foreground:   0 0% 11%;
+
+    --popover:           0 0% 100%;
+    --popover-foreground: 0 0% 11%;
+
+    --primary:           355 100% 46%;       /* #eb0000 — signal red */
+    --primary-foreground: 0 0% 100%;
+    --primary-glow:      355 100% 58%;
+
+    --secondary:         240 5% 97%;         /* #f5f5f7 */
+    --secondary-foreground: 0 0% 11%;
+
+    --accent:            355 100% 46%;
+    --accent-foreground: 0 0% 100%;
+    --accent-secondary:  355 80% 36%;
+
+    --muted:             240 5% 97%;
+    --muted-foreground:  240 2% 44%;         /* #6e6e73 */
+
+    --destructive:       355 80% 46%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning:           38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+
+    --success:           142 71% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --border:            240 4% 84%;         /* #d2d2d7 */
+    --input:             240 5% 97%;
+    --ring:              355 100% 46%;
+
+    --radius: 0.75rem;
+
+    /* ── CLEAN SHADOWS (no neumorphism) ─────────────────────────────────── */
+    --surface:           0 0% 100%;
+    --surface-2:         240 5% 97%;
+    --shadow-light-rgb:  255, 255, 255;
+    --shadow-dark-rgb:   0, 0, 0;
+
+    --neu-extruded:      0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    --neu-extruded-hover: 0 4px 12px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.08);
+    --neu-extruded-sm:   0 1px 2px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+    --neu-inset:         inset 0 1px 3px rgba(0,0,0,0.07);
+    --neu-inset-deep:    inset 0 2px 6px rgba(0,0,0,0.10);
+    --neu-inset-sm:      inset 0 1px 2px rgba(0,0,0,0.06);
+
+    /* ── LEGACY ALIASES ─────────────────────────────────────────────────── */
+    --bone:              0 0% 96%;
+    --paper:             240 2% 44%;
+    --void:              0 0% 100%;
+    --ink:               0 0% 11%;
+    --charcoal:          0 0% 20%;
+    --gunmetal:          0 0% 32%;
+    --steel-blue:        213 27% 50%;
+    --blood:             355 100% 46%;
+    --signal-red:        355 100% 46%;
+    --dirty-gold:        38 80% 50%;
+    --warning-yellow:    38 92% 56%;
+    --signal:            355 100% 46%;
+    --brass:             38 80% 50%;
+    --brass-light:       38 85% 62%;
+    --brass-dark:        38 75% 38%;
+    --crimson:           355 100% 46%;
+    --crimson-spatter:   355 100% 46%;
+    --parchment:         0 0% 97%;
+    --ink-faded:         240 2% 55%;
+    --wood-grain:        240 5% 97%;
+    --bloodred:          355 100% 46%;
+    --steel:             240 2% 55%;
+    --sungold:           38 80% 50%;
+    --sungold-2:         38 85% 62%;
+    --krypton:           240 5% 97%;
+    --kryptonite:        355 100% 46%;
+
+    /* Legacy shadow aliases */
+    --shadow-card:       var(--neu-extruded);
+    --shadow-floating:   var(--neu-extruded-hover);
+    --shadow-pressed:    var(--neu-inset);
+    --shadow-recessed:   var(--neu-inset-sm);
+    --shadow-sharp:      var(--neu-extruded);
+    --shadow-glow:       0 0 0 3px hsl(var(--primary) / 0.2);
+    --shadow-primary:    var(--neu-extruded);
+    --shadow-led-green:  0 0 14px hsl(142 71% 36% / 0.4);
+    --shadow-engraved:   var(--neu-inset);
+    --shadow-wax-seal:   var(--neu-extruded);
+    --shadow-brut-sm:    var(--neu-extruded-sm);
+    --shadow-brut:       var(--neu-extruded);
+    --shadow-brut-lg:    var(--neu-extruded-hover);
+    --shadow-brut-xl:    var(--neu-extruded-hover);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 11%;
+    --sidebar-primary: 355 100% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 97%;
+    --sidebar-accent-foreground: 222 44% 18%;
+    --sidebar-border: transparent;
+    --sidebar-ring: 222 44% 26%;
+  }
+
+  .dark {
+    /* GRINDHOUSE — pure black, white text, signal-red accent. */
+    --background:        0 0% 0%;
+    --background-alt:    0 0% 5%;
+    --foreground:        0 0% 96%;
+    --muted-bg:          0 0% 8%;
+
+    --card:              0 0% 7%;
+    --card-foreground:   0 0% 96%;
+    --popover:           0 0% 9%;
+    --popover-foreground:0 0% 96%;
+
+    /* Primary = signal red */
+    --primary:           0 90% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow:      0 90% 60%;
+
+    --secondary:         0 0% 11%;
+    --secondary-foreground: 0 0% 96%;
+    --muted:             0 0% 13%;
+    --muted-foreground:  0 0% 50%;
+
+    --accent:            0 90% 50%;
+    --accent-foreground: 0 0% 100%;
+    --accent-secondary:  0 0% 100%;
+
+    --destructive:       0 80% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --warning:           38 92% 56%;
+    --success:           140 60% 50%;
+
+    --border:            0 0% 13%;
+    --input:             0 0% 9%;
+    --ring:              0 90% 50%;
+
+    --surface:           0 0% 7%;
+    --surface-2:         0 0% 11%;
+    --shadow-light-rgb:  255, 255, 255;
+    --shadow-dark-rgb:   0, 0, 0;
+
+    --neu-extruded:       0 1px 0 rgba(255,255,255,0.04);
+    --neu-extruded-hover: 0 8px 24px rgba(0,0,0,0.6);
+    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04);
+    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.06);
+    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.08);
+    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.05);
+
+    --bone:              0 0% 100%;
+    --paper:             0 0% 50%;
+    --void:              0 0% 0%;
+    --ink:               0 0% 0%;
+    --charcoal:          0 0% 8%;
+    --gunmetal:          0 0% 13%;
+    --blood:             0 90% 50%;
+    --signal-red:        0 90% 50%;
+    --dirty-gold:        0 90% 50%;
+    --warning-yellow:    38 92% 56%;
+    --parchment:         0 0% 96%;
+    --ink-faded:         0 0% 50%;
+    --steel:             0 0% 50%;
+
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 0 90% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 9%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-ring: 0 90% 50%;
+  }
+
+  * { border-color: hsl(var(--border)); }
+
+  html {
+    width: 100%; max-width: 100%; overflow-x: hidden;
+    font-size: 16px; scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    @apply bg-background text-foreground;
+    width: 100%; max-width: 100%; overflow-x: hidden;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
+    background-color: hsl(var(--background));
+    background-image: none;
   }
+
+  /* Strip all the swirl/halftone overlays — DICE is pure flat black */
+  .dark body { background-image: none !important; background-attachment: initial; }
+  .dark body::before, .dark body::after { content: none !important; }
+  .dark .bg-background { background-image: none !important; background-color: hsl(var(--background)) !important; }
+  .dark .min-h-screen.bg-background::before { content: none !important; }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: hsl(var(--foreground));
+    text-transform: none;
+    text-shadow: none;
+  }
+  h1 { font-weight: 800; letter-spacing: -0.035em; }
+
+  ::selection { background: hsl(var(--primary) / 0.35); color: hsl(var(--foreground)); }
 }
 
-/**
- * Using the elevate system.
- * Automatic contrast adjustment.
- *
- * <element className="hover-elevate" />
- * <element className="active-elevate-2" />
- *
- * // Using the tailwind utility when a data attribute is "on"
- * <element className="toggle-elevate data-[state=on]:toggle-elevated" />
- * // Or manually controlling the toggle state
- * <element className="toggle-elevate toggle-elevated" />
- *
- * Elevation systems have to handle many states.
- * - not-hovered, vs. hovered vs. active  (three mutually exclusive states)
- * - toggled or not
- * - focused or not (this is not handled with these utilities)
- *
- * Even without handling focused or not, this is six possible combinations that
- * need to be distinguished from eachother visually.
- */
+/* =====================================================================
+   UTILITIES
+   ===================================================================== */
 @layer utilities {
-
-  /* Hide ugly search cancel button in Chrome until we can style it properly */
-  input[type="search"]::-webkit-search-cancel-button {
-    @apply hidden;
+  /* ---------- TYPOGRAPHY ---------- */
+  .font-display,
+  .font-headline,
+  .font-heading {
+    font-family: "Plus Jakarta Sans", "DM Sans", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    line-height: 1.05;
+  }
+  .font-condensed {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: none;
+  }
+  .font-editorial,
+  .font-serif,
+  .font-body {
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .font-mono,
+  .font-data {
+    font-family: ui-monospace, "JetBrains Mono", "IBM Plex Mono", monospace;
+    font-feature-settings: "tnum";
+    letter-spacing: 0;
+    text-transform: none;
   }
 
-  /* Placeholder styling for contentEditable div */
-  [contenteditable][data-placeholder]:empty::before {
-    content: attr(data-placeholder);
+  .headline-mega { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: clamp(3rem, 9vw, 6rem); line-height: 1; letter-spacing: -0.035em; text-transform: none; }
+  .headline-xl   { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 800; font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.03em; text-transform: none; }
+  .headline-lg   { font-family: "Plus Jakarta Sans", sans-serif; font-weight: 700; font-size: clamp(1.75rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; text-transform: none; }
+
+  .pull-quote {
+    font-family: "DM Sans", sans-serif; font-style: italic; font-weight: 400;
+    font-size: 1.25rem; line-height: 1.5; color: hsl(var(--muted-foreground));
+    padding-left: 1.25rem; border-left: 3px solid hsl(var(--primary));
+  }
+
+  /* ---------- COLOR ALIAS UTILITIES (legacy hooks → neumorphic palette) ---------- */
+  .text-bone, .text-parchment        { color: hsl(var(--foreground)); }
+  .text-paper                         { color: hsl(var(--muted-foreground)); }
+  .text-blood, .text-crimson, .text-signal,
+  .text-max-1, .text-max-5            { color: hsl(var(--destructive)); }
+  .text-gold, .text-brass, .text-sungold, .text-kryptonite,
+  .text-max-3, .text-max-4            { color: hsl(var(--primary)); }
+  .text-warning, .text-yellow         { color: hsl(var(--warning)); }
+  .text-steel, .text-ink-faded,
+  .text-max-2                         { color: hsl(var(--muted-foreground)); }
+  .text-void, .text-ink, .text-krypton{ color: hsl(var(--foreground)); }
+
+  .bg-bone, .bg-parchment             { background-color: hsl(var(--foreground)); }
+  .bg-paper                           { background-color: hsl(var(--muted-foreground)); }
+  .bg-blood, .bg-crimson, .bg-signal,
+  .bg-max-1, .bg-max-5                { background-color: hsl(var(--destructive)); }
+  .bg-gold, .bg-brass, .bg-sungold,
+  .bg-max-3, .bg-max-4                { background-color: hsl(var(--primary)); }
+  .bg-warning                         { background-color: hsl(var(--warning)); }
+  .bg-void, .bg-ink, .bg-krypton,
+  .bg-charcoal, .bg-panel, .bg-gunmetal,
+  .bg-aged-oak, .bg-max-2, .bg-max-muted { background-color: hsl(var(--background)); }
+
+  .border-bone, .border-parchment,
+  .border-blood, .border-crimson,
+  .border-gold, .border-brass, .border-sungold,
+  .border-warning, .border-void, .border-krypton,
+  .border-max-1, .border-max-5,
+  .border-max-2,
+  .border-max-3, .border-max-4        { border-color: transparent; }
+
+  .bg-brass-gradient,
+  .text-gradient,
+  .text-gradient-sun {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+  .text-gradient-blood {
+    background: linear-gradient(135deg, hsl(var(--destructive)) 0%, hsl(var(--primary)) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+  }
+
+  /* Disable old text-shadows */
+  .text-engraved, .text-shadow-1, .text-shadow-2, .text-shadow-3,
+  .text-shadow-mega, .text-emboss, .text-spray { text-shadow: none; }
+
+  /* ---------- NEUMORPHIC PRIMITIVE UTILITIES ---------- */
+  .neu-surface       { background: hsl(var(--surface)); border-radius: 2rem; box-shadow: var(--neu-extruded); }
+  .neu-raised        { box-shadow: var(--neu-extruded); }
+  .neu-raised-sm     { box-shadow: var(--neu-extruded-sm); }
+  .neu-raised-hover  { box-shadow: var(--neu-extruded-hover); }
+  .neu-inset         { box-shadow: var(--neu-inset); }
+  .neu-inset-deep    { box-shadow: var(--neu-inset-deep); }
+  .neu-inset-sm      { box-shadow: var(--neu-inset-sm); }
+  .neu-pressable     { transition: transform 300ms ease-out, box-shadow 300ms ease-out; }
+  .neu-pressable:hover { transform: translateY(-1px); box-shadow: var(--neu-extruded-hover); }
+  .neu-pressable:active { transform: translateY(0.5px); box-shadow: var(--neu-inset-sm); }
+  .neu-icon-well     { background: hsl(var(--surface)); border-radius: 1rem; box-shadow: var(--neu-inset-deep); display: inline-flex; align-items: center; justify-content: center; }
+
+  /* ---------- LEGACY MASTHEAD / EDITORIAL HOOKS (softened) ---------- */
+  .label-stamped, .broadcast-label, .label-mono {
+    font-family: ui-monospace, "JetBrains Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    font-size: 0.66rem;
     color: hsl(var(--muted-foreground));
-    pointer-events: none;
+    background: hsl(var(--surface));
+    border: none;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    box-shadow: var(--neu-inset-sm);
+    display: inline-block;
+  }
+  .label-blood   { color: hsl(var(--destructive)); }
+  .label-gold    { color: hsl(var(--primary)); }
+  .label-warning { color: hsl(var(--warning)); }
+
+  .edition-meta {
+    font-family: ui-monospace, "JetBrains Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.625rem;
+    color: hsl(var(--muted-foreground));
+    border: none;
+    padding: 4px 0;
   }
 
-  /* .no-default-hover-elevate/no-default-active-elevate is an escape hatch so consumers of
-   * buttons/badges can remove the automatic brightness adjustment on interactions
-   * and program their own. */
-  .no-default-hover-elevate {}
+  .rule-thin   { height: 1px; background: hsl(var(--muted-foreground) / 0.18); border: 0; }
+  .rule-thick  { height: 2px; background: hsl(var(--muted-foreground) / 0.25); border: 0; margin-top: 2px; }
+  .rule-blood  { height: 3px; background: hsl(var(--primary)); border-radius: 9999px; }
+  .rule-gold,
+  .ornate-divider { height: 2px; background: hsl(var(--primary) / 0.6); margin: 1.5rem 0; border-radius: 9999px; }
+  .ornate-divider::before { content: none; }
 
-  .no-default-active-elevate {}
+  .ornate-frame, .corner-flourish { position: relative; }
+  .ornate-frame::before, .ornate-frame::after,
+  .corner-flourish::before, .corner-flourish::after { content: none; }
 
+  .stamp {
+    display: inline-block;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded-sm);
+    transform: none;
+    text-shadow: none;
+    color: hsl(var(--foreground));
+  }
+  .stamp-buy   { color: hsl(var(--accent-secondary)); }
+  .stamp-pass  { color: hsl(var(--destructive)); }
+  .stamp-target{ color: hsl(var(--primary)); }
 
-  /**
-   * Toggleable backgrounds go behind the content. Hoverable/active goes on top.
-   * This way they can stack/compound. Both will overlap the parent's borders!
-   * So borders will be automatically adjusted both on toggle, and hover/active,
-   * and they will be compounded.
-   */
-  .toggle-elevate::before,
-  .toggle-elevate-2::before {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0px;
-    /*border-radius: inherit;   match rounded corners */
-    border-radius: inherit;
-    z-index: -1;
-    /* sits behind content but above backdrop */
+  .wax-seal {
+    width: 48px; height: 48px;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: hsl(var(--primary));
   }
 
-  .toggle-elevate.toggle-elevated::before {
-    background-color: var(--elevate-2);
+  .drop-cap::first-letter,
+  .drop-cap-target {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 3.25rem;
+    line-height: 0.9;
+    float: left;
+    margin: 0.25rem 0.6rem 0 0;
+    color: hsl(var(--primary));
+    font-weight: 800;
+    text-shadow: none;
   }
 
-  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
-  .border.toggle-elevate::before {
-    inset: -1px;
-  }
+  .sepia-image, img.sepia { filter: none; transition: transform 500ms ease-out; }
+  .sepia-image:hover, img.sepia:hover,
+  .group:hover .sepia-image, .group:hover img.sepia { filter: none; transform: scale(1.02); }
+  .img-noir { filter: none; }
+  .arch-top { border-radius: 1rem; }
 
-  /* Does not work on elements with overflow:hidden! */
-  .hover-elevate:not(.no-default-hover-elevate),
-  .active-elevate:not(.no-default-active-elevate),
-  .hover-elevate-2:not(.no-default-hover-elevate),
-  .active-elevate-2:not(.no-default-active-elevate) {
+  /* ---------- LEGACY SHADOW HOOKS → neumorphic ---------- */
+  .shadow-multi, .shadow-multi-lg, .shadow-mixed, .shadow-engraved,
+  .shadow-wax-seal, .shadow-card, .shadow-floating,
+  .shadow-sharp, .shadow-glow, .shadow-primary-key,
+  .shadow-brut, .shadow-brut-lg, .shadow-brut-xl { box-shadow: var(--neu-extruded); }
+  .shadow-brut-sm { box-shadow: var(--neu-extruded-sm); }
+  .shadow-pressed, .shadow-recessed { box-shadow: var(--neu-inset); }
+  .shadow-glow-accent    { box-shadow: 0 0 0 2px hsl(var(--primary) / 0.35); }
+  .shadow-glow-accent-lg { box-shadow: 0 0 0 3px hsl(var(--primary) / 0.55); }
+
+  /* ---------- PATTERNS (neutralized) ---------- */
+  .pattern-dots, .pattern-stripes, .pattern-checker, .pattern-mesh,
+  .bg-grid, .bg-halftone, .bg-halftone-red, .scanlines { background-image: none; }
+  .bg-newsprint { background-color: hsl(var(--surface)); color: hsl(var(--foreground)); background-image: none; box-shadow: var(--neu-extruded); border-radius: 2rem; }
+
+  .tilt-l, .tilt-r { transform: none; }
+
+  .led { width: 0.6rem; height: 0.6rem; border-radius: 9999px; display: inline-block; background: hsl(var(--destructive)); box-shadow: 0 0 8px hsl(var(--destructive) / 0.55); }
+  .led-green { background: hsl(var(--accent-secondary)); box-shadow: 0 0 8px hsl(var(--accent-secondary) / 0.55); }
+
+  .screws::before, .screws::after,
+  .screws > .screws-bottom::before, .screws > .screws-bottom::after { content: none; }
+  .vent-slot { display: none; }
+
+  .ease-mech { transition-timing-function: cubic-bezier(0.2, 0, 0.1, 1); }
+
+  /* ---------- MOTION ---------- */
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  .animate-float { animation: float 3s ease-in-out infinite; will-change: transform; }
+  @keyframes float-reverse {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(6px); }
+  }
+  .animate-float-reverse { animation: float-reverse 3s ease-in-out infinite; will-change: transform; }
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.35); }
+    50%      { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+  }
+  .animate-pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+  @keyframes pulse-blood {
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--destructive) / 0.5); }
+    50%      { box-shadow: 0 0 0 8px hsl(var(--destructive) / 0); }
+  }
+  .animate-pulse-blood { animation: pulse-blood 1.8s ease-out infinite; }
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-ticker { animation: ticker 40s linear infinite; }
+  @keyframes wipe-in {
+    0%   { clip-path: inset(0 100% 0 0); }
+    100% { clip-path: inset(0 0 0 0); }
+  }
+  .animate-wipe { animation: wipe-in 360ms cubic-bezier(0.2, 0, 0.1, 1) both; }
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50%      { background-position: 100% 50%; }
+  }
+  .animate-gradient { animation: gradient-shift 8s ease-in-out infinite; background-size: 200% 200%; }
+}
+
+/* =====================================================================
+   COMPONENT LAYER — global overrides for shadcn primitives
+   ===================================================================== */
+@layer components {
+  /* Cards — flat dark tile, large radius (DICE) */
+  .bg-card,
+  [data-slot="card"],
+  .surface,
+  .panel {
+    background-color: hsl(var(--surface));
+    border: none;
+    border-radius: 1.5rem;
+    box-shadow: var(--neu-extruded);
     position: relative;
-    z-index: 0;
+    transition: transform 250ms ease-out, box-shadow 250ms ease-out;
+  }
+  .bg-card:hover,
+  [data-slot="card"]:hover {
+    box-shadow: var(--neu-extruded-hover);
   }
 
-  .hover-elevate:not(.no-default-hover-elevate)::after,
-  .active-elevate:not(.no-default-active-elevate)::after,
-  .hover-elevate-2:not(.no-default-hover-elevate)::after,
-  .active-elevate-2:not(.no-default-active-elevate)::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0px;
-    /*border-radius: inherit;   match rounded corners */
-    border-radius: inherit;
-    z-index: 999;
-    /* sits in front of content */
+  /* Featured / urgent panel — accent ring instead of slab */
+  .border-2.border-primary,
+  [data-featured="true"] {
+    border: none !important;
+    border-radius: 2rem !important;
+    box-shadow: var(--neu-extruded), 0 0 0 2px hsl(var(--primary) / 0.5) inset !important;
   }
 
-  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
-  .active-elevate:active:not(.no-default-active-elevate)::after {
-    background-color: var(--elevate-1);
+  /* Inputs — pressed well */
+  input, textarea, select {
+    background-color: hsl(var(--surface));
+    border: none;
+    border-radius: 1rem;
+    color: hsl(var(--foreground));
+    font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+    box-shadow: var(--neu-inset);
+    transition: box-shadow 200ms ease-out;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    box-shadow: var(--neu-inset-deep), 0 0 0 2px hsl(var(--primary) / 0.5);
+  }
+  input::placeholder, textarea::placeholder {
+    color: hsl(var(--muted-foreground) / 0.7);
+    text-transform: none;
+    letter-spacing: 0;
   }
 
-  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
-  .active-elevate-2:active:not(.no-default-active-elevate)::after {
-    background-color: var(--elevate-2);
+  /* Header / masthead — flush surface, no underline */
+  header, .site-header {
+    background-color: hsl(var(--background) / 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: none;
+    box-shadow: 0 1px 0 hsl(var(--muted-foreground) / 0.08);
+    position: relative;
+  }
+  header::after, .site-header::after { content: none; }
+
+  /* Badges — pillows */
+  .badge,
+  [data-slot="badge"] {
+    border-radius: 9999px !important;
+    font-family: "DM Sans", sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    border: none;
+    box-shadow: var(--neu-extruded-sm);
+    background: hsl(var(--surface));
   }
 
-  /* If there's a 1px border, adjust the inset so that it covers that parent's border */
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
-    inset: -1px;
+  /* Tabs */
+  [role="tablist"] {
+    border-bottom: none;
+    background: hsl(var(--surface));
+    border-radius: 9999px;
+    padding: 4px;
+    box-shadow: var(--neu-inset);
+  }
+  [role="tab"] {
+    border-radius: 9999px !important;
+    font-family: "DM Sans", sans-serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+  [role="tab"][data-state="active"] {
+    background: hsl(var(--surface));
+    color: hsl(var(--primary));
+    box-shadow: var(--neu-extruded-sm);
+  }
+
+  /* Dialogs */
+  [role="dialog"] {
+    border-radius: 2rem !important;
+    border: none !important;
+    box-shadow: var(--neu-extruded-hover) !important;
+    background: hsl(var(--surface)) !important;
   }
 }
+
+/* =====================================================================
+   LEGACY EDITORIAL HOOKS — softened to neumorphic equivalents
+   ===================================================================== */
+@layer utilities {
+  .font-stencil,
+  .font-stencil-fill {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: -0.02em;
+    -webkit-text-stroke: 0;
+    color: hsl(var(--foreground));
+    text-shadow: none;
+  }
+
+  .dossier {
+    position: relative;
+    background: hsl(var(--surface));
+    border: none;
+    border-radius: 2rem;
+    box-shadow: var(--neu-extruded);
+    padding: 1.5rem;
+  }
+  .dossier::before, .dossier::after { content: none; }
+
+  .reticle { position: relative; }
+  .reticle::before, .reticle::after { content: none; }
+
+  .torn-bottom { -webkit-mask-image: none; mask-image: none; }
+
+  .ticker-rail {
+    background: hsl(var(--surface));
+    border: none;
+    border-radius: 9999px;
+    box-shadow: var(--neu-inset);
+    color: hsl(var(--muted-foreground));
+    font-family: ui-monospace, "JetBrains Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.7rem;
+    overflow: hidden; white-space: nowrap;
+    padding: 0 1rem;
+  }
+  .ticker-rail .ticker-track { display: inline-flex; gap: 2.5rem; padding: 8px 0; animation: ticker 40s linear infinite; }
+
+  .file-stamp {
+    display: inline-block;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border: none;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded-sm);
+    transform: none;
+    text-shadow: none;
+    opacity: 1;
+    color: hsl(var(--foreground));
+  }
+  .file-stamp-blood { color: hsl(var(--destructive)); }
+  .file-stamp-gold  { color: hsl(var(--primary)); }
+  .file-stamp-bone  { color: hsl(var(--foreground)); }
+
+  .redacted {
+    background: hsl(var(--muted-foreground) / 0.25);
+    color: transparent;
+    border-radius: 4px;
+    padding: 0 0.4em;
+    user-select: none;
+  }
+
+  .intel-value {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: hsl(var(--foreground));
+    font-variant-numeric: tabular-nums;
+    text-shadow: none;
+  }
+  .intel-value-gold { color: hsl(var(--primary)); }
+
+  .verdict {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    padding: 0.65rem 1.5rem;
+    border: none;
+    border-radius: 9999px;
+    background: hsl(var(--surface));
+    box-shadow: var(--neu-extruded);
+    color: hsl(var(--foreground));
+  }
+  .verdict-buy   { color: hsl(var(--accent-secondary)); }
+  .verdict-pass  { color: hsl(var(--destructive)); }
+  .verdict-steal { color: hsl(var(--primary)); }
+
+  .lamp-glow { background: hsl(var(--surface)); }
+  .rain-overlay { position: relative; }
+  .rain-overlay::after { content: none; }
+
+  .tape {
+    display: inline-block;
+    background: hsl(var(--surface));
+    color: hsl(var(--primary));
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    padding: 6px 14px; font-size: 0.7rem;
+    border-radius: 9999px;
+    box-shadow: var(--neu-extruded-sm);
+  }
+
+  .col-rule { border-left: 1px solid hsl(var(--muted-foreground) / 0.18); padding-left: 1rem; }
+  .col-rule-gold { border-left: 2px solid hsl(var(--primary) / 0.5); padding-left: 1rem; }
+
+  .thumb-rail {
+    position: sticky; bottom: 0; z-index: 30;
+    background: hsl(var(--background));
+    backdrop-filter: blur(8px);
+    border-top: none;
+    border-radius: 2rem 2rem 0 0;
+    box-shadow: 0 -10px 30px hsl(var(--muted-foreground) / 0.18);
+    padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
+
+@keyframes tool-panel-in {
+  0%   { opacity: 0; transform: translateX(60px) scale(0.94); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes icon-tap-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+.icon-tap-pulse { animation: icon-tap-pulse 0.55s cubic-bezier(0.34, 1.4, 0.64, 1); }
+
+/* ── Grindhouse additions ─────────────────────────────────────────────── */
+
+/* Grain overlay */
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  pointer-events: none;
+  z-index: 9999;
+  animation: grain-shift 0.5s steps(2) infinite;
+}
+
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-2%, -3%); }
+  50%  { transform: translate(3%, 1%); }
+  75%  { transform: translate(-1%, 2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Preloader */
+@keyframes preloader-up {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
+.preloader-exit { animation: preloader-up 0.8s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+
+/* Kinetic char reveal */
+@keyframes char-up {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.char-reveal {
+  overflow: hidden;
+  display: inline-block;
+}
+.char-reveal span {
+  display: inline-block;
+  animation: char-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Football spin */
+@keyframes football-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes football-counter {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes football-wobble {
+  0%   { transform: perspective(300px) rotateY(-20deg) rotateX(10deg); }
+  50%  { transform: perspective(300px) rotateY(20deg) rotateX(-10deg); }
+  100% { transform: perspective(300px) rotateY(-20deg) rotateX(10deg); }
+}
+
+/* Shimmer on hover for cards */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Text marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 18s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .grain::after,
+  .preloader-exit,
+  .char-reveal span,
+  .marquee-track { animation: none !important; }
+}
+
+/* Bebas display util */
+.font-bebas { font-family: "Bebas Neue", "Anton", "Oswald", sans-serif; letter-spacing: 0.04em; }
+
+@media (prefers-reduced-motion: reduce) { .neu-pressable, .neu-pressable:hover, .neu-pressable:active { transition: none !important; transform: none !important; box-shadow: var(--neu-extruded) !important; } [class*="animate-"] { animation: none !important; transition: none !important; } }
+:root { --mouse-x: 50%; --mouse-y: 50%; }
+
+/* ── Norris link animation (char-by-char vertical swap on hover) ─────────── */
+:root { --norris-time: 25ms; }
+.norris-link { display: inline-block; overflow: hidden; line-height: 1; }
+.norris-link span {
+  position: relative;
+  display: inline-block;
+  color: transparent;
+}
+.norris-link span::before,
+.norris-link span::after {
+  position: absolute;
+  left: 0;
+  content: attr(data-char);
+  color: currentColor;
+  transition: transform ease-in-out calc(var(--norris-time) * 10),
+              opacity ease-in-out calc(var(--norris-time) * 10);
+  transition-delay: calc(var(--index, 0) * var(--norris-time));
+}
+.norris-link span::before { transform: translateY(0); opacity: 1; }
+.norris-link span::after  { transform: translateY(100%); opacity: 0; }
+.norris-link:hover span::before { transform: translateY(-100%); opacity: 0; }
+.norris-link:hover span::after  { transform: translateY(0); opacity: 1; }
