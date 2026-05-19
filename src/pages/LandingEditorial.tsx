@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import TeamPickerPanel from "@/components/TeamPickerPanel";
+import ScrambleText from "@/components/ScrambleText";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 
 export default function LandingEditorial() {
