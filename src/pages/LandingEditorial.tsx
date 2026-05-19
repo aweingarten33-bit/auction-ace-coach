@@ -3,18 +3,25 @@ import { Menu } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const VIDEO_SCALE_KEY = "landing-video-scale";
+const VIDEO_POS_KEY = "landing-video-pos";
 
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
   const [videoScale, setVideoScale] = useState(() => {
-    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1.3"); } catch { return 1.3; }
+    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1.6"); } catch { return 1.6; }
   });
-  const [showSlider, setShowSlider] = useState(true);
+  const [videoPos, setVideoPos] = useState(() => {
+    try { return parseFloat(localStorage.getItem(VIDEO_POS_KEY) || "35"); } catch { return 35; }
+  });
+  const [showSlider, setShowSlider] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {}
   }, [videoScale]);
+  useEffect(() => {
+    try { localStorage.setItem(VIDEO_POS_KEY, String(videoPos)); } catch {}
+  }, [videoPos]);
 
   useEffect(() => {
     let raf = 0;
@@ -89,7 +96,7 @@ export default function LandingEditorial() {
         muted
         playsInline
         className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
-        style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)", transform: `scale(${videoScale})`, transformOrigin: "center center" }}
+        style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)", transform: `scale(${videoScale})`, transformOrigin: `center ${videoPos}%` }}
       >
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
@@ -217,19 +224,33 @@ export default function LandingEditorial() {
           <span
             className="cursor-pointer select-none hover:text-white/60 transition"
             onClick={() => setShowSlider(v => !v)}
+            title="Tune video"
           >HB_A · Auction Ace Coach</span>
           <span>© 2025 — All bids final</span>
         </footer>
 
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex flex-col items-center gap-2 rounded-2xl bg-black/80 backdrop-blur px-6 py-4 ring-1 ring-white/20 w-72">
-          <p className="text-[10px] uppercase tracking-widest text-white/50">Video zoom — {Math.round(videoScale * 100)}%</p>
-          <input
-            type="range" min="0.5" max="2.5" step="0.05"
-            value={videoScale}
-            onChange={e => setVideoScale(parseFloat(e.target.value))}
-            className="w-full accent-white"
-          />
-        </div>
+        {showSlider && (
+          <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex flex-col gap-3 rounded-2xl bg-black/80 backdrop-blur px-6 py-4 ring-1 ring-white/20 w-80">
+            <div className="flex items-center justify-between mb-1">
+              <p className="text-[10px] uppercase tracking-widest text-white/70 font-semibold">Video Tuner</p>
+              <button onClick={() => setShowSlider(false)} className="text-white/40 hover:text-white text-lg leading-none">×</button>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] uppercase tracking-widest text-white/50">Zoom — {Math.round(videoScale * 100)}%</p>
+              <input type="range" min="1.0" max="3.0" step="0.05"
+                value={videoScale}
+                onChange={e => setVideoScale(parseFloat(e.target.value))}
+                className="w-full accent-white" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-[10px] uppercase tracking-widest text-white/50">Pan — {Math.round(videoPos)}% from top</p>
+              <input type="range" min="0" max="100" step="1"
+                value={videoPos}
+                onChange={e => setVideoPos(parseFloat(e.target.value))}
+                className="w-full accent-white" />
+            </div>
+          </div>
+        )}
 
       </div>
 
