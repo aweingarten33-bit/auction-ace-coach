@@ -7,14 +7,8 @@ export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoZoom, setVideoZoom] = useState<number>(() => {
-    if (typeof window === "undefined") return 1;
-    const v = parseFloat(localStorage.getItem("heroVideoZoom") || "1");
-    return Number.isFinite(v) && v > 0 ? v : 1;
-  });
-  useEffect(() => {
-    try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
-  }, [videoZoom]);
+  const videoZoom = 1.59;
+
 
   // Keep the video parked at frame 0 while the preloader runs, then start when visible.
   useEffect(() => {
@@ -201,31 +195,8 @@ export default function LandingEditorial() {
 
 
 
-      {/* Hero video zoom slider */}
-      <div
-        className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-white/80 backdrop-blur"
-        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-      >
-        <span>Zoom</span>
-        <input
-          type="range"
-          min={0.5}
-          max={2.5}
-          step={0.01}
-          value={videoZoom}
-          onChange={(e) => setVideoZoom(parseFloat(e.target.value))}
-          className="h-1 w-32 cursor-pointer accent-white"
-          aria-label="Hero video zoom"
-        />
-        <span className="w-10 text-right tabular-nums">{videoZoom.toFixed(2)}x</span>
-        <button
-          type="button"
-          onClick={() => setVideoZoom(1)}
-          className="rounded-full border border-white/20 px-2 py-0.5 text-white/70 transition hover:border-white/60 hover:text-white"
-        >
-          Reset
-        </button>
-      </div>
+
+
 
       <div
         className="pointer-events-none absolute inset-0 z-0"
