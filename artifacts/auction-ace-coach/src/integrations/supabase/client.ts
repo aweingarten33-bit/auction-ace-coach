@@ -30,6 +30,29 @@ export const supabase = {
   functions: {
     async invoke(name: string) {
       if (name === "league-teams") {
+        try {
+          const raw = typeof window !== "undefined" ? localStorage.getItem("espnCreds") : null;
+          if (raw) {
+            const { leagueId, season, swid, s2 } = JSON.parse(raw);
+            if (leagueId) {
+              const qs = new URLSearchParams({
+                leagueId: String(leagueId),
+                season: String(season || new Date().getFullYear()),
+                swid: swid || "",
+                s2: s2 || "",
+              });
+              const r = await fetch(`/api/espn/teams?${qs.toString()}`);
+              if (r.ok) {
+                const data = await r.json();
+                if (Array.isArray(data?.teams) && data.teams.length > 0) {
+                  return { data: { teams: data.teams }, error: null };
+                }
+              }
+            }
+          }
+        } catch {
+          /* fall through to mocks */
+        }
         return { data: { teams: MOCK_TEAMS }, error: null };
       }
       return { data: null, error: null };
