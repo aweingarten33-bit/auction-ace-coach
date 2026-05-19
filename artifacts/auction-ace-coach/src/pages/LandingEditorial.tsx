@@ -239,27 +239,21 @@ export default function LandingEditorial() {
         </div>{/* end scrollable content */}
       </div>
 
-      {/* ── EXPANDING CARD ────────────────────────────────────────────────── */}
+      {/* ── EXPANDING CARD (fullscreen) ───────────────────────────────────── */}
       <div style={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "flex-start",
-        paddingTop: "80px",
-        paddingBottom: "40px",
+        alignItems: "stretch",
         minHeight: "100svh",
         boxSizing: "border-box",
         position: "relative", zIndex: 10,
       }}>
         <div style={{
-          width: cardExpanded ? "88vw" : "28vw",
-          maxWidth: "420px",
-          height: "72svh",
-          borderRadius: "24px",
+          width: "100vw",
+          height: "100svh",
+          borderRadius: 0,
           overflow: "hidden",
           position: "relative",
-          transition: "width 1.1s cubic-bezier(0.16,1,0.3,1)",
-          willChange: "width",
-          boxShadow: "0 12px 60px rgba(0,0,0,0.18)",
         }}>
           {/* Football video plays inside the card */}
           <video
