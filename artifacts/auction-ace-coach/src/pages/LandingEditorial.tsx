@@ -270,8 +270,8 @@ export default function LandingEditorial() {
               objectFit: "cover",
               objectPosition: "center center",
               pointerEvents: "none",
-              opacity: 1,
-              filter: "brightness(1.15) contrast(1.05) saturate(1.1)",
+              opacity: 0.5,
+              filter: "brightness(1.3) contrast(1.05) saturate(1.2)",
             }}
           >
             <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
