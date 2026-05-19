@@ -111,7 +111,15 @@ export default function LandingEditorial() {
             ● REC
           </div>
 
-          <div className="relative aspect-[4/5] w-full overflow-hidden border border-white/15 bg-black sm:aspect-video">
+          <div
+            className="relative aspect-[4/5] w-full overflow-hidden bg-transparent sm:aspect-video"
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+              maskImage:
+                "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+            }}
+          >
             <video
               ref={videoRef}
               loop muted playsInline preload="auto"
@@ -126,6 +134,28 @@ export default function LandingEditorial() {
             >
               <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
             </video>
+
+            {/* Soft blur bands on top + bottom edges */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-[22%]"
+              style={{
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
+                maskImage: "linear-gradient(to bottom, black, transparent)",
+              }}
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-[22%]"
+              style={{
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                WebkitMaskImage: "linear-gradient(to top, black, transparent)",
+                maskImage: "linear-gradient(to top, black, transparent)",
+              }}
+            />
 
             {/* Paper grain during sketch */}
             <div
