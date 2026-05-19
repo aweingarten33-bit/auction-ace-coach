@@ -83,7 +83,7 @@ export default function LandingEditorial() {
         }}>
           {/* Logo */}
           <div style={{ color: "white", lineHeight: 1.05, fontWeight: 700, fontSize: "21px", textShadow: "0 1px 12px rgba(0,0,0,0.5)" }}>
-            Auction<br />Ace
+            Ace
           </div>
 
           {/* CTA — frosted glass pill */}
@@ -136,7 +136,7 @@ export default function LandingEditorial() {
             opacity: heroReady ? 1 : 0,
             transition: "opacity 0.9s ease 0.55s",
           }}>
-            Budget-first planning powered by your league's actual 3-year auction history.
+            Budget-first planning powered by your league's actual 3-year draft history.
           </p>
 
         </div>
