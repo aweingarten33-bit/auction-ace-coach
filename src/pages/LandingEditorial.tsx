@@ -62,9 +62,28 @@ export default function LandingEditorial() {
       overflow: "hidden",
     }}>
 
+      {/* ── FULL-SCREEN FORTRESS BACKGROUND ───────────────────────────────── */}
+      <img
+        src={`${import.meta.env.BASE_URL}${BG_IMAGES[bgIndex]}`}
+        alt=""
+        style={{
+          position: "fixed", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "center center",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+      {/* Subtle dark vignette over bg */}
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none",
+        background: "linear-gradient(to bottom, rgba(10,14,26,0.35) 0%, rgba(10,14,26,0.1) 40%, rgba(10,14,26,0.5) 100%)",
+      }} />
+
       {/* ── TOP NAV ───────────────────────────────────────────────────────── */}
       <div style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, backdropFilter: "blur(0px)",
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "16px 20px",
       }}>
@@ -196,6 +215,7 @@ export default function LandingEditorial() {
         paddingBottom: "40px",
         minHeight: "100svh",
         boxSizing: "border-box",
+        position: "relative", zIndex: 2,
       }}>
         <div style={{
           width: cardExpanded ? "88vw" : "28vw",
@@ -208,29 +228,15 @@ export default function LandingEditorial() {
           willChange: "width",
           boxShadow: "0 12px 60px rgba(0,0,0,0.18)",
         }}>
-          {/* Background image */}
-          <img
-            src={`${import.meta.env.BASE_URL}${BG_IMAGES[bgIndex]}`}
-            alt=""
-            style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              objectFit: "cover",
-              objectPosition: "center center",
-              pointerEvents: "none",
-            }}
-          />
-
-          {/* Ghost video overlay */}
+          {/* Football video plays inside the card */}
           <video
             autoPlay loop muted playsInline
             style={{
               position: "absolute", inset: 0,
               width: "100%", height: "100%",
               objectFit: "cover",
+              objectPosition: "center center",
               pointerEvents: "none",
-              mixBlendMode: "screen",
-              opacity: 0.3,
             }}
           >
             <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
@@ -266,6 +272,7 @@ export default function LandingEditorial() {
       <div style={{
         textAlign: "center",
         padding: "0 32px 60px",
+        position: "relative", zIndex: 2,
         opacity: cardExpanded ? 1 : 0,
         transition: "opacity 0.9s ease 1.1s",
       }}>
@@ -273,7 +280,7 @@ export default function LandingEditorial() {
           fontStyle: "italic",
           fontSize: "clamp(1.1rem, 4vw, 1.5rem)",
           lineHeight: 1.55,
-          color: "#3a3530",
+          color: "rgba(255,255,255,0.75)",
           margin: 0,
         }}>
           Budget-first planning powered<br />by your league's actual draft history.
