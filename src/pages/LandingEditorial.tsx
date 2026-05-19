@@ -166,6 +166,7 @@ export default function LandingEditorial() {
         muted
         playsInline
         preload="auto"
+        poster={`${import.meta.env.BASE_URL}hero-poster.png`}
         className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain"
         style={{
           filter: sketchVisible
