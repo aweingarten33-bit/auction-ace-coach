@@ -47,7 +47,7 @@ function PublicGate({ children }: { children: JSX.Element }) {
 }
 
 function AppShell() {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
   const handlePreloaderDone = useCallback(() => setReady(true), []);
 
   return (
