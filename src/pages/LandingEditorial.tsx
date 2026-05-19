@@ -6,28 +6,19 @@ import { toast } from "sonner";
 
 interface Team { id: number; name: string; abbrev?: string }
 
-const VIDEO_SCALE_KEY = "landing-video-scale";
-const VIDEO_POS_KEY   = "landing-video-pos";
+// Cycle through all 4 images as background
+const BG_IMAGES = ["IMG_2304.jpeg", "IMG_2308.jpeg", "IMG_2309.jpeg", "IMG_2310.jpeg"];
 
 export default function LandingEditorial() {
-  const navigate   = useNavigate();
+  const navigate    = useNavigate();
   const { setTeam } = useSelectedTeam();
 
   const [panelOpen,    setPanelOpen]    = useState(false);
   const [teams,        setTeams]        = useState<Team[]>([]);
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [heroReady,    setHeroReady]    = useState(false);
-  const [showTuner,    setShowTuner]    = useState(false);
+  const [bgIndex,      setBgIndex]      = useState(0);
 
-  const [videoScale, setVideoScale] = useState(() => {
-    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1.6"); } catch { return 1.6; }
-  });
-  const [videoPos, setVideoPos] = useState(() => {
-    try { return parseFloat(localStorage.getItem(VIDEO_POS_KEY) || "35"); } catch { return 35; }
-  });
-
-  useEffect(() => { try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {} }, [videoScale]);
-  useEffect(() => { try { localStorage.setItem(VIDEO_POS_KEY,   String(videoPos));   } catch {} }, [videoPos]);
   useEffect(() => { const t = setTimeout(() => setHeroReady(true), 200); return () => clearTimeout(t); }, []);
   useEffect(() => {
     document.body.style.overflow = panelOpen ? "hidden" : "";
@@ -58,88 +49,45 @@ export default function LandingEditorial() {
     navigate("/draft-room", { replace: true });
   };
 
+  const bgSrc = `${import.meta.env.BASE_URL}${BG_IMAGES[bgIndex]}`;
+
   return (
-    <div style={{
-      background: "linear-gradient(170deg, #dce8f2 0%, #eef5fa 35%, #e6f0f8 65%, #d5e6f0 100%)",
-      minHeight: "100vh",
-      position: "relative",
-      overflow: "hidden",
-      fontFamily: "'Playfair Display', Georgia, serif",
-    }}>
+    <div style={{ position: "relative", minHeight: "100svh", overflow: "hidden", fontFamily: "'Playfair Display', Georgia, serif" }}>
 
-      {/* Crystal lattice — diagonal slabs like the 1978 Fortress of Solitude */}
-      {([
-        { w: "70vw", h: "16px", top: "0%",    left: "-18%",  rot: "36deg",  op: 0.55 },
-        { w: "55vw", h: "10px", top: "5%",    right: "-14%", rot: "-40deg", op: 0.45 },
-        { w: "80vw", h: "22px", top: "-1%",   left: "-22%",  rot: "28deg",  op: 0.3  },
-        { w: "48vw", h: "12px", top: "10%",   right: "-8%",  rot: "-32deg", op: 0.4  },
-        { w: "65vw", h: "14px", bottom: "2%", left: "-16%",  rot: "38deg",  op: 0.5  },
-        { w: "58vw", h: "18px", bottom: "7%", right: "-18%", rot: "-36deg", op: 0.42 },
-        { w: "42vw", h: "9px",  bottom: "0%", right: "-6%",  rot: "-28deg", op: 0.35 },
-        { w: "50vw", h: "11px", bottom: "12%",left: "-10%",  rot: "42deg",  op: 0.38 },
-      ] as Array<{w:string;h:string;top?:string;bottom?:string;left?:string;right?:string;rot:string;op:number}>).map((s, i) => (
-        <div key={i} style={{
-          position: "absolute",
-          width: s.w, height: s.h,
-          top: s.top, left: s.left, right: s.right, bottom: s.bottom,
-          background: "linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(190,218,242,0.75) 30%, rgba(255,255,255,0.95) 50%, rgba(190,218,242,0.75) 70%, rgba(255,255,255,0.05) 100%)",
-          transform: `rotate(${s.rot})`,
-          opacity: s.op,
-          pointerEvents: "none",
-          borderRadius: 3,
-          boxShadow: "0 1px 8px rgba(180,210,240,0.4)",
-        }} />
-      ))}
-
-      {/* ── HERO CARD ──────────────────────────────────────────────────────── */}
-      <div
+      {/* ── FULL-BLEED BACKGROUND ─────────────────────────────────────────── */}
+      <img
+        src={bgSrc}
+        alt=""
         style={{
-          margin: "12px",
-          borderRadius: "28px",
-          overflow: "hidden",
-          height: "calc(100svh - 24px)",
-          position: "relative",
-          transition: "transform 0.65s cubic-bezier(0.32,0,0.15,1), filter 0.65s ease, box-shadow 0.65s ease",
-          willChange: "transform, filter",
-          transform: panelOpen ? "scale(0.95) translateX(-2%)" : "scale(1) translateX(0)",
-          filter:    panelOpen ? "brightness(0.5)"              : "brightness(1)",
-          boxShadow: panelOpen ? "none" : "0 0 60px rgba(190,220,245,0.6), 0 0 130px rgba(160,205,240,0.3), inset 0 0 0 1px rgba(255,255,255,0.25)",
+          position: "absolute", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          objectPosition: "center center",
+          pointerEvents: "none",
+          userSelect: "none",
         }}
-      >
-        {/* Video */}
-        <video
-          autoPlay loop muted playsInline
-          style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover", pointerEvents: "none",
-            transform: `scale(${videoScale})`,
-            transformOrigin: `center ${videoPos}%`,
-            filter: "brightness(0.58) saturate(0.75)",
-          }}
-        >
-          <source src={`${import.meta.env.BASE_URL}242145e6-3537-4a6b-aba9-5f821bb9d45a_watermarked_video_s3_key.mov`} type="video/quicktime" />
-          <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-        </video>
+      />
 
-        {/* Gradient */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none",
-          background: "linear-gradient(to bottom, rgba(2,12,30,0.35) 0%, rgba(0,0,0,0) 35%, rgba(2,8,24,0.85) 100%)",
-        }} />
+      {/* Gradient overlay — dark at edges, lets image breathe in center */}
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        background: "linear-gradient(to bottom, rgba(4,10,22,0.45) 0%, rgba(4,10,22,0) 30%, rgba(4,10,22,0) 55%, rgba(4,10,22,0.82) 100%)",
+      }} />
 
-        {/* Top nav inside card */}
+      {/* ── UI LAYER ──────────────────────────────────────────────────────── */}
+      <div style={{ position: "relative", zIndex: 10, minHeight: "100svh", display: "flex", flexDirection: "column" }}>
+
+        {/* Top nav */}
         <div style={{
-          position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "22px 22px",
         }}>
           {/* Logo */}
-          <div style={{ color: "white", lineHeight: 1.05, fontWeight: 700, fontSize: "21px" }}>
+          <div style={{ color: "white", lineHeight: 1.05, fontWeight: 700, fontSize: "21px", textShadow: "0 1px 12px rgba(0,0,0,0.5)" }}>
             Auction<br />Ace
           </div>
 
-          {/* CTA button — frosted glass pill */}
+          {/* CTA — frosted glass pill */}
           <button
             onClick={openPanel}
             style={{
@@ -165,12 +113,16 @@ export default function LandingEditorial() {
           </button>
         </div>
 
-        {/* Bottom text */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10, padding: "0 24px 36px" }}>
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Bottom text + image switcher */}
+        <div style={{ padding: "0 24px 40px" }}>
           <h1 style={{
             color: "white",
             fontSize: "clamp(2.8rem, 9vw, 5.5rem)",
             fontWeight: 700, lineHeight: 1.06, margin: "0 0 14px 0",
+            textShadow: "0 2px 24px rgba(0,0,0,0.4)",
             opacity:   heroReady ? 1 : 0,
             transform: heroReady ? "none" : "translateY(28px)",
             transition: "opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s",
@@ -178,26 +130,33 @@ export default function LandingEditorial() {
             Draft with<br /><em>the Edge.</em>
           </h1>
           <p style={{
-            color: "rgba(255,255,255,0.6)",
+            color: "rgba(255,255,255,0.65)",
             fontFamily: "'Inter', sans-serif",
             fontSize: "15px", lineHeight: 1.6,
-            maxWidth: "280px", margin: 0,
+            maxWidth: "280px", margin: "0 0 20px 0",
             opacity: heroReady ? 1 : 0,
             transition: "opacity 0.9s ease 0.55s",
           }}>
             Budget-first planning powered by your league's actual 3-year auction history.
           </p>
-        </div>
 
-        {/* Hidden video tuner tap target */}
-        <button
-          onClick={() => setShowTuner(v => !v)}
-          style={{
-            position: "absolute", bottom: 10, right: 14, zIndex: 10,
-            background: "none", border: "none",
-            color: "rgba(255,255,255,0.15)", fontSize: "11px", cursor: "pointer",
-          }}
-        >✦</button>
+          {/* Image switcher dots */}
+          <div style={{ display: "flex", gap: "8px", opacity: heroReady ? 1 : 0, transition: "opacity 0.9s ease 0.7s" }}>
+            {BG_IMAGES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setBgIndex(i)}
+                style={{
+                  width: i === bgIndex ? 24 : 8, height: 8,
+                  borderRadius: 4,
+                  background: i === bgIndex ? "white" : "rgba(255,255,255,0.35)",
+                  border: "none", cursor: "pointer", padding: 0,
+                  transition: "width 0.3s ease, background 0.3s ease",
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* ── CURTAIN PANEL ─────────────────────────────────────────────────── */}
@@ -210,14 +169,14 @@ export default function LandingEditorial() {
         willChange: "transform",
       }}>
 
-        {/* Curtain fold shadow — left edge */}
+        {/* Fold shadow */}
         <div style={{
           position: "absolute", top: 0, left: 0, bottom: 0, width: "32px",
           background: "linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
-          zIndex: 10, pointerEvents: "none", borderRadius: "0 0 0 0",
+          zIndex: 10, pointerEvents: "none",
         }} />
 
-        {/* Panel background — dark glass with color bleed */}
+        {/* Panel background */}
         <div style={{
           position: "absolute", inset: 0,
           background: "rgba(8,8,12,0.88)",
@@ -225,37 +184,27 @@ export default function LandingEditorial() {
           WebkitBackdropFilter: "blur(24px)",
           overflow: "hidden",
         }}>
-          {/* Crystal/ice glows — Fortress of Solitude palette */}
-          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(180,220,255,0.28) 0%, transparent 70%)",  filter: "blur(35px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(60,130,255,0.22) 0%, transparent 70%)",   filter: "blur(45px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(120,190,255,0.18) 0%, transparent 70%)",  filter: "blur(55px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(200,235,255,0.14) 0%, transparent 70%)",  filter: "blur(40px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "55%",  right: "10%",  width: "40%",  height: "30%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(80,160,255,0.16) 0%, transparent 70%)",   filter: "blur(50px)", pointerEvents: "none" }} />
+          {/* Ice crystal glows */}
+          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%", borderRadius: "50%", background: "radial-gradient(circle, rgba(180,220,255,0.28) 0%, transparent 70%)", filter: "blur(35px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%", borderRadius: "50%", background: "radial-gradient(circle, rgba(60,130,255,0.22) 0%, transparent 70%)",  filter: "blur(45px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(120,190,255,0.18) 0%, transparent 70%)", filter: "blur(55px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%", borderRadius: "50%", background: "radial-gradient(circle, rgba(200,235,255,0.14) 0%, transparent 70%)", filter: "blur(40px)", pointerEvents: "none" }} />
         </div>
 
-        {/* Content */}
+        {/* Panel content */}
         <div style={{
           position: "relative", zIndex: 5,
           height: "100%", display: "flex", flexDirection: "column",
           paddingTop: "env(safe-area-inset-top)",
         }}>
-          {/* Header */}
-          <div style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "20px 20px",
-          }}>
-            <span style={{
-              color: "rgba(255,255,255,0.35)",
-              fontFamily: "'Inter', sans-serif",
-              fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase",
-            }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 20px" }}>
+            <span style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Inter', sans-serif", fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase" }}>
               Your Team
             </span>
             <button
               onClick={() => setPanelOpen(false)}
               style={{
-                background: "rgba(255,255,255,0.1)",
-                border: "1px solid rgba(255,255,255,0.15)",
+                background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)",
                 borderRadius: "50%", width: 40, height: 40,
                 cursor: "pointer", color: "white", fontSize: "15px",
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -264,20 +213,13 @@ export default function LandingEditorial() {
             >✕</button>
           </div>
 
-          {/* Team list */}
           <div style={{ flex: 1, overflowY: "auto", padding: "4px 22px 48px" }}>
             {loadingTeams && (
-              <p style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Inter',sans-serif", fontSize: "14px", paddingTop: "16px" }}>
-                Loading teams…
-              </p>
+              <p style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Inter',sans-serif", fontSize: "14px", paddingTop: "16px" }}>Loading teams…</p>
             )}
-
             {!loadingTeams && teams.length === 0 && (
-              <p style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Inter',sans-serif", fontSize: "14px", lineHeight: 1.6, paddingTop: "16px" }}>
-                No teams found. Connect ESPN first.
-              </p>
+              <p style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Inter',sans-serif", fontSize: "14px", lineHeight: 1.6, paddingTop: "16px" }}>No teams found. Connect ESPN first.</p>
             )}
-
             {!loadingTeams && teams.map((team, i) => (
               <button
                 key={team.id}
@@ -300,7 +242,6 @@ export default function LandingEditorial() {
                 {team.name}
               </button>
             ))}
-
             <button
               onClick={skip}
               style={{
@@ -321,37 +262,7 @@ export default function LandingEditorial() {
 
       {/* Click-outside to close */}
       {panelOpen && (
-        <div
-          onClick={() => setPanelOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 299 }}
-        />
-      )}
-
-      {/* ── VIDEO TUNER ───────────────────────────────────────────────────── */}
-      {showTuner && (
-        <div style={{
-          position: "fixed", bottom: "80px", left: "50%", transform: "translateX(-50%)",
-          zIndex: 9999, background: "rgba(0,0,0,0.92)",
-          border: "1px solid rgba(255,255,255,0.12)",
-          borderRadius: "16px", padding: "20px 24px", width: "300px",
-        }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-            <span style={{ color: "white", fontSize: "12px", fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Video Tuner</span>
-            <button onClick={() => setShowTuner(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "18px" }}>×</button>
-          </div>
-          <div style={{ marginBottom: "16px" }}>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontFamily: "'Inter',sans-serif", marginBottom: "8px" }}>Zoom — {Math.round(videoScale * 100)}%</p>
-            <input type="range" min="1" max="3" step="0.05" value={videoScale}
-              onChange={e => setVideoScale(parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: "#ccff00" }} />
-          </div>
-          <div>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontFamily: "'Inter',sans-serif", marginBottom: "8px" }}>Pan — {Math.round(videoPos)}% from top</p>
-            <input type="range" min="0" max="100" step="1" value={videoPos}
-              onChange={e => setVideoPos(parseFloat(e.target.value))}
-              style={{ width: "100%", accentColor: "#ccff00" }} />
-          </div>
-        </div>
+        <div onClick={() => setPanelOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 299 }} />
       )}
     </div>
   );
