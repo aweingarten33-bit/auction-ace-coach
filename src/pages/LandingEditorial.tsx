@@ -1,10 +1,20 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import TeamPickerPanel from "@/components/TeamPickerPanel";
+import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 
 export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [morphing, setMorphing] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const nav = useNavigate();
+  const { team } = useSelectedTeam();
+
+  // If a team was already picked in a previous session, skip the landing.
+  useEffect(() => {
+    if (team) nav("/draft-room", { replace: true });
+  }, [team, nav]);
 
   // Hold video at frame 0 until preloader finishes, then play + drop sketch filter.
   useEffect(() => {
@@ -93,18 +103,52 @@ export default function LandingEditorial() {
 
           <button
             type="button"
-            aria-label="Choose your team"
-            onClick={() => setMenuOpen(true)}
-            className="relative h-9 w-9 outline-none"
+            aria-label="Choose your teams"
+            onClick={() => {
+              if (morphing) return;
+              setMorphing(true);
+              window.setTimeout(() => setMenuOpen(true), 520);
+              window.setTimeout(() => setMorphing(false), 1400);
+            }}
+            className={`group relative flex h-9 items-center overflow-hidden rounded-full outline-none ring-1 transition-all duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+              morphing
+                ? "w-[210px] bg-red-500 ring-red-300/60 shadow-[0_0_24px_-4px_rgba(239,68,68,0.9)]"
+                : "w-9 bg-transparent ring-white/0 hover:ring-white/20"
+            }`}
           >
             <span
-              className="absolute left-1/2 top-1/2 block h-px w-6 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
-              style={{ transform: "translate(-50%,-50%) translateY(-4px)" }}
+              aria-hidden
+              className="absolute left-1/2 top-1/2 block h-px bg-white transition-all duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
+              style={{
+                width: morphing ? "190px" : "24px",
+                opacity: morphing ? 0 : 1,
+                transform: morphing
+                  ? "translate(-50%,-50%) translateY(0)"
+                  : "translate(-50%,-50%) translateY(-4px)",
+                transitionDelay: morphing ? "60ms" : "0ms",
+              }}
             />
             <span
-              className="absolute left-1/2 top-1/2 block h-px w-6 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
-              style={{ transform: "translate(-50%,-50%) translateY(4px)" }}
+              aria-hidden
+              className="absolute left-1/2 top-1/2 block h-px bg-white transition-all duration-[600ms] ease-[cubic-bezier(0.76,0,0.24,1)]"
+              style={{
+                width: morphing ? "190px" : "24px",
+                opacity: morphing ? 0 : 1,
+                transform: morphing
+                  ? "translate(-50%,-50%) translateY(0)"
+                  : "translate(-50%,-50%) translateY(4px)",
+              }}
             />
+            <span
+              className="pointer-events-none absolute inset-0 flex items-center justify-center whitespace-nowrap font-bebas text-[12px] tracking-[0.28em] text-white transition-all duration-500 ease-out md:text-[13px]"
+              style={{
+                opacity: morphing ? 1 : 0,
+                transform: morphing ? "translateY(0)" : "translateY(6px)",
+                transitionDelay: morphing ? "380ms" : "0ms",
+              }}
+            >
+              CHOOSE&nbsp;YOUR&nbsp;TEAMS
+            </span>
           </button>
         </div>
       </header>
