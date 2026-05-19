@@ -109,10 +109,29 @@ export default function LandingEditorial() {
       )}
 
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="min-h-screen flex flex-col justify-between pt-[72px] pb-10 px-5 overflow-hidden">
+      <section className="relative h-screen min-h-[640px] flex flex-col justify-end pb-10 px-5 overflow-hidden">
 
-        {/* Giant headline */}
-        <div className="pt-10">
+        {/* Full-screen video background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          style={{
+            transform: `scale(${videoScale})`,
+            transformOrigin: `center ${videoPos}%`,
+            filter: "brightness(0.45) saturate(0.7)",
+          }}
+        >
+          <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+        </video>
+
+        {/* Gradient — heavier at bottom so text is readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80 pointer-events-none" />
+
+        {/* Text sits at the bottom of the full-screen hero */}
+        <div className="relative z-10">
           <h1
             className="font-black uppercase leading-[0.88] tracking-tight text-white"
             style={{ fontSize: "clamp(3.8rem, 20vw, 15rem)", letterSpacing: "-0.025em" }}
@@ -120,50 +139,12 @@ export default function LandingEditorial() {
             AUCTION
             <br />
             DRAFT.
-          </h1>
-        </div>
-
-        {/* Video — circular, floating in the center */}
-        <div className="flex justify-center py-4">
-          <div
-            className="relative overflow-hidden"
-            style={{
-              width: "min(72vw, 420px)",
-              height: "min(72vw, 420px)",
-              borderRadius: "50%",
-              boxShadow: `0 0 0 1px rgba(255,255,255,0.08), 0 32px 80px rgba(0,0,0,0.8)`,
-            }}
-          >
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-              style={{
-                transform: `scale(${videoScale})`,
-                transformOrigin: `center ${videoPos}%`,
-              }}
-            >
-              <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-            </video>
-            {/* Rim light */}
-            <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/10 pointer-events-none" />
-          </div>
-        </div>
-
-        {/* Lower text block */}
-        <div>
-          <h2
-            className="font-black uppercase leading-[0.88] tracking-tight text-white"
-            style={{ fontSize: "clamp(3.8rem, 20vw, 15rem)", letterSpacing: "-0.025em" }}
-          >
+            <br />
             YOUR
             <br />
             EDGE.
-          </h2>
+          </h1>
 
-          {/* Body + CTA */}
           <div className="mt-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <p className="text-[15px] leading-relaxed text-white/50 max-w-xs font-normal">
               Budget-first draft planning powered by your league's actual 3-year auction history.
@@ -171,9 +152,9 @@ export default function LandingEditorial() {
 
             <Link
               to="/team"
-              className="inline-flex items-center gap-4 self-start rounded-full border border-white/20 pl-6 pr-2 py-2 hover:border-white/40 transition-colors shrink-0"
+              className="inline-flex items-center gap-4 self-start rounded-full border border-white/30 pl-6 pr-2 py-2 hover:border-white/60 transition-colors shrink-0"
             >
-              <span className="text-[14px] font-semibold uppercase tracking-wide">Choose Your Team</span>
+              <span className="text-[14px] font-semibold uppercase tracking-wide text-white">Choose Your Team</span>
               <span
                 className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg shrink-0"
                 style={{ background: LIME }}
