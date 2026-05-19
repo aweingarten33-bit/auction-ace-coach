@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/v2/"
+title = "Auction Ace Coach v2"
+version = "1.0.0"
+id = "artifacts/auction-ace-coach-v2"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/v2/" ]
+localPort = 24550
+
+[services.development]
+run = "pnpm --filter @workspace/auction-ace-coach-v2 run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/auction-ace-coach-v2", "run", "build" ]
+publicDir = "artifacts/auction-ace-coach-v2/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24550"
+BASE_PATH = "/v2/"
