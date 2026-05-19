@@ -80,28 +80,8 @@ export default function LandingEditorial() {
 
       <div className="mx-5 mt-4 h-px bg-white/10 md:mx-10" />
 
-      {/* ── Editorial hero ─────────────────────────────────────────────── */}
-      <section className="relative z-10 px-5 pt-8 md:px-10 md:pt-12">
-        {/* Oversized wordmark, broken into two lines */}
-        <h1 className="font-serif italic leading-[0.82] tracking-[-0.04em] text-white"
-            style={{ fontFamily: "'Playfair Display', serif" }}>
-          <span className="block text-[clamp(4.5rem,22vw,16rem)]">Auction</span>
-          <span className="block text-[clamp(4.5rem,22vw,16rem)] pl-[18%] text-white/35">Room.</span>
-        </h1>
-
-        {/* Meta row */}
-        <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/10 pt-4">
-          <p className="max-w-[20rem] text-[12px] leading-relaxed text-white/65">
-            A shared research desk for your league — three years of price history, tiered values, zero noise.
-          </p>
-          <div className="shrink-0 text-right text-[9px] font-mono uppercase tracking-[0.28em] text-white/40">
-            №&nbsp;001<br />HB_A
-          </div>
-        </div>
-      </section>
-
-      {/* ── Video panel ────────────────────────────────────────────────── */}
-      <section className="relative z-10 mt-8 px-5 md:px-10">
+      {/* ── Video panel (front and center on load) ─────────────────────── */}
+      <section className="relative z-10 mt-4 px-5 md:px-10">
         <div className="relative">
           {/* Corner labels */}
           <div className="absolute -top-3 left-0 z-20 bg-[#0a0a0a] px-2 text-[9px] font-mono uppercase tracking-[0.32em] text-white/55">
@@ -112,7 +92,15 @@ export default function LandingEditorial() {
           </div>
 
           <div
-            className="relative aspect-[4/5] w-full overflow-hidden bg-transparent sm:aspect-video"
+            className="relative h-[62vh] max-h-[640px] w-full overflow-hidden bg-transparent sm:h-[70vh]"
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+              maskImage:
+                "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+            }}
+          >
+
             style={{
               WebkitMaskImage:
                 "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
