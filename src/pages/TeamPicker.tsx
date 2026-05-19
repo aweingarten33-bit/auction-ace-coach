@@ -116,17 +116,17 @@ export default function TeamPicker() {
                     onClick={() => setPicked(t)}
                     className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${
                       isPicked
-                        ? "border-primary bg-primary/10"
-                        : "border-border/60 bg-secondary/20 hover:bg-secondary/40"
+                        ? "border-red-500 bg-red-500/10"
+                        : "border-black/10 bg-white/60 hover:bg-white"
                     }`}
                   >
                     {t.abbrev && (
-                      <span className="font-mono text-[11px] font-semibold text-muted-foreground">
+                      <span className="font-mono text-[11px] font-semibold text-black/50">
                         {t.abbrev}
                       </span>
                     )}
                     <span className="flex-1 text-sm font-medium">{t.name}</span>
-                    {isPicked && <ArrowRight className="h-4 w-4 text-primary" />}
+                    {isPicked && <ArrowRight className="h-4 w-4 text-red-500" />}
                   </button>
                 );
               })}
