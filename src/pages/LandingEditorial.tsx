@@ -100,28 +100,42 @@ export default function LandingEditorial() {
       className="relative min-h-screen w-full overflow-hidden bg-black text-white"
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer */}
+      {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer (edge-detect ink on paper) */}
       <svg aria-hidden width="0" height="0" style={{ position: "absolute" }}>
         <defs>
-          <filter id="ahaSketch" x="0%" y="0%" width="100%" height="100%">
+          <filter id="ahaSketch" x="0%" y="0%" width="100%" height="100%" colorInterpolationFilters="sRGB">
+            {/* 1. Desaturate */}
             <feColorMatrix
               in="SourceGraphic"
               type="matrix"
               values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"
               result="gray"
             />
-            <feComponentTransfer in="gray" result="ink">
-              <feFuncR type="linear" slope="2.4" intercept="-0.75" />
-              <feFuncG type="linear" slope="2.4" intercept="-0.75" />
-              <feFuncB type="linear" slope="2.4" intercept="-0.75" />
-            </feComponentTransfer>
-            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="2" result="noise">
-              <animate attributeName="seed" values="1;4;7;2;9;5" dur="0.45s" repeatCount="indefinite" calcMode="discrete" />
+            {/* 2. Edge detect (Laplacian) */}
+            <feConvolveMatrix
+              in="gray"
+              order="3"
+              preserveAlpha="true"
+              kernelMatrix="1 1 1  1 -8 1  1 1 1"
+              result="edges"
+            />
+            {/* 3. Invert + crank contrast → black ink lines on white paper */}
+            <feColorMatrix
+              in="edges"
+              type="matrix"
+              values="-6 0 0 0 1  0 -6 0 0 1  0 0 -6 0 1  0 0 0 1 0"
+              result="ink"
+            />
+            {/* 4. Animated turbulence for the hand-drawn shimmer */}
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="2" result="noise">
+              <animate attributeName="seed" values="1;4;7;2;9;5" dur="0.4s" repeatCount="indefinite" calcMode="discrete" />
             </feTurbulence>
-            <feDisplacementMap in="ink" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G" />
+            {/* 5. Displace the ink with the noise → wobbly pencil strokes */}
+            <feDisplacementMap in="ink" in2="noise" scale="7" xChannelSelector="R" yChannelSelector="G" />
           </filter>
         </defs>
       </svg>
+
 
       {/* Bottom layer: real color hero video */}
       <video
