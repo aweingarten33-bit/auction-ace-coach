@@ -176,8 +176,8 @@ export default function LandingEditorial() {
         {/* Headline — Modus scale: massive condensed, two stacked lines, second line ghosted for depth (sits visually "behind" subject) */}
         <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 md:px-12 md:pb-16">
           <h1
-            className="font-bebas uppercase leading-[0.86] tracking-[0.005em] text-white"
-            style={{ fontSize: "clamp(3.25rem, 15vw, 13rem)" }}
+            className="font-bebas uppercase leading-[0.88] tracking-[0.005em] text-white"
+            style={{ fontSize: "clamp(2.25rem, 11vw, 9rem)" }}
           >
             <span className="block">Draft&nbsp;smarter,</span>
             <span
