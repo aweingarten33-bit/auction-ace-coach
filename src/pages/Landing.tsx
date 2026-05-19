@@ -17,7 +17,7 @@ function KineticWord({ text, className = "", delay = 0 }: { text: string; classN
 
 // ── Scrolling marquee strip ───────────────────────────────────────────────────
 function MarqueeStrip() {
-  const content = "AUCTION DRAFT · BUDGET MATH · LEAGUE HISTORY · TIER MAPPING · SMART BIDS · ";
+  const content = "ACE · BUDGET MATH · LEAGUE HISTORY · TIER MAPPING · DRAFT ROOM · SMART BIDS · ";
   return (
     <div className="pointer-events-none overflow-hidden border-y border-white/10 py-2.5">
       <div className="marquee-track whitespace-nowrap text-[11px] font-semibold tracking-[0.25em] text-white/30">
@@ -55,14 +55,19 @@ export default function Landing() {
         {/* Headline — pushed to bottom so players are visible above */}
         <h1 className="mb-0 text-center font-bebas leading-none tracking-wider">
           <KineticWord
-            text="AUCTION"
+            text="DRAFT"
             className="block text-[clamp(3.5rem,18vw,9rem)] text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]"
             delay={0.3}
           />
           <KineticWord
-            text="ACE"
+            text="WITH THE"
+            className="block text-[clamp(1.8rem,9vw,4.5rem)] text-white/60 drop-shadow-[0_2px_24px_rgba(0,0,0,0.8)]"
+            delay={0.5}
+          />
+          <KineticWord
+            text="EDGE."
             className="block text-[clamp(3.5rem,18vw,9rem)] text-red-500 drop-shadow-[0_2px_24px_rgba(220,38,38,0.5)]"
-            delay={0.6}
+            delay={0.7}
           />
         </h1>
 
