@@ -16,16 +16,20 @@ export default function LandingEditorial() {
     try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
   }, [videoZoom]);
 
+  // Play immediately on mount; sketch filter is on for 1.7s, then live color.
   useEffect(() => {
-    const reveal = () => {
-      const v = videoRef.current;
-      if (v) { try { v.currentTime = 0; } catch {} void v.play().catch(() => {}); }
-      // a-ha "Take On Me": hold the sketch shimmer, then snap to live color.
-      window.setTimeout(() => setSketchVisible(false), 1700);
+    const v = videoRef.current;
+    if (!v) return;
+    const start = () => { try { v.currentTime = 0; } catch {} void v.play().catch(() => {}); };
+    start();
+    v.addEventListener("loadeddata", start, { once: true });
+    const t = window.setTimeout(() => setSketchVisible(false), 1700);
+    return () => {
+      window.clearTimeout(t);
+      v.removeEventListener("loadeddata", start);
     };
-    window.addEventListener("landing:visible", reveal, { once: true });
-    return () => window.removeEventListener("landing:visible", reveal);
   }, []);
+
 
 
 
