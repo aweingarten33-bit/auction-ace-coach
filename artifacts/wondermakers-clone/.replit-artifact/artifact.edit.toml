@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Wonder Makers Clone"
+version = "1.0.0"
+id = "artifacts/wondermakers-clone"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26223
+
+[services.development]
+run = "pnpm --filter @workspace/wondermakers-clone run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/wondermakers-clone", "run", "build" ]
+publicDir = "artifacts/wondermakers-clone/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26223"
+BASE_PATH = "/"
