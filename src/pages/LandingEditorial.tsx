@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
+  const [polaroidActive, setPolaroidActive] = useState(false);
+  const [showPolaroid, setShowPolaroid] = useState(false);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoZoom, setVideoZoom] = useState<number>(() => {
@@ -15,38 +17,37 @@ export default function LandingEditorial() {
     try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
   }, [videoZoom]);
 
-  // Sync video start with preloader end (~6.5s) so it doesn't begin mid-clip.
+  useEffect(() => {
+    const reveal = () => {
+      setShowPolaroid(true);
+      requestAnimationFrame(() => setPolaroidActive(true));
+    };
+
+    window.addEventListener("landing:visible", reveal, { once: true });
+    return () => window.removeEventListener("landing:visible", reveal);
+  }, []);
+
+  // Start immediately when the landing page mounts; the Polaroid still covers any browser warm-up.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    v.pause();
-    try { v.currentTime = 0; } catch {}
+    let cancelled = false;
 
-    // Kick off play slightly before the preloader finishes so the first frame
-    // is already on screen when it fades out — eliminates the perceived gap.
-    const PRELOADER_MS = 6500;
-    const LEAD_MS = 600;
-    const readyAfter = Date.now() + Math.max(0, PRELOADER_MS - LEAD_MS);
-
-    let started = false;
     const start = () => {
-      if (started || !videoRef.current) return;
-      started = true;
-      try { videoRef.current.currentTime = 0; } catch {}
-      void videoRef.current.play().catch(() => {});
+      if (cancelled) return;
+      void v.play().catch(() => {});
     };
 
-    const t = setTimeout(start, Math.max(0, PRELOADER_MS - LEAD_MS));
-    const onReady = () => {
-      if (Date.now() >= readyAfter) start();
-    };
-    v.addEventListener("canplay", onReady);
-    v.addEventListener("canplaythrough", onReady);
+    try { v.currentTime = 0; } catch {}
+    v.load();
+    if (v.readyState >= 2) start();
+    v.addEventListener("loadeddata", start, { once: true });
+    v.addEventListener("canplay", start, { once: true });
 
     return () => {
-      clearTimeout(t);
-      v.removeEventListener("canplay", onReady);
-      v.removeEventListener("canplaythrough", onReady);
+      cancelled = true;
+      v.removeEventListener("loadeddata", start);
+      v.removeEventListener("canplay", start);
     };
   }, []);
 
@@ -133,6 +134,23 @@ export default function LandingEditorial() {
       >
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
+
+      {showPolaroid && (
+        <div className="pointer-events-none fixed inset-0 z-[1] grid place-items-center overflow-hidden">
+          <div
+            className={`w-[min(78vw,520px)] bg-white p-3 pb-10 shadow-[0_24px_80px_rgba(0,0,0,0.55)] md:w-[min(56vw,660px)] md:p-4 md:pb-14 ${polaroidActive ? "hero-polaroid-frame" : "opacity-0"}`}
+            onAnimationEnd={() => setShowPolaroid(false)}
+          >
+            <img
+              src={`${import.meta.env.BASE_URL}hero-polaroid.jpg`}
+              alt=""
+              draggable={false}
+              className="aspect-video w-full object-contain grayscale"
+              style={{ filter: "grayscale(1) contrast(1.08) brightness(0.9)" }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Hero video zoom slider */}
       <div
@@ -290,6 +308,20 @@ export default function LandingEditorial() {
           0%, 100% { transform: rotate(-18deg) scale(1); }
           25% { transform: rotate(-12deg) scale(1.04); }
           75% { transform: rotate(-22deg) scale(0.97); }
+        }
+        @keyframes hero-polaroid-reveal {
+          0% { opacity: 0; transform: translate3d(-42vw, -38vh, 0) rotate(-16deg) scale(0.72); }
+          16% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-5deg) scale(0.94); }
+          36% { opacity: 1; transform: translate3d(0, 0, 0) rotate(2deg) scale(1); }
+          62% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg) scale(1.03); filter: grayscale(1); }
+          100% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg) scale(${videoZoom}); filter: grayscale(0); }
+        }
+        .hero-polaroid-frame {
+          animation: hero-polaroid-reveal 1800ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+          will-change: transform, opacity, filter;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-polaroid-frame { animation-duration: 600ms; }
         }
       `}</style>
     </div>

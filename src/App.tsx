@@ -48,7 +48,12 @@ function PublicGate({ children }: { children: JSX.Element }) {
 
 function AppShell() {
   const [ready, setReady] = useState(false);
-  const handlePreloaderDone = useCallback(() => setReady(true), []);
+  const handlePreloaderDone = useCallback(() => {
+    setReady(true);
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("landing:visible"));
+    });
+  }, []);
 
   return (
     <>
