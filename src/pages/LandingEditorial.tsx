@@ -166,6 +166,24 @@ export default function LandingEditorial() {
         </div>
       </section>
 
+      {/* ── Editorial headline (below video) ───────────────────────────── */}
+      <section className="relative z-10 px-5 pt-8 md:px-10 md:pt-12">
+        <h2 className="font-serif italic leading-[0.82] tracking-[-0.04em] text-white"
+            style={{ fontFamily: "'Playfair Display', serif" }}>
+          <span className="block text-[clamp(3.5rem,18vw,12rem)]">Auction</span>
+          <span className="block text-[clamp(3.5rem,18vw,12rem)] pl-[18%] text-white/35">Room.</span>
+        </h2>
+        <div className="mt-6 flex items-end justify-between gap-4 border-t border-white/10 pt-4">
+          <p className="max-w-[20rem] text-[12px] leading-relaxed text-white/65">
+            A shared research desk for your league — three years of price history, tiered values, zero noise.
+          </p>
+          <div className="shrink-0 text-right text-[9px] font-mono uppercase tracking-[0.28em] text-white/40">
+            №&nbsp;001<br />HB_A
+          </div>
+        </div>
+      </section>
+
+
       {/* ── Marquee ────────────────────────────────────────────────────── */}
       <section className="relative z-10 mt-10 overflow-hidden border-y border-white/10 py-3">
         <div className="marquee-track whitespace-nowrap font-serif italic text-[clamp(1.5rem,5vw,2.5rem)] text-white/30"
