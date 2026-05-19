@@ -140,7 +140,7 @@ export default function LandingEditorial() {
       </div>
 
       {/* ── Full-bleed hero video ──────────────────────────────────── */}
-      <section className="relative h-[100svh] min-h-[560px] w-full overflow-hidden">
+      <section className="relative w-full overflow-hidden pt-20 md:pt-24" style={{ aspectRatio: "1.59 / 1" }}>
         <video
           ref={videoRef}
           loop muted playsInline preload="auto"
