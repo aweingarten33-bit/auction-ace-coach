@@ -96,7 +96,7 @@ export default function LandingEditorial() {
               onClick={() => setMenuOpen(false)}
               className="flex items-center justify-between rounded-full border border-white/20 px-6 py-3 hover:border-white/40 transition-colors"
             >
-              <span className="text-[15px] font-medium">Enter Draft Room</span>
+              <span className="text-[15px] font-medium">Choose Your Team</span>
               <span
                 className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg"
                 style={{ background: LIME }}
@@ -173,7 +173,7 @@ export default function LandingEditorial() {
               to="/team"
               className="inline-flex items-center gap-4 self-start rounded-full border border-white/20 pl-6 pr-2 py-2 hover:border-white/40 transition-colors shrink-0"
             >
-              <span className="text-[14px] font-semibold uppercase tracking-wide">Enter Draft Room</span>
+              <span className="text-[14px] font-semibold uppercase tracking-wide">Choose Your Team</span>
               <span
                 className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg shrink-0"
                 style={{ background: LIME }}
@@ -250,7 +250,7 @@ export default function LandingEditorial() {
             to="/team"
             className="inline-flex items-center gap-4 rounded-full border border-white/20 pl-6 pr-2 py-2 hover:border-white/40 transition-colors shrink-0"
           >
-            <span className="text-[14px] font-semibold uppercase tracking-wide">Get started</span>
+            <span className="text-[14px] font-semibold uppercase tracking-wide">Choose Your Team</span>
             <span
               className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg"
               style={{ background: LIME }}
