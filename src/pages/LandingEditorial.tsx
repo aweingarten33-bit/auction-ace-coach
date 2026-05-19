@@ -81,6 +81,7 @@ export default function LandingEditorial() {
         className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover"
         style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
       >
+        <source src={`${import.meta.env.BASE_URL}Export.mov`} type="video/mp4" />
         <source src={`${import.meta.env.BASE_URL}hero-video.mp4`} type="video/mp4" />
       </video>
 
