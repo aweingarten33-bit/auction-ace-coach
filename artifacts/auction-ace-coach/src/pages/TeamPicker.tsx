@@ -167,7 +167,7 @@ export default function TeamPicker() {
         )}
 
         {!loading && !error && teams.length > 0 && (
-          <div className="rounded-3xl bg-white/15 backdrop-blur-2xl border border-white/40 shadow-2xl overflow-hidden divide-y divide-white/20 min-h-[80vh]">
+          <div className="rounded-3xl bg-white/15 backdrop-blur-2xl border border-white/40 shadow-2xl overflow-hidden divide-y divide-white/20 min-h-[125vh]">
             {teams.map((t) => {
               const isPicked = picked?.id === t.id;
               return (
