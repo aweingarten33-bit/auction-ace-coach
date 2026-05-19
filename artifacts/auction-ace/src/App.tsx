@@ -53,7 +53,7 @@ function AppShell() {
   return (
     <>
       {!ready && <Preloader onDone={handlePreloaderDone} />}
-      <AppRoutes />
+      {ready && <AppRoutes />}
     </>
   );
 }
