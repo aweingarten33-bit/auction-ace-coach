@@ -51,6 +51,7 @@ function AppShell() {
   const handlePreloaderDone = useCallback(() => {
     setReady(true);
     requestAnimationFrame(() => {
+      (window as typeof window & { __landingVisible?: boolean }).__landingVisible = true;
       window.dispatchEvent(new Event("landing:visible"));
     });
   }, []);

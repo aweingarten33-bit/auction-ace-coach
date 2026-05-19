@@ -16,17 +16,37 @@ export default function LandingEditorial() {
     try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
   }, [videoZoom]);
 
-  // Play immediately on mount; sketch filter is on for 1.7s, then live color.
+  // Keep the video parked at frame 0 while the preloader runs, then start when visible.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const start = () => { try { v.currentTime = 0; } catch {} void v.play().catch(() => {}); };
-    start();
-    v.addEventListener("loadeddata", start, { once: true });
-    const t = window.setTimeout(() => setSketchVisible(false), 1700);
+    let sketchTimer = 0;
+
+    const resetToStart = () => {
+      try { v.pause(); } catch {}
+      try { v.currentTime = 0; } catch {}
+    };
+
+    const start = () => {
+      window.clearTimeout(sketchTimer);
+      setSketchVisible(true);
+      try { v.currentTime = 0; } catch {}
+      void v.play().catch(() => {});
+      sketchTimer = window.setTimeout(() => setSketchVisible(false), 1700);
+    };
+
+    resetToStart();
+    v.addEventListener("loadedmetadata", resetToStart, { once: true });
+    window.addEventListener("landing:visible", start, { once: true });
+
+    if ((window as typeof window & { __landingVisible?: boolean }).__landingVisible) {
+      start();
+    }
+
     return () => {
-      window.clearTimeout(t);
-      v.removeEventListener("loadeddata", start);
+      window.clearTimeout(sketchTimer);
+      v.removeEventListener("loadedmetadata", resetToStart);
+      window.removeEventListener("landing:visible", start);
     };
   }, []);
 
