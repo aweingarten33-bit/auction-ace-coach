@@ -59,7 +59,11 @@ export default function LandingEditorial() {
   };
 
   return (
-    <div style={{ background: "#ede8df", minHeight: "100vh", fontFamily: "'Playfair Display', Georgia, serif" }}>
+    <div style={{
+      background: "linear-gradient(160deg, #020c1b 0%, #050f22 40%, #03091a 70%, #010812 100%)",
+      minHeight: "100vh",
+      fontFamily: "'Playfair Display', Georgia, serif",
+    }}>
 
       {/* ── HERO CARD ──────────────────────────────────────────────────────── */}
       <div
@@ -69,11 +73,11 @@ export default function LandingEditorial() {
           overflow: "hidden",
           height: "calc(100svh - 24px)",
           position: "relative",
-          transition: "transform 0.65s cubic-bezier(0.32,0,0.15,1), filter 0.65s ease",
+          transition: "transform 0.65s cubic-bezier(0.32,0,0.15,1), filter 0.65s ease, box-shadow 0.65s ease",
           willChange: "transform, filter",
-          // Subtle depth push when curtain opens
           transform: panelOpen ? "scale(0.95) translateX(-2%)" : "scale(1) translateX(0)",
           filter:    panelOpen ? "brightness(0.5)"              : "brightness(1)",
+          boxShadow: panelOpen ? "none" : "0 0 60px rgba(80,160,255,0.18), 0 0 120px rgba(40,100,200,0.10)",
         }}
       >
         {/* Video */}
@@ -88,13 +92,14 @@ export default function LandingEditorial() {
             filter: "brightness(0.58) saturate(0.75)",
           }}
         >
+          <source src={`${import.meta.env.BASE_URL}242145e6-3537-4a6b-aba9-5f821bb9d45a_watermarked_video_s3_key.mov`} type="video/quicktime" />
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
 
         {/* Gradient */}
         <div style={{
           position: "absolute", inset: 0, pointerEvents: "none",
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.75) 100%)",
+          background: "linear-gradient(to bottom, rgba(2,12,30,0.35) 0%, rgba(0,0,0,0) 35%, rgba(2,8,24,0.85) 100%)",
         }} />
 
         {/* Top nav inside card */}
@@ -194,12 +199,12 @@ export default function LandingEditorial() {
           WebkitBackdropFilter: "blur(24px)",
           overflow: "hidden",
         }}>
-          {/* Graffiti-inspired color glows */}
-          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(255,200,0,0.3) 0%, transparent 70%)",   filter: "blur(35px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(0,140,255,0.22) 0%, transparent 70%)",  filter: "blur(45px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(160,0,255,0.18) 0%, transparent 70%)", filter: "blur(55px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(255,60,0,0.2) 0%, transparent 70%)",   filter: "blur(40px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "55%",  right: "10%",  width: "40%",  height: "30%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(0,255,120,0.12) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
+          {/* Crystal/ice glows — Fortress of Solitude palette */}
+          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(180,220,255,0.28) 0%, transparent 70%)",  filter: "blur(35px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(60,130,255,0.22) 0%, transparent 70%)",   filter: "blur(45px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(120,190,255,0.18) 0%, transparent 70%)",  filter: "blur(55px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(200,235,255,0.14) 0%, transparent 70%)",  filter: "blur(40px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "55%",  right: "10%",  width: "40%",  height: "30%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(80,160,255,0.16) 0%, transparent 70%)",   filter: "blur(50px)", pointerEvents: "none" }} />
         </div>
 
         {/* Content */}
