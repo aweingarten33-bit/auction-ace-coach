@@ -1,571 +1,327 @@
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSelectedTeam } from "@/hooks/useSelectedTeam";
+import { toast } from "sonner";
 
-const LIME = "#d4ff00";
-const CREAM = "#f3efe6";
-const INK = "#0e0e0e";
+interface Team { id: number; name: string; abbrev?: string }
+
+const VIDEO_SCALE_KEY = "landing-video-scale";
+const VIDEO_POS_KEY   = "landing-video-pos";
 
 export default function LandingEditorial() {
-  const [phase, setPhase] = useState<"loading" | "wiping" | "ready">("loading");
+  const navigate   = useNavigate();
+  const { setTeam } = useSelectedTeam();
 
-  // cursor (normalized -1..1 around center)
-  const mouse = useRef({ x: 0, y: 0 });
-  const [, force] = useState(0);
+  const [panelOpen,    setPanelOpen]    = useState(false);
+  const [teams,        setTeams]        = useState<Team[]>([]);
+  const [loadingTeams, setLoadingTeams] = useState(false);
+  const [heroReady,    setHeroReady]    = useState(false);
+  const [showTuner,    setShowTuner]    = useState(false);
+
+  const [videoScale, setVideoScale] = useState(() => {
+    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1.6"); } catch { return 1.6; }
+  });
+  const [videoPos, setVideoPos] = useState(() => {
+    try { return parseFloat(localStorage.getItem(VIDEO_POS_KEY) || "35"); } catch { return 35; }
+  });
+
+  useEffect(() => { try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {} }, [videoScale]);
+  useEffect(() => { try { localStorage.setItem(VIDEO_POS_KEY,   String(videoPos));   } catch {} }, [videoPos]);
+  useEffect(() => { const t = setTimeout(() => setHeroReady(true), 200); return () => clearTimeout(t); }, []);
   useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      const nx = (e.clientX / window.innerWidth) * 2 - 1;
-      const ny = (e.clientY / window.innerHeight) * 2 - 1;
-      mouse.current = { x: nx, y: ny };
-      force((n) => (n + 1) % 1000);
-    };
-    window.addEventListener("pointermove", onMove);
-    return () => window.removeEventListener("pointermove", onMove);
-  }, []);
+    document.body.style.overflow = panelOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [panelOpen]);
 
-  // preloader sequence: draw L7 → wipe up → reveal
-  useEffect(() => {
-    const t1 = setTimeout(() => setPhase("wiping"), 1500);
-    const t2 = setTimeout(() => setPhase("ready"), 2400);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
-
-  return (
-    <div
-      className="relative min-h-screen w-full overflow-hidden"
-      style={{ background: CREAM, color: INK, cursor: "none" }}
-    >
-      <StyleTag />
-
-      {/* ── Preloader (lime panel) ─────────────────────────────── */}
-      <div
-        className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
-        style={{
-          background: LIME,
-          transform: phase === "ready" ? "translateY(-101%)" : "translateY(0)",
-          transition: "transform 900ms cubic-bezier(0.85,0,0.15,1)",
-          pointerEvents: phase === "ready" ? "none" : "auto",
-        }}
-      >
-        <MonogramDraw drawing={phase === "loading"} className="h-14 w-14 text-black" />
-        <span
-          className="absolute bottom-8 text-[11px] font-bold tracking-[0.3em] text-black"
-          style={{ fontFamily: '"JetBrains Mono", monospace' }}
-        >
-          <DotLoader /> LOAD ACE
-        </span>
-      </div>
-
-      {/* ── Cream base layer underneath the motion system ─ */}
-      <div className="pointer-events-none fixed inset-0 z-0" style={{ background: CREAM }} />
-
-      {/* ── Cursor-following gooey blob ────────────────────────── */}
-      <BlobLayer mx={mouse.current.x} my={mouse.current.y} active={phase === "ready"} />
-
-      {/* ── Topographic background (draws in after wipe) ──────── */}
-      <TopoBackground active={phase === "ready"} mx={mouse.current.x} my={mouse.current.y} />
-
-      {/* ── Custom cursor dot ─────────────────────────────────── */}
-      <Cursor active={phase === "ready"} />
-
-      {/* ── Top bar ───────────────────────────────────────────── */}
-      <header
-        className="relative z-10 flex items-center justify-between px-5 pt-5"
-        style={{
-          opacity: phase === "ready" ? 1 : 0,
-          transform: phase === "ready" ? "translateY(0)" : "translateY(-12px)",
-          transition: "opacity 600ms 200ms ease, transform 600ms 200ms ease",
-        }}
-      >
-        <MagneticLink to="/team" className="lando-pill">
-          <BagIcon className="h-3.5 w-3.5" /> ENTER
-        </MagneticLink>
-        <MagneticLink to="/passcode" className="lando-menu" aria-label="Menu">
-          <span className="block h-px w-4 bg-current" />
-        </MagneticLink>
-      </header>
-
-      {/* ── Wordmark ──────────────────────────────────────────── */}
-      <div
-        className="relative z-10 mt-6 flex flex-col items-center px-5 text-center"
-        style={{
-          opacity: phase === "ready" ? 1 : 0,
-          transform: phase === "ready" ? "translateY(0)" : "translateY(20px)",
-          transition: "opacity 700ms 350ms ease, transform 800ms 350ms cubic-bezier(0.22,1,0.36,1)",
-        }}
-      >
-        <MonogramDraw drawing={false} className="h-8 w-8 text-black" />
-        <h1
-          className="lando-wordmark mt-3 leading-none"
-          style={{ fontSize: "clamp(2.5rem, 13vw, 7rem)" }}
-        >
-          <span className="lando-serif">Auction</span>
-          <span className="lando-sans">ACE</span>
-        </h1>
-        <p
-          className="mt-3 text-[11px] font-bold tracking-[0.3em] text-black"
-          style={{ fontFamily: '"JetBrains Mono", monospace' }}
-        >
-          DRAFT&nbsp;ROOM&nbsp;SINCE&nbsp;2025
-        </p>
-
-        {/* ── The orb — touch it, crazy shit happens ───────────── */}
-        <HeroOrb mx={mouse.current.x} my={mouse.current.y} active={phase === "ready"} />
-      </div>
-
-      {/* ── Magnetic action button ────────────────────────────── */}
-      <MagneticButton phase={phase} />
-
-      {/* ── Footer marker ─────────────────────────────────────── */}
-      <div className="relative z-10 mt-auto px-5 pb-5 pt-24">
-        <div
-          className="flex items-center justify-between text-[10px] tracking-[0.3em] text-black/50"
-          style={{
-            fontFamily: '"JetBrains Mono", monospace',
-            opacity: phase === "ready" ? 1 : 0,
-            transition: "opacity 600ms 600ms ease",
-          }}
-        >
-          <span>AUCTION&nbsp;ACE</span>
-          <span className="lando-pulse">● LIVE</span>
-          <span>EST.&nbsp;2025</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────── */
-
-function StyleTag() {
-  return (
-    <style>{`
-      @keyframes lando-dash { to { stroke-dashoffset: 0; } }
-      @keyframes lando-drift { 0%{transform:translate(0,0)} 50%{transform:translate(-6px,4px)} 100%{transform:translate(0,0)} }
-      @keyframes lando-blob { 0%,100%{ d: path("M60,-50C72,-32,72,-7,64,15C56,37,40,55,18,62C-4,69,-32,64,-50,48C-68,32,-76,4,-69,-20C-62,-44,-40,-64,-15,-70C10,-76,48,-68,60,-50Z"); }
-        50%{ d: path("M55,-58C68,-40,72,-15,66,8C60,31,44,52,21,63C-2,74,-32,75,-52,60C-72,45,-82,14,-74,-13C-66,-40,-40,-62,-13,-68C14,-74,42,-76,55,-58Z"); } }
-      @keyframes lando-pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
-      @keyframes lando-spin { to { transform: rotate(360deg); } }
-      @keyframes lando-shard {
-        0% { transform: translate(0,0) scale(1); opacity:1; }
-        100% { transform: translate(var(--dx), var(--dy)) scale(.2); opacity:0; }
-      }
-      @keyframes lando-ring {
-        0% { transform: scale(.3); opacity:.9; }
-        100% { transform: scale(2.4); opacity:0; }
-      }
-      @keyframes lando-shake {
-        0%,100%{transform:translate(0,0)}
-        20%{transform:translate(-3px,2px)}
-        40%{transform:translate(4px,-2px)}
-        60%{transform:translate(-2px,-3px)}
-        80%{transform:translate(3px,2px)}
-      }
-
-      .lando-pill {
-        display:inline-flex; align-items:center; gap:.5rem;
-        background:${LIME}; color:#000; padding:.55rem 1rem;
-        border-radius:999px; font-family:"JetBrains Mono",monospace;
-        font-size:11px; font-weight:700; letter-spacing:.2em;
-        transition: transform 350ms cubic-bezier(0.22,1,0.36,1);
-      }
-      .lando-menu {
-        display:grid; place-items:center; width:40px; height:40px;
-        border:1px solid rgba(0,0,0,.35); border-radius:12px; color:#000;
-        transition: transform 350ms cubic-bezier(0.22,1,0.36,1), background-color 250ms, color 250ms;
-      }
-      .lando-menu:hover { background:#000; color:${LIME}; }
-
-      .lando-wordmark { display:inline-flex; align-items:baseline; gap:.05em; }
-      .lando-serif {
-        font-family:"Playfair Display","DM Serif Display",serif;
-        font-weight:400; font-style:italic;
-        transition: letter-spacing 600ms ease, transform 600ms cubic-bezier(0.22,1,0.36,1);
-      }
-      .lando-sans {
-        font-family:"Inter","DM Sans",sans-serif; font-weight:900;
-        letter-spacing:-0.03em;
-        transition: font-stretch 600ms ease, letter-spacing 600ms ease, transform 600ms cubic-bezier(0.22,1,0.36,1);
-      }
-      .lando-wordmark:hover .lando-serif { letter-spacing:.04em; transform:translateY(-2px); }
-      .lando-wordmark:hover .lando-sans  { letter-spacing:.02em; transform:translateY(2px); }
-
-      .lando-pulse { animation: lando-pulse 1.8s ease-in-out infinite; }
-
-      .lando-topo path, .lando-topo ellipse {
-        stroke-dasharray: 1200;
-        stroke-dashoffset: 1200;
-      }
-      .lando-topo.active path, .lando-topo.active ellipse {
-        animation: lando-dash 2.2s cubic-bezier(0.22,1,0.36,1) forwards;
-      }
-      .lando-topo.active g { animation: lando-drift 12s ease-in-out infinite; }
-
-      .lando-blob path { animation: lando-blob 7s ease-in-out infinite; }
-
-      .lando-tap-label { animation: lando-pulse 2s ease-in-out infinite; }
-    `}</style>
-  );
-}
-
-/* ── Animated L7 monogram (self-draws) ─────────────────────── */
-function MonogramDraw({ className = "", drawing = false }: { className?: string; drawing?: boolean }) {
-  return (
-    <svg viewBox="0 0 60 60" className={className} fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-      <path
-        d="M10 6 L10 46 L26 46 L26 38 L18 38 L18 6 Z M30 6 L52 6 L42 46 L34 46 L42 14 L30 14 Z"
-        fill={drawing ? "none" : "currentColor"}
-        stroke="currentColor"
-        strokeWidth={drawing ? 1.5 : 0}
-        style={
-          drawing
-            ? { strokeDasharray: 240, strokeDashoffset: 240, animation: "lando-dash 1.3s ease-out forwards" }
-            : undefined
-        }
-      />
-    </svg>
-  );
-}
-
-/* ── Cursor-tracked gooey blob ─────────────────────────────── */
-function BlobLayer({ mx, my, active }: { mx: number; my: number; active: boolean }) {
-  const tx = mx * 40;
-  const ty = my * 40;
-  return (
-    <div
-      className="pointer-events-none fixed inset-0 z-[1] flex items-center justify-center"
-      style={{
-        opacity: active ? 1 : 0,
-        transition: "opacity 800ms ease",
-      }}
-    >
-      <svg
-        viewBox="-100 -100 200 200"
-        className="lando-blob h-[70vmin] w-[70vmin]"
-        style={{
-          transform: `translate3d(${tx}px,${ty}px,0)`,
-          transition: "transform 600ms cubic-bezier(0.22,1,0.36,1)",
-          filter: "blur(0.3px)",
-        }}
-      >
-        <defs>
-          <radialGradient id="blob-grad" cx="40%" cy="40%">
-            <stop offset="0%" stopColor={LIME} stopOpacity="0.55" />
-            <stop offset="60%" stopColor={LIME} stopOpacity="0.18" />
-            <stop offset="100%" stopColor={LIME} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <path
-          d="M60,-50C72,-32,72,-7,64,15C56,37,40,55,18,62C-4,69,-32,64,-50,48C-68,32,-76,4,-69,-20C-62,-44,-40,-64,-15,-70C10,-76,48,-68,60,-50Z"
-          fill="url(#blob-grad)"
-        />
-      </svg>
-    </div>
-  );
-}
-
-/* ── Topo background, parallax with cursor ─────────────────── */
-function TopoBackground({ active, mx, my }: { active: boolean; mx: number; my: number }) {
-  return (
-    <svg
-      className={`lando-topo pointer-events-none absolute inset-0 h-full w-full z-[2] ${active ? "active" : ""}`}
-      viewBox="0 0 400 800"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden
-    >
-      <g
-        fill="none"
-        stroke={INK}
-        strokeOpacity="0.1"
-        strokeWidth="1"
-        style={{
-          transform: `translate3d(${mx * -10}px, ${my * -10}px, 0)`,
-          transition: "transform 700ms cubic-bezier(0.22,1,0.36,1)",
-        }}
-      >
-        <path d="M-50 200 Q 80 140 200 220 T 460 200" />
-        <path d="M-50 260 Q 80 200 200 280 T 460 260" />
-        <path d="M-50 320 Q 80 260 200 340 T 460 320" />
-        <path d="M-50 420 Q 100 360 220 440 T 460 420" />
-        <path d="M-50 500 Q 120 440 240 520 T 460 500" />
-        <path d="M-50 580 Q 120 520 240 600 T 460 580" />
-        <path d="M-50 660 Q 140 600 260 680 T 460 660" />
-        <ellipse cx="60" cy="380" rx="55" ry="35" />
-        <ellipse cx="60" cy="380" rx="35" ry="22" />
-        <ellipse cx="320" cy="360" rx="70" ry="48" />
-        <ellipse cx="320" cy="360" rx="48" ry="32" />
-        <ellipse cx="320" cy="360" rx="26" ry="18" />
-        <ellipse cx="90" cy="640" rx="60" ry="40" />
-        <ellipse cx="90" cy="640" rx="38" ry="24" />
-      </g>
-    </svg>
-  );
-}
-
-/* ── Custom cursor ─────────────────────────────────────────── */
-function Cursor({ active }: { active: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      const el = ref.current; if (!el) return;
-      el.style.transform = `translate3d(${e.clientX - 8}px, ${e.clientY - 8}px, 0)`;
-    };
-    window.addEventListener("pointermove", onMove);
-    return () => window.removeEventListener("pointermove", onMove);
-  }, []);
-  return (
-    <div
-      ref={ref}
-      className="pointer-events-none fixed left-0 top-0 z-[200] h-4 w-4 rounded-full mix-blend-difference"
-      style={{
-        background: LIME,
-        opacity: active ? 1 : 0,
-        transition: "opacity 400ms ease",
-      }}
-    />
-  );
-}
-
-/* ── Magnetic wrappers ─────────────────────────────────────── */
-function useMagnetic(strength = 0.35) {
-  const ref = useRef<HTMLAnchorElement | HTMLButtonElement | null>(null);
-  useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const onMove = (e: PointerEvent) => {
-      const r = el.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
-      const dist = Math.hypot(dx, dy);
-      if (dist < 140) {
-        el.style.transform = `translate(${dx * strength}px, ${dy * strength}px)`;
-      } else {
-        el.style.transform = "translate(0,0)";
-      }
-    };
-    const onLeave = () => { el.style.transform = "translate(0,0)"; };
-    window.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
-    return () => {
-      window.removeEventListener("pointermove", onMove);
-      el.removeEventListener("pointerleave", onLeave);
-    };
-  }, [strength]);
-  return ref;
-}
-
-function MagneticLink({
-  to, children, className, ...rest
-}: { to: string; children: React.ReactNode; className?: string } & React.HTMLAttributes<HTMLAnchorElement>) {
-  const ref = useMagnetic(0.3) as React.RefObject<HTMLAnchorElement>;
-  return (
-    <Link to={to} ref={ref} className={className} {...rest}>
-      {children}
-    </Link>
-  );
-}
-
-function MagneticButton({ phase }: { phase: "loading" | "wiping" | "ready" }) {
-  const ref = useMagnetic(0.4) as React.RefObject<HTMLAnchorElement>;
-  return (
-    <Link
-      to="/draft-room"
-      ref={ref}
-      className="group fixed bottom-5 right-5 z-10 grid h-16 w-16 place-items-center rounded-full text-black shadow-lg"
-      style={{
-        background: LIME,
-        opacity: phase === "ready" ? 1 : 0,
-        transition: "transform 400ms cubic-bezier(0.22,1,0.36,1), opacity 600ms 500ms ease",
-        boxShadow: `0 10px 30px -10px ${LIME}`,
-      }}
-      aria-label="Enter draft room"
-    >
-      <HandIcon className="h-7 w-7" />
-      <span
-        className="lando-tap-label pointer-events-none absolute -top-7 right-1 text-[9px] font-bold tracking-[0.25em] text-black/70"
-        style={{ fontFamily: '"JetBrains Mono", monospace' }}
-      >
-        TAP&nbsp;TO&nbsp;DRAFT
-      </span>
-    </Link>
-  );
-}
-
-/* ── Misc icons ────────────────────────────────────────────── */
-function DotLoader() {
-  return (
-    <span style={{ display: "inline-flex", gap: 3, marginRight: 6 }}>
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          style={{
-            width: 4, height: 4, borderRadius: 999, background: "#000",
-            animation: `lando-pulse 1s ease-in-out ${i * 0.15}s infinite`,
-          }}
-        />
-      ))}
-    </span>
-  );
-}
-function BagIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
-      <path d="M5 8h14l-1.2 12.2a2 2 0 0 1-2 1.8H8.2a2 2 0 0 1-2-1.8L5 8Z" />
-      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
-    </svg>
-  );
-}
-function HandIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden>
-      <path d="M11 2a1.5 1.5 0 0 0-1.5 1.5V11l-1.4-1.4a1.5 1.5 0 1 0-2.1 2.1l4.2 4.6a4 4 0 0 0 2.95 1.3H17a3 3 0 0 0 3-3v-4a1.5 1.5 0 0 0-3 0 1.5 1.5 0 0 0-3 0V3.5A1.5 1.5 0 0 0 12.5 2 1.5 1.5 0 0 0 11 3.5v-1Z" />
-    </svg>
-  );
-}
-
-/* ── Hero orb: morphing blob with avatar — touch = chaos ────── */
-function HeroOrb({ mx, my, active }: { mx: number; my: number; active: boolean }) {
-  const [bursts, setBursts] = useState<number[]>([]);
-  const [shaking, setShaking] = useState(false);
-  const [hovering, setHovering] = useState(false);
-
-  const triggerBurst = () => {
-    const id = Date.now();
-    setBursts((b) => [...b, id]);
-    setShaking(true);
-    setTimeout(() => setShaking(false), 500);
-    setTimeout(() => setBursts((b) => b.filter((x) => x !== id)), 1200);
+  const openPanel = async () => {
+    setPanelOpen(true);
+    if (teams.length > 0) return;
+    setLoadingTeams(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.signInAnonymously();
+      const { data } = await supabase.functions.invoke("league-teams");
+      const list: Team[] = (data?.teams ?? []).map((t: any) => ({ id: t.id, name: t.name, abbrev: t.abbrev }));
+      setTeams(list);
+    } catch { /* silent */ } finally { setLoadingTeams(false); }
   };
 
-  // cursor-driven warp strength
-  const warp = hovering ? 12 + Math.abs(mx) * 8 : 3;
-  const tilt = `rotate(${mx * 8}deg)`;
+  const pickTeam = (team: Team) => {
+    setTeam(team);
+    toast.success(`Let's go, ${team.name}!`);
+    navigate("/draft-room", { replace: true });
+  };
+
+  const skip = () => {
+    setTeam(null);
+    navigate("/draft-room", { replace: true });
+  };
 
   return (
-    <div
-      className="relative mt-10 grid place-items-center"
-      style={{
-        opacity: active ? 1 : 0,
-        transform: active ? "scale(1)" : "scale(0.6)",
-        transition: "opacity 800ms 500ms ease, transform 900ms 500ms cubic-bezier(0.22,1,0.36,1)",
-      }}
-    >
-      {/* radiating rings on burst */}
-      {bursts.map((id) => (
-        <span
-          key={`r-${id}`}
-          className="pointer-events-none absolute h-48 w-48 rounded-full"
-          style={{
-            border: `2px solid ${LIME}`,
-            animation: "lando-ring 900ms cubic-bezier(0.22,1,0.36,1) forwards",
-          }}
-        />
-      ))}
+    <div style={{ background: "#ede8df", minHeight: "100vh", fontFamily: "'Playfair Display', Georgia, serif" }}>
 
-      {/* shards on burst */}
-      {bursts.map((id) =>
-        Array.from({ length: 14 }).map((_, i) => {
-          const angle = (i / 14) * Math.PI * 2;
-          const dist = 140 + Math.random() * 80;
-          return (
-            <span
-              key={`s-${id}-${i}`}
-              className="pointer-events-none absolute h-2 w-2 rounded-sm"
+      {/* ── HERO CARD ──────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          margin: "12px",
+          borderRadius: "28px",
+          overflow: "hidden",
+          height: "calc(100svh - 24px)",
+          position: "relative",
+          transition: "transform 0.65s cubic-bezier(0.32,0,0.15,1), filter 0.65s ease",
+          willChange: "transform, filter",
+          // Subtle depth push when curtain opens
+          transform: panelOpen ? "scale(0.95) translateX(-2%)" : "scale(1) translateX(0)",
+          filter:    panelOpen ? "brightness(0.5)"              : "brightness(1)",
+        }}
+      >
+        {/* Video */}
+        <video
+          autoPlay loop muted playsInline
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", pointerEvents: "none",
+            transform: `scale(${videoScale})`,
+            transformOrigin: `center ${videoPos}%`,
+            filter: "brightness(0.58) saturate(0.75)",
+          }}
+        >
+          <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+        </video>
+
+        {/* Gradient */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.75) 100%)",
+        }} />
+
+        {/* Top nav inside card */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "22px 22px",
+        }}>
+          {/* Logo */}
+          <div style={{ color: "white", lineHeight: 1.05, fontWeight: 700, fontSize: "21px" }}>
+            Auction<br />Ace
+          </div>
+
+          {/* CTA button — frosted glass pill */}
+          <button
+            onClick={openPanel}
+            style={{
+              display: "flex", alignItems: "center", gap: "10px",
+              background: "rgba(255,255,255,0.14)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              borderRadius: "100px",
+              padding: "10px 10px 10px 18px",
+              color: "white", cursor: "pointer",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "13px", fontWeight: 600,
+            }}
+          >
+            Choose Your Team
+            <span style={{
+              background: "white", color: "#111",
+              borderRadius: "50%", width: 32, height: 32,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "15px", fontWeight: 700, flexShrink: 0,
+            }}>→</span>
+          </button>
+        </div>
+
+        {/* Bottom text */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10, padding: "0 24px 36px" }}>
+          <h1 style={{
+            color: "white",
+            fontSize: "clamp(2.8rem, 9vw, 5.5rem)",
+            fontWeight: 700, lineHeight: 1.06, margin: "0 0 14px 0",
+            opacity:   heroReady ? 1 : 0,
+            transform: heroReady ? "none" : "translateY(28px)",
+            transition: "opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s",
+          }}>
+            Draft with<br /><em>the Edge.</em>
+          </h1>
+          <p style={{
+            color: "rgba(255,255,255,0.6)",
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "15px", lineHeight: 1.6,
+            maxWidth: "280px", margin: 0,
+            opacity: heroReady ? 1 : 0,
+            transition: "opacity 0.9s ease 0.55s",
+          }}>
+            Budget-first planning powered by your league's actual 3-year auction history.
+          </p>
+        </div>
+
+        {/* Hidden video tuner tap target */}
+        <button
+          onClick={() => setShowTuner(v => !v)}
+          style={{
+            position: "absolute", bottom: 10, right: 14, zIndex: 10,
+            background: "none", border: "none",
+            color: "rgba(255,255,255,0.15)", fontSize: "11px", cursor: "pointer",
+          }}
+        >✦</button>
+      </div>
+
+      {/* ── CURTAIN PANEL ─────────────────────────────────────────────────── */}
+      <div style={{
+        position: "fixed", top: 0, right: 0, bottom: 0,
+        width: "82vw", maxWidth: "400px",
+        zIndex: 300,
+        transform: panelOpen ? "translateX(0) skewX(0deg)" : "translateX(108%) skewX(-1.5deg)",
+        transition: "transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94)",
+        willChange: "transform",
+      }}>
+
+        {/* Curtain fold shadow — left edge */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, bottom: 0, width: "32px",
+          background: "linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
+          zIndex: 10, pointerEvents: "none", borderRadius: "0 0 0 0",
+        }} />
+
+        {/* Panel background — dark glass with color bleed */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "rgba(8,8,12,0.88)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          overflow: "hidden",
+        }}>
+          {/* Graffiti-inspired color glows */}
+          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(255,200,0,0.3) 0%, transparent 70%)",   filter: "blur(35px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(0,140,255,0.22) 0%, transparent 70%)",  filter: "blur(45px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(160,0,255,0.18) 0%, transparent 70%)", filter: "blur(55px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(255,60,0,0.2) 0%, transparent 70%)",   filter: "blur(40px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "55%",  right: "10%",  width: "40%",  height: "30%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(0,255,120,0.12) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
+        </div>
+
+        {/* Content */}
+        <div style={{
+          position: "relative", zIndex: 5,
+          height: "100%", display: "flex", flexDirection: "column",
+          paddingTop: "env(safe-area-inset-top)",
+        }}>
+          {/* Header */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "20px 20px",
+          }}>
+            <span style={{
+              color: "rgba(255,255,255,0.35)",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase",
+            }}>
+              Your Team
+            </span>
+            <button
+              onClick={() => setPanelOpen(false)}
               style={{
-                background: i % 2 ? LIME : INK,
-                ["--dx" as any]: `${Math.cos(angle) * dist}px`,
-                ["--dy" as any]: `${Math.sin(angle) * dist}px`,
-                animation: `lando-shard 900ms cubic-bezier(0.22,1,0.36,1) forwards`,
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: "50%", width: 40, height: 40,
+                cursor: "pointer", color: "white", fontSize: "15px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "sans-serif",
               }}
-            />
-          );
-        })
+            >✕</button>
+          </div>
+
+          {/* Team list */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "4px 22px 48px" }}>
+            {loadingTeams && (
+              <p style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Inter',sans-serif", fontSize: "14px", paddingTop: "16px" }}>
+                Loading teams…
+              </p>
+            )}
+
+            {!loadingTeams && teams.length === 0 && (
+              <p style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Inter',sans-serif", fontSize: "14px", lineHeight: 1.6, paddingTop: "16px" }}>
+                No teams found. Connect ESPN first.
+              </p>
+            )}
+
+            {!loadingTeams && teams.map((team, i) => (
+              <button
+                key={team.id}
+                onClick={() => pickTeam(team)}
+                style={{
+                  display: "block", width: "100%", textAlign: "left",
+                  background: "none", border: "none",
+                  borderBottom: "1px solid rgba(255,255,255,0.07)",
+                  padding: "16px 0", color: "white", cursor: "pointer",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "clamp(1.5rem, 5vw, 1.9rem)",
+                  fontWeight: 700, lineHeight: 1.1,
+                  opacity:   panelOpen ? 1 : 0,
+                  transform: panelOpen ? "none" : "translateX(20px)",
+                  transition: `opacity 0.45s ease ${i * 50 + 280}ms, transform 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 50 + 280}ms`,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#ccff00")}
+                onMouseLeave={e => (e.currentTarget.style.color = "white")}
+              >
+                {team.name}
+              </button>
+            ))}
+
+            <button
+              onClick={skip}
+              style={{
+                marginTop: "28px", background: "none", border: "none",
+                color: "rgba(255,255,255,0.25)", fontFamily: "'Inter',sans-serif",
+                fontSize: "13px", cursor: "pointer", padding: 0,
+                opacity: panelOpen ? 1 : 0,
+                transition: "opacity 0.4s ease 650ms, color 0.2s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.55)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.25)")}
+            >
+              Skip for now →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Click-outside to close */}
+      {panelOpen && (
+        <div
+          onClick={() => setPanelOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 299 }}
+        />
       )}
 
-      <button
-        type="button"
-        onPointerEnter={() => setHovering(true)}
-        onPointerLeave={() => setHovering(false)}
-        onPointerDown={triggerBurst}
-        className="relative h-48 w-48 cursor-none"
-        style={{
-          background: "transparent",
-          border: 0,
-          padding: 0,
-          transform: shaking ? undefined : tilt,
-          animation: shaking ? "lando-shake 500ms ease-in-out" : undefined,
-          transition: "transform 400ms cubic-bezier(0.22,1,0.36,1)",
-        }}
-        aria-label="Interact"
-      >
-        <svg
-          viewBox="-100 -100 200 200"
-          className="h-full w-full"
-          style={{ animation: "lando-spin 22s linear infinite" }}
-        >
-          <defs>
-            <filter id="orb-warp">
-              <feTurbulence
-                type="fractalNoise"
-                baseFrequency={hovering ? "0.025" : "0.012"}
-                numOctaves="2"
-                seed={bursts.length}
-              >
-                <animate attributeName="baseFrequency" dur="6s" values="0.01;0.03;0.01" repeatCount="indefinite" />
-              </feTurbulence>
-              <feDisplacementMap in="SourceGraphic" scale={warp} />
-            </filter>
-            <radialGradient id="orb-fill" cx="35%" cy="35%">
-              <stop offset="0%" stopColor={LIME} />
-              <stop offset="55%" stopColor="#aacc00" />
-              <stop offset="100%" stopColor={INK} />
-            </radialGradient>
-            <clipPath id="orb-clip">
-              <path d="M75,-55C82,-32,72,-3,60,22C48,47,33,69,10,76C-14,83,-46,75,-62,57C-78,39,-78,11,-72,-15C-66,-41,-54,-65,-32,-74C-10,-83,21,-77,45,-72C69,-67,68,-78,75,-55Z" />
-            </clipPath>
-          </defs>
-
-          <g filter="url(#orb-warp)">
-            <path
-              d="M75,-55C82,-32,72,-3,60,22C48,47,33,69,10,76C-14,83,-46,75,-62,57C-78,39,-78,11,-72,-15C-66,-41,-54,-65,-32,-74C-10,-83,21,-77,45,-72C69,-67,68,-78,75,-55Z"
-              fill="url(#orb-fill)"
-            />
-            {/* football inside */}
-            <g clipPath="url(#orb-clip)">
-              <ellipse cx="0" cy="0" rx="55" ry="30" fill="#3a1f10" />
-              <ellipse cx="0" cy="0" rx="55" ry="30" fill="none" stroke="#f3efe6" strokeWidth="2" />
-              <line x1="-22" y1="0" x2="22" y2="0" stroke="#f3efe6" strokeWidth="3" />
-              {[-14, -7, 0, 7, 14].map((x) => (
-                <line key={x} x1={x} y1="-5" x2={x} y2="5" stroke="#f3efe6" strokeWidth="2" />
-              ))}
-            </g>
-          </g>
-
-          {/* orbiting label */}
-          <g style={{ animation: "lando-spin 14s linear infinite reverse", transformOrigin: "0 0" }}>
-            <path id="orb-text-path" d="M 0,0 m -88,0 a 88,88 0 1,1 176,0 a 88,88 0 1,1 -176,0" fill="none" />
-            <text fontSize="9" fontFamily='"JetBrains Mono", monospace' fontWeight="700" letterSpacing="4" fill={INK}>
-              <textPath href="#orb-text-path">
-                TOUCH · ME · TOUCH · ME · TOUCH · ME · TOUCH · ME ·
-              </textPath>
-            </text>
-          </g>
-        </svg>
-
-        {/* RGB split echo when hovering */}
-        {hovering && (
-          <>
-            <span className="pointer-events-none absolute inset-0 mix-blend-screen" style={{
-              boxShadow: `inset 0 0 0 2px ${LIME}`, borderRadius: "50%", transform: "translate(3px,0)",
-              opacity: 0.4,
-            }} />
-            <span className="pointer-events-none absolute inset-0 mix-blend-multiply" style={{
-              boxShadow: "inset 0 0 0 2px #ff2a2a", borderRadius: "50%", transform: "translate(-3px,0)",
-              opacity: 0.3,
-            }} />
-          </>
-        )}
-      </button>
+      {/* ── VIDEO TUNER ───────────────────────────────────────────────────── */}
+      {showTuner && (
+        <div style={{
+          position: "fixed", bottom: "80px", left: "50%", transform: "translateX(-50%)",
+          zIndex: 9999, background: "rgba(0,0,0,0.92)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: "16px", padding: "20px 24px", width: "300px",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+            <span style={{ color: "white", fontSize: "12px", fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Video Tuner</span>
+            <button onClick={() => setShowTuner(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "18px" }}>×</button>
+          </div>
+          <div style={{ marginBottom: "16px" }}>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontFamily: "'Inter',sans-serif", marginBottom: "8px" }}>Zoom — {Math.round(videoScale * 100)}%</p>
+            <input type="range" min="1" max="3" step="0.05" value={videoScale}
+              onChange={e => setVideoScale(parseFloat(e.target.value))}
+              style={{ width: "100%", accentColor: "#ccff00" }} />
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontFamily: "'Inter',sans-serif", marginBottom: "8px" }}>Pan — {Math.round(videoPos)}% from top</p>
+            <input type="range" min="0" max="100" step="1" value={videoPos}
+              onChange={e => setVideoPos(parseFloat(e.target.value))}
+              style={{ width: "100%", accentColor: "#ccff00" }} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
