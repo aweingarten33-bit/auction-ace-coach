@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Trophy, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
+import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
 import { toast } from "sonner";
 
 interface Team { id: number; name: string; abbrev?: string }
@@ -44,6 +45,7 @@ export default function TeamPicker() {
           id: t.id, name: t.name, abbrev: t.abbrev,
         }));
         setTeams(list);
+        saveTeamsToCache(list);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Couldn't load teams.");
       } finally {

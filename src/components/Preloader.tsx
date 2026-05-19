@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { loadTeamsFromCache, generateTeamSVG, svgToDataUrl } from "@/lib/teamLogoGenerator";
 
 interface Props {
   onDone: () => void;
 }
 
-const TEAMS = [
+const NFL_TEAMS = [
   "kc", "sf", "phi", "dal", "ne", "gb", "buf", "mia",
   "pit", "bal", "cin", "cle", "hou", "ind", "jax", "ten",
   "den", "lv", "lac", "nyj", "nyg", "wsh", "chi", "det",
   "min", "atl", "car", "no", "tb", "ari", "lar", "sea",
 ];
 
-const LOGO_URL = (t: string) => `https://a.espncdn.com/i/teamlogos/nfl/500/${t}.png`;
+const NFL_LOGO_URL = (t: string) => `https://a.espncdn.com/i/teamlogos/nfl/500/${t}.png`;
 
 function Star({ cx, cy, size, fill }: { cx: number; cy: number; size: number; fill: string }) {
   const pts: string[] = [];
@@ -119,6 +120,20 @@ const EXIT_MS = 820;
 export default function Preloader({ onDone }: Props) {
   const [exiting, setExiting] = useState(false);
 
+  const { logos, isFantasy } = useMemo(() => {
+    const cached = loadTeamsFromCache();
+    if (cached.length > 0) {
+      return {
+        isFantasy: true,
+        logos: cached.map((t) => ({ key: String(t.id), src: svgToDataUrl(generateTeamSVG(t.name)), name: t.name })),
+      };
+    }
+    return {
+      isFantasy: false,
+      logos: NFL_TEAMS.map((t) => ({ key: t, src: NFL_LOGO_URL(t), name: t })),
+    };
+  }, []);
+
   useEffect(() => {
     const t = setTimeout(() => {
       setExiting(true);
@@ -154,17 +169,17 @@ export default function Preloader({ onDone }: Props) {
       />
 
       <div className="absolute inset-0 grid place-items-center">
-        {TEAMS.map((team, i) => (
+        {logos.map((logo, i) => (
           <img
-            key={team}
-            src={LOGO_URL(team)}
-            alt=""
+            key={logo.key}
+            src={logo.src}
+            alt={logo.name}
             draggable={false}
-            crossOrigin="anonymous"
+            crossOrigin={isFantasy ? undefined : "anonymous"}
             className="absolute select-none pointer-events-none"
             style={{
-              width: 320,
-              height: 320,
+              width: isFantasy ? 260 : 320,
+              height: isFantasy ? 320 : 320,
               objectFit: "contain",
               opacity: 0,
               filter: "drop-shadow(0 0 24px rgba(255,255,255,0.35))",
