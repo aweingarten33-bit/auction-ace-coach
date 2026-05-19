@@ -50,7 +50,9 @@ function AppShell() {
   const [ready, setReady] = useState(false);
   const handlePreloaderDone = useCallback(() => {
     setReady(true);
-    window.dispatchEvent(new Event("landing:visible"));
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new Event("landing:visible"));
+    });
   }, []);
 
   return (
