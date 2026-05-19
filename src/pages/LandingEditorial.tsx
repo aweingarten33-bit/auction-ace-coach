@@ -8,9 +8,9 @@ export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
   const [videoScale, setVideoScale] = useState(() => {
-    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1"); } catch { return 1; }
+    try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1.3"); } catch { return 1.3; }
   });
-  const [showSlider, setShowSlider] = useState(false);
+  const [showSlider, setShowSlider] = useState(true);
 
   useEffect(() => {
     try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {}
@@ -221,18 +221,15 @@ export default function LandingEditorial() {
           <span>© 2025 — All bids final</span>
         </footer>
 
-        {showSlider && (
-          <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 flex flex-col items-center gap-3 rounded-2xl bg-black/80 backdrop-blur px-6 py-4 ring-1 ring-white/20 w-72">
-            <p className="text-[10px] uppercase tracking-widest text-white/50">Video zoom</p>
-            <input
-              type="range" min="0.5" max="2" step="0.05"
-              value={videoScale}
-              onChange={e => setVideoScale(parseFloat(e.target.value))}
-              className="w-full accent-white"
-            />
-            <p className="text-[11px] text-white/40">{Math.round(videoScale * 100)}%</p>
-          </div>
-        )}
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 flex flex-col items-center gap-2 rounded-2xl bg-black/80 backdrop-blur px-6 py-4 ring-1 ring-white/20 w-72">
+          <p className="text-[10px] uppercase tracking-widest text-white/50">Video zoom — {Math.round(videoScale * 100)}%</p>
+          <input
+            type="range" min="0.5" max="2.5" step="0.05"
+            value={videoScale}
+            onChange={e => setVideoScale(parseFloat(e.target.value))}
+            className="w-full accent-white"
+          />
+        </div>
 
       </div>
 
