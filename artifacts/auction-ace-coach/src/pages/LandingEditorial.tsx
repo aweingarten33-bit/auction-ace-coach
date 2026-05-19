@@ -145,8 +145,7 @@ export default function LandingEditorial() {
             objectFit: "cover",
             objectPosition: "center top",
             pointerEvents: "none",
-            opacity: 0.6,
-            filter: "saturate(0.15) brightness(1.8) contrast(0.85)",
+            opacity: 0.35,
             mixBlendMode: "screen",
           }}
         >
@@ -271,6 +270,9 @@ export default function LandingEditorial() {
               objectFit: "cover",
               objectPosition: "center center",
               pointerEvents: "none",
+              opacity: 0.55,
+              filter: "saturate(0.1) brightness(1.7) contrast(0.85)",
+              mixBlendMode: "screen",
             }}
           >
             <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
