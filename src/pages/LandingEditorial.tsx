@@ -149,8 +149,10 @@ export default function LandingEditorial() {
         borderRadius: "0 0 28px 28px",
         border: "1px solid rgba(255,255,255,0.07)",
         borderTop: "none",
-        padding: "80px 32px 36px",
-        paddingTop: "calc(env(safe-area-inset-top) + 72px)",
+        padding: "24px 32px 28px",
+        paddingTop: "calc(env(safe-area-inset-top) + 68px)",
+        maxHeight: "70vh",
+        overflowY: "auto",
       }}>
         {/* Team list */}
         {loadingTeams && (
