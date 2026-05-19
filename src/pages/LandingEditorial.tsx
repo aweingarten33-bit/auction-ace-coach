@@ -275,7 +275,7 @@ export default function LandingEditorial() {
           <div aria-hidden style={{ height: "calc(2rem + 3 * clamp(3.5rem, 11vw, 10rem) * 0.92)" }} />
 
 
-          <div className="mt-14 flex justify-center">
+          <div className="mt-[55vh] flex justify-center md:mt-[60vh]">
             <Link
               to="/team"
               className="group inline-flex items-center gap-3 rounded-full border border-white/25 px-8 py-3.5 text-[11px] uppercase tracking-[0.32em] text-white/90 transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
