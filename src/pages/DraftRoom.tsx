@@ -213,7 +213,16 @@ export default function DraftRoom() {
         className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-3 py-3"
         style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
       >
-        {isAdmin && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 shrink-0"
+          aria-label="Back to landing"
+          onClick={() => navigate("/", { state: { fromBack: true } })}
+        >
+          <ChevronLeft className="h-6 w-6" strokeWidth={2} />
+        </Button>
+
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0" aria-label="Menu">
