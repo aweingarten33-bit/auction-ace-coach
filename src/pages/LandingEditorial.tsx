@@ -102,11 +102,42 @@ export default function LandingEditorial() {
         muted
         playsInline
         preload="auto"
-        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain"
-        style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)", objectPosition: "center" }}
+        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain transition-transform duration-150"
+        style={{
+          filter: "brightness(0.7) contrast(1.05) saturate(0.85)",
+          objectPosition: "center",
+          transform: `scale(${videoZoom})`,
+          transformOrigin: "center center",
+        }}
       >
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
+
+      {/* Hero video zoom slider */}
+      <div
+        className="fixed bottom-4 right-4 z-50 flex items-center gap-2 rounded-full border border-white/20 bg-black/60 px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-white/80 backdrop-blur"
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
+      >
+        <span>Zoom</span>
+        <input
+          type="range"
+          min={0.5}
+          max={2.5}
+          step={0.01}
+          value={videoZoom}
+          onChange={(e) => setVideoZoom(parseFloat(e.target.value))}
+          className="h-1 w-32 cursor-pointer accent-white"
+          aria-label="Hero video zoom"
+        />
+        <span className="w-10 text-right tabular-nums">{videoZoom.toFixed(2)}x</span>
+        <button
+          type="button"
+          onClick={() => setVideoZoom(1)}
+          className="rounded-full border border-white/20 px-2 py-0.5 text-white/70 transition hover:border-white/60 hover:text-white"
+        >
+          Reset
+        </button>
+      </div>
 
       <div
         className="pointer-events-none absolute inset-0 z-0"
