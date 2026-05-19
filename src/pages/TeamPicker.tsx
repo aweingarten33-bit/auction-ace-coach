@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trophy, ArrowRight } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
@@ -67,17 +68,18 @@ export default function TeamPicker() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#f6f4ef] text-[#0a0a0a]">
+      <BackButton to="/" />
       <main
-        className="mx-auto max-w-md px-5 pt-12 pb-32"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 3rem)" }}
+        className="mx-auto max-w-md px-5 pt-20 pb-32"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 5rem)" }}
       >
         <div className="mb-8">
-          <Trophy className="mb-4 h-10 w-10 text-primary" strokeWidth={1.5} />
+          <Trophy className="mb-4 h-10 w-10 text-red-500" strokeWidth={1.5} />
           <h1 className="mb-3 text-[34px] leading-[1.05] font-semibold tracking-tight">
             Which team are you?
           </h1>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-black/60">
             Pick your team to personalize the dossier — budget remaining, roster needs,
             and AI recommendations get tailored to your specific roster and gaps.
           </p>
@@ -114,17 +116,17 @@ export default function TeamPicker() {
                     onClick={() => setPicked(t)}
                     className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${
                       isPicked
-                        ? "border-primary bg-primary/10"
-                        : "border-border/60 bg-secondary/20 hover:bg-secondary/40"
+                        ? "border-red-500 bg-red-500/10"
+                        : "border-black/10 bg-white/60 hover:bg-white"
                     }`}
                   >
                     {t.abbrev && (
-                      <span className="font-mono text-[11px] font-semibold text-muted-foreground">
+                      <span className="font-mono text-[11px] font-semibold text-black/50">
                         {t.abbrev}
                       </span>
                     )}
                     <span className="flex-1 text-sm font-medium">{t.name}</span>
-                    {isPicked && <ArrowRight className="h-4 w-4 text-primary" />}
+                    {isPicked && <ArrowRight className="h-4 w-4 text-red-500" />}
                   </button>
                 );
               })}
