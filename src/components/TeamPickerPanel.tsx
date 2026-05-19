@@ -3,7 +3,8 @@
 // then sends the visitor to the draft room.
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Trophy, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight } from "lucide-react";
+import helmetImg from "@/assets/choose-team-helmet.jpeg";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
@@ -54,17 +55,28 @@ export default function TeamPickerPanel({ active }: { active: boolean }) {
   };
 
   return (
-    <div className="flex h-full flex-col px-8 pb-10 pt-24 md:px-14">
-      <div className="mb-8">
-        <Trophy className="mb-4 h-9 w-9 text-red-500" strokeWidth={1.5} />
-        <h2 className="font-bebas text-[clamp(2rem,7vw,3.25rem)] uppercase leading-[0.95] tracking-[0.01em] text-white">
-          Which team<br />are you?
-        </h2>
-        <p className="mt-3 max-w-sm text-[13px] leading-relaxed text-white/60">
-          Pick your team to personalize the dossier — budget, roster needs, and coach
-          recommendations get tailored to you.
-        </p>
+    <div className="flex h-full flex-col px-5 pb-10 pt-20 md:px-10">
+      {/* Helmet hero with parallel horizontal lines on each side */}
+      <div className="mb-6 -mx-2 flex items-center gap-2 md:gap-3">
+        <div className="flex flex-1 flex-col gap-1.5">
+          <span className="block h-px w-full bg-white/40" />
+          <span className="block h-px w-full bg-white/20" />
+        </div>
+        <img
+          src={helmetImg}
+          alt="Choose your team"
+          className="h-auto w-[62%] max-w-[340px] flex-shrink-0 select-none drop-shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
+          draggable={false}
+        />
+        <div className="flex flex-1 flex-col gap-1.5">
+          <span className="block h-px w-full bg-white/40" />
+          <span className="block h-px w-full bg-white/20" />
+        </div>
       </div>
+      <p className="mb-6 max-w-sm text-[13px] leading-relaxed text-white/60">
+        Pick your team to personalize the dossier — budget, roster needs, and coach
+        recommendations get tailored to you.
+      </p>
 
       {loading && (
         <div className="flex items-center gap-2 py-8 text-sm text-white/60">
