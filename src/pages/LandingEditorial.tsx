@@ -246,9 +246,8 @@ export default function LandingEditorial() {
 
       <div className="relative z-10">
         <header className="flex items-center justify-between px-6 pt-6 md:px-10 md:pt-8">
-          <Link to="/" aria-label="Home" className="flex items-center">
-            <Wordmark className="text-2xl md:text-3xl" />
-          </Link>
+          <Link to="/" aria-label="Home" className="flex items-center" />
+
 
           <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.32em] text-white/55">
             <span>Est. 2025</span>
