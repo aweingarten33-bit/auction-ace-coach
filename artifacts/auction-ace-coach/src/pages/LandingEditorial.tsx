@@ -270,13 +270,24 @@ export default function LandingEditorial() {
               objectFit: "cover",
               objectPosition: "center center",
               pointerEvents: "none",
-              opacity: 0.55,
-              filter: "saturate(0.1) brightness(1.7) contrast(0.85)",
+              opacity: 0.7,
+              filter: "grayscale(1) brightness(2.2) contrast(1.1) blur(0.5px)",
               mixBlendMode: "screen",
             }}
           >
             <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
           </video>
+
+          {/* Crystal-white tint overlay */}
+          <div
+            aria-hidden
+            style={{
+              position: "absolute", inset: 0,
+              background: "radial-gradient(ellipse at center, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.1) 60%, rgba(255,255,255,0) 100%)",
+              mixBlendMode: "screen",
+              pointerEvents: "none",
+            }}
+          />
 
           {/* Bottom gradient for text */}
           <div style={{
