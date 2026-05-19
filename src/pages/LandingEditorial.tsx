@@ -78,7 +78,7 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-contain"
         style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
       >
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
