@@ -182,11 +182,11 @@ export default function LandingEditorial() {
           <span className="text-[10px] uppercase tracking-[0.32em] text-white/85">Draft Season 2026</span>
         </div>
 
-        {/* Headline — Modus scale: massive condensed, two stacked lines, second line ghosted for depth (sits visually "behind" subject) */}
-        <div className="absolute inset-x-0 bottom-0 z-10 px-5 pb-10 md:px-12 md:pb-16">
+        {/* Headline */}
+        <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-4 md:px-12 md:pb-12">
           <h1
-            className="font-bebas uppercase leading-[0.88] tracking-[0.005em] text-white"
-            style={{ fontSize: "clamp(2.25rem, 11vw, 9rem)" }}
+            className="font-bebas uppercase leading-[0.9] tracking-[0.005em] text-white"
+            style={{ fontSize: "clamp(1.5rem, 7.5vw, 9rem)" }}
           >
             <span className="block">Draft&nbsp;smarter,</span>
             <span
@@ -200,14 +200,14 @@ export default function LandingEditorial() {
             </span>
           </h1>
 
-          <p className="mt-6 max-w-lg text-[13px] leading-relaxed text-white/80 md:text-[15px]">
+          <p className="mt-3 hidden max-w-lg text-[13px] leading-relaxed text-white/80 md:block md:text-[15px]">
             Three years of league price history, tiered values, and shared
             research — built for your commissioner's draft room.
           </p>
         </div>
 
-        {/* scroll cue */}
-        <div className="absolute bottom-5 right-5 z-10 flex items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/55 md:bottom-7 md:right-10">
+        {/* scroll cue (desktop only — hero is too short on mobile) */}
+        <div className="absolute bottom-5 right-5 z-10 hidden items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/55 md:bottom-7 md:right-10 md:flex">
           <span>Scroll</span>
           <span aria-hidden className="inline-block h-px w-8 bg-white/50" />
         </div>
