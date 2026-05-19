@@ -120,7 +120,7 @@ export default function LandingEditorial() {
 
       <aside
         aria-hidden={!menuOpen}
-        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-[#0f0f0f]/95 backdrop-blur-2xl ring-1 ring-white/10 shadow-[-20px_0_60px_rgba(0,0,0,0.6)] transition-transform duration-[650ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-black/25 backdrop-blur-xl ring-1 ring-white/10 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] transition-transform duration-[1200ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
