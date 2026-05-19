@@ -198,7 +198,7 @@ export default function LandingEditorial() {
           {[
             { n: "01", title: "LEAGUE HISTORY",    body: "3 years of your room's real auction prices — not ESPN projections. CMC goes for $47 in your league? We know." },
             { n: "02", title: "BUDGET PATHS",       body: "Not bid or pass. See the optimal spend path given your remaining budget and roster gaps." },
-            { n: "03", title: "AI COACH",           body: "Ask \"what are my RB options at $30?\" Get players, tiers, and two strategic approaches. Not verdicts." },
+            { n: "03", title: "LIVE DRAFT SYNC",    body: "Connects directly to your ESPN auction. Picks come in automatically — no manual logging mid-draft." },
           ].map((f) => (
             <div key={f.n} className="flex gap-6 py-8 group">
               <span className="font-mono text-[12px] text-white/30 mt-1 w-7 shrink-0">{f.n}</span>
