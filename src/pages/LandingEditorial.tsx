@@ -97,20 +97,39 @@ export default function LandingEditorial() {
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-hidden bg-black text-white"
-      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
-    >
+      {/* SVG filter: a-ha "Take On Me" pencil-sketch shimmer */}
+      <svg aria-hidden width="0" height="0" style={{ position: "absolute" }}>
+        <defs>
+          <filter id="ahaSketch" x="0%" y="0%" width="100%" height="100%">
+            <feColorMatrix
+              in="SourceGraphic"
+              type="matrix"
+              values="0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0.33 0.33 0.33 0 0  0 0 0 1 0"
+              result="gray"
+            />
+            <feComponentTransfer in="gray" result="ink">
+              <feFuncR type="linear" slope="2.4" intercept="-0.75" />
+              <feFuncG type="linear" slope="2.4" intercept="-0.75" />
+              <feFuncB type="linear" slope="2.4" intercept="-0.75" />
+            </feComponentTransfer>
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="2" result="noise">
+              <animate attributeName="seed" values="1;4;7;2;9;5" dur="0.45s" repeatCount="indefinite" calcMode="discrete" />
+            </feTurbulence>
+            <feDisplacementMap in="ink" in2="noise" scale="9" xChannelSelector="R" yChannelSelector="G" />
+          </filter>
+        </defs>
+      </svg>
+
+      {/* Bottom layer: real color hero video */}
       <video
         ref={videoRef}
         loop
         muted
         playsInline
         preload="auto"
-        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain transition-[filter] duration-500"
+        className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain"
         style={{
-          filter: colorOn
-            ? "brightness(0.7) contrast(1.05) saturate(0.85)"
-            : "grayscale(1) contrast(1.15) brightness(0.78)",
+          filter: "brightness(0.7) contrast(1.05) saturate(0.85)",
           objectPosition: "center",
           transform: `scale(${videoZoom})`,
           transformOrigin: "center center",
@@ -119,16 +138,40 @@ export default function LandingEditorial() {
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
 
-      {/* Camera flash overlay */}
+      {/* Top layer: same video, rotoscoped pencil sketch — fades out into the color video */}
+      <video
+        ref={sketchVideoRef}
+        loop
+        muted
+        playsInline
+        preload="auto"
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-[2] h-screen w-screen object-contain"
+        style={{
+          filter: "url(#ahaSketch)",
+          objectPosition: "center",
+          transform: `scale(${videoZoom})`,
+          transformOrigin: "center center",
+          opacity: sketchVisible ? 1 : 0,
+          transition: "opacity 900ms ease-in",
+        }}
+      >
+        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+      </video>
+
+      {/* Paper grain overlay during the sketch phase */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-[2] bg-white transition-opacity"
+        className="pointer-events-none fixed inset-0 z-[3] mix-blend-multiply"
         style={{
-          opacity: flashOn ? 1 : 0,
-          transitionDuration: flashOn ? "90ms" : "320ms",
-          transitionTimingFunction: flashOn ? "ease-out" : "ease-in",
+          opacity: sketchVisible ? 0.35 : 0,
+          transition: "opacity 900ms ease-in",
+          backgroundImage:
+            "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.93  0 0 0 0 0.88  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>\")",
+          backgroundSize: "240px 240px",
         }}
       />
+
 
 
       {/* Hero video zoom slider */}
