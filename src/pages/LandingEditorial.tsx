@@ -17,7 +17,6 @@ export default function LandingEditorial() {
   const [teams,        setTeams]        = useState<Team[]>([]);
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [heroReady,    setHeroReady]    = useState(false);
-  const [bgIndex,      setBgIndex]      = useState(0);
 
   useEffect(() => { const t = setTimeout(() => setHeroReady(true), 200); return () => clearTimeout(t); }, []);
   useEffect(() => {
@@ -49,7 +48,7 @@ export default function LandingEditorial() {
     navigate("/draft-room", { replace: true });
   };
 
-  const bgSrc = `${import.meta.env.BASE_URL}${BG_IMAGES[bgIndex]}`;
+  const bgSrc = `${import.meta.env.BASE_URL}${BG_IMAGES[0]}`;
 
   return (
     <div style={{ position: "relative", minHeight: "100svh", overflow: "hidden", fontFamily: "'Playfair Display', Georgia, serif" }}>
@@ -140,22 +139,6 @@ export default function LandingEditorial() {
             Budget-first planning powered by your league's actual 3-year auction history.
           </p>
 
-          {/* Image switcher dots */}
-          <div style={{ display: "flex", gap: "8px", opacity: heroReady ? 1 : 0, transition: "opacity 0.9s ease 0.7s" }}>
-            {BG_IMAGES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setBgIndex(i)}
-                style={{
-                  width: i === bgIndex ? 24 : 8, height: 8,
-                  borderRadius: 4,
-                  background: i === bgIndex ? "white" : "rgba(255,255,255,0.35)",
-                  border: "none", cursor: "pointer", padding: 0,
-                  transition: "width 0.3s ease, background 0.3s ease",
-                }}
-              />
-            ))}
-          </div>
         </div>
       </div>
 
@@ -176,19 +159,25 @@ export default function LandingEditorial() {
           zIndex: 10, pointerEvents: "none",
         }} />
 
-        {/* Panel background */}
-        <div style={{
-          position: "absolute", inset: 0,
-          background: "rgba(8,8,12,0.88)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          overflow: "hidden",
-        }}>
-          {/* Ice crystal glows */}
-          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%", borderRadius: "50%", background: "radial-gradient(circle, rgba(180,220,255,0.28) 0%, transparent 70%)", filter: "blur(35px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%", borderRadius: "50%", background: "radial-gradient(circle, rgba(60,130,255,0.22) 0%, transparent 70%)",  filter: "blur(45px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(120,190,255,0.18) 0%, transparent 70%)", filter: "blur(55px)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%", borderRadius: "50%", background: "radial-gradient(circle, rgba(200,235,255,0.14) 0%, transparent 70%)", filter: "blur(40px)", pointerEvents: "none" }} />
+        {/* Panel background — Superman cape video */}
+        <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+          <video
+            autoPlay loop muted playsInline
+            style={{
+              position: "absolute", inset: 0,
+              width: "100%", height: "100%",
+              objectFit: "cover",
+              objectPosition: "center top",
+            }}
+          >
+            <source src={`${import.meta.env.BASE_URL}242145e6-3537-4a6b-aba9-5f821bb9d45a_watermarked_video_s3_key.mov`} type="video/quicktime" />
+            <source src={`${import.meta.env.BASE_URL}242145e6-3537-4a6b-aba9-5f821bb9d45a_watermarked_video_s3_key.mov`} type="video/mp4" />
+          </video>
+          {/* Dark overlay so team names are readable */}
+          <div style={{
+            position: "absolute", inset: 0,
+            background: "linear-gradient(to bottom, rgba(8,4,20,0.55) 0%, rgba(8,4,20,0.3) 40%, rgba(8,4,20,0.7) 100%)",
+          }} />
         </div>
 
         {/* Panel content */}
