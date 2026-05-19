@@ -195,8 +195,7 @@ export default function LandingEditorial() {
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
 
-        {/* Modus-style overlay gradients: heavy bottom for type, soft top behind nav */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent" />
+        {/* Modus-style overlay gradient: heavy bottom for type */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
 
         {/* paper grain during sketch */}
