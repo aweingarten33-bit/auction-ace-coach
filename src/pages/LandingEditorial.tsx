@@ -298,6 +298,20 @@ export default function LandingEditorial() {
           25% { transform: rotate(-12deg) scale(1.04); }
           75% { transform: rotate(-22deg) scale(0.97); }
         }
+        @keyframes hero-polaroid-reveal {
+          0% { opacity: 0; transform: translate3d(-42vw, -38vh, 0) rotate(-16deg) scale(0.72); }
+          16% { opacity: 1; transform: translate3d(0, 0, 0) rotate(-5deg) scale(0.94); }
+          36% { opacity: 1; transform: translate3d(0, 0, 0) rotate(2deg) scale(1); }
+          62% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg) scale(1.03); filter: grayscale(1); }
+          100% { opacity: 0; transform: translate3d(0, 0, 0) rotate(0deg) scale(${videoZoom}); filter: grayscale(0); }
+        }
+        .hero-polaroid-frame {
+          animation: hero-polaroid-reveal 1800ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+          will-change: transform, opacity, filter;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-polaroid-frame { animation-duration: 600ms; }
+        }
       `}</style>
     </div>
   );
