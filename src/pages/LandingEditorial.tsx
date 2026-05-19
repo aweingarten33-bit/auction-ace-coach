@@ -7,7 +7,6 @@ export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const sketchVideoRef = useRef<HTMLVideoElement>(null);
   const [videoZoom, setVideoZoom] = useState<number>(() => {
     if (typeof window === "undefined") return 1;
     const v = parseFloat(localStorage.getItem("heroVideoZoom") || "1");
@@ -20,15 +19,14 @@ export default function LandingEditorial() {
   useEffect(() => {
     const reveal = () => {
       const v = videoRef.current;
-      const s = sketchVideoRef.current;
       if (v) { try { v.currentTime = 0; } catch {} void v.play().catch(() => {}); }
-      if (s) { try { s.currentTime = 0; } catch {} void s.play().catch(() => {}); }
-      // Hold the a-ha sketch shimmer, then dissolve to color (Take On Me).
+      // a-ha "Take On Me": hold the sketch shimmer, then snap to live color.
       window.setTimeout(() => setSketchVisible(false), 1700);
     };
     window.addEventListener("landing:visible", reveal, { once: true });
     return () => window.removeEventListener("landing:visible", reveal);
   }, []);
+
 
 
 
