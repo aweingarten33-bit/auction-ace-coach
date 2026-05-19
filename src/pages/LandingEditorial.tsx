@@ -112,7 +112,10 @@ export default function LandingEditorial() {
           onClick={openMenu}
           style={{
             width: 48, height: 48,
-            background: "#1a2332",
+            background: "rgba(8,14,28,0.45)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: "14px",
             border: "none", cursor: "pointer",
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -140,8 +143,12 @@ export default function LandingEditorial() {
         transition: "transform 0.5s cubic-bezier(0.16,1,0.3,1)",
         zIndex: 300,
         width: "90vw", maxWidth: "380px",
-        background: "#1a2332",
-        borderRadius: "0 0 24px 24px",
+        background: "rgba(8,14,28,0.38)",
+        backdropFilter: "blur(28px)",
+        WebkitBackdropFilter: "blur(28px)",
+        borderRadius: "0 0 28px 28px",
+        border: "1px solid rgba(255,255,255,0.07)",
+        borderTop: "none",
         padding: "80px 32px 36px",
         paddingTop: "calc(env(safe-area-inset-top) + 72px)",
       }}>
