@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import heroImg from "/league-hero.jpeg?url";
+const heroImg = "/league-hero.jpeg";
 
 interface Props {
   onDone: () => void;
