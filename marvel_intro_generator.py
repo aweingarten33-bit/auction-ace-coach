@@ -1,7 +1,13 @@
 """
-Marvel Studios Intro Animation Generator
-Uses Wan2.1 Image-to-Video (I2V) to animate a Marvel Studios logo image
-into a cinematic comic-book-flip intro sequence.
+Fantasy Football League Marvel-Style Intro Generator
+Uses Wan2.1 Image-to-Video (I2V) to animate the "Bro, We're Senior Citizens FF League"
+logo into a Marvel Studios-style cinematic intro sequence.
+
+The input image already mirrors the Marvel intro layout:
+  - NFL team logo panels arranged in a hero-grid
+  - Diagonal film strips running across corners
+  - Dramatic crimson atmospheric lighting
+  - Metallic centre title text
 
 Requirements:
     pip install torch torchvision diffusers transformers accelerate Pillow
@@ -21,21 +27,40 @@ import os
 
 
 # ---------------------------------------------------------------------------
-# Prompt crafted to replicate the Marvel Studios flip-book intro:
-#   - Rapid comic-book pages cascade across the frame in crimson tones
-#   - Vintage halftone panels flash heroes in mid-action
-#   - Pages peel and whip away to reveal the Marvel Studios logo
-#   - Bold zoom-in push, lens-flare, cinematic depth of field
+# Prompt tuned specifically for the "Bro, We're Senior Citizens FF League" image:
+#
+# The image already has the Marvel intro layout — NFL logo panels in a hero
+# grid, diagonal film strips in the corners, deep crimson lighting, metallic
+# centre text. The prompt drives the I2V model to ANIMATE those elements:
+#   1. Each NFL logo panel lights up and pulses in rapid succession
+#   2. Film strips scroll diagonally with motion blur
+#   3. Red atmospheric light sweeps across the frame
+#   4. Camera slow-pushes into the centre title with a metallic gleam
+#   5. Cinematic lens flare bursts from the corner highlights
 # ---------------------------------------------------------------------------
 MARVEL_INTRO_PROMPT = (
-    "Cinematic Marvel Studios intro sequence. Dozens of vintage red-tinted comic book "
-    "pages rapidly flip and cascade across the frame, each panel showing ink-drawn "
-    "superhero action poses rendered in classic halftone print style. Pages whip past "
-    "in quick succession with motion blur, creating a dynamic flipping book effect. "
-    "The crimson-filtered pages peel away one by one to reveal the bold Marvel Studios "
-    "red logo centred on a clean white background. Camera pushes in with a slow zoom, "
-    "dramatic lens flare streaks across the logo, shallow depth of field, high contrast "
-    "cinematic lighting, IMAX quality, photorealistic motion, 24fps film grain."
+    "Cinematic Marvel Studios-style intro animation. The grid of NFL team logo panels "
+    "illuminates one by one in rapid succession, each emblem glowing with deep crimson "
+    "light and a metallic sheen, pulsing in a quick staccato rhythm. The diagonal film "
+    "strips in the corners scroll and roll with motion blur, frames flickering past. "
+    "A dramatic red atmospheric light sweeps slowly across the entire frame from left "
+    "to right. The camera performs a smooth slow push-in toward the bold silver metallic "
+    "centre title 'BRO, WE'RE SENIOR CITIZENS FF LEAGUE', which catches the light with "
+    "a gleaming specular highlight. Crimson lens flare bursts from the corner panel edges. "
+    "Epic cinematic score atmosphere, shallow depth of field, high contrast dramatic "
+    "lighting, IMAX quality motion, 24fps film grain, photorealistic."
+)
+
+# Alternative prompt — tries to get the panels to flip/peel like real Marvel intro
+MARVEL_INTRO_PROMPT_FLIP = (
+    "Marvel Studios intro sequence recreation. Starting from a grid of NFL team logo "
+    "panels on a deep crimson background, each panel rapidly flips and peels away like "
+    "pages in a flip-book, revealing glowing crimson light beneath. Film strips in the "
+    "corners whip past with motion blur. After the panels flip through in quick succession "
+    "the camera dramatically pushes in toward the bold metallic centrepiece title "
+    "'BRO, WE'RE SENIOR CITIZENS FF LEAGUE' which shimmers with a sweeping specular "
+    "highlight. Dramatic red lens flare, cinematic depth of field, IMAX quality, "
+    "high contrast lighting, 24fps."
 )
 
 NEGATIVE_PROMPT = (
@@ -104,7 +129,12 @@ def generate(args):
 
     pipe = build_pipeline(args.resolution, args.offload)
 
-    prompt = args.prompt or MARVEL_INTRO_PROMPT
+    if args.prompt:
+        prompt = args.prompt
+    elif getattr(args, "prompt_style", "sweep") == "flip":
+        prompt = MARVEL_INTRO_PROMPT_FLIP
+    else:
+        prompt = MARVEL_INTRO_PROMPT
     print(f"Prompt:\n{prompt}\n")
     print(f"Generating {args.num_frames} frames at {args.fps}fps "
           f"({args.num_frames / args.fps:.1f}s video)...\n")
@@ -127,12 +157,12 @@ def generate(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Animate a Marvel Studios logo image into a cinematic intro using Wan2.1 I2V"
+        description="Animate 'Bro We're Senior Citizens FF League' image into a Marvel-style intro using Wan2.1 I2V"
     )
     parser.add_argument(
         "--image",
-        default="marvel_logo.png",
-        help="Path to your Marvel Studios logo image (PNG/JPG)",
+        default="bro_we_are_senior_citizens.png",
+        help="Path to your FF league logo image (PNG/JPG)",
     )
     parser.add_argument(
         "--output",
@@ -184,7 +214,17 @@ def main():
         "--prompt",
         type=str,
         default=None,
-        help="Override the default Marvel intro prompt with your own",
+        help="Override the built-in prompt with your own text",
+    )
+    parser.add_argument(
+        "--prompt-style",
+        choices=["sweep", "flip"],
+        default="sweep",
+        dest="prompt_style",
+        help=(
+            "'sweep' = light sweep + panel glow (default, more reliable). "
+            "'flip' = panels peel and flip like real Marvel intro (more ambitious)."
+        ),
     )
 
     args = parser.parse_args()
