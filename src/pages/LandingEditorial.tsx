@@ -179,23 +179,73 @@ export default function LandingEditorial() {
       </aside>
 
       {/* ── Full-bleed hero video ──────────────────────────────────── */}
-      {/* HERO — full screen. Change `height` below to control size (e.g. "100svh", "80svh", "640px") */}
-      <section className="relative w-full overflow-hidden" style={{ height: "100svh" }}>
+      <section className="relative w-full overflow-hidden" style={{ height: `${videoHeight}svh` }}>
         <video
           ref={videoRef}
           loop muted playsInline preload="auto"
           poster={`${import.meta.env.BASE_URL}hero-poster.png`}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute left-1/2 top-1/2 h-full w-full object-cover"
           style={{
-            objectPosition: "50% 85%",
+            objectPosition: `50% ${videoY}%`,
+            transform: `translate(-50%, -50%) scale(${videoZoom / 100})`,
             filter: sketchVisible
               ? "url(#ahaSketch)"
               : "brightness(0.85) contrast(1.06) saturate(0.95)",
-            transition: "filter 600ms ease",
+            transition: "filter 600ms ease, transform 220ms ease, object-position 220ms ease",
           }}
         >
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
+
+        <div className="absolute left-4 top-4 z-20 w-[min(92vw,360px)] rounded-lg bg-black/45 p-3 text-white shadow-2xl ring-1 ring-white/15 backdrop-blur-md md:left-6 md:top-6">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">Video sizing</span>
+            <button
+              type="button"
+              onClick={() => {
+                setVideoHeight(100);
+                setVideoZoom(118);
+                setVideoY(100);
+              }}
+              className="rounded-md bg-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white/75 ring-1 ring-white/15 transition hover:bg-white/20"
+            >
+              Reset
+            </button>
+          </div>
+          <label className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/65">
+            Screen height
+            <input
+              type="range"
+              min="45"
+              max="120"
+              value={videoHeight}
+              onChange={(e) => setVideoHeight(Number(e.target.value))}
+              className="mt-2 block w-full accent-white"
+            />
+          </label>
+          <label className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/65">
+            Video zoom
+            <input
+              type="range"
+              min="100"
+              max="160"
+              value={videoZoom}
+              onChange={(e) => setVideoZoom(Number(e.target.value))}
+              className="mt-2 block w-full accent-white"
+            />
+          </label>
+          <label className="block text-[10px] uppercase tracking-[0.2em] text-white/65">
+            Vertical crop
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={videoY}
+              onChange={(e) => setVideoY(Number(e.target.value))}
+              className="mt-2 block w-full accent-white"
+            />
+          </label>
+        </div>
 
         {/* Modus-style overlay gradient: heavy bottom for type */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
