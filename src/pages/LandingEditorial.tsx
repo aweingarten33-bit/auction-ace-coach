@@ -228,12 +228,6 @@ export default function LandingEditorial() {
             <span>Vol. I</span>
           </div>
 
-          <button
-            aria-label="Menu"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white/80 transition hover:border-white/60 hover:text-white"
-          >
-            <Menu className="h-4 w-4" strokeWidth={1.5} />
-          </button>
         </header>
 
         <div className="mx-6 mt-6 h-px bg-white/10 md:mx-10" />
