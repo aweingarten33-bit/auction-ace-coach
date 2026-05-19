@@ -121,13 +121,15 @@ export default function Preloader({ onDone }: Props) {
   const [exiting, setExiting] = useState(false);
 
   const { logos, isFantasy } = useMemo(() => {
-    const cached = loadTeamsFromCache();
-    if (cached.length > 0) {
-      return {
-        isFantasy: true,
-        logos: cached.map((t) => ({ key: String(t.id), src: svgToDataUrl(generateTeamSVG(t.name)), name: t.name })),
-      };
-    }
+    try {
+      const cached = loadTeamsFromCache();
+      if (cached.length > 0) {
+        return {
+          isFantasy: true,
+          logos: cached.map((t) => ({ key: String(t.id), src: svgToDataUrl(generateTeamSVG(t.name)), name: t.name })),
+        };
+      }
+    } catch {}
     return {
       isFantasy: false,
       logos: NFL_TEAMS.map((t) => ({ key: t, src: NFL_LOGO_URL(t), name: t })),
@@ -135,11 +137,13 @@ export default function Preloader({ onDone }: Props) {
   }, []);
 
   useEffect(() => {
+    // Safety net — always call onDone even if something goes wrong
+    const safety = setTimeout(onDone, TOTAL_MS + EXIT_MS + 2000);
     const t = setTimeout(() => {
       setExiting(true);
       setTimeout(onDone, EXIT_MS);
     }, TOTAL_MS);
-    return () => clearTimeout(t);
+    return () => { clearTimeout(t); clearTimeout(safety); };
   }, [onDone]);
 
   const TITLE_TOP = "BRO WE'RE";
