@@ -272,22 +272,6 @@ export default function LandingEditorial() {
           className="px-6 pt-24 md:px-10 md:pt-32"
           style={{ opacity: heroFade }}
         >
-          <p className="mb-8 text-center text-[10px] uppercase tracking-[0.4em] text-white/55">
-            <span className="mr-3">N°01</span>
-            <span className="text-white/30">—</span>
-            <span className="ml-3">A research room for fantasy football auctions</span>
-          </p>
-
-          <h1
-            className="mx-auto max-w-6xl text-center font-serif font-medium leading-[0.92] tracking-[-0.03em] text-white"
-            style={{
-              fontFamily: "'Playfair Display', 'Times New Roman', serif",
-              fontSize: "clamp(3.5rem, 11vw, 10rem)",
-            }}
-          >
-            <span className="block">High-end research.</span>
-            <span className="block italic font-normal text-white/95">Auction ready.</span>
-          </h1>
 
           <p className="mx-auto mt-12 max-w-xl text-center text-base leading-relaxed text-white/65 md:text-[17px]">
             Tiers, values, and trends — pulled from your ESPN league, shared with
