@@ -78,8 +78,7 @@ export default function TeamPicker() {
           style={{
             position: "absolute", top: "50%", left: "50%",
             width: "100%", height: "100%", objectFit: "cover",
-            filter: "blur(60px) saturate(0.3) brightness(1.8)", opacity: 0.45,
-            mixBlendMode: "screen",
+            filter: "blur(40px) saturate(1.3)", opacity: 0.85,
           }}
         >
           <source src={videoSrc} type="video/mp4" />
@@ -91,9 +90,7 @@ export default function TeamPicker() {
           style={{
             position: "absolute", top: "50%", left: "50%",
             width: "100%", height: "100%", objectFit: "contain",
-            opacity: 0.35,
-            filter: "saturate(0.2) brightness(1.6) contrast(0.9)",
-            mixBlendMode: "screen",
+            opacity: 1,
           }}
         >
           <source src={videoSrc} type="video/mp4" />

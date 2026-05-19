@@ -145,7 +145,8 @@ export default function LandingEditorial() {
             objectFit: "cover",
             objectPosition: "center top",
             pointerEvents: "none",
-            opacity: 0.35,
+            opacity: 0.6,
+            filter: "saturate(0.15) brightness(1.8) contrast(0.85)",
             mixBlendMode: "screen",
           }}
         >
