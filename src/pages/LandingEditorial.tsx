@@ -186,9 +186,10 @@ export default function LandingEditorial() {
           poster={`${import.meta.env.BASE_URL}hero-poster.png`}
           className="absolute inset-0 h-full w-full object-cover"
           style={{
+            objectPosition: "50% 85%",
             filter: sketchVisible
               ? "url(#ahaSketch)"
-              : "brightness(0.72) contrast(1.06) saturate(0.95)",
+              : "brightness(0.85) contrast(1.06) saturate(0.95)",
             transition: "filter 600ms ease",
           }}
         >
