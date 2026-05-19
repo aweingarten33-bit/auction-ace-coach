@@ -223,6 +223,7 @@ export default function DraftRoom() {
           <ChevronLeft className="h-6 w-6" strokeWidth={2} />
         </Button>
 
+        {isAdmin && (
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0" aria-label="Menu">
