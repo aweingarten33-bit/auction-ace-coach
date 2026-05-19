@@ -21,20 +21,12 @@ export default function LandingEditorial() {
     if (!v) return;
     v.pause();
     try { v.currentTime = 0; } catch {}
-    const t = setTimeout(() => {
-      if (!videoRef.current) return;
-      try { videoRef.current.currentTime = 0; } catch {}
-  // Sync video start with preloader end (~6.5s) so it doesn't begin mid-clip.
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.pause();
-    try { v.currentTime = 0; } catch {}
 
     // Kick off play slightly before the preloader finishes so the first frame
     // is already on screen when it fades out — eliminates the perceived gap.
     const PRELOADER_MS = 6500;
-    const LEAD_MS = 600; // start ~600ms early to absorb decode/play latency
+    const LEAD_MS = 600;
+    const readyAfter = Date.now() + Math.max(0, PRELOADER_MS - LEAD_MS);
 
     let started = false;
     const start = () => {
@@ -45,13 +37,9 @@ export default function LandingEditorial() {
     };
 
     const t = setTimeout(start, Math.max(0, PRELOADER_MS - LEAD_MS));
-
-    // If the video is ready earlier, we still wait for the timer;
-    // if it isn't ready by then, fire as soon as it becomes playable.
     const onReady = () => {
       if (Date.now() >= readyAfter) start();
     };
-    const readyAfter = Date.now() + Math.max(0, PRELOADER_MS - LEAD_MS);
     v.addEventListener("canplay", onReady);
     v.addEventListener("canplaythrough", onReady);
 
@@ -59,6 +47,19 @@ export default function LandingEditorial() {
       clearTimeout(t);
       v.removeEventListener("canplay", onReady);
       v.removeEventListener("canplaythrough", onReady);
+    };
+  }, []);
+
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setScrollY(window.scrollY));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
     };
   }, []);
 
