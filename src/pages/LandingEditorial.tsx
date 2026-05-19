@@ -89,10 +89,11 @@ export default function LandingEditorial() {
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       <video
-        autoPlay
+        ref={videoRef}
         loop
         muted
         playsInline
+        preload="auto"
         className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
         style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
       >
