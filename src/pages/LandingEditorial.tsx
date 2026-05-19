@@ -1,44 +1,23 @@
-import { Link } from "react-router-dom";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSelectedTeam } from "@/hooks/useSelectedTeam";
+import { toast } from "sonner";
+
+interface Team { id: number; name: string; abbrev?: string }
 
 const VIDEO_SCALE_KEY = "landing-video-scale";
 const VIDEO_POS_KEY   = "landing-video-pos";
-const LIME = "#ccff00";
-const SCRAMBLE_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#@$%&";
-
-// ── Scramble hook ──────────────────────────────────────────────────────────
-function useScramble(target: string, startDelay = 0) {
-  const [text, setText] = useState(target.replace(/[A-Z]/g, "X"));
-  useEffect(() => {
-    let t: ReturnType<typeof setTimeout>;
-    let iv: ReturnType<typeof setInterval>;
-    let frame = 0;
-    const frames = 22;
-    t = setTimeout(() => {
-      iv = setInterval(() => {
-        frame++;
-        setText(
-          target.split("").map((ch, i) => {
-            if (ch === " " || ch === "." || ch === "-") return ch;
-            if (i <= (frame / frames) * target.length) return ch;
-            return SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)];
-          }).join("")
-        );
-        if (frame >= frames) { clearInterval(iv); setText(target); }
-      }, 35);
-    }, startDelay);
-    return () => { clearTimeout(t); clearInterval(iv); };
-  }, [target, startDelay]);
-  return text;
-}
 
 export default function LandingEditorial() {
-  const [menuOpen,   setMenuOpen]   = useState(false);
-  const [showTuner,  setShowTuner]  = useState(false);
-  const [cursor,     setCursor]     = useState({ x: -300, y: -300 });
-  const [heroReady,  setHeroReady]  = useState(false);
-  const magnetRef = useRef<HTMLAnchorElement>(null);
-  const magnetRef2 = useRef<HTMLAnchorElement>(null);
+  const navigate   = useNavigate();
+  const { setTeam } = useSelectedTeam();
+
+  const [panelOpen,    setPanelOpen]    = useState(false);
+  const [teams,        setTeams]        = useState<Team[]>([]);
+  const [loadingTeams, setLoadingTeams] = useState(false);
+  const [heroReady,    setHeroReady]    = useState(false);
+  const [showTuner,    setShowTuner]    = useState(false);
 
   const [videoScale, setVideoScale] = useState(() => {
     try { return parseFloat(localStorage.getItem(VIDEO_SCALE_KEY) || "1.6"); } catch { return 1.6; }
@@ -47,317 +26,302 @@ export default function LandingEditorial() {
     try { return parseFloat(localStorage.getItem(VIDEO_POS_KEY) || "35"); } catch { return 35; }
   });
 
+  useEffect(() => { try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {} }, [videoScale]);
+  useEffect(() => { try { localStorage.setItem(VIDEO_POS_KEY,   String(videoPos));   } catch {} }, [videoPos]);
+  useEffect(() => { const t = setTimeout(() => setHeroReady(true), 200); return () => clearTimeout(t); }, []);
   useEffect(() => {
-    try { localStorage.setItem(VIDEO_SCALE_KEY, String(videoScale)); } catch {}
-  }, [videoScale]);
-  useEffect(() => {
-    try { localStorage.setItem(VIDEO_POS_KEY, String(videoPos)); } catch {}
-  }, [videoPos]);
-
-  // Cursor glow tracker
-  useEffect(() => {
-    const move = (e: MouseEvent) => setCursor({ x: e.clientX, y: e.clientY });
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
-
-  // Hero text entrance
-  useEffect(() => { const t = setTimeout(() => setHeroReady(true), 100); return () => clearTimeout(t); }, []);
-
-  // Lock body scroll when menu open
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
+    document.body.style.overflow = panelOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
+  }, [panelOpen]);
 
-  // Scroll reveal
-  useEffect(() => {
-    const els = document.querySelectorAll<HTMLElement>("[data-reveal]");
-    const obs = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) (e.target as HTMLElement).classList.add("sr-visible"); }),
-      { threshold: 0.1 }
-    );
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
+  const openPanel = async () => {
+    setPanelOpen(true);
+    if (teams.length > 0) return;
+    setLoadingTeams(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) await supabase.auth.signInAnonymously();
+      const { data } = await supabase.functions.invoke("league-teams");
+      const list: Team[] = (data?.teams ?? []).map((t: any) => ({ id: t.id, name: t.name, abbrev: t.abbrev }));
+      setTeams(list);
+    } catch { /* silent */ } finally { setLoadingTeams(false); }
+  };
 
-  // Magnetic button
-  const onMagnet = useCallback((ref: React.RefObject<HTMLAnchorElement | null>) => (e: React.MouseEvent) => {
-    const el = ref.current; if (!el) return;
-    const r = el.getBoundingClientRect();
-    const x = (e.clientX - (r.left + r.width / 2)) * 0.28;
-    const y = (e.clientY - (r.top + r.height / 2)) * 0.28;
-    el.style.transform = `translate(${x}px,${y}px)`;
-  }, []);
-  const offMagnet = useCallback((ref: React.RefObject<HTMLAnchorElement | null>) => () => {
-    if (ref.current) ref.current.style.transform = "";
-  }, []);
+  const pickTeam = (team: Team) => {
+    setTeam(team);
+    toast.success(`Let's go, ${team.name}!`);
+    navigate("/draft-room", { replace: true });
+  };
 
-  // Scrambled words
-  const w1 = useScramble("AUCTION", 300);
-  const w2 = useScramble("DRAFT.", 500);
-  const w3 = useScramble("YOUR", 700);
-  const w4 = useScramble("EDGE.", 900);
-
-  const NavBar = ({ open, onToggle }: { open: boolean; onToggle: () => void }) => (
-    <header className="flex items-center justify-between px-5 py-4 border-b border-white/10">
-      <span className="text-white text-[22px] select-none leading-none">✦</span>
-      <div className="flex items-center rounded-full border border-white/20 overflow-hidden text-[12px] font-medium select-none">
-        <span className="px-4 py-[7px] text-white/40">Light</span>
-        <span className="px-4 py-[7px] bg-white text-black rounded-full">Dark</span>
-      </div>
-      <button
-        onClick={onToggle}
-        aria-label={open ? "Close menu" : "Open menu"}
-        className="h-10 w-10 rounded-full border border-white/20 flex items-center justify-center text-white text-[18px] leading-none hover:border-white/50 transition-all duration-200"
-      >
-        <span style={{ display: "inline-block", transition: "transform 0.3s", transform: open ? "rotate(45deg)" : "none" }}>
-          {open ? "✕" : "≡"}
-        </span>
-      </button>
-    </header>
-  );
+  const skip = () => {
+    setTeam(null);
+    navigate("/draft-room", { replace: true });
+  };
 
   return (
-    <div className="bg-black text-white" style={{ fontFamily: "'Montserrat','Inter',sans-serif" }}>
+    <div style={{ background: "#ede8df", minHeight: "100vh", fontFamily: "'Playfair Display', Georgia, serif" }}>
 
-      {/* ── CURSOR GLOW ───────────────────────────────────────────────────── */}
+      {/* ── HERO CARD ──────────────────────────────────────────────────────── */}
       <div
-        className="pointer-events-none fixed z-[9990]"
         style={{
-          left: cursor.x - 180,
-          top: cursor.y - 180,
-          width: 360,
-          height: 360,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, rgba(204,255,0,0.07) 0%, transparent 70%)`,
-          transition: "left 80ms linear, top 80ms linear",
+          margin: "12px",
+          borderRadius: "28px",
+          overflow: "hidden",
+          height: "calc(100svh - 24px)",
+          position: "relative",
+          transition: "transform 0.65s cubic-bezier(0.32,0,0.15,1), filter 0.65s ease",
+          willChange: "transform, filter",
+          // Subtle depth push when curtain opens
+          transform: panelOpen ? "scale(0.95) translateX(-2%)" : "scale(1) translateX(0)",
+          filter:    panelOpen ? "brightness(0.5)"              : "brightness(1)",
         }}
-      />
-
-      {/* ── STICKY NAV ────────────────────────────────────────────────────── */}
-      <div className="fixed top-0 inset-x-0 z-50 bg-black/90 backdrop-blur-sm">
-        <NavBar open={menuOpen} onToggle={() => setMenuOpen((v) => !v)} />
-      </div>
-
-      {/* ── FULL-SCREEN MENU ──────────────────────────────────────────────── */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 z-[100] bg-black flex flex-col"
-          style={{ animation: "menuIn 0.35s cubic-bezier(0.16,1,0.3,1) forwards" }}
+      >
+        {/* Video */}
+        <video
+          autoPlay loop muted playsInline
+          style={{
+            position: "absolute", inset: 0,
+            width: "100%", height: "100%",
+            objectFit: "cover", pointerEvents: "none",
+            transform: `scale(${videoScale})`,
+            transformOrigin: `center ${videoPos}%`,
+            filter: "brightness(0.58) saturate(0.75)",
+          }}
         >
-          <NavBar open={menuOpen} onToggle={() => setMenuOpen(false)} />
-          <nav className="flex-1 flex flex-col justify-center px-5 overflow-hidden">
-            {[
-              { label: "✦ HOME",       to: "/" },
-              { label: "DRAFT ROOM",   to: "/draft-room" },
-              { label: "SETUP",        to: "/setup" },
-              { label: "CONNECT ESPN", to: "/espn" },
-              { label: "YOUR TEAM",    to: "/team" },
-            ].map((item, i) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-end py-4 border-b border-white/10 hover:opacity-50 transition-opacity"
-                style={{ animation: `menuItemIn 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 60}ms both` }}
-              >
-                <span className="font-black uppercase leading-none tracking-tight"
-                  style={{ fontSize: "clamp(2rem, 10vw, 5rem)" }}>
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </nav>
-          <div className="px-5 py-6" style={{ animation: "menuItemIn 0.4s cubic-bezier(0.16,1,0.3,1) 350ms both" }}>
-            <Link
-              to="/team"
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center justify-between rounded-full border border-white/20 px-6 py-3 hover:border-white/50 transition-colors"
-            >
-              <span className="text-[15px] font-medium">Choose Your Team</span>
-              <span className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg" style={{ background: LIME }}>→</span>
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative h-screen min-h-[640px] flex flex-col justify-end pb-10 px-5 overflow-hidden">
-        {/* Full-screen video */}
-        <video autoPlay loop muted playsInline
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-          style={{ transform: `scale(${videoScale})`, transformOrigin: `center ${videoPos}%`, filter: "brightness(0.42) saturate(0.7)" }}>
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/85 pointer-events-none" />
 
-        {/* Scrambling headline — each word slams in */}
-        <div className="relative z-10">
-          <h1
-            className="font-black uppercase leading-[0.88] tracking-tight text-white overflow-hidden"
-            style={{ fontSize: "clamp(3.8rem, 20vw, 15rem)", letterSpacing: "-0.025em" }}
-          >
-            {[w1, w2, w3, w4].map((word, i) => (
-              <span
-                key={i}
-                className="block"
-                style={{
-                  opacity: heroReady ? 1 : 0,
-                  transform: heroReady ? "none" : "translateY(60px) skewY(3deg)",
-                  transition: `opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 120 + 100}ms, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 120 + 100}ms`,
-                  fontVariantNumeric: "tabular-nums",
-                }}
-              >
-                {word}
-              </span>
-            ))}
-          </h1>
+        {/* Gradient */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 35%, rgba(0,0,0,0.75) 100%)",
+        }} />
 
-          <div
-            className="mt-8 flex flex-col gap-6 md:flex-row md:items-end md:justify-between"
+        {/* Top nav inside card */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, zIndex: 10,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "22px 22px",
+        }}>
+          {/* Logo */}
+          <div style={{ color: "white", lineHeight: 1.05, fontWeight: 700, fontSize: "21px" }}>
+            Auction<br />Ace
+          </div>
+
+          {/* CTA button — frosted glass pill */}
+          <button
+            onClick={openPanel}
             style={{
-              opacity: heroReady ? 1 : 0,
-              transform: heroReady ? "none" : "translateY(20px)",
-              transition: "opacity 0.6s ease 700ms, transform 0.6s ease 700ms",
+              display: "flex", alignItems: "center", gap: "10px",
+              background: "rgba(255,255,255,0.14)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1px solid rgba(255,255,255,0.28)",
+              borderRadius: "100px",
+              padding: "10px 10px 10px 18px",
+              color: "white", cursor: "pointer",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "13px", fontWeight: 600,
             }}
           >
-            <p className="text-[15px] leading-relaxed text-white/50 max-w-xs font-normal">
-              Budget-first draft planning powered by your league's actual 3-year auction history.
-            </p>
+            Choose Your Team
+            <span style={{
+              background: "white", color: "#111",
+              borderRadius: "50%", width: 32, height: 32,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "15px", fontWeight: 700, flexShrink: 0,
+            }}>→</span>
+          </button>
+        </div>
 
-            <Link
-              ref={magnetRef}
-              to="/team"
-              onMouseMove={onMagnet(magnetRef)}
-              onMouseLeave={offMagnet(magnetRef)}
-              className="inline-flex items-center gap-4 self-start rounded-full border border-white/30 pl-6 pr-2 py-2 shrink-0"
-              style={{ transition: "transform 0.15s ease, border-color 0.2s" }}
+        {/* Bottom text */}
+        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10, padding: "0 24px 36px" }}>
+          <h1 style={{
+            color: "white",
+            fontSize: "clamp(2.8rem, 9vw, 5.5rem)",
+            fontWeight: 700, lineHeight: 1.06, margin: "0 0 14px 0",
+            opacity:   heroReady ? 1 : 0,
+            transform: heroReady ? "none" : "translateY(28px)",
+            transition: "opacity 0.9s ease 0.3s, transform 0.9s cubic-bezier(0.16,1,0.3,1) 0.3s",
+          }}>
+            Draft with<br /><em>the Edge.</em>
+          </h1>
+          <p style={{
+            color: "rgba(255,255,255,0.6)",
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "15px", lineHeight: 1.6,
+            maxWidth: "280px", margin: 0,
+            opacity: heroReady ? 1 : 0,
+            transition: "opacity 0.9s ease 0.55s",
+          }}>
+            Budget-first planning powered by your league's actual 3-year auction history.
+          </p>
+        </div>
+
+        {/* Hidden video tuner tap target */}
+        <button
+          onClick={() => setShowTuner(v => !v)}
+          style={{
+            position: "absolute", bottom: 10, right: 14, zIndex: 10,
+            background: "none", border: "none",
+            color: "rgba(255,255,255,0.15)", fontSize: "11px", cursor: "pointer",
+          }}
+        >✦</button>
+      </div>
+
+      {/* ── CURTAIN PANEL ─────────────────────────────────────────────────── */}
+      <div style={{
+        position: "fixed", top: 0, right: 0, bottom: 0,
+        width: "82vw", maxWidth: "400px",
+        zIndex: 300,
+        transform: panelOpen ? "translateX(0) skewX(0deg)" : "translateX(108%) skewX(-1.5deg)",
+        transition: "transform 0.65s cubic-bezier(0.25,0.46,0.45,0.94)",
+        willChange: "transform",
+      }}>
+
+        {/* Curtain fold shadow — left edge */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, bottom: 0, width: "32px",
+          background: "linear-gradient(to right, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
+          zIndex: 10, pointerEvents: "none", borderRadius: "0 0 0 0",
+        }} />
+
+        {/* Panel background — dark glass with color bleed */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "rgba(8,8,12,0.88)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
+          overflow: "hidden",
+        }}>
+          {/* Graffiti-inspired color glows */}
+          <div style={{ position: "absolute", top: "-5%",  right: "-10%", width: "65%", height: "45%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(255,200,0,0.3) 0%, transparent 70%)",   filter: "blur(35px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "25%",  left: "-15%", width: "55%",  height: "40%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(0,140,255,0.22) 0%, transparent 70%)",  filter: "blur(45px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "5%", right: "-5%", width: "60%",  height: "50%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(160,0,255,0.18) 0%, transparent 70%)", filter: "blur(55px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: "35%",left: "5%",   width: "45%",  height: "35%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(255,60,0,0.2) 0%, transparent 70%)",   filter: "blur(40px)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", top: "55%",  right: "10%",  width: "40%",  height: "30%",  borderRadius: "50%", background: "radial-gradient(circle, rgba(0,255,120,0.12) 0%, transparent 70%)", filter: "blur(50px)", pointerEvents: "none" }} />
+        </div>
+
+        {/* Content */}
+        <div style={{
+          position: "relative", zIndex: 5,
+          height: "100%", display: "flex", flexDirection: "column",
+          paddingTop: "env(safe-area-inset-top)",
+        }}>
+          {/* Header */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            padding: "20px 20px",
+          }}>
+            <span style={{
+              color: "rgba(255,255,255,0.35)",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: "10px", letterSpacing: "0.3em", textTransform: "uppercase",
+            }}>
+              Your Team
+            </span>
+            <button
+              onClick={() => setPanelOpen(false)}
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                borderRadius: "50%", width: 40, height: 40,
+                cursor: "pointer", color: "white", fontSize: "15px",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: "sans-serif",
+              }}
+            >✕</button>
+          </div>
+
+          {/* Team list */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "4px 22px 48px" }}>
+            {loadingTeams && (
+              <p style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Inter',sans-serif", fontSize: "14px", paddingTop: "16px" }}>
+                Loading teams…
+              </p>
+            )}
+
+            {!loadingTeams && teams.length === 0 && (
+              <p style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Inter',sans-serif", fontSize: "14px", lineHeight: 1.6, paddingTop: "16px" }}>
+                No teams found. Connect ESPN first.
+              </p>
+            )}
+
+            {!loadingTeams && teams.map((team, i) => (
+              <button
+                key={team.id}
+                onClick={() => pickTeam(team)}
+                style={{
+                  display: "block", width: "100%", textAlign: "left",
+                  background: "none", border: "none",
+                  borderBottom: "1px solid rgba(255,255,255,0.07)",
+                  padding: "16px 0", color: "white", cursor: "pointer",
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "clamp(1.5rem, 5vw, 1.9rem)",
+                  fontWeight: 700, lineHeight: 1.1,
+                  opacity:   panelOpen ? 1 : 0,
+                  transform: panelOpen ? "none" : "translateX(20px)",
+                  transition: `opacity 0.45s ease ${i * 50 + 280}ms, transform 0.45s cubic-bezier(0.16,1,0.3,1) ${i * 50 + 280}ms`,
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = "#ccff00")}
+                onMouseLeave={e => (e.currentTarget.style.color = "white")}
+              >
+                {team.name}
+              </button>
+            ))}
+
+            <button
+              onClick={skip}
+              style={{
+                marginTop: "28px", background: "none", border: "none",
+                color: "rgba(255,255,255,0.25)", fontFamily: "'Inter',sans-serif",
+                fontSize: "13px", cursor: "pointer", padding: 0,
+                opacity: panelOpen ? 1 : 0,
+                transition: "opacity 0.4s ease 650ms, color 0.2s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.55)")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.25)")}
             >
-              <span className="text-[14px] font-semibold uppercase tracking-wide text-white">Choose Your Team</span>
-              <span className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg shrink-0" style={{ background: LIME }}>→</span>
-            </Link>
+              Skip for now →
+            </button>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* ── FEATURES ──────────────────────────────────────────────────────── */}
-      <section className="border-t border-white/10 px-5 py-20" data-reveal>
-        <p className="font-black uppercase leading-none tracking-tight text-white/15 mb-16"
-          style={{ fontSize: "clamp(2rem, 10vw, 7rem)", letterSpacing: "-0.02em" }}>
-          WHAT WE DO
-        </p>
-        <div className="divide-y divide-white/10">
-          {[
-            { n: "01", title: "LEAGUE HISTORY",  body: "3 years of your room's real auction prices — not ESPN projections. CMC goes for $47 in your league? We know." },
-            { n: "02", title: "BUDGET PATHS",    body: "Not bid or pass. See the optimal spend path given your remaining budget and roster gaps." },
-            { n: "03", title: "LIVE DRAFT SYNC", body: "Connects directly to your ESPN auction. Picks come in automatically — no manual logging mid-draft." },
-          ].map((f, i) => (
-            <div
-              key={f.n}
-              className="flex gap-6 py-8 group cursor-default"
-              data-reveal
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              <span className="font-mono text-[12px] text-white/25 mt-1 w-7 shrink-0">{f.n}</span>
-              <div className="flex-1">
-                <h3 className="font-black uppercase tracking-tight leading-none mb-3 transition-colors duration-200 group-hover:text-white/60"
-                  style={{ fontSize: "clamp(1.4rem, 5vw, 2.5rem)", letterSpacing: "-0.02em" }}>
-                  {f.title}
-                </h3>
-                <p className="text-[14px] text-white/35 leading-relaxed max-w-lg transition-colors duration-200 group-hover:text-white/55">{f.body}</p>
-              </div>
-              <span className="text-white/15 group-hover:text-white/40 transition-all duration-300 text-xl mt-1 group-hover:translate-x-1 group-hover:-translate-y-1 inline-block">↗</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── PULLQUOTE ─────────────────────────────────────────────────────── */}
-      <section className="border-t border-white/10 px-5 py-24" data-reveal>
-        <h2 className="font-black uppercase leading-[0.88] tracking-tight"
-          style={{ fontSize: "clamp(2.8rem, 14vw, 11rem)", letterSpacing: "-0.025em" }}>
-          <span className="text-white">YOUR LEAGUE</span><br />
-          <span className="text-white/15">PAYS $47.</span><br />
-          <span className="text-white">WE KNOW.</span>
-        </h2>
-        <p className="mt-8 text-[15px] text-white/35 max-w-sm leading-relaxed">
-          Every league has its own pricing DNA. We use yours — three seasons of actual results pulled straight from ESPN.
-        </p>
-      </section>
-
-      {/* ── FINAL CTA ─────────────────────────────────────────────────────── */}
-      <section className="border-t border-white/10 px-5 py-16" data-reveal>
-        <div className="flex items-center justify-between flex-wrap gap-6">
-          <span className="font-black uppercase leading-none tracking-tight"
-            style={{ fontSize: "clamp(2rem, 8vw, 5.5rem)", letterSpacing: "-0.02em" }}>
-            AUCTION DAY<br />IS COMING.
-          </span>
-          <Link
-            ref={magnetRef2}
-            to="/team"
-            onMouseMove={onMagnet(magnetRef2)}
-            onMouseLeave={offMagnet(magnetRef2)}
-            className="inline-flex items-center gap-4 rounded-full border border-white/20 pl-6 pr-2 py-2 shrink-0"
-            style={{ transition: "transform 0.15s ease, border-color 0.2s" }}
-          >
-            <span className="text-[14px] font-semibold uppercase tracking-wide">Choose Your Team</span>
-            <span className="h-10 w-10 rounded-full flex items-center justify-center font-bold text-black text-lg" style={{ background: LIME }}>→</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* ── FOOTER ────────────────────────────────────────────────────────── */}
-      <footer className="border-t border-white/10 px-5 py-6 flex items-center justify-between text-[12px] text-white/25">
-        <span className="cursor-pointer hover:text-white/50 transition-colors select-none" onClick={() => setShowTuner((v) => !v)}>
-          ✦ Auction Ace Coach
-        </span>
-        <span>© 2025 — All bids final</span>
-      </footer>
+      {/* Click-outside to close */}
+      {panelOpen && (
+        <div
+          onClick={() => setPanelOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 299 }}
+        />
+      )}
 
       {/* ── VIDEO TUNER ───────────────────────────────────────────────────── */}
       {showTuner && (
-        <div className="fixed bottom-20 left-1/2 z-[9999] -translate-x-1/2 bg-black border border-white/20 rounded-2xl px-6 py-5 w-80 shadow-2xl">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-[12px] font-semibold text-white">Video Tuner</p>
-            <button onClick={() => setShowTuner(false)} className="text-white/40 hover:text-white text-xl leading-none">×</button>
+        <div style={{
+          position: "fixed", bottom: "80px", left: "50%", transform: "translateX(-50%)",
+          zIndex: 9999, background: "rgba(0,0,0,0.92)",
+          border: "1px solid rgba(255,255,255,0.12)",
+          borderRadius: "16px", padding: "20px 24px", width: "300px",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+            <span style={{ color: "white", fontSize: "12px", fontFamily: "'Inter',sans-serif", fontWeight: 600 }}>Video Tuner</span>
+            <button onClick={() => setShowTuner(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "18px" }}>×</button>
           </div>
-          <div className="flex flex-col gap-4">
-            <div>
-              <p className="text-[11px] text-white/40 mb-2">Zoom — {Math.round(videoScale * 100)}%</p>
-              <input type="range" min="1.0" max="3.0" step="0.05" value={videoScale}
-                onChange={(e) => setVideoScale(parseFloat(e.target.value))}
-                className="w-full" style={{ accentColor: LIME }} />
-            </div>
-            <div>
-              <p className="text-[11px] text-white/40 mb-2">Pan — {Math.round(videoPos)}% from top</p>
-              <input type="range" min="0" max="100" step="1" value={videoPos}
-                onChange={(e) => setVideoPos(parseFloat(e.target.value))}
-                className="w-full" style={{ accentColor: LIME }} />
-            </div>
+          <div style={{ marginBottom: "16px" }}>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontFamily: "'Inter',sans-serif", marginBottom: "8px" }}>Zoom — {Math.round(videoScale * 100)}%</p>
+            <input type="range" min="1" max="3" step="0.05" value={videoScale}
+              onChange={e => setVideoScale(parseFloat(e.target.value))}
+              style={{ width: "100%", accentColor: "#ccff00" }} />
+          </div>
+          <div>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "11px", fontFamily: "'Inter',sans-serif", marginBottom: "8px" }}>Pan — {Math.round(videoPos)}% from top</p>
+            <input type="range" min="0" max="100" step="1" value={videoPos}
+              onChange={e => setVideoPos(parseFloat(e.target.value))}
+              style={{ width: "100%", accentColor: "#ccff00" }} />
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes menuIn {
-          from { opacity: 0; transform: translateY(-12px); }
-          to   { opacity: 1; transform: none; }
-        }
-        @keyframes menuItemIn {
-          from { opacity: 0; transform: translateX(30px); }
-          to   { opacity: 1; transform: none; }
-        }
-        [data-reveal] {
-          opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
-        }
-        [data-reveal].sr-visible {
-          opacity: 1;
-          transform: none;
-        }
-      `}</style>
     </div>
   );
 }
