@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trophy, ArrowRight } from "lucide-react";
+import BackButton from "@/components/BackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
