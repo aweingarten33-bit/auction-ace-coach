@@ -54,7 +54,7 @@ export default function LandingEditorial() {
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-x-hidden bg-[#f6f4ef] text-[#0a0a0a]"
+      className="relative min-h-screen w-full overflow-x-hidden bg-[#0a0a0a] text-white"
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       {/* a-ha sketch filter */}
