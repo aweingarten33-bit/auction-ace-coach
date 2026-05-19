@@ -295,30 +295,29 @@ export default function LandingEditorial() {
 
           {/* CRYSTAL SPARKLES */}
           <style>{`
-            @keyframes crystalVibrate {
-              0%   { transform: translate(0,0) scale(1); }
-              10%  { transform: translate(-1.5px,1px) scale(1.04); }
-              20%  { transform: translate(1.5px,-1px) scale(0.98); }
-              30%  { transform: translate(-1px,-1.5px) scale(1.05); }
-              40%  { transform: translate(1px,1.5px) scale(1); }
-              50%  { transform: translate(-1.5px,0.5px) scale(1.06); }
-              60%  { transform: translate(1.5px,-0.5px) scale(0.97); }
-              70%  { transform: translate(-1px,1px) scale(1.03); }
-              80%  { transform: translate(1px,-1px) scale(1); }
-              90%  { transform: translate(-0.5px,1.5px) scale(1.05); }
-              100% { transform: translate(0,0) scale(1); }
-            }
-            @keyframes crystalPulse {
-              0%, 100% { filter: drop-shadow(0 0 4px rgba(255,255,255,0.7)) drop-shadow(0 0 8px rgba(180,220,255,0.4)); opacity: 0.55; }
-              50%      { filter: drop-shadow(0 0 14px rgba(255,255,255,1)) drop-shadow(0 0 28px rgba(180,220,255,0.9)) drop-shadow(0 0 40px rgba(255,255,255,0.5)); opacity: 1; }
+            @keyframes crystalTwinkle {
+              0%, 100% {
+                opacity: 0;
+                transform: scale(0.3) rotate(0deg);
+                filter: drop-shadow(0 0 2px rgba(255,255,255,0.4));
+              }
+              40% {
+                opacity: 1;
+                transform: scale(1.1) rotate(35deg);
+                filter: drop-shadow(0 0 12px rgba(255,255,255,1)) drop-shadow(0 0 24px rgba(180,220,255,0.9)) drop-shadow(0 0 40px rgba(255,255,255,0.6));
+              }
+              60% {
+                opacity: 1;
+                transform: scale(1.25) rotate(55deg);
+                filter: drop-shadow(0 0 16px rgba(255,255,255,1)) drop-shadow(0 0 32px rgba(180,220,255,1)) drop-shadow(0 0 50px rgba(255,255,255,0.7));
+              }
             }
             .crystal {
               position: absolute;
               pointer-events: none;
               mix-blend-mode: screen;
-              animation:
-                crystalVibrate 0.18s linear infinite,
-                crystalPulse 1.8s ease-in-out infinite;
+              opacity: 0;
+              animation: crystalTwinkle 1.4s ease-in-out infinite;
             }
             .crystal::before, .crystal::after {
               content: "";
