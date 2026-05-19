@@ -82,7 +82,7 @@ export default function LandingEditorial() {
         muted
         playsInline
         className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover"
-        style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
+        style={{ filter: "brightness(0.55) contrast(0.92) saturate(0.6) blur(1.5px)" }}
       >
         <source src={`${import.meta.env.BASE_URL}hero-video.mp4?v=2`} type="video/mp4" />
       </video>
