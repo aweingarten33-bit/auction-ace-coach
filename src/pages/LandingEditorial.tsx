@@ -75,9 +75,26 @@ export default function LandingEditorial() {
           zIndex: 0,
         }}
       />
+
+      {/* Football video — full screen, ghosted over the Fortress */}
+      <video
+        autoPlay loop muted playsInline
+        style={{
+          position: "fixed", inset: 0,
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          pointerEvents: "none",
+          zIndex: 1,
+          mixBlendMode: "screen",
+          opacity: 0.4,
+        }}
+      >
+        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+      </video>
+
       {/* Subtle dark vignette over bg */}
       <div style={{
-        position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none",
+        position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none",
         background: "linear-gradient(to bottom, rgba(10,14,26,0.35) 0%, rgba(10,14,26,0.1) 40%, rgba(10,14,26,0.5) 100%)",
       }} />
 
@@ -215,7 +232,7 @@ export default function LandingEditorial() {
         paddingBottom: "40px",
         minHeight: "100svh",
         boxSizing: "border-box",
-        position: "relative", zIndex: 2,
+        position: "relative", zIndex: 10,
       }}>
         <div style={{
           width: cardExpanded ? "88vw" : "28vw",
@@ -272,7 +289,7 @@ export default function LandingEditorial() {
       <div style={{
         textAlign: "center",
         padding: "0 32px 60px",
-        position: "relative", zIndex: 2,
+        position: "relative", zIndex: 10,
         opacity: cardExpanded ? 1 : 0,
         transition: "opacity 0.9s ease 1.1s",
       }}>
