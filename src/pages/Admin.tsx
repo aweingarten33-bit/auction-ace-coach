@@ -106,7 +106,7 @@ export default function Admin() {
     <div className="mx-auto max-w-5xl p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/draft"><ArrowLeft className="mr-1 h-4 w-4" /> Back</Link>
+          <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Home</Link>
         </Button>
         <Button variant="outline" size="sm" onClick={load}>
           <RefreshCw className="mr-1 h-3.5 w-3.5" /> Refresh

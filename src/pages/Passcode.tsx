@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useLock } from "@/hooks/useLock";
@@ -27,6 +28,13 @@ export default function Passcode() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-6">
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-[12px] font-medium text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2} />
+        Home
+      </button>
       <div className="w-full max-w-xs space-y-4 text-center">
         <p className="text-lg font-semibold">Admin access</p>
         <input

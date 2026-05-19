@@ -233,7 +233,7 @@ alert('✓ Auction Coach live sync active!');})();`;
     <div className="mx-auto max-w-3xl p-4 sm:p-6">
       <div className="mb-4 flex items-center justify-between">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/dashboard"><ArrowLeft className="mr-1 h-4 w-4" /> Dashboard</Link>
+          <Link to="/"><ArrowLeft className="mr-1 h-4 w-4" /> Home</Link>
         </Button>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {user?.email}
