@@ -132,7 +132,7 @@ export default function LandingEditorial() {
         borderRadius: "0 0 28px 28px",
         border: "1px solid rgba(255,255,255,0.1)",
         borderTop: "none",
-        maxHeight: "55vh",
+        maxHeight: "88vh",
         overflow: "hidden",
         position: "fixed",
       }}>
@@ -157,7 +157,7 @@ export default function LandingEditorial() {
           position: "relative", zIndex: 1,
           padding: "24px 24px 24px",
           paddingTop: "calc(env(safe-area-inset-top) + 68px)",
-          maxHeight: "55vh",
+          maxHeight: "88vh",
           overflowY: "auto",
         }}>
         {/* Team list */}
