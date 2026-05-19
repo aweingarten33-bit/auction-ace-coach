@@ -7,14 +7,8 @@ export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoZoom, setVideoZoom] = useState<number>(() => {
-    if (typeof window === "undefined") return 1;
-    const v = parseFloat(localStorage.getItem("heroVideoZoom") || "1");
-    return Number.isFinite(v) && v > 0 ? v : 1;
-  });
-  useEffect(() => {
-    try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
-  }, [videoZoom]);
+  const videoZoom = 1.59;
+
 
   // Keep the video parked at frame 0 while the preloader runs, then start when visible.
   useEffect(() => {
