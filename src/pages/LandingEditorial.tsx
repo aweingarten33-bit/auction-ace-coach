@@ -125,7 +125,7 @@ export default function LandingEditorial() {
       <div
         aria-hidden
         onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 z-30 bg-black/40 backdrop-blur-[2px] transition-opacity duration-500 ${
+        className={`fixed inset-0 z-30 bg-white/30 backdrop-blur-md transition-opacity duration-500 ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       />
@@ -133,7 +133,7 @@ export default function LandingEditorial() {
       {/* Panel */}
       <aside
         aria-hidden={!menuOpen}
-        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-[#0f0f0f] shadow-[-20px_0_60px_rgba(0,0,0,0.6)] transition-transform duration-[650ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-white/70 backdrop-blur-2xl ring-1 ring-black/5 shadow-[-20px_0_60px_rgba(0,0,0,0.12)] transition-transform duration-[650ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -142,7 +142,7 @@ export default function LandingEditorial() {
           type="button"
           aria-label="Close menu"
           onClick={() => setMenuOpen(false)}
-          className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white/85 ring-1 ring-white/15 transition hover:bg-white/20 md:right-7 md:top-7"
+          className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-black/5 text-[#0a0a0a] ring-1 ring-black/10 transition hover:bg-black/10 md:right-7 md:top-7"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -161,7 +161,7 @@ export default function LandingEditorial() {
               key={link.to}
               to={link.to}
               onClick={() => setMenuOpen(false)}
-              className="group flex items-baseline gap-3 py-1 font-serif text-[clamp(2rem,7vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.01em] text-white transition-colors hover:text-red-500"
+              className="group flex items-baseline gap-3 py-1 font-serif text-[clamp(2rem,7vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.01em] text-[#0a0a0a] transition-colors hover:text-red-500"
               style={{
                 opacity: menuOpen ? 1 : 0,
                 transform: menuOpen ? "translateX(0)" : "translateX(24px)",
@@ -173,7 +173,7 @@ export default function LandingEditorial() {
           ))}
 
           <div
-            className="mt-10 flex flex-col gap-2 text-[11px] uppercase tracking-[0.32em] text-white/45"
+            className="mt-10 flex flex-col gap-2 text-[11px] uppercase tracking-[0.32em] text-black/45"
             style={{
               opacity: menuOpen ? 1 : 0,
               transform: menuOpen ? "translateY(0)" : "translateY(12px)",
