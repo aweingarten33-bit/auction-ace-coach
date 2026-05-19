@@ -21,12 +21,33 @@ export default function LandingEditorial() {
     if (!v) return;
     v.pause();
     try { v.currentTime = 0; } catch {}
-    const t = setTimeout(() => {
-      if (!videoRef.current) return;
+
+    // Kick off play slightly before the preloader finishes so the first frame
+    // is already on screen when it fades out — eliminates the perceived gap.
+    const PRELOADER_MS = 6500;
+    const LEAD_MS = 600;
+    const readyAfter = Date.now() + Math.max(0, PRELOADER_MS - LEAD_MS);
+
+    let started = false;
+    const start = () => {
+      if (started || !videoRef.current) return;
+      started = true;
       try { videoRef.current.currentTime = 0; } catch {}
       void videoRef.current.play().catch(() => {});
-    }, 6500);
-    return () => clearTimeout(t);
+    };
+
+    const t = setTimeout(start, Math.max(0, PRELOADER_MS - LEAD_MS));
+    const onReady = () => {
+      if (Date.now() >= readyAfter) start();
+    };
+    v.addEventListener("canplay", onReady);
+    v.addEventListener("canplaythrough", onReady);
+
+    return () => {
+      clearTimeout(t);
+      v.removeEventListener("canplay", onReady);
+      v.removeEventListener("canplaythrough", onReady);
+    };
   }, []);
 
   useEffect(() => {
