@@ -67,67 +67,80 @@ export default function LandingEditorial() {
       </nav>
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="relative h-[100svh] min-h-[640px] flex flex-col items-center justify-center overflow-hidden">
-        {/* Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+      <section className="bg-black pt-16 pb-8 px-4 md:px-8 flex flex-col items-center">
+        {/* Theater frame */}
+        <div
+          className="relative w-full overflow-hidden"
           style={{
-            transform: `scale(${videoScale})`,
-            transformOrigin: `center ${videoPos}%`,
-            filter: "brightness(0.52) saturate(0.75) contrast(1.05)",
+            maxWidth: "1200px",
+            borderRadius: "16px",
+            aspectRatio: "16 / 9",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.06)",
           }}
         >
-          <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-        </video>
-
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/65 pointer-events-none" />
-        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-
-        {/* Text */}
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          <p className="text-[11px] uppercase tracking-[0.35em] text-white/50 mb-7">
-            Fantasy Football · Auction Draft Planning
-          </p>
-          <h1
-            className="text-white font-bold leading-[0.9] mb-7"
+          {/* Video */}
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             style={{
-              fontSize: "clamp(4.5rem, 14vw, 11.5rem)",
-              letterSpacing: "-0.04em",
+              transform: `scale(${videoScale})`,
+              transformOrigin: `center ${videoPos}%`,
+              filter: "brightness(0.52) saturate(0.75) contrast(1.05)",
             }}
           >
-            Auction
-            <br />
-            <span className="font-light italic" style={{ letterSpacing: "-0.03em" }}>
-              Ready.
-            </span>
-          </h1>
-          <p className="text-[16px] md:text-[18px] text-white/65 max-w-md mx-auto leading-relaxed mb-10 font-light">
-            Budget-path planning powered by your league's actual 3-year auction history.
-          </p>
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            <Link
-              to="/team"
-              className="text-[15px] font-semibold text-[#1d1d1f] bg-white rounded-full px-7 py-3 hover:bg-white/90 transition-all shadow-sm"
+            <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+          </video>
+
+          {/* Gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/70 pointer-events-none" />
+
+          {/* Text inside the frame */}
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-end pb-10 px-6 text-center">
+            <h1
+              className="text-white font-bold leading-[0.9] mb-4"
+              style={{
+                fontSize: "clamp(2.8rem, 9vw, 8rem)",
+                letterSpacing: "-0.04em",
+              }}
             >
-              Enter Draft Room
-            </Link>
-            <Link
-              to="/espn"
-              className="text-[15px] font-medium text-white/85 border border-white/25 rounded-full px-7 py-3 hover:border-white/60 hover:text-white transition-all"
-            >
-              Connect ESPN
-            </Link>
+              Auction
+              <span className="font-light italic" style={{ letterSpacing: "-0.03em" }}>
+                {" "}Ready.
+              </span>
+            </h1>
+            <p className="text-[14px] md:text-[16px] text-white/60 max-w-sm mx-auto leading-relaxed mb-7 font-light">
+              Budget-path planning powered by your league's actual 3-year auction history.
+            </p>
+            <div className="flex items-center justify-center gap-3 flex-wrap">
+              <Link
+                to="/team"
+                className="text-[13px] md:text-[15px] font-semibold text-[#1d1d1f] bg-white rounded-full px-6 py-2.5 hover:bg-white/90 transition-all shadow-sm"
+              >
+                Enter Draft Room
+              </Link>
+              <Link
+                to="/espn"
+                className="text-[13px] md:text-[15px] font-medium text-white/85 border border-white/25 rounded-full px-6 py-2.5 hover:border-white/60 hover:text-white transition-all"
+              >
+                Connect ESPN
+              </Link>
+            </div>
           </div>
         </div>
 
+        {/* Below-video eyebrow on black bg */}
+        <div className="mt-5 flex items-center justify-center gap-2 text-[11px] uppercase tracking-[0.35em] text-white/30">
+          <span>Fantasy Football</span>
+          <span className="text-white/15">·</span>
+          <span>Auction Draft Planning</span>
+        </div>
+
         {/* Scroll cue */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10">
-          <ArrowDown className="h-5 w-5 text-white/30 animate-bounce" strokeWidth={1.5} />
+        <div className="mt-6">
+          <ArrowDown className="h-5 w-5 text-white/20 animate-bounce mx-auto" strokeWidth={1.5} />
         </div>
       </section>
 
