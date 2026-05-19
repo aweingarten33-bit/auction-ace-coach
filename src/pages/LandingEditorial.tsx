@@ -123,21 +123,71 @@ export default function LandingEditorial() {
         </div>
       </header>
 
-      {/* ── Fullscreen menu overlay ───────────────────────────────── */}
+      {/* ── Side-panel menu (Clum-style: slides in from right) ─────── */}
+      {/* Backdrop */}
       <div
-        aria-hidden={!menuOpen}
-        className={`fixed inset-0 z-40 flex flex-col items-center justify-center bg-[#0a0a0a] transition-[clip-path,opacity] duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+        aria-hidden
+        onClick={() => setMenuOpen(false)}
+        className={`fixed inset-0 z-30 bg-black/40 backdrop-blur-[2px] transition-opacity duration-500 ${
           menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
-        style={{ clipPath: menuOpen ? "circle(160% at 8% 6%)" : "circle(0% at 8% 6%)" }}
+      />
+
+      {/* Panel */}
+      <aside
+        aria-hidden={!menuOpen}
+        className={`fixed right-0 top-0 z-40 h-[100svh] w-[88vw] max-w-[520px] bg-[#0f0f0f] shadow-[-20px_0_60px_rgba(0,0,0,0.6)] transition-transform duration-[650ms] ease-[cubic-bezier(0.76,0,0.24,1)] ${
+          menuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
-        <p
-          className="absolute top-24 left-6 text-[10px] uppercase tracking-[0.32em] text-white/40 md:left-10"
-          style={{ opacity: menuOpen ? 1 : 0, transition: "opacity 600ms ease 300ms" }}
+        {/* Round close button */}
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setMenuOpen(false)}
+          className="absolute right-5 top-5 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white/85 ring-1 ring-white/15 transition hover:bg-white/20 md:right-7 md:top-7"
         >
-          Menu coming soon — tell me what links to add
-        </p>
-      </div>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        {/* Nav list — large bold left-aligned, staggered fade-in */}
+        <nav className="flex h-full flex-col justify-center gap-1 px-8 md:px-14">
+          {[
+            { label: "Home", to: "/" },
+            { label: "Teams", to: "/team" },
+            { label: "Draft Room", to: "/draftroom" },
+            { label: "Admin", to: "/passcode" },
+          ].map((link, i) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setMenuOpen(false)}
+              className="group flex items-baseline gap-3 py-1 font-serif text-[clamp(2rem,7vw,3.25rem)] font-bold leading-[1.1] tracking-[-0.01em] text-white transition-colors hover:text-red-500"
+              style={{
+                opacity: menuOpen ? 1 : 0,
+                transform: menuOpen ? "translateX(0)" : "translateX(24px)",
+                transition: `opacity 600ms ease ${220 + i * 80}ms, transform 600ms cubic-bezier(0.22,1,0.36,1) ${220 + i * 80}ms, color 220ms`,
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          <div
+            className="mt-10 flex flex-col gap-2 text-[11px] uppercase tracking-[0.32em] text-white/45"
+            style={{
+              opacity: menuOpen ? 1 : 0,
+              transform: menuOpen ? "translateY(0)" : "translateY(12px)",
+              transition: `opacity 600ms ease 600ms, transform 600ms cubic-bezier(0.22,1,0.36,1) 600ms`,
+            }}
+          >
+            <span>Auction Ace · Draft 2026</span>
+            <span>Read-only · Shared view</span>
+          </div>
+        </nav>
+      </aside>
 
       {/* ── Full-bleed hero video ──────────────────────────────────── */}
       {/* HERO — full screen. Change `height` below to control size (e.g. "100svh", "80svh", "640px") */}
