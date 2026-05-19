@@ -59,7 +59,7 @@ function AppShell() {
   return (
     <>
       {!ready && <Preloader onDone={handlePreloaderDone} />}
-      <div style={{ visibility: ready ? "visible" : "hidden" }}>
+      <div style={{ opacity: ready ? 1 : 0, pointerEvents: ready ? "auto" : "none" }}>
         <AppRoutes />
       </div>
     </>

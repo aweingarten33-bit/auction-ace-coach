@@ -21,6 +21,7 @@ export default function LandingEditorial() {
     const v = videoRef.current;
     if (!v) return;
     let sketchTimer = 0;
+    let shouldPlay = false;
 
     const resetToStart = () => {
       try { v.pause(); } catch {}
@@ -28,6 +29,7 @@ export default function LandingEditorial() {
     };
 
     const start = () => {
+      shouldPlay = true;
       window.clearTimeout(sketchTimer);
       setSketchVisible(true);
       try { v.currentTime = 0; } catch {}
@@ -37,6 +39,7 @@ export default function LandingEditorial() {
 
     resetToStart();
     v.addEventListener("loadedmetadata", resetToStart, { once: true });
+    v.addEventListener("canplay", () => { if (shouldPlay) void v.play().catch(() => {}); });
     window.addEventListener("landing:visible", start, { once: true });
 
     if ((window as typeof window & { __landingVisible?: boolean }).__landingVisible) {
