@@ -84,6 +84,18 @@ export default function TeamPicker() {
           <source src={videoSrc} type="video/mp4" />
         </video>
 
+        <video
+          autoPlay loop muted playsInline
+          className="tp-kb"
+          style={{
+            position: "absolute", top: "50%", left: "50%",
+            width: "100%", height: "100%", objectFit: "contain",
+            opacity: 1,
+          }}
+        >
+          <source src={videoSrc} type="video/mp4" />
+        </video>
+
         <div
           aria-hidden
           style={{
@@ -155,7 +167,7 @@ export default function TeamPicker() {
         )}
 
         {!loading && !error && teams.length > 0 && (
-          <div className="space-y-1.5">
+          <div className="rounded-3xl bg-white/15 backdrop-blur-2xl border border-white/40 shadow-2xl overflow-hidden divide-y divide-white/20">
             {teams.map((t) => {
               const isPicked = picked?.id === t.id;
               return (
@@ -163,22 +175,22 @@ export default function TeamPicker() {
                   key={t.id}
                   type="button"
                   onClick={() => setPicked(t)}
-                  className={`w-full flex items-center gap-4 rounded-xl px-5 py-3.5 text-left transition-all backdrop-blur ${
+                  className={`w-full flex items-center gap-4 px-6 py-5 text-left transition-all ${
                     isPicked
                       ? "bg-[#1d1d1f] text-white"
-                      : "bg-white/70 text-[#1d1d1f] hover:bg-white/90 border border-white"
+                      : "text-white hover:bg-white/10"
                   }`}
                 >
                   {t.abbrev && (
                     <span
-                      className={`font-mono text-[11px] font-semibold w-8 shrink-0 ${
-                        isPicked ? "text-white/50" : "text-[#6e6e73]"
+                      className={`font-mono text-[11px] font-semibold w-10 shrink-0 ${
+                        isPicked ? "text-white/50" : "text-white/60"
                       }`}
                     >
                       {t.abbrev}
                     </span>
                   )}
-                  <span className="flex-1 text-[15px] font-medium">{t.name}</span>
+                  <span className="flex-1 text-[15px] font-semibold tracking-wide uppercase">{t.name}</span>
                   {isPicked && <Check className="h-4 w-4 shrink-0" strokeWidth={2.5} />}
                 </button>
               );
