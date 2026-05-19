@@ -52,11 +52,11 @@ export default function TeamPicker() {
 
   return (
     <div
-      className="relative min-h-screen text-[#1d1d1f] overflow-hidden bg-white"
+      className="relative min-h-screen text-[#1d1d1f] overflow-hidden"
       style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif" }}
     >
       {/* Background video — transparent + white-border treatment (matches landing hero) */}
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-white">
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden bg-black">
         <style>{`
           @keyframes tpDrift {
             0%   { transform: translate(-50%, -50%) scale(1.2); }
@@ -78,7 +78,7 @@ export default function TeamPicker() {
           style={{
             position: "absolute", top: "50%", left: "50%",
             width: "100%", height: "100%", objectFit: "cover",
-            filter: "blur(40px) saturate(1.1)", opacity: 0.25,
+            filter: "blur(40px) saturate(1.3)", opacity: 0.85,
           }}
         >
           <source src={videoSrc} type="video/mp4" />
@@ -90,7 +90,7 @@ export default function TeamPicker() {
           style={{
             position: "absolute", top: "50%", left: "50%",
             width: "100%", height: "100%", objectFit: "contain",
-            opacity: 0.35,
+            opacity: 1,
           }}
         >
           <source src={videoSrc} type="video/mp4" />
@@ -109,7 +109,7 @@ export default function TeamPicker() {
           style={{
             position: "absolute", inset: 0,
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 18%, rgba(255,255,255,0) 82%, rgba(255,255,255,0.95) 100%)",
+              "linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 22%, rgba(255,255,255,0) 78%, rgba(255,255,255,0.85) 100%)",
           }}
         />
       </div>
