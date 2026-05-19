@@ -5,6 +5,21 @@ import { useEffect, useRef, useState } from "react";
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Sync video start with preloader end (~6.5s) so it doesn't begin mid-clip.
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    try { v.currentTime = 0; } catch {}
+    const t = setTimeout(() => {
+      if (!videoRef.current) return;
+      try { videoRef.current.currentTime = 0; } catch {}
+      void videoRef.current.play().catch(() => {});
+    }, 6500);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     let raf = 0;
@@ -74,10 +89,11 @@ export default function LandingEditorial() {
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       <video
-        autoPlay
+        ref={videoRef}
         loop
         muted
         playsInline
+        preload="auto"
         className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
         style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
       >
