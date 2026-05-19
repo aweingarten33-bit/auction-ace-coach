@@ -60,7 +60,7 @@ export default function LandingEditorial() {
         style={{
           position: "absolute", inset: 0,
           width: "100%", height: "100%",
-          objectFit: "cover",
+          objectFit: "contain",
           objectPosition: "center center",
           pointerEvents: "none",
           userSelect: "none",
