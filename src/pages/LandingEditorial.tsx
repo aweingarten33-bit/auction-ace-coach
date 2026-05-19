@@ -78,14 +78,14 @@ export default function LandingEditorial() {
         loop
         muted
         playsInline
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-cover"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
         style={{ filter: "brightness(0.7) contrast(1.05) saturate(0.85)" }}
       >
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
 
       <div
-        className="pointer-events-none fixed inset-0 z-0"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
             "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.05) 22%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.92) 100%)",
