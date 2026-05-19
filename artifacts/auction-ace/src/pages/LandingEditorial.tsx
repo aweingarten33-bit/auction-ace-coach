@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     let raf = 0;
@@ -17,6 +18,20 @@ export default function LandingEditorial() {
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
     };
+  }, []);
+
+  // Hold the video at frame 0 until the preloader (6500ms) finishes
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.pause();
+    v.currentTime = 0;
+    const t = setTimeout(() => {
+      if (!videoRef.current) return;
+      videoRef.current.currentTime = 0;
+      videoRef.current.play().catch(() => {});
+    }, 6600);
+    return () => clearTimeout(t);
   }, []);
 
   const progress = Math.min(scrollY / 600, 1);
@@ -77,12 +92,13 @@ export default function LandingEditorial() {
     >
       {/* Full-bleed background video */}
       <video
-        autoPlay
+        ref={videoRef}
         loop
         muted
         playsInline
+        preload="auto"
         className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain"
-        style={{ filter: "brightness(0.55) contrast(0.92) saturate(0.6) blur(1.5px)" }}
+        style={{ filter: "brightness(0.85) contrast(1.05) saturate(1)" }}
       >
         <source src={`${import.meta.env.BASE_URL}hero-video.mp4?v=2`} type="video/mp4" />
       </video>
