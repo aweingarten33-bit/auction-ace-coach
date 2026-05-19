@@ -9,10 +9,32 @@ export default function LandingEditorial() {
   const [sketchVisible, setSketchVisible] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [morphing, setMorphing] = useState(false);
+  const [videoControlsOpen, setVideoControlsOpen] = useState(false);
+  const [videoHeight, setVideoHeight] = useState(100);
+  const [videoZoom, setVideoZoom] = useState(118);
+  const [videoY, setVideoY] = useState(100);
   const videoRef = useRef<HTMLVideoElement>(null);
   const nav = useNavigate();
   const location = useLocation();
   const { team } = useSelectedTeam();
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("landing-video-controls");
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved) as { height?: number; zoom?: number; y?: number };
+      if (typeof parsed.height === "number") setVideoHeight(parsed.height);
+      if (typeof parsed.zoom === "number") setVideoZoom(parsed.zoom);
+      if (typeof parsed.y === "number") setVideoY(parsed.y);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "landing-video-controls",
+      JSON.stringify({ height: videoHeight, zoom: videoZoom, y: videoY })
+    );
+  }, [videoHeight, videoZoom, videoY]);
 
   // If a team was already picked, resume into the draft room — unless the
   // user just hit Back from the draft room (then stay on the landing).
@@ -158,23 +180,86 @@ export default function LandingEditorial() {
       </aside>
 
       {/* ── Full-bleed hero video ──────────────────────────────────── */}
-      {/* HERO — full screen. Change `height` below to control size (e.g. "100svh", "80svh", "640px") */}
-      <section className="relative w-full overflow-hidden" style={{ height: "100svh" }}>
+      <section className="relative w-full overflow-hidden" style={{ height: `${videoHeight}svh` }}>
         <video
           ref={videoRef}
           loop muted playsInline preload="auto"
           poster={`${import.meta.env.BASE_URL}hero-poster.png`}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute left-1/2 top-1/2 h-full w-full object-cover"
           style={{
-            objectPosition: "50% 85%",
+            objectPosition: `50% ${videoY}%`,
+            transform: `translate(-50%, -50%) scale(${videoZoom / 100})`,
             filter: sketchVisible
               ? "url(#ahaSketch)"
               : "brightness(0.85) contrast(1.06) saturate(0.95)",
-            transition: "filter 600ms ease",
+            transition: "filter 600ms ease, transform 220ms ease, object-position 220ms ease",
           }}
         >
           <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
         </video>
+
+        <div className="absolute left-4 top-28 z-20 w-[min(88vw,360px)] text-white md:left-6 md:top-32">
+          <button
+            type="button"
+            onClick={() => setVideoControlsOpen((open) => !open)}
+            className="rounded-md bg-black/45 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/85 ring-1 ring-white/15 backdrop-blur-md transition hover:bg-black/55"
+          >
+            Video sizing
+          </button>
+          <div
+            className={`mt-2 rounded-lg bg-black/45 p-3 shadow-2xl ring-1 ring-white/15 backdrop-blur-md transition duration-300 ${
+              videoControlsOpen ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
+            }`}
+          >
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">Video sizing</span>
+            <button
+              type="button"
+              onClick={() => {
+                setVideoHeight(100);
+                setVideoZoom(118);
+                setVideoY(100);
+              }}
+              className="rounded-md bg-white/10 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white/75 ring-1 ring-white/15 transition hover:bg-white/20"
+            >
+              Reset
+            </button>
+          </div>
+          <label className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/65">
+            Screen height
+            <input
+              type="range"
+              min="45"
+              max="120"
+              value={videoHeight}
+              onChange={(e) => setVideoHeight(Number(e.target.value))}
+              className="mt-2 block w-full accent-white"
+            />
+          </label>
+          <label className="mb-2 block text-[10px] uppercase tracking-[0.2em] text-white/65">
+            Video zoom
+            <input
+              type="range"
+              min="100"
+              max="160"
+              value={videoZoom}
+              onChange={(e) => setVideoZoom(Number(e.target.value))}
+              className="mt-2 block w-full accent-white"
+            />
+          </label>
+          <label className="block text-[10px] uppercase tracking-[0.2em] text-white/65">
+            Vertical crop
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={videoY}
+              onChange={(e) => setVideoY(Number(e.target.value))}
+              className="mt-2 block w-full accent-white"
+            />
+          </label>
+          </div>
+        </div>
 
         {/* Modus-style overlay gradient: heavy bottom for type */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%] bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
