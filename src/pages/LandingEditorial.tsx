@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 
 export default function LandingEditorial() {
   const [scrollY, setScrollY] = useState(0);
-  const [showPolaroid, setShowPolaroid] = useState(true);
+  const [polaroidActive, setPolaroidActive] = useState(false);
+  const [showPolaroid, setShowPolaroid] = useState(false);
   const ghostRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoZoom, setVideoZoom] = useState<number>(() => {
@@ -15,6 +16,16 @@ export default function LandingEditorial() {
   useEffect(() => {
     try { localStorage.setItem("heroVideoZoom", String(videoZoom)); } catch {}
   }, [videoZoom]);
+
+  useEffect(() => {
+    const reveal = () => {
+      setShowPolaroid(true);
+      requestAnimationFrame(() => setPolaroidActive(true));
+    };
+
+    window.addEventListener("landing:visible", reveal, { once: true });
+    return () => window.removeEventListener("landing:visible", reveal);
+  }, []);
 
   // Start immediately when the landing page mounts; the Polaroid still covers any browser warm-up.
   useEffect(() => {
@@ -127,7 +138,7 @@ export default function LandingEditorial() {
       {showPolaroid && (
         <div className="pointer-events-none fixed inset-0 z-[1] grid place-items-center overflow-hidden">
           <div
-            className="hero-polaroid-frame w-[min(78vw,520px)] bg-white p-3 pb-10 shadow-[0_24px_80px_rgba(0,0,0,0.55)] md:w-[min(56vw,660px)] md:p-4 md:pb-14"
+            className={`w-[min(78vw,520px)] bg-white p-3 pb-10 shadow-[0_24px_80px_rgba(0,0,0,0.55)] md:w-[min(56vw,660px)] md:p-4 md:pb-14 ${polaroidActive ? "hero-polaroid-frame" : "opacity-0"}`}
             onAnimationEnd={() => setShowPolaroid(false)}
           >
             <img
