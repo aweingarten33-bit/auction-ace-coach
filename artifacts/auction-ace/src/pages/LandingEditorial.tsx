@@ -90,15 +90,42 @@ export default function LandingEditorial() {
       className="relative min-h-screen w-full overflow-hidden bg-black text-white"
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      {/* Full-bleed background video */}
+      {/* Hero video stack — huge blurred backdrop + clean centered foreground */}
+      <style>{`
+        @keyframes heroDriftAA { 0%{transform:translate(-50%,-50%) scale(1.2);} 50%{transform:translate(-52%,-48%) scale(1.35);} 100%{transform:translate(-50%,-50%) scale(1.2);} }
+        @keyframes heroKenBurnsAA { 0%{transform:translate(-50%,-50%) scale(1);} 50%{transform:translate(-51%,-49%) scale(1.08);} 100%{transform:translate(-50%,-50%) scale(1);} }
+        .hero-drift-aa { animation: heroDriftAA 40s ease-in-out infinite; }
+        .hero-kb-aa    { animation: heroKenBurnsAA 30s ease-in-out infinite; }
+      `}</style>
+
+      {/* Layer 1: huge blurred backdrop */}
+      <video
+        loop muted playsInline aria-hidden preload="auto"
+        className="hero-drift-aa pointer-events-none fixed"
+        style={{
+          top: "50%", left: "50%",
+          width: "100%", height: "100%",
+          objectFit: "cover",
+          filter: "blur(40px) saturate(1.1) brightness(0.7)",
+          opacity: 0.4,
+          zIndex: 0,
+        }}
+      >
+        <source src={`${import.meta.env.BASE_URL}hero-video.mp4?v=2`} type="video/mp4" />
+      </video>
+
+      {/* Layer 2: clean centered foreground */}
       <video
         ref={videoRef}
-        loop
-        muted
-        playsInline
-        preload="auto"
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full object-contain"
-        style={{ filter: "brightness(0.75) contrast(1) saturate(0.9) blur(0.6px)" }}
+        loop muted playsInline preload="auto"
+        className="hero-kb-aa pointer-events-none fixed"
+        style={{
+          top: "50%", left: "50%",
+          width: "100%", height: "100%",
+          objectFit: "contain",
+          opacity: 0.6,
+          zIndex: 0,
+        }}
       >
         <source src={`${import.meta.env.BASE_URL}hero-video.mp4?v=2`} type="video/mp4" />
       </video>
