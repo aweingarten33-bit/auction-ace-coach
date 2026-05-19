@@ -135,7 +135,7 @@ export default function LandingEditorial() {
       </svg>
 
 
-      {/* Bottom layer: real color hero video */}
+      {/* Single hero video — sketch filter during intro, then live color */}
       <video
         ref={videoRef}
         loop
@@ -144,7 +144,9 @@ export default function LandingEditorial() {
         preload="auto"
         className="pointer-events-none fixed inset-0 z-0 h-screen w-screen object-contain"
         style={{
-          filter: "brightness(0.7) contrast(1.05) saturate(0.85)",
+          filter: sketchVisible
+            ? "url(#ahaSketch)"
+            : "brightness(0.7) contrast(1.05) saturate(0.85)",
           objectPosition: "center",
           transform: `scale(${videoZoom})`,
           transformOrigin: "center center",
@@ -153,26 +155,6 @@ export default function LandingEditorial() {
         <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
       </video>
 
-      {/* Top layer: same video, rotoscoped pencil sketch — fades out into the color video */}
-      <video
-        ref={sketchVideoRef}
-        loop
-        muted
-        playsInline
-        preload="auto"
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-[2] h-screen w-screen object-contain"
-        style={{
-          filter: "url(#ahaSketch)",
-          objectPosition: "center",
-          transform: `scale(${videoZoom})`,
-          transformOrigin: "center center",
-          opacity: sketchVisible ? 1 : 0,
-          transition: "opacity 900ms ease-in",
-        }}
-      >
-        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-      </video>
 
       {/* Paper grain overlay during the sketch phase */}
       <div
