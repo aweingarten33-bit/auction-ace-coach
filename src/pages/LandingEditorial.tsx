@@ -95,16 +95,85 @@ export default function LandingEditorial() {
         </defs>
       </svg>
 
-      {/* Top bar */}
-      <header className="relative z-20 flex items-center justify-between px-5 pt-5 md:px-10 md:pt-7">
-        <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.32em] text-white/55">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
-          <span>Live · 2025</span>
-        </div>
-        <div className="text-[10px] uppercase tracking-[0.32em] text-white/55">Vol. I</div>
+      {/* ── Top bar (center hamburger) ─────────────────────────────── */}
+      <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-5 pt-5 md:px-10 md:pt-7 mix-blend-difference">
+        <Link to="/" aria-label="Home" className="font-serif italic leading-[0.85] text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <span className="block text-[18px] md:text-[22px]">auction</span>
+          <span className="block pl-3 text-[18px] md:text-[22px]">ace</span>
+        </Link>
+
+        <button
+          type="button"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+          className="relative h-10 w-10 outline-none"
+        >
+          <span
+            className="absolute left-1/2 top-1/2 block h-px w-7 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+            style={{ transform: menuOpen ? "translate(-50%,-50%) rotate(45deg)" : "translate(-50%,-50%) translateY(-4px)" }}
+          />
+          <span
+            className="absolute left-1/2 top-1/2 block h-px w-7 bg-white transition-transform duration-500 ease-[cubic-bezier(0.76,0,0.24,1)]"
+            style={{ transform: menuOpen ? "translate(-50%,-50%) rotate(-45deg)" : "translate(-50%,-50%) translateY(4px)" }}
+          />
+        </button>
+
+        <span aria-hidden className="font-serif text-2xl leading-none text-red-500 md:text-3xl" style={{ fontFamily: "'Playfair Display', serif" }}>✳</span>
       </header>
 
-      <div className="mx-5 mt-4 h-px bg-white/10 md:mx-10" />
+      {/* ── Fullscreen menu overlay ───────────────────────────────── */}
+      <div
+        aria-hidden={!menuOpen}
+        className={`fixed inset-0 z-40 flex flex-col items-center justify-center bg-[#0a0a0a] transition-[clip-path,opacity] duration-700 ease-[cubic-bezier(0.76,0,0.24,1)] ${
+          menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        style={{ clipPath: menuOpen ? "circle(150% at 50% 0%)" : "circle(0% at 50% 0%)" }}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.06] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>\")",
+          }}
+        />
+        <nav className="relative flex flex-col items-center gap-1 md:gap-2">
+          {NAV_LINKS.map((link, i) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={() => setMenuOpen(false)}
+              className="font-serif italic text-[clamp(2.5rem,9vw,5.5rem)] leading-[1.05] tracking-[-0.02em] text-white/85 transition-colors duration-300 hover:text-red-500"
+              style={{
+                fontFamily: "'Playfair Display', serif",
+                transform: menuOpen ? "translateY(0)" : "translateY(40px)",
+                opacity: menuOpen ? 1 : 0,
+                transition: `transform 700ms cubic-bezier(0.22,1,0.36,1) ${260 + i * 90}ms, opacity 700ms ease ${260 + i * 90}ms, color 300ms`,
+              }}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <div
+          className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2 font-serif italic text-[clamp(1rem,3.5vw,1.5rem)] text-white/55"
+          style={{
+            fontFamily: "'Playfair Display', serif",
+            opacity: menuOpen ? 1 : 0,
+            transform: menuOpen ? "translateY(0)" : "translateY(20px)",
+            transition: `opacity 600ms ease ${260 + NAV_LINKS.length * 90 + 80}ms, transform 600ms cubic-bezier(0.22,1,0.36,1) ${260 + NAV_LINKS.length * 90 + 80}ms`,
+          }}
+        >
+          {SOCIAL_LINKS.map((l) => (
+            <Link key={l.to} to={l.to} onClick={() => setMenuOpen(false)} className="transition-colors hover:text-white">
+              {l.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="mx-5 mt-20 h-px bg-white/10 md:mx-10 md:mt-24" />
 
       {/* ── Video panel (front and center on load) ─────────────────────── */}
       <section className="relative z-10 mt-4 px-5 md:px-10">
