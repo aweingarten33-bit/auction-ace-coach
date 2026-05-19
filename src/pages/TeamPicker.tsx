@@ -79,7 +79,7 @@ export default function TeamPicker() {
           <h1 className="mb-3 text-[34px] leading-[1.05] font-semibold tracking-tight">
             Which team are you?
           </h1>
-          <p className="text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-black/60">
             Pick your team to personalize the dossier — budget remaining, roster needs,
             and AI recommendations get tailored to your specific roster and gaps.
           </p>
