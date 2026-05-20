@@ -323,7 +323,7 @@ export default function LandingEditorial() {
               transform: cardExpanded ? "none" : "translateY(-20px)",
               transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
             }}>
-              Personalized Fantasy Football<br />Auction Intelligence
+              Personalized Fantasy Football Auction Intelligence
             </h1>
           </div>
 
@@ -331,13 +331,14 @@ export default function LandingEditorial() {
           <div style={{
             position: "absolute", bottom: 0, left: 0, right: 0,
             padding: "0 24px 28px",
-            textAlign: "center",
+            textAlign: "left",
           }}>
             <p style={{
               color: "rgba(255,255,255,0.9)",
               fontSize: "clamp(0.95rem, 2.6vw, 1.15rem)",
               lineHeight: 1.4, margin: 0,
               fontStyle: "italic",
+              textAlign: "left",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               opacity: cardExpanded ? 1 : 0,
               transform: cardExpanded ? "none" : "translateY(20px)",
