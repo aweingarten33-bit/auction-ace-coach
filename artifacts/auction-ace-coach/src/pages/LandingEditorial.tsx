@@ -307,8 +307,61 @@ export default function LandingEditorial() {
             pointerEvents: "none",
           }} />
 
+          {/* DRONE FLY-IN KEYFRAMES */}
+          <style>{`
+            @keyframes droneFlyIn {
+              0% {
+                opacity: 0;
+                transform: translate3d(0, -120px, -400px) scale(2.4) rotateX(-35deg);
+                filter: blur(14px);
+              }
+              55% {
+                opacity: 1;
+                filter: blur(2px);
+              }
+              100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1) rotateX(0deg);
+                filter: blur(0);
+              }
+            }
+            @keyframes droneFlyInUp {
+              0% {
+                opacity: 0;
+                transform: translate3d(0, 80px, -300px) scale(1.6);
+                filter: blur(10px);
+              }
+              60% {
+                opacity: 1;
+                filter: blur(1.5px);
+              }
+              100% {
+                opacity: 1;
+                transform: translate3d(0, 0, 0) scale(1);
+                filter: blur(0);
+              }
+            }
+            .drone-word {
+              display: inline-block;
+              opacity: 0;
+              animation: droneFlyIn 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              transform-origin: center center;
+              will-change: transform, opacity, filter;
+            }
+            .drone-word-up {
+              display: inline-block;
+              opacity: 0;
+              animation: droneFlyInUp 1.0s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+              will-change: transform, opacity, filter;
+            }
+            .drone-stage {
+              perspective: 1200px;
+              perspective-origin: 50% 50%;
+            }
+          `}</style>
+
           {/* Top headline */}
-          <div style={{
+          <div className="drone-stage" style={{
             position: "absolute", top: 0, left: 0, right: 0,
             padding: "28px 24px 0",
             textAlign: "left",
@@ -319,17 +372,26 @@ export default function LandingEditorial() {
               fontWeight: 700, lineHeight: 1.15, margin: 0,
               textAlign: "left",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
-              opacity: cardExpanded ? 1 : 0,
-              transform: cardExpanded ? "none" : "translateY(-20px)",
-              transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
             }}>
-              <span style={{ whiteSpace: "nowrap", display: "block" }}>Personalized Fantasy Football</span>
-              <span style={{ display: "block" }}>Auction Intelligence</span>
+              <span style={{ whiteSpace: "nowrap", display: "block" }}>
+                {cardExpanded && ["Personalized", "Fantasy", "Football"].map((w, i) => (
+                  <span key={w} className="drone-word" style={{ animationDelay: `${0.6 + i * 0.18}s`, marginRight: "0.28em" }}>
+                    {w}
+                  </span>
+                ))}
+              </span>
+              <span style={{ display: "block" }}>
+                {cardExpanded && ["Auction", "Intelligence"].map((w, i) => (
+                  <span key={w} className="drone-word" style={{ animationDelay: `${1.2 + i * 0.18}s`, marginRight: "0.28em" }}>
+                    {w}
+                  </span>
+                ))}
+              </span>
             </h1>
           </div>
 
           {/* Bottom powered-by */}
-          <div style={{
+          <div className="drone-stage" style={{
             position: "absolute", bottom: 0, left: 0, right: 0,
             padding: "0 24px 28px",
             textAlign: "left",
@@ -341,11 +403,22 @@ export default function LandingEditorial() {
               fontStyle: "italic",
               textAlign: "left",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
-              opacity: cardExpanded ? 1 : 0,
-              transform: cardExpanded ? "none" : "translateY(20px)",
-              transition: "opacity 0.8s ease 0.9s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.9s",
             }}>
-              Powered by our ESPN league history<br />and real-time auction data.
+              {cardExpanded && (
+                <>
+                  {"Powered by our ESPN league history".split(" ").map((w, i) => (
+                    <span key={`a${i}`} className="drone-word-up" style={{ animationDelay: `${1.9 + i * 0.08}s`, marginRight: "0.28em" }}>
+                      {w}
+                    </span>
+                  ))}
+                  <br />
+                  {"and real-time auction data.".split(" ").map((w, i) => (
+                    <span key={`b${i}`} className="drone-word-up" style={{ animationDelay: `${2.4 + i * 0.08}s`, marginRight: "0.28em" }}>
+                      {w}
+                    </span>
+                  ))}
+                </>
+              )}
             </p>
           </div>
         </div>
