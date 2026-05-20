@@ -314,13 +314,13 @@ export default function LandingEditorial() {
           }}>
             <h1 style={{
               color: "white",
-              fontSize: "clamp(2.2rem, 8vw, 4rem)",
-              fontWeight: 700, lineHeight: 1.06, margin: 0,
+              fontSize: "clamp(1.5rem, 5vw, 2.6rem)",
+              fontWeight: 700, lineHeight: 1.15, margin: 0,
               opacity: cardExpanded ? 1 : 0,
               transform: cardExpanded ? "none" : "translateY(20px)",
               transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
             }}>
-              Draft with<br /><em>the Edge.</em>
+              Personalized Fantasy Football<br />Auction Intelligence
             </h1>
           </div>
         </div>
@@ -341,7 +341,7 @@ export default function LandingEditorial() {
           color: "rgba(255,255,255,0.75)",
           margin: 0,
         }}>
-          Budget-first planning powered<br />by your league's actual draft history.
+          Powered by our ESPN league history<br />and real-time auction data.
         </p>
       </div>
     </div>
