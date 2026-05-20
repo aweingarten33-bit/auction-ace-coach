@@ -243,12 +243,11 @@ export default function LandingEditorial() {
       <div style={{
         display: "flex",
         justifyContent: "center",
-        alignItems: "flex-start",
-        paddingTop: "80px",
-        paddingBottom: "40px",
-        minHeight: "100svh",
-        boxSizing: "border-box",
-        position: "relative", zIndex: 10,
+        alignItems: "center",
+        position: "fixed",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: 10,
       }}>
         <div style={{
           width: cardExpanded ? "88vw" : "28vw",
@@ -260,6 +259,7 @@ export default function LandingEditorial() {
           transition: "width 1.1s cubic-bezier(0.16,1,0.3,1)",
           willChange: "width",
           boxShadow: "0 12px 60px rgba(0,0,0,0.18)",
+          pointerEvents: "auto",
         }}>
           {/* Football video plays inside the card */}
           <video
