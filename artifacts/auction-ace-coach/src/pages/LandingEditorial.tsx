@@ -300,13 +300,6 @@ export default function LandingEditorial() {
           />
 
 
-          {/* Bottom gradient for text */}
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to bottom, transparent 40%, rgba(10,16,28,0.75) 100%)",
-            pointerEvents: "none",
-          }} />
-
           {/* SUPERMAN ZOOM */}
           <style>{`
             @keyframes supermanZoom {
