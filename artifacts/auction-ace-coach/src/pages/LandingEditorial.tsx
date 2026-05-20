@@ -307,16 +307,33 @@ export default function LandingEditorial() {
             pointerEvents: "none",
           }} />
 
-          {/* REVERSE DISSOLVE */}
+          {/* SUPERMAN ZOOM */}
           <style>{`
-            @keyframes dissolveIn {
-              from { opacity: 0; }
-              to { opacity: 1; }
+            @keyframes supermanZoom {
+              0% {
+                opacity: 0;
+                transform: scale(0.05);
+                filter: blur(8px);
+              }
+              40% {
+                opacity: 1;
+                filter: blur(2px);
+              }
+              80% {
+                transform: scale(1.08);
+                filter: blur(0);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+              }
             }
             .nfl-word, .nfl-ticker {
               display: inline-block;
               opacity: 0;
-              will-change: opacity;
+              will-change: transform, opacity, filter;
+              transform-origin: center center;
             }
           `}</style>
 
@@ -339,8 +356,8 @@ export default function LandingEditorial() {
                     key={w}
                     className="nfl-word"
                     style={{
-                      animation: "dissolveIn 0.9s ease forwards",
-                      animationDelay: `${0.4 + i * 0.18}s`,
+                      animation: "supermanZoom 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards",
+                      animationDelay: `${0.3 + i * 0.22}s`,
                       marginRight: "0.28em",
                     }}
                   >
@@ -354,8 +371,8 @@ export default function LandingEditorial() {
                     key={w}
                     className="nfl-word"
                     style={{
-                      animation: "dissolveIn 0.9s ease forwards",
-                      animationDelay: `${1.0 + i * 0.18}s`,
+                      animation: "supermanZoom 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards",
+                      animationDelay: `${1.1 + i * 0.22}s`,
                       marginRight: "0.28em",
                     }}
                   >
@@ -387,8 +404,8 @@ export default function LandingEditorial() {
                       key={`a${i}`}
                       className="nfl-ticker"
                       style={{
-                        animation: "dissolveIn 0.7s ease forwards",
-                        animationDelay: `${1.6 + i * 0.06}s`,
+                        animation: "supermanZoom 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) forwards",
+                        animationDelay: `${1.8 + i * 0.07}s`,
                         marginRight: "0.28em",
                       }}
                     >
@@ -401,8 +418,8 @@ export default function LandingEditorial() {
                       key={`b${i}`}
                       className="nfl-ticker"
                       style={{
-                        animation: "dissolveIn 0.7s ease forwards",
-                        animationDelay: `${2.0 + i * 0.06}s`,
+                        animation: "supermanZoom 0.55s cubic-bezier(0.2, 0.7, 0.3, 1) forwards",
+                        animationDelay: `${2.3 + i * 0.07}s`,
                         marginRight: "0.28em",
                       }}
                     >
