@@ -315,7 +315,7 @@ export default function LandingEditorial() {
           }}>
             <h1 style={{
               color: "white",
-              fontSize: "clamp(1.5rem, 5vw, 2.6rem)",
+              fontSize: "clamp(1.05rem, 3.4vw, 1.9rem)",
               fontWeight: 700, lineHeight: 1.15, margin: 0,
               textAlign: "left",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
@@ -323,7 +323,8 @@ export default function LandingEditorial() {
               transform: cardExpanded ? "none" : "translateY(-20px)",
               transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
             }}>
-              Personalized Fantasy Football<br />Auction Intelligence
+              <span style={{ whiteSpace: "nowrap", display: "block" }}>Personalized Fantasy Football</span>
+              <span style={{ display: "block" }}>Auction Intelligence</span>
             </h1>
           </div>
 
