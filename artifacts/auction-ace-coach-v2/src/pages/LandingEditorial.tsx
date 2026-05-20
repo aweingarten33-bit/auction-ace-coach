@@ -106,25 +106,21 @@ export default function LandingEditorial() {
 
         {/* Right side: Let's draft + hamburger */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <button
-            onClick={openMenu}
+          <div
             style={{
-              background: "transparent",
               border: "1px solid rgba(255,255,255,0.5)",
               color: "white",
               padding: "12px 26px",
               fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               fontWeight: 500,
-              cursor: "pointer",
               letterSpacing: "0.02em",
-              transition: "background 0.25s ease",
+              userSelect: "none",
+              pointerEvents: "none",
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
           >
-            Let's draft
-          </button>
+            League: Bro, We're Senior Citizens
+          </div>
 
           <button
             onClick={openMenu}
