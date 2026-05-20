@@ -17,9 +17,9 @@ export default function LandingV2() {
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [cardExpanded, setCardExpanded] = useState(false);
   const [hoverIdx,     setHoverIdx]     = useState<number | null>(null);
+  const [leagueName,   setLeagueName]   = useState<string | null>(null);
   const [bgIndex]                       = useState(0);
 
-  // Expand card on load
   useEffect(() => {
     const t = setTimeout(() => setCardExpanded(true), 800);
     return () => clearTimeout(t);
@@ -40,6 +40,7 @@ export default function LandingV2() {
       const { data } = await supabase.functions.invoke("league-teams");
       const list: Team[] = (data?.teams ?? []).map((t: any) => ({ id: t.id, name: t.name, abbrev: t.abbrev }));
       setTeams(list);
+      if (data?.leagueName) setLeagueName(data.leagueName);
     } catch { /* silent */ } finally { setLoadingTeams(false); }
   };
 
@@ -93,51 +94,20 @@ export default function LandingV2() {
         padding: "20px 32px",
         height: 84,
       }}>
-        {/* Logo */}
+        {/* League name (left) */}
         <div style={{
           fontFamily: "'Inter', sans-serif",
           fontWeight: 600,
-          fontSize: 28,
-          color: "white",
-          letterSpacing: "-0.01em",
+          fontSize: 15,
+          color: "rgba(255,255,255,0.55)",
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
         }}>
-          auction<span style={{ color: "#5fd4d4" }}>.</span>
+          {leagueName ?? ""}
         </div>
 
-        {/* Right side: Let's draft + hamburger */}
+        {/* Right side: hamburger */}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              textAlign: "right",
-              lineHeight: 1.15,
-              userSelect: "none",
-              pointerEvents: "none",
-            }}
-          >
-            <span style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 10,
-              letterSpacing: "0.24em",
-              textTransform: "uppercase",
-              color: "rgba(255,255,255,0.5)",
-              marginBottom: 4,
-            }}>
-              League
-            </span>
-            <span style={{
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 15,
-              fontWeight: 600,
-              color: "white",
-              letterSpacing: "0.01em",
-            }}>
-              Bro, We're<br />Senior Citizens
-            </span>
-          </div>
-
           <button
             onClick={openMenu}
             aria-label="Menu"
@@ -180,20 +150,13 @@ export default function LandingV2() {
           }}
         />
 
-        {/* Top bar with logo + bracketed X */}
+        {/* Top bar with X button */}
         <div style={{
           position: "sticky", top: 0,
-          display: "flex", alignItems: "center", justifyContent: "space-between",
+          display: "flex", alignItems: "center", justifyContent: "flex-end",
           padding: "24px 32px",
           zIndex: 3,
         }}>
-          <div style={{
-            fontFamily: "'Anton', 'Inter', sans-serif",
-            fontSize: 28, color: "#002060", letterSpacing: "0.02em",
-          }}>
-            auction<span style={{ fontStyle: "italic", fontFamily: "'Inter', cursive", fontWeight: 400 }}> labs</span>
-          </div>
-
           <button
             onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }}
             aria-label="Close"
