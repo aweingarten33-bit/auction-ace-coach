@@ -177,7 +177,7 @@ export default function LandingEditorial() {
         }}>
           <div style={{
             fontFamily: "'Anton', 'Inter', sans-serif",
-            fontSize: 28, color: "#000", letterSpacing: "0.02em",
+            fontSize: 28, color: "#002060", letterSpacing: "0.02em",
           }}>
             auction<span style={{ fontStyle: "italic", fontFamily: "'Inter', cursive", fontWeight: 400 }}> labs</span>
           </div>
@@ -190,7 +190,7 @@ export default function LandingEditorial() {
               width: 56, height: 56,
               background: "transparent", border: "none", cursor: "pointer",
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 22, fontWeight: 500, color: "#000",
+              fontSize: 22, fontWeight: 500, color: "#002060",
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "0 6px",
               lineHeight: 1,
@@ -219,7 +219,7 @@ export default function LandingEditorial() {
           {loadingTeams && (
             <p style={{
               fontFamily: "'JetBrains Mono', monospace",
-              fontSize: 13, color: "#666", letterSpacing: "0.18em",
+              fontSize: 13, color: "#002060", letterSpacing: "0.18em",
               textTransform: "uppercase",
             }}>
               [ LOADING TEAMS… ]
@@ -275,14 +275,14 @@ export default function LandingEditorial() {
               style={{
                 marginTop: 24,
                 background: "none", border: "none", cursor: "pointer",
-                color: "#666",
+                color: "rgba(0,32,96,0.6)",
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
                 opacity: menuOpen ? 1 : 0,
                 transition: `opacity 0.6s ease ${menuOpen ? teams.length * 60 + 320 : 0}ms, color 0.25s ease`,
               }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#000")}
-              onMouseLeave={e => (e.currentTarget.style.color = "#666")}
+              onMouseEnter={e => (e.currentTarget.style.color = "#002060")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(0,32,96,0.6)")}
             >
               SKIP FOR NOW
             </button>
