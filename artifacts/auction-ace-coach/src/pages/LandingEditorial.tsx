@@ -311,13 +311,13 @@ export default function LandingEditorial() {
           <div style={{
             position: "absolute", top: 0, left: 0, right: 0,
             padding: "28px 24px 0",
-            textAlign: "center",
+            textAlign: "left",
           }}>
             <h1 style={{
               color: "white",
               fontSize: "clamp(1.5rem, 5vw, 2.6rem)",
               fontWeight: 700, lineHeight: 1.15, margin: 0,
-              textAlign: "center",
+              textAlign: "left",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               opacity: cardExpanded ? 1 : 0,
               transform: cardExpanded ? "none" : "translateY(-20px)",
