@@ -315,7 +315,7 @@ export default function LandingEditorial() {
           }}>
             <h1 style={{
               color: "white",
-              fontSize: "clamp(1.05rem, 3.4vw, 1.9rem)",
+              fontSize: "clamp(1.25rem, 4.2vw, 2.4rem)",
               fontWeight: 700, lineHeight: 1.15, margin: 0,
               textAlign: "left",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
