@@ -315,13 +315,9 @@ export default function LandingEditorial() {
                 transform: scale(0.05);
                 filter: blur(8px);
               }
-              40% {
+              60% {
                 opacity: 1;
-                filter: blur(2px);
-              }
-              80% {
-                transform: scale(1.08);
-                filter: blur(0);
+                filter: blur(1.5px);
               }
               100% {
                 opacity: 1;
