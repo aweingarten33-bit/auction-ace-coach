@@ -296,7 +296,7 @@ export default function LandingEditorial() {
           transition: "opacity 1s ease 0.2s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.2s",
           maxWidth: 1100,
         }}>
-          We Are a Fantasy Football Auction Tool
+          Fantasy Football Auction Tool <span style={{ fontStyle: "italic", opacity: 0.85 }}>(personalized to your league and your team)</span>
         </h1>
 
         <p style={{
