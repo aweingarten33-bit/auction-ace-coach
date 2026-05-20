@@ -307,21 +307,43 @@ export default function LandingEditorial() {
             pointerEvents: "none",
           }} />
 
-          {/* Bottom text */}
+          {/* Top headline */}
           <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0,
-            padding: "0 24px 28px",
+            position: "absolute", top: 0, left: 0, right: 0,
+            padding: "28px 24px 0",
+            textAlign: "center",
           }}>
             <h1 style={{
               color: "white",
               fontSize: "clamp(1.5rem, 5vw, 2.6rem)",
               fontWeight: 700, lineHeight: 1.15, margin: 0,
+              textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               opacity: cardExpanded ? 1 : 0,
-              transform: cardExpanded ? "none" : "translateY(20px)",
+              transform: cardExpanded ? "none" : "translateY(-20px)",
               transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
             }}>
               Personalized Fantasy Football<br />Auction Intelligence
             </h1>
+          </div>
+
+          {/* Bottom powered-by */}
+          <div style={{
+            position: "absolute", bottom: 0, left: 0, right: 0,
+            padding: "0 24px 28px",
+            textAlign: "center",
+          }}>
+            <p style={{
+              color: "rgba(255,255,255,0.9)",
+              fontSize: "clamp(0.95rem, 2.6vw, 1.15rem)",
+              lineHeight: 1.4, margin: 0,
+              fontStyle: "italic",
+              textShadow: "0 2px 12px rgba(0,0,0,0.5)",
+              opacity: cardExpanded ? 1 : 0,
+              transform: cardExpanded ? "none" : "translateY(20px)",
+              transition: "opacity 0.8s ease 0.9s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.9s",
+            }}>
+              Powered by our ESPN league history<br />and real-time auction data.
+            </p>
           </div>
         </div>
       </div>
@@ -334,15 +356,6 @@ export default function LandingEditorial() {
         opacity: cardExpanded ? 1 : 0,
         transition: "opacity 0.9s ease 1.1s",
       }}>
-        <p style={{
-          fontStyle: "italic",
-          fontSize: "clamp(1.1rem, 4vw, 1.5rem)",
-          lineHeight: 1.55,
-          color: "rgba(255,255,255,0.75)",
-          margin: 0,
-        }}>
-          Powered by our ESPN league history<br />and real-time auction data.
-        </p>
       </div>
     </div>
   );
