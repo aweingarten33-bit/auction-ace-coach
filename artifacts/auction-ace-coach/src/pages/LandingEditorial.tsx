@@ -323,7 +323,7 @@ export default function LandingEditorial() {
               transform: cardExpanded ? "none" : "translateY(-20px)",
               transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
             }}>
-              Personalized Fantasy Football Auction Intelligence
+              Personalized Fantasy Football<br />Auction Intelligence
             </h1>
           </div>
 
