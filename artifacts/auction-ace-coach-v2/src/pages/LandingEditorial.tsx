@@ -108,18 +108,33 @@ export default function LandingEditorial() {
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div
             style={{
-              border: "1px solid rgba(255,255,255,0.5)",
-              color: "white",
-              padding: "12px 26px",
-              fontFamily: "'Inter', sans-serif",
-              fontSize: 14,
-              fontWeight: 500,
-              letterSpacing: "0.02em",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              lineHeight: 1.1,
               userSelect: "none",
               pointerEvents: "none",
             }}
           >
-            League: Bro, We're Senior Citizens
+            <span style={{
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 10,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.5)",
+              marginBottom: 4,
+            }}>
+              League
+            </span>
+            <span style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 15,
+              fontWeight: 600,
+              color: "white",
+              letterSpacing: "0.01em",
+            }}>
+              Bro, We're Senior Citizens
+            </span>
           </div>
 
           <button
