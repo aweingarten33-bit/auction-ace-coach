@@ -317,6 +317,7 @@ export default function LandingEditorial() {
               color: "white",
               fontSize: "clamp(1.5rem, 5vw, 2.6rem)",
               fontWeight: 700, lineHeight: 1.15, margin: 0,
+              textAlign: "center",
               textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               opacity: cardExpanded ? 1 : 0,
               transform: cardExpanded ? "none" : "translateY(-20px)",
