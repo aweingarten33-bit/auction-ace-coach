@@ -1,0 +1,6 @@
+{
+  "buildCommand": "pnpm --filter @workspace/auction-ace-coach run build",
+  "installCommand": "pnpm install --frozen-lockfile=false",
+  "outputDirectory": "artifacts/auction-ace-coach/dist/public",
+  "framework": null
+}
