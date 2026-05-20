@@ -55,17 +55,17 @@ export default function LandingEditorial() {
 
   return (
     <div style={{
-      background: "#eceae6",
+      background: "#1f2933",
       minHeight: "100svh",
-      fontFamily: "'Playfair Display', Georgia, serif",
+      fontFamily: "'Inter', sans-serif",
       position: "relative",
       overflow: "hidden",
+      color: "white",
     }}>
 
-      {/* ── FULL-SCREEN FORTRESS BACKGROUND ───────────────────────────────── */}
-      <img
-        src={`${import.meta.env.BASE_URL}${BG_IMAGES[bgIndex]}`}
-        alt=""
+      {/* ── FULL-BLEED FOOTBALL VIDEO BACKGROUND ──────────────────────────── */}
+      <video
+        autoPlay loop muted playsInline preload="auto"
         style={{
           position: "fixed", inset: 0,
           width: "100%", height: "100%",
@@ -74,42 +74,74 @@ export default function LandingEditorial() {
           pointerEvents: "none",
           zIndex: 0,
         }}
-      />
+      >
+        <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
+      </video>
 
-      {/* Subtle dark vignette over bg */}
+      {/* Dark vignette over video */}
       <div style={{
-        position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none",
-        background: "linear-gradient(to bottom, rgba(10,14,26,0.35) 0%, rgba(10,14,26,0.1) 40%, rgba(10,14,26,0.5) 100%)",
+        position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none",
+        background: "linear-gradient(to bottom, rgba(31,41,51,0.45) 0%, rgba(15,21,28,0.55) 60%, rgba(8,12,18,0.7) 100%)",
       }} />
 
-      {/* ── TOP NAV ───────────────────────────────────────────────────────── */}
-      <div style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 200, backdropFilter: "blur(0px)",
+      {/* ── BLEND-STYLE DARK HEADER BAR ───────────────────────────────────── */}
+      <header style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
+        background: "#1f2933",
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "16px 20px",
+        padding: "20px 32px",
+        height: 84,
       }}>
-        {/* Empty left */}
-        <div style={{ width: 48 }} />
+        {/* Logo */}
+        <div style={{
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 600,
+          fontSize: 28,
+          color: "white",
+          letterSpacing: "-0.01em",
+        }}>
+          auction<span style={{ color: "#5fd4d4" }}>.</span>
+        </div>
 
-        {/* Hamburger */}
-        <button
-          onClick={openMenu}
-          style={{
-            width: 48, height: 48,
-            background: "rgba(8,14,28,0.45)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderRadius: "14px",
-            border: "none", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            flexDirection: "column", gap: "5px",
-          }}
-        >
-          <span style={{ display: "block", width: 20, height: 2, background: "white", borderRadius: 2 }} />
-          <span style={{ display: "block", width: 20, height: 2, background: "white", borderRadius: 2 }} />
-          <span style={{ display: "block", width: 20, height: 2, background: "white", borderRadius: 2 }} />
-        </button>
-      </div>
+        {/* Right side: Let's draft + hamburger */}
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <button
+            onClick={openMenu}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.5)",
+              color: "white",
+              padding: "12px 26px",
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: "pointer",
+              letterSpacing: "0.02em",
+              transition: "background 0.25s ease",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+          >
+            Let's draft
+          </button>
+
+          <button
+            onClick={openMenu}
+            aria-label="Menu"
+            style={{
+              width: 40, height: 40,
+              background: "transparent",
+              border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexDirection: "column", gap: "6px",
+            }}
+          >
+            <span style={{ display: "block", width: 26, height: 2, background: "white" }} />
+            <span style={{ display: "block", width: 26, height: 2, background: "white" }} />
+            <span style={{ display: "block", width: 26, height: 2, background: "white" }} />
+          </button>
+        </div>
+      </header>
 
       {/* ── DROPDOWN MENU ─────────────────────────────────────────────────── */}
       {menuOpen && (
@@ -239,111 +271,50 @@ export default function LandingEditorial() {
         </div>{/* end scrollable content */}
       </div>
 
-      {/* ── EXPANDING CARD ────────────────────────────────────────────────── */}
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start",
-        paddingTop: "80px",
-        paddingBottom: "40px",
+      {/* ── BLEND-STYLE CENTERED HERO ─────────────────────────────────────── */}
+      <main style={{
+        position: "relative", zIndex: 10,
         minHeight: "100svh",
-        boxSizing: "border-box",
-        position: "relative", zIndex: 10,
-      }}>
-        <div style={{
-          width: cardExpanded ? "88vw" : "28vw",
-          maxWidth: "420px",
-          height: "72svh",
-          borderRadius: "24px",
-          overflow: "hidden",
-          position: "relative",
-          transition: "width 1.1s cubic-bezier(0.16,1,0.3,1)",
-          willChange: "width",
-          boxShadow: "0 12px 60px rgba(0,0,0,0.18)",
-        }}>
-          {/* Football video plays inside the card */}
-          <video
-            autoPlay loop muted playsInline preload="auto"
-            style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              objectFit: "cover",
-              objectPosition: "center center",
-              pointerEvents: "none",
-              opacity: 0.5,
-              filter: "brightness(1.3) contrast(1.05) saturate(1.2)",
-            }}
-          >
-            <source src={`${import.meta.env.BASE_URL}export.mp4`} type="video/mp4" />
-          </video>
-
-          {/* Crystal white glow overlay (keeps video color underneath) */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute", inset: 0,
-              background:
-                "radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.2) 45%, rgba(255,255,255,0) 80%)",
-              mixBlendMode: "screen",
-              pointerEvents: "none",
-            }}
-          />
-          <div
-            aria-hidden
-            style={{
-              position: "absolute", inset: 0,
-              background:
-                "radial-gradient(circle at 50% 40%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 55%)",
-              mixBlendMode: "overlay",
-              pointerEvents: "none",
-            }}
-          />
-
-
-          {/* Bottom gradient for text */}
-          <div style={{
-            position: "absolute", inset: 0,
-            background: "linear-gradient(to bottom, transparent 40%, rgba(10,16,28,0.75) 100%)",
-            pointerEvents: "none",
-          }} />
-
-          {/* Bottom text */}
-          <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0,
-            padding: "0 24px 28px",
-          }}>
-            <h1 style={{
-              color: "white",
-              fontSize: "clamp(2.2rem, 8vw, 4rem)",
-              fontWeight: 700, lineHeight: 1.06, margin: 0,
-              opacity: cardExpanded ? 1 : 0,
-              transform: cardExpanded ? "none" : "translateY(20px)",
-              transition: "opacity 0.8s ease 0.7s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.7s",
-            }}>
-              Draft with<br /><em>the Edge.</em>
-            </h1>
-          </div>
-        </div>
-      </div>
-
-      {/* ── TAGLINE BELOW CARD ────────────────────────────────────────────── */}
-      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
         textAlign: "center",
-        padding: "0 32px 60px",
-        position: "relative", zIndex: 10,
-        opacity: cardExpanded ? 1 : 0,
-        transition: "opacity 0.9s ease 1.1s",
+        padding: "120px 32px 80px",
+        boxSizing: "border-box",
       }}>
-        <p style={{
-          fontStyle: "italic",
-          fontSize: "clamp(1.1rem, 4vw, 1.5rem)",
-          lineHeight: 1.55,
-          color: "rgba(255,255,255,0.75)",
+        <h1 style={{
           margin: 0,
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 500,
+          fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
+          lineHeight: 1.15,
+          letterSpacing: "-0.01em",
+          color: "#5fd4d4",
+          opacity: cardExpanded ? 1 : 0,
+          transform: cardExpanded ? "none" : "translateY(20px)",
+          transition: "opacity 1s ease 0.2s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.2s",
+          maxWidth: 1100,
         }}>
-          Budget-first planning powered<br />by your league's actual draft history.
+          We Are a Fantasy Football Auction Tool
+        </h1>
+
+        <p style={{
+          marginTop: 28,
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 700,
+          fontSize: "clamp(1.1rem, 2.2vw, 1.75rem)",
+          color: "white",
+          textDecoration: "underline",
+          textUnderlineOffset: "6px",
+          textDecorationThickness: "2px",
+          opacity: cardExpanded ? 1 : 0,
+          transform: cardExpanded ? "none" : "translateY(20px)",
+          transition: "opacity 1s ease 0.5s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.5s",
+        }}>
+          ESPN + Real-Time + Auction Data
         </p>
-      </div>
+      </main>
     </div>
   );
 }
