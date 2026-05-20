@@ -68,7 +68,7 @@ export default function DraftRoom() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { isAdmin } = useLock();
-  const { team: selectedTeam } = useSelectedTeam();
+  const { team: selectedTeam, setTeam } = useSelectedTeam();
   const {
     settings,
     keepers,
@@ -87,6 +87,22 @@ export default function DraftRoom() {
   const [top50InfoOpen, setTop50InfoOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
+  const [availableTeams, setAvailableTeams] = useState<{ id: number; name: string }[]>([]);
+  const [teamPickerOpen, setTeamPickerOpen] = useState(false);
+
+  // Load league teams once for the one-time team picker
+  useEffect(() => {
+    if (selectedTeam) return;
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) await supabase.auth.signInAnonymously();
+        const { data } = await supabase.functions.invoke("league-teams");
+        const list = (data?.teams ?? []).map((t: any) => ({ id: t.id, name: t.name }));
+        if (list.length > 0) { setAvailableTeams(list); setTeamPickerOpen(true); }
+      } catch { /* silent */ }
+    })();
+  }, [selectedTeam]);
 
   // Redirect to setup if no data yet (admin only; guests can view).
   useEffect(() => {
@@ -208,6 +224,59 @@ export default function DraftRoom() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-white text-[#1d1d1f]" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>
+
+      {/* ── ONE-TIME TEAM PICKER ─────────────────────────── */}
+      {teamPickerOpen && availableTeams.length > 0 && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 999,
+          background: "rgba(10,14,26,0.85)",
+          backdropFilter: "blur(12px)",
+          display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center",
+          padding: "32px 24px",
+        }}>
+          <p style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: 11, letterSpacing: "0.22em",
+            textTransform: "uppercase", color: "rgba(255,255,255,0.45)",
+            marginBottom: 20,
+          }}>Which team are you?</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 360 }}>
+            {availableTeams.map(t => (
+              <button
+                key={t.id}
+                onClick={() => { setTeam(t); setTeamPickerOpen(false); toast.success(`Let's go, ${t.name}!`); }}
+                style={{
+                  background: "rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: 14, padding: "16px 20px",
+                  color: "white", cursor: "pointer",
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: 15, fontWeight: 600,
+                  textAlign: "left",
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.14)")}
+                onMouseLeave={e => (e.currentTarget.style.background = "rgba(255,255,255,0.07)")}
+              >
+                {t.name}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setTeamPickerOpen(false)}
+            style={{
+              marginTop: 24, background: "none", border: "none",
+              color: "rgba(255,255,255,0.3)", cursor: "pointer",
+              fontFamily: "'Inter', sans-serif", fontSize: 12,
+              letterSpacing: "0.1em", textTransform: "uppercase",
+            }}
+          >
+            Skip for now
+          </button>
+        </div>
+      )}
+
       {/* ── HEADER ─────────────────────────────────────────── */}
       <header
         className="flex shrink-0 items-center gap-2 border-b border-black/[0.08] bg-white/90 backdrop-blur-xl px-3 py-3"
