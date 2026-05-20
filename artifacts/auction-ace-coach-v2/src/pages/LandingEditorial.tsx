@@ -16,6 +16,7 @@ export default function LandingEditorial() {
   const [teams,        setTeams]        = useState<Team[]>([]);
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [cardExpanded, setCardExpanded] = useState(false);
+  const [hoverIdx,     setHoverIdx]     = useState<number | null>(null);
   const [bgIndex]                       = useState(0);
 
   // Expand card on load
@@ -143,132 +144,137 @@ export default function LandingEditorial() {
         </div>
       </header>
 
-      {/* ── DROPDOWN MENU ─────────────────────────────────────────────────── */}
-      {menuOpen && (
-        <div
-          onClick={() => setMenuOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 299 }}
-        />
-      )}
-      <div style={{
-        position: "fixed", top: 0, left: "50%",
-        transform: menuOpen
-          ? "translateX(-50%) translateY(0)"
-          : "translateX(-50%) translateY(-110%)",
-        transition: "transform 0.5s cubic-bezier(0.16,1,0.3,1)",
-        zIndex: 300,
-        width: "92vw", maxWidth: "400px",
-        background: "rgba(4,8,20,0.55)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderRadius: "0 0 28px 28px",
-        border: "1px solid rgba(255,255,255,0.1)",
-        borderTop: "none",
-        maxHeight: "88vh",
-        overflow: "hidden",
-        position: "fixed",
-      }}>
-        {/* Superman video plays behind the team list */}
-        <video
-          autoPlay loop muted playsInline preload="auto"
+      {/* ── NOOMO-STYLE FULLSCREEN MENU ───────────────────────────────────── */}
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 250,
+          background: "rgba(20,26,34,0.78)",
+          backdropFilter: "blur(28px)",
+          WebkitBackdropFilter: "blur(28px)",
+          opacity: menuOpen ? 1 : 0,
+          pointerEvents: menuOpen ? "auto" : "none",
+          transition: "opacity 0.55s cubic-bezier(0.16,1,0.3,1)",
+        }}
+        onClick={() => setMenuOpen(false)}
+      >
+        {/* Close X */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }}
+          aria-label="Close"
           style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover",
-            objectPosition: "center top",
-            pointerEvents: "none",
-            opacity: 0.35,
-            mixBlendMode: "screen",
+            position: "absolute", top: 22, right: 32,
+            width: 44, height: 44,
+            background: "transparent", border: "none", cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            zIndex: 2,
           }}
         >
-          <source src={`${import.meta.env.BASE_URL}video-output-0AF95F42-1823-4CCB-83D5-A4D004535139-1.mov`} type="video/quicktime" />
-        </video>
+          <span style={{
+            position: "absolute", width: 28, height: 2, background: "white",
+            transform: "rotate(45deg)",
+          }} />
+          <span style={{
+            position: "absolute", width: 28, height: 2, background: "white",
+            transform: "rotate(-45deg)",
+          }} />
+        </button>
 
-        {/* Content sits on top of video */}
-        <div style={{
-          position: "relative", zIndex: 1,
-          padding: "24px 24px 24px",
-          paddingTop: "calc(env(safe-area-inset-top) + 68px)",
-          maxHeight: "88vh",
-          overflowY: "auto",
-        }}>
-        {/* Team list */}
-        {loadingTeams && (
-          <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "'Inter',sans-serif", fontSize: "14px", textAlign: "center", marginBottom: 16 }}>
-            Loading teams…
-          </p>
-        )}
-        {!loadingTeams && teams.length === 0 && (
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
+        {/* Centered team list */}
+        <div
+          onClick={(e) => e.stopPropagation()}
+          onMouseLeave={() => setHoverIdx(null)}
+          style={{
+            position: "absolute", inset: 0,
+            display: "flex", flexDirection: "column",
+            alignItems: "center", justifyContent: "center",
+            padding: "100px 24px 120px",
+            boxSizing: "border-box",
+            overflowY: "auto",
+          }}
+        >
+          {loadingTeams && (
+            <p style={{
+              color: "rgba(255,255,255,0.5)",
+              fontFamily: "'Inter',sans-serif",
+              fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase",
+            }}>
+              Loading teams…
+            </p>
+          )}
+
+          {!loadingTeams && teams.length === 0 && (
             <button
               onClick={() => { setMenuOpen(false); navigate("/espn"); }}
               style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
                 background: "white", color: "#1a2332",
-                borderRadius: "100px", border: "none",
-                padding: "14px 28px",
-                fontFamily: "'Inter',sans-serif", fontSize: "13px", fontWeight: 700,
-                cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase",
+                borderRadius: 999, border: "none",
+                padding: "18px 36px",
+                fontFamily: "'Inter',sans-serif",
+                fontSize: 14, fontWeight: 700,
+                letterSpacing: "0.1em", textTransform: "uppercase",
+                cursor: "pointer",
               }}
             >
               ⚡ Connect ESPN
             </button>
-          </div>
-        )}
-        {!loadingTeams && teams.map((team, i) => (
-          <button
-            key={team.id}
-            onClick={() => pickTeam(team)}
-            style={{
-              display: "block", width: "100%", textAlign: "center",
-              background: "none", border: "none",
-              borderBottom: "1px solid rgba(255,255,255,0.08)",
-              padding: "14px 0", color: "white", cursor: "pointer",
-              fontFamily: "'Inter',sans-serif",
-              fontSize: "13px", fontWeight: 600,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              opacity: menuOpen ? 1 : 0,
-              transition: `opacity 0.35s ease ${i * 40 + 200}ms`,
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = "#60a5fa")}
-            onMouseLeave={e => (e.currentTarget.style.color = "white")}
-          >
-            {team.name}
-          </button>
-        ))}
+          )}
 
-        {/* Choose Your Team CTA */}
-        <div style={{ marginTop: 24, textAlign: "center" }}>
-          <button
-            onClick={openMenu}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              background: "white", color: "#1a2332",
-              borderRadius: "100px", border: "none",
-              padding: "14px 28px",
-              fontFamily: "'Inter',sans-serif", fontSize: "13px", fontWeight: 700,
-              cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase",
-            }}
-          >
-            Choose Your Team
-          </button>
+          {!loadingTeams && teams.map((team, i) => {
+            const dim = hoverIdx !== null && hoverIdx !== i;
+            return (
+              <button
+                key={team.id}
+                onClick={() => pickTeam(team)}
+                onMouseEnter={() => setHoverIdx(i)}
+                style={{
+                  display: "flex", alignItems: "baseline", gap: 18,
+                  background: "none", border: "none", cursor: "pointer",
+                  color: "white",
+                  padding: "6px 0",
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 500,
+                  fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.02em",
+                  opacity: menuOpen ? (dim ? 0.25 : 1) : 0,
+                  transform: menuOpen ? "translateY(0)" : "translateY(28px)",
+                  transition: `opacity 0.5s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 60 + 220 : 0}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 60 + 220 : 0}ms`,
+                }}
+              >
+                <span style={{
+                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                  fontSize: "0.32em",
+                  fontWeight: 500,
+                  opacity: 0.55,
+                  letterSpacing: 0,
+                }}>
+                  0{i + 1}
+                </span>
+                <span>{team.name}</span>
+              </button>
+            );
+          })}
+
+          {!loadingTeams && teams.length > 0 && (
+            <button
+              onClick={skip}
+              style={{
+                marginTop: 40,
+                background: "none", border: "none",
+                color: "rgba(255,255,255,0.45)",
+                fontFamily: "'Inter',sans-serif",
+                fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase",
+                cursor: "pointer",
+                opacity: menuOpen ? 1 : 0,
+                transition: `opacity 0.5s ease ${menuOpen ? teams.length * 60 + 320 : 0}ms`,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = "white")}
+              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+            >
+              Skip for now
+            </button>
+          )}
         </div>
-
-        <button
-          onClick={skip}
-          style={{
-            display: "block", margin: "18px auto 0",
-            background: "none", border: "none",
-            color: "rgba(255,255,255,0.3)", fontFamily: "'Inter',sans-serif",
-            fontSize: "12px", cursor: "pointer", letterSpacing: "0.1em",
-            textTransform: "uppercase",
-          }}
-          onMouseEnter={e => (e.currentTarget.style.color = "rgba(255,255,255,0.6)")}
-          onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
-        >
-          Skip for now
-        </button>
-        </div>{/* end scrollable content */}
       </div>
 
       {/* ── BLEND-STYLE CENTERED HERO ─────────────────────────────────────── */}
