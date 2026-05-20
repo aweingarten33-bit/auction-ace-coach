@@ -134,7 +134,6 @@ export default function LandingSuperman() {
         borderTop: "none",
         maxHeight: "88vh",
         overflow: "hidden",
-        position: "fixed",
       }}>
         {/* Superman video plays behind the team list */}
         <video
