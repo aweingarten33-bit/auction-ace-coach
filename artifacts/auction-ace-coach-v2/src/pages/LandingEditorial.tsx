@@ -144,61 +144,85 @@ export default function LandingEditorial() {
         </div>
       </header>
 
-      {/* ── NOOMO-STYLE FULLSCREEN MENU ───────────────────────────────────── */}
+      {/* ── NOOMO-LABS-STYLE FULLSCREEN MENU ──────────────────────────────── */}
       <div
         style={{
           position: "fixed", inset: 0, zIndex: 250,
-          background: "rgba(20,26,34,0.78)",
-          backdropFilter: "blur(28px)",
-          WebkitBackdropFilter: "blur(28px)",
+          background: "#fafafa",
           opacity: menuOpen ? 1 : 0,
           pointerEvents: menuOpen ? "auto" : "none",
-          transition: "opacity 0.55s cubic-bezier(0.16,1,0.3,1)",
+          transition: "opacity 0.5s cubic-bezier(0.16,1,0.3,1)",
+          overflowY: "auto",
         }}
         onClick={() => setMenuOpen(false)}
       >
-        {/* Close X */}
-        <button
-          onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }}
-          aria-label="Close"
+        {/* Pixelated soft pattern background */}
+        <div
+          aria-hidden
           style={{
-            position: "absolute", top: 22, right: 32,
-            width: 44, height: 44,
-            background: "transparent", border: "none", cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            zIndex: 2,
+            position: "absolute", inset: 0,
+            backgroundImage:
+              "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)",
+            backgroundSize: "8px 8px",
+            pointerEvents: "none",
           }}
-        >
-          <span style={{
-            position: "absolute", width: 28, height: 2, background: "white",
-            transform: "rotate(45deg)",
-          }} />
-          <span style={{
-            position: "absolute", width: 28, height: 2, background: "white",
-            transform: "rotate(-45deg)",
-          }} />
-        </button>
+        />
 
-        {/* Centered team list */}
+        {/* Top bar with logo + bracketed X */}
+        <div style={{
+          position: "sticky", top: 0,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "24px 32px",
+          zIndex: 3,
+        }}>
+          <div style={{
+            fontFamily: "'Anton', 'Inter', sans-serif",
+            fontSize: 28, color: "#000", letterSpacing: "0.02em",
+          }}>
+            auction<span style={{ fontStyle: "italic", fontFamily: "'Inter', cursive", fontWeight: 400 }}> labs</span>
+          </div>
+
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenuOpen(false); }}
+            aria-label="Close"
+            style={{
+              position: "relative",
+              width: 56, height: 56,
+              background: "transparent", border: "none", cursor: "pointer",
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 22, fontWeight: 500, color: "#000",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "0 6px",
+              lineHeight: 1,
+            }}
+          >
+            <span>[</span>
+            <span style={{ fontSize: 18 }}>×</span>
+            <span>]</span>
+          </button>
+        </div>
+
+        {/* Centered bracketed team list */}
         <div
           onClick={(e) => e.stopPropagation()}
           onMouseLeave={() => setHoverIdx(null)}
           style={{
-            position: "absolute", inset: 0,
+            position: "relative", zIndex: 2,
             display: "flex", flexDirection: "column",
             alignItems: "center", justifyContent: "center",
-            padding: "100px 24px 120px",
+            padding: "40px 24px 80px",
+            gap: "clamp(20px, 4vw, 44px)",
+            minHeight: "calc(100svh - 100px)",
             boxSizing: "border-box",
-            overflowY: "auto",
           }}
         >
           {loadingTeams && (
             <p style={{
-              color: "rgba(255,255,255,0.5)",
-              fontFamily: "'Inter',sans-serif",
-              fontSize: 14, letterSpacing: "0.18em", textTransform: "uppercase",
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: 13, color: "#666", letterSpacing: "0.18em",
+              textTransform: "uppercase",
             }}>
-              Loading teams…
+              [ LOADING TEAMS… ]
             </p>
           )}
 
@@ -206,16 +230,15 @@ export default function LandingEditorial() {
             <button
               onClick={() => { setMenuOpen(false); navigate("/espn"); }}
               style={{
-                background: "white", color: "#1a2332",
-                borderRadius: 999, border: "none",
-                padding: "18px 36px",
-                fontFamily: "'Inter',sans-serif",
-                fontSize: 14, fontWeight: 700,
-                letterSpacing: "0.1em", textTransform: "uppercase",
-                cursor: "pointer",
+                background: "transparent", color: "#000",
+                border: "none", cursor: "pointer",
+                fontFamily: "'Anton', sans-serif",
+                fontSize: "clamp(2.4rem, 7vw, 5rem)",
+                lineHeight: 1, letterSpacing: "0.02em",
+                textTransform: "uppercase",
               }}
             >
-              ⚡ Connect ESPN
+              [ CONNECT ESPN ]
             </button>
           )}
 
@@ -227,30 +250,21 @@ export default function LandingEditorial() {
                 onClick={() => pickTeam(team)}
                 onMouseEnter={() => setHoverIdx(i)}
                 style={{
-                  display: "flex", alignItems: "baseline", gap: 18,
                   background: "none", border: "none", cursor: "pointer",
-                  color: "white",
-                  padding: "6px 0",
-                  fontFamily: "'Inter', sans-serif",
-                  fontWeight: 500,
-                  fontSize: "clamp(2rem, 5.5vw, 4.5rem)",
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.02em",
-                  opacity: menuOpen ? (dim ? 0.25 : 1) : 0,
-                  transform: menuOpen ? "translateY(0)" : "translateY(28px)",
-                  transition: `opacity 0.5s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 60 + 220 : 0}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 60 + 220 : 0}ms`,
+                  color: dim ? "rgba(0,0,0,0.2)" : "#000",
+                  padding: 0,
+                  fontFamily: "'Anton', 'Inter', sans-serif",
+                  fontWeight: 400,
+                  fontSize: "clamp(2.2rem, 7vw, 5rem)",
+                  lineHeight: 1,
+                  letterSpacing: "0.02em",
+                  textTransform: "uppercase",
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? "translateY(0)" : "translateY(30px)",
+                  transition: `color 0.3s ease, opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 60 + 200 : 0}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${menuOpen ? i * 60 + 200 : 0}ms`,
                 }}
               >
-                <span style={{
-                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                  fontSize: "0.32em",
-                  fontWeight: 500,
-                  opacity: 0.55,
-                  letterSpacing: 0,
-                }}>
-                  0{i + 1}
-                </span>
-                <span>{team.name}</span>
+                [{team.name}]
               </button>
             );
           })}
@@ -259,19 +273,18 @@ export default function LandingEditorial() {
             <button
               onClick={skip}
               style={{
-                marginTop: 40,
-                background: "none", border: "none",
-                color: "rgba(255,255,255,0.45)",
-                fontFamily: "'Inter',sans-serif",
-                fontSize: 12, letterSpacing: "0.18em", textTransform: "uppercase",
-                cursor: "pointer",
+                marginTop: 24,
+                background: "none", border: "none", cursor: "pointer",
+                color: "#666",
+                fontFamily: "'JetBrains Mono', monospace",
+                fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase",
                 opacity: menuOpen ? 1 : 0,
-                transition: `opacity 0.5s ease ${menuOpen ? teams.length * 60 + 320 : 0}ms`,
+                transition: `opacity 0.6s ease ${menuOpen ? teams.length * 60 + 320 : 0}ms, color 0.25s ease`,
               }}
-              onMouseEnter={e => (e.currentTarget.style.color = "white")}
-              onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+              onMouseEnter={e => (e.currentTarget.style.color = "#000")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#666")}
             >
-              Skip for now
+              SKIP FOR NOW
             </button>
           )}
         </div>
