@@ -251,7 +251,7 @@ export default function LandingEditorial() {
                 onMouseEnter={() => setHoverIdx(i)}
                 style={{
                   background: "none", border: "none", cursor: "pointer",
-                  color: dim ? "rgba(10,21,56,0.2)" : "#0a1538",
+                  color: dim ? "rgba(0,32,96,0.2)" : "#002060",
                   padding: 0,
                   fontFamily: "'Anton', 'Inter', sans-serif",
                   fontWeight: 400,
