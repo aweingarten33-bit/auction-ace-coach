@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { loadSleeperPlayers, searchPlayers, SleeperPlayer } from "@/lib/sleeper";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +27,8 @@ export default function PlayerAutocomplete({
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const listboxId = useId();
 
   useEffect(() => {
     loadSleeperPlayers().then(setPlayers).catch(() => {});
@@ -42,6 +44,12 @@ export default function PlayerAutocomplete({
 
   const suggestions = value.trim().length >= 2 ? searchPlayers(players, value, 8) : [];
 
+  useEffect(() => {
+    if (!open) return;
+    const active = listRef.current?.querySelector<HTMLButtonElement>(`[data-index="${highlight}"]`);
+    active?.scrollIntoView({ block: "nearest" });
+  }, [highlight, open]);
+
   const choose = (p: SleeperPlayer) => {
     onChange(p.full_name);
     onSelect?.(p);
@@ -51,6 +59,11 @@ export default function PlayerAutocomplete({
   return (
     <div ref={wrapRef} className={`relative min-w-0 ${className || ""}`}>
       <Input
+        role="combobox"
+        aria-expanded={open && suggestions.length > 0}
+        aria-controls={listboxId}
+        aria-autocomplete="list"
+        aria-activedescendant={open && suggestions[highlight] ? `${listboxId}-option-${highlight}` : undefined}
         placeholder={placeholder}
         value={value}
         autoFocus={autoFocus}
@@ -89,10 +102,19 @@ export default function PlayerAutocomplete({
         className="font-medium"
       />
       {open && suggestions.length > 0 && (
-        <div className="absolute left-0 z-50 mt-1 max-h-80 w-full max-w-[calc(100vw-1.5rem)] overflow-auto rounded-md border border-border bg-popover shadow-lg sm:w-[min(22rem,90vw)]">
+        <div
+          ref={listRef}
+          id={listboxId}
+          role="listbox"
+          className="absolute left-0 z-50 mt-1 max-h-80 w-full max-w-[calc(100vw-1.5rem)] overflow-auto rounded-md border border-border bg-popover shadow-lg sm:w-[min(22rem,90vw)]"
+        >
           {suggestions.map((p, i) => (
             <button
               key={p.player_id}
+              id={`${listboxId}-option-${i}`}
+              role="option"
+              aria-selected={i === highlight}
+              data-index={i}
               type="button"
               onMouseDown={(e) => {
                 e.preventDefault();
