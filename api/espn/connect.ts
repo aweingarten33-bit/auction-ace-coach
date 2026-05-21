@@ -114,7 +114,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (leagues.length === 0 && allLeagues.length > 0) {
       return res.json({
         leagues: [],
-        hint: `Connected to ESPN but no leagues found for season ${year}. Found leagues in seasons: ${[...new Set(allLeagues.map((l) => l.season))].join(", ")}.`,
+        hint: `Connected to ESPN but no leagues found for season ${year}. Found leagues in seasons: ${Array.from(new Set(allLeagues.map((l) => l.season))).join(", ")}.`,
       });
     }
 
