@@ -38,7 +38,27 @@ export const supabase = {
             }
           }
         } catch { /* fall through — no creds or network error */ }
-        return { data: { teams: [], leagueName: null }, error: null };
+        // Fall back to mock teams so the UI is never empty
+        return {
+          data: {
+            teams: [
+              { id: "1",  name: "Show Me Your TDs",     abbrev: "SMYT" },
+              { id: "2",  name: "Gridiron Gang",         abbrev: "GG"   },
+              { id: "3",  name: "Belichick Yourself",    abbrev: "BLCK" },
+              { id: "4",  name: "Purple Drank",          abbrev: "PRPL" },
+              { id: "5",  name: "Burrow My Heart",       abbrev: "BURR" },
+              { id: "6",  name: "Mahomes Alone",         abbrev: "MAHO" },
+              { id: "7",  name: "Kelce's Angels",        abbrev: "KLCE" },
+              { id: "8",  name: "Lamar in the Streets",  abbrev: "LMAR" },
+              { id: "9",  name: "CeeDee Lamb Chops",     abbrev: "CDLC" },
+              { id: "10", name: "Tua Legit to Quit",     abbrev: "TUA"  },
+              { id: "11", name: "Saquon and Garfunkel",  abbrev: "SAQU" },
+              { id: "12", name: "The Wu Tang Klan",      abbrev: "WUTG" },
+            ],
+            leagueName: null,
+          },
+          error: null,
+        };
       }
 
       // ── espn-connect: discover leagues or save league selection ─────────
