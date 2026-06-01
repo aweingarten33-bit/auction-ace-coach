@@ -1,10 +1,4 @@
 {
-  "buildCommand": "pnpm --filter @workspace/auction-ace-coach run build",
-  "installCommand": "pnpm install --frozen-lockfile=false",
-  "outputDirectory": "artifacts/auction-ace-coach/dist/public",
-  "framework": null,
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "installCommand": "npm install --legacy-peer-deps",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

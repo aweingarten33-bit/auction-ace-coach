@@ -1,1 +1,7 @@
 project_id = "ksiiollsmecvzpwgclic"
+
+[functions.draft-webhook]
+verify_jwt = false
+
+[functions.vetri-notes-refresh]
+verify_jwt = false

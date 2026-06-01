@@ -1,0 +1,556 @@
+// Pulls Sal Vetri's latest YouTube videos via public RSS, scrapes auto-captions,
+// falls back to OpenAI Whisper transcription of the audio stream when captions
+// are missing, then distills with Lovable AI into structured "takes".
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+const CHANNEL_ID = "UC6oJruhkkXrws3HWqPfMHJw"; // @salvetri
+const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36";
+
+interface FeedItem {
+  videoId: string;
+  title: string;
+  url: string;
+  publishedAt: string | null;
+  description: string;
+}
+
+function parseFeed(xml: string, max: number): FeedItem[] {
+  const items: FeedItem[] = [];
+  const entryRe = /<entry>([\s\S]*?)<\/entry>/g;
+  let m: RegExpExecArray | null;
+  while ((m = entryRe.exec(xml)) && items.length < max) {
+    const block = m[1];
+    const id = block.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
+    const title = block.match(/<title>([^<]+)<\/title>/)?.[1];
+    const published = block.match(/<published>([^<]+)<\/published>/)?.[1] ?? null;
+    const description = block.match(/<media:description>([\s\S]*?)<\/media:description>/)?.[1] ?? "";
+    if (id && title) {
+      items.push({
+        videoId: id,
+        title: decodeXml(title),
+        url: `https://www.youtube.com/watch?v=${id}`,
+        publishedAt: published,
+        description: decodeXml(description).trim(),
+      });
+    }
+  }
+  return items;
+}
+
+function decodeXml(s: string): string {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function extractJsonObjectAfter(html: string, marker: string): any | null {
+  const markerIdx = html.indexOf(marker);
+  if (markerIdx < 0) return null;
+  const start = html.indexOf("{", markerIdx);
+  if (start < 0) return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < html.length; i++) {
+    const ch = html[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === "\\") escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === "{") depth++;
+    else if (ch === "}") {
+      depth--;
+      if (depth === 0) {
+        try {
+          return JSON.parse(html.slice(start, i + 1));
+        } catch {
+          return null;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function descriptionLooksActionable(description: string): boolean {
+  const text = description.trim();
+  if (text.length < 80) return false;
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const timestamped = lines.filter((l) => /(?:^|\s)(?:\d{1,2}:)?\d{1,2}:\d{2}\b/.test(l));
+  const footballEntries = lines.filter((l) =>
+    /\b(QB|RB|WR|TE)\b/.test(l) ||
+    /\b(target|fade|avoid|sleeper|breakout|value|rookie|draft|adp|ranking)\b/i.test(l)
+  );
+  return timestamped.length >= 2 || footballEntries.length >= 3;
+}
+
+function expectedTakeCountFromTitle(title: string): number | null {
+  const m = title.match(/\b(\d{1,2})\s+(?:rookies|players|sleepers|breakouts|league winners|targets|fades|values)\b/i);
+  if (!m) return null;
+  const n = Number(m[1]);
+  return Number.isFinite(n) && n > 0 && n <= 15 ? n : null;
+}
+
+// ---- Blog fallback ------------------------------------------------------
+// Sal mirrors most YouTube videos as written posts on fantasy-football-club.com.
+function slugCandidatesFromTitle(title: string): string[] {
+  const base = title
+    .toLowerCase()
+    .replace(/[''`]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const cands = new Set<string>();
+  const variants = new Set<string>();
+  variants.add(base);
+  // who could → that could
+  variants.add(base.replace(/\bwho could\b/g, "that could"));
+  // strip "this year" / "this season"
+  for (const v of [...variants]) {
+    variants.add(v.replace(/\b(this year|this season|next year)\b/g, "").replace(/\s+/g, " ").trim());
+  }
+  // year suffix variants
+  const years = [new Date().getFullYear(), new Date().getFullYear() - 1, 2025];
+  for (const v of [...variants]) {
+    const slug = v.split(" ").filter(Boolean).join("-");
+    if (slug) cands.add(slug);
+    if (!/\b20\d{2}\b/.test(v)) {
+      for (const y of years) {
+        cands.add(`${slug}-in-${y}`);
+        cands.add(`${slug}-${y}`);
+      }
+    }
+  }
+  return [...cands];
+}
+
+function stripHtmlToText(html: string): string {
+  const cleaned = html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+    .replace(/<header[\s\S]*?<\/header>/gi, " ");
+  const article = cleaned.match(/<article[\s\S]*?<\/article>/i)?.[0] ?? cleaned;
+  return article
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h[1-6])>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n\n")
+    .trim();
+}
+
+async function fetchBlogPost(title: string): Promise<string | null> {
+  for (const slug of slugCandidatesFromTitle(title)) {
+    if (!slug) continue;
+    try {
+      const url = `https://www.fantasy-football-club.com/p/${slug}`;
+      const resp = await fetch(url, { headers: { "User-Agent": UA } });
+      if (resp.ok) {
+        const text = stripHtmlToText(await resp.text());
+        if (text.length > 400) {
+          console.log("blog hit (slug)", slug);
+          return text.slice(0, 16000);
+        }
+      }
+    } catch (e) {
+      console.warn("blog slug fetch error", slug, e);
+    }
+  }
+  try {
+    const q = encodeURIComponent(`site:fantasy-football-club.com ${title}`);
+    const search = await fetch(`https://duckduckgo.com/html/?q=${q}`, { headers: { "User-Agent": UA } });
+    if (!search.ok) return null;
+    const link = (await search.text()).match(/https?:\/\/(?:www\.)?fantasy-football-club\.com\/p\/[a-z0-9-]+/i)?.[0];
+    if (!link) return null;
+    const resp = await fetch(link, { headers: { "User-Agent": UA } });
+    if (!resp.ok) return null;
+    const text = stripHtmlToText(await resp.text());
+    if (text.length > 400) {
+      console.log("blog hit (search)", link);
+      return text.slice(0, 16000);
+    }
+  } catch (e) {
+    console.warn("blog search error", e);
+  }
+  return null;
+}
+
+async function fetchTranscript(videoId: string): Promise<string | null> {
+  try {
+    const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
+      headers: { "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9" },
+    });
+    if (!watch.ok) return null;
+    const html = await watch.text();
+    const player = extractJsonObjectAfter(html, "ytInitialPlayerResponse");
+    const tracks: any[] = player?.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
+    if (!tracks.length) return null;
+    const track = tracks.find((t) => t?.languageCode === "en") ?? tracks[0];
+    if (!track?.baseUrl) return null;
+    const ttResp = await fetch(track.baseUrl, {
+      headers: { "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9" },
+    });
+    if (!ttResp.ok) return null;
+    const tt = await ttResp.text();
+    // <text start="..." dur="...">caption</text>
+    const lines: string[] = [];
+    const re = /<text[^>]*>([\s\S]*?)<\/text>/g;
+    let lm: RegExpExecArray | null;
+    while ((lm = re.exec(tt))) {
+      const raw = decodeXml(lm[1])
+        .replace(/<[^>]+>/g, "")
+        .replace(/\n/g, " ")
+        .trim();
+      if (raw) lines.push(raw);
+    }
+    const transcript = lines.join(" ").replace(/\s+/g, " ").trim();
+    return transcript || null;
+  } catch (e) {
+    console.error("transcript error", videoId, e);
+    return null;
+  }
+}
+
+// ---- Whisper fallback ---------------------------------------------------
+// Extracts a direct (non-ciphered) audio stream URL from the YouTube watch
+// page and sends it to OpenAI Whisper. Returns null if no usable URL is
+// available (some videos sign their URLs and require signature deciphering,
+// which we don't implement here).
+async function fetchAudioStreamUrl(videoId: string): Promise<{ url: string; mime: string } | null> {
+  try {
+    const watch = await fetch(`https://www.youtube.com/watch?v=${videoId}&hl=en`, {
+      headers: { "User-Agent": UA, "Accept-Language": "en-US,en;q=0.9" },
+    });
+    if (!watch.ok) return null;
+    const html = await watch.text();
+    const player = extractJsonObjectAfter(html, "ytInitialPlayerResponse");
+    if (!player) return null;
+    const formats: any[] = player?.streamingData?.adaptiveFormats ?? [];
+    // audio-only mp4 (m4a) — smallest bitrate to stay under Whisper 25MB
+    const audio = formats
+      .filter((f) => typeof f?.mimeType === "string" && f.mimeType.startsWith("audio/") && f.url)
+      .sort((a, b) => (a.bitrate ?? 0) - (b.bitrate ?? 0))[0];
+    if (!audio) return null;
+    return { url: audio.url, mime: (audio.mimeType.split(";")[0] || "audio/mp4") };
+  } catch (e) {
+    console.error("audio extract error", videoId, e);
+    return null;
+  }
+}
+
+async function transcribeWithWhisper(videoId: string): Promise<string | null> {
+  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+  if (!OPENAI_API_KEY) {
+    console.warn("OPENAI_API_KEY not set, skipping Whisper fallback");
+    return null;
+  }
+  const stream = await fetchAudioStreamUrl(videoId);
+  if (!stream) {
+    console.warn("no audio stream URL for", videoId);
+    return null;
+  }
+  try {
+    const audioResp = await fetch(stream.url, { headers: { "User-Agent": UA } });
+    if (!audioResp.ok) {
+      console.warn("audio fetch failed", videoId, audioResp.status);
+      return null;
+    }
+    const buf = await audioResp.arrayBuffer();
+    if (buf.byteLength > 25 * 1024 * 1024) {
+      console.warn("audio too large for Whisper", videoId, buf.byteLength);
+      return null;
+    }
+    const ext = stream.mime.includes("webm") ? "webm" : "m4a";
+    const form = new FormData();
+    form.append("file", new Blob([buf], { type: stream.mime }), `${videoId}.${ext}`);
+    form.append("model", "whisper-1");
+    form.append("response_format", "text");
+    const wResp = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
+    });
+    if (!wResp.ok) {
+      console.error("whisper error", videoId, wResp.status, await wResp.text());
+      return null;
+    }
+    const text = (await wResp.text()).trim();
+    return text || null;
+  } catch (e) {
+    console.error("whisper exception", videoId, e);
+    return null;
+  }
+}
+
+const SUMMARY_TOOL = {
+  type: "function",
+  function: {
+    name: "emit_takes",
+    description: "Emit structured Sal Vetri takes from a video transcript.",
+    parameters: {
+      type: "object",
+      properties: {
+        summary: { type: "string", description: "2-3 sentence overview of the video's thesis." },
+        positions: {
+          type: "array",
+          items: { type: "string", enum: ["QB", "RB", "WR", "TE", "K", "DST"] },
+          description: "Positions discussed.",
+        },
+          takes: {
+          type: "array",
+          minItems: 1,
+          maxItems: 12,
+          items: {
+            type: "object",
+            properties: {
+              player: { type: "string", description: "Player full name." },
+              position: { type: "string", enum: ["QB", "RB", "WR", "TE", "K", "DST"] },
+              lean: {
+                type: "string",
+                enum: ["target", "value", "fade", "avoid", "sleeper", "breakout", "neutral"],
+                description: "Sal's directional take.",
+              },
+              tier: { type: "string", description: "Tier label if mentioned (e.g. 'Tier 1 RB'). Optional, may be empty." },
+              reasoning: { type: "string", description: "Punchy 1-sentence WHY in Sal's voice. <=140 chars." },
+              salPrice: { type: "string", description: "Exact $ amount or range Sal explicitly states for this player (e.g. '$45', '$30-35', 'late round'). Empty string if he gives no price." },
+              estPrice: { type: "integer", description: "Your auction value estimate in dollars assuming a STANDARD $200 auction budget, 12-team PPR. Base it on Sal's lean (target/breakout=premium, value=mid, fade/avoid=cheap), position, and tier. Use 1 for waiver-tier. Always provide a number." },
+            },
+            required: ["player", "position", "lean", "reasoning", "estPrice"],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ["summary", "positions", "takes"],
+      additionalProperties: false,
+    },
+  },
+};
+
+type Source = "captions" | "description" | "whisper" | "blog";
+
+async function distill(title: string, transcript: string, source: Source = "captions"): Promise<{ summary: string; positions: string[]; takes: any[] } | null> {
+  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
+  const trimmed = transcript.length > 28000 ? transcript.slice(0, 28000) + " [truncated]" : transcript;
+
+  const system = `You are an analyst extracting actionable fantasy football takes from Sal Vetri's content. Sal is a sharp, contrarian fantasy analyst — capture HIS opinions and directional calls on specific players, not generic advice. Be faithful to what he actually says. If he's high on a player, lean=target/breakout/sleeper. If he's down, lean=fade/avoid. Use 'value' when he says good price. Use 'neutral' only when he discusses without a clear direction.\n\nFor EVERY take you MUST also provide an estPrice — your best estimate of the player's auction value in dollars on a STANDARD $200, 12-team PPR auction. Use Sal's lean as a strong signal (targets/breakouts cost a premium for their tier; fades/avoids should be discounted; sleepers are cheap dart throws $1-5). Anchor to consensus tiers (elite RB1/WR1 $50-70, mid RB2/WR2 $25-40, flex $10-20, late-round $1-5). If Sal explicitly states a $ amount or range, copy it verbatim into salPrice (e.g. '$45', '$30-35') — leave salPrice empty otherwise. estPrice is REQUIRED and must always be a positive integer.`;
+
+  const sourceNote = source === "description"
+    ? "## Source\nThis is the YouTube DESCRIPTION (captions weren't available). Treat each entry as Sal's stated take."
+    : source === "whisper"
+    ? "## Source\nThis is a WHISPER audio transcription. Expect occasional misspellings of player names — normalize to the most likely real NFL player."
+    : source === "blog"
+    ? "## Source\nThis is Sal's WRITTEN BLOG POST mirroring the video. It is well-formatted with numbered player headers — extract every named player."
+    : "";
+  const expected = expectedTakeCountFromTitle(title);
+  const countInstruction = expected
+    ? `The title promises ${expected} players. Extract exactly ${expected} player takes if the content contains them. Do not return zero takes unless the content truly contains no player names.`
+    : "Extract every clearly named player take. Do not return zero takes if specific player names are present.";
+  const user = `## Video Title\n${title}\n${sourceNote}\n\n## Content (${source}, may have minor errors)\n${trimmed}\n\n## Task\nCall emit_takes with Sal's structured takes. ${countInstruction} The UI needs the names first, not a generic recap. Reasoning must quote/paraphrase his actual rationale, not generic stats.`;
+
+  const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      tools: [SUMMARY_TOOL],
+      tool_choice: { type: "function", function: { name: "emit_takes" } },
+    }),
+  });
+
+  if (!resp.ok) {
+    const t = await resp.text();
+    console.error("AI gateway error", resp.status, t);
+    if (resp.status === 429) throw new Error("rate_limit");
+    if (resp.status === 402) throw new Error("payment_required");
+    throw new Error(`ai_${resp.status}`);
+  }
+  const data = await resp.json();
+  const args = data?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments;
+  if (!args) return null;
+  try {
+    return JSON.parse(args);
+  } catch {
+    return null;
+  }
+}
+
+Deno.serve(async (req: Request) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  try {
+    const url = new URL(req.url);
+    const max = Math.min(parseInt(url.searchParams.get("max") ?? "5", 10) || 5, 10);
+    const force = url.searchParams.get("force") === "1";
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const sb = createClient(supabaseUrl, serviceKey);
+
+    const feedResp = await fetch(RSS_URL, { headers: { "User-Agent": UA } });
+    if (!feedResp.ok) throw new Error(`RSS fetch ${feedResp.status}`);
+    const xml = await feedResp.text();
+    const items = parseFeed(xml, max);
+
+    const { data: existing } = await sb
+      .from("vetri_notes")
+      .select("video_id, status, takes")
+      .in("video_id", items.map((i) => i.videoId));
+    const existingMap = new Map((existing ?? []).map((r) => [r.video_id, r]));
+
+    const results: { videoId: string; title: string; status: string; error?: string }[] = [];
+
+    for (const item of items) {
+      const prior = existingMap.get(item.videoId);
+      const priorTakeCount = Array.isArray(prior?.takes) ? prior.takes.length : 0;
+      const expected = expectedTakeCountFromTitle(item.title);
+      const hasUsefulCache = prior?.status === "ready" && priorTakeCount > 0 && (expected == null || priorTakeCount >= Math.min(expected, 3));
+      if (!force && hasUsefulCache) {
+        results.push({ videoId: item.videoId, title: item.title, status: "skipped" });
+        continue;
+      }
+
+      // Upsert a "processing" row so the UI shows it immediately.
+      await sb.from("vetri_notes").upsert(
+        {
+          video_id: item.videoId,
+          title: item.title,
+          url: item.url,
+          published_at: item.publishedAt,
+          status: "processing",
+          error: null,
+        },
+        { onConflict: "video_id" },
+      );
+
+      let transcript = await fetchTranscript(item.videoId);
+      let source: Source = "captions";
+      if (!transcript) {
+        if (item.description && descriptionLooksActionable(item.description)) {
+          transcript = item.description;
+          source = "description";
+        } else {
+          // Try blog mirror first (cheap, well-structured)
+          const blogText = await fetchBlogPost(item.title);
+          if (blogText) {
+            transcript = blogText;
+            source = "blog";
+          } else {
+            const whisperText = await transcribeWithWhisper(item.videoId);
+            if (whisperText && whisperText.length > 100) {
+              transcript = whisperText;
+              source = "whisper";
+            } else {
+              await sb
+                .from("vetri_notes")
+                .update({ status: "no_transcript", error: "No captions, blog post, or audio transcript available" })
+                .eq("video_id", item.videoId);
+              results.push({ videoId: item.videoId, title: item.title, status: "no_transcript" });
+              continue;
+            }
+          }
+        }
+      }
+
+      try {
+        const distilled = await distill(item.title, transcript, source);
+        const expected = expectedTakeCountFromTitle(item.title);
+        const takeCount = distilled?.takes?.length ?? 0;
+        if (!distilled || takeCount === 0 || (expected != null && takeCount < Math.min(expected, 3))) {
+          // Try escalating fallbacks: blog → whisper
+          const tryNext = async (nextSource: Source, fetcher: () => Promise<string | null>) => {
+            if (source === nextSource) return null;
+            const text = await fetcher();
+            if (!text || text.length < 100) return null;
+            const retry = await distill(item.title, text, nextSource);
+            if (retry && retry.takes?.length > 0) {
+              transcript = text;
+              source = nextSource;
+              return retry;
+            }
+            return null;
+          };
+          const retry =
+            (await tryNext("blog", () => fetchBlogPost(item.title))) ||
+            (await tryNext("whisper", () => transcribeWithWhisper(item.videoId)));
+          if (retry) {
+            await sb
+              .from("vetri_notes")
+              .update({
+                status: "ready",
+                error: null,
+                transcript,
+                summary: retry.summary,
+                takes: retry.takes,
+                positions: retry.positions ?? [],
+              })
+              .eq("video_id", item.videoId);
+            results.push({ videoId: item.videoId, title: item.title, status: "ready" });
+            continue;
+          }
+          await sb
+            .from("vetri_notes")
+            .update({ status: "failed", error: expected ? `Expected player list from title, got ${takeCount} takes` : "Model returned no takes", transcript })
+            .eq("video_id", item.videoId);
+          results.push({ videoId: item.videoId, title: item.title, status: "failed" });
+          continue;
+        }
+        await sb
+          .from("vetri_notes")
+          .update({
+            status: "ready",
+            error: null,
+            transcript,
+            summary: distilled.summary,
+            takes: distilled.takes,
+            positions: distilled.positions ?? [],
+          })
+          .eq("video_id", item.videoId);
+        results.push({ videoId: item.videoId, title: item.title, status: "ready" });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "unknown";
+        await sb
+          .from("vetri_notes")
+          .update({ status: "failed", error: msg, transcript })
+          .eq("video_id", item.videoId);
+        results.push({ videoId: item.videoId, title: item.title, status: "failed", error: msg });
+        if (msg === "rate_limit" || msg === "payment_required") break;
+      }
+    }
+
+    return new Response(JSON.stringify({ results }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    console.error("vetri-notes-refresh error", e);
+    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
