@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { ArrowLeft, Copy, Download, Eye, EyeOff, RefreshCw, Shield } from "lucide-react";
+import { ArrowLeft, Copy, Eye, EyeOff, RefreshCw, Shield } from "lucide-react";
 import ConnectorStatus from "@/components/ConnectorStatus";
 
 interface League { leagueId: number; leagueName: string; teamId: number; teamName: string; seasonId: number; }
@@ -426,26 +426,13 @@ alert('✓ Auction Coach live sync active!');})();`;
                 <Label className="text-xs">Webhook URL</Label>
                 <Input readOnly value={webhookUrl} className="font-mono text-[10px]" />
               </div>
-              <Button variant="outline" size="sm" onClick={() => downloadExtension()}>
-                <Download className="mr-1 h-3.5 w-3.5" /> Download extension (.zip)
-              </Button>
+              <p className="text-[11px] text-muted-foreground">
+                Extension downloads are disabled on this page to prevent mobile browser download prompts.
+              </p>
             </div>
           </div>
         </details>
       </Card>
     </div>
   );
-}
-
-function downloadExtension() {
-  fetch("/auction-coach-extension.zip")
-    .then((r) => { if (!r.ok) throw new Error(`Download failed: ${r.status}`); return r.blob(); })
-    .then((blob) => {
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "auction-coach-extension.zip";
-      a.click();
-      URL.revokeObjectURL(a.href);
-    })
-    .catch((e) => toast.error(e.message));
 }
