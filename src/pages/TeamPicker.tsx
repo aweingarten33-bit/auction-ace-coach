@@ -95,9 +95,7 @@ export default function TeamPicker() {
         {error && !loading && (
           <Card className="border-destructive/40 bg-destructive/5 p-4 text-xs text-destructive">
             <p className="mb-1 font-semibold">Couldn't load teams.</p>
-            <p className="text-destructive/80">
-              {error}. The league commissioner may need to connect ESPN first.
-            </p>
+            <p className="text-destructive/80">{error}</p>
             <Button variant="outline" size="sm" className="mt-3" onClick={skip}>
               Continue without picking →
             </Button>

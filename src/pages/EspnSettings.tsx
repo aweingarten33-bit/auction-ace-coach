@@ -102,7 +102,15 @@ export default function EspnSettings() {
     });
     setBusy(false);
     if (error || data?.error) {
-      toast.error(data?.error ?? error?.message ?? "Failed");
+      let errMsg: string = data?.error ?? data?.hint ?? "";
+      if (!errMsg && error) {
+        try {
+          const body = await (error as any).context?.json?.();
+          errMsg = body?.error ?? body?.hint ?? "";
+        } catch { /* ignore */ }
+        errMsg = errMsg || error.message || "Failed";
+      }
+      toast.error(errMsg || "Failed");
       return;
     }
     setLeagues(data.leagues ?? []);

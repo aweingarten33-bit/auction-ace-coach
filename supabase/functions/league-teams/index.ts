@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
 
     const { data: snap } = await query.maybeSingle();
     if (!snap) {
-      return j({ error: "No league snapshot yet. Commissioner needs to sync ESPN first." }, 400);
+      return j({ ok: false, error: "No league snapshot yet. Commissioner needs to sync ESPN first." });
     }
 
     return j({
