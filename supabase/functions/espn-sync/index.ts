@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
     if (!auth) return j({ error: "missing auth" }, 401);
 
     const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
-    const { data: u } = await sb.auth.getUser();
+    const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
     if (!u.user) return j({ error: "unauthorized" }, 401);
 
     // Prefer the caller's own creds; if their row lacks a league, fall back to
