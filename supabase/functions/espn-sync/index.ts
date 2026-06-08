@@ -13,23 +13,30 @@ Deno.serve(async (req) => {
     const url = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // Soft auth — try to get caller's user_id but don't block if unavailable.
     const auth = req.headers.get("Authorization");
-    if (!auth) return j({ error: "missing auth" }, 401);
+    let userId: string | null = null;
+    if (auth) {
+      const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
+      const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
+      if (u.user) userId = u.user.id;
+    }
 
-    const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
-    const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
-    if (!u.user) return j({ error: "unauthorized" }, 401);
+    const admin = createClient(url, service);
 
-    // Prefer the caller's own creds; if their row lacks a league, fall back to
-    // any configured league (ESPN connection is admin-owned/shared in this app).
-    let { data: creds } = await sb
-      .from("espn_credentials")
-      .select("swid, espn_s2, league_id, season_id")
-      .eq("user_id", u.user.id)
-      .maybeSingle();
+    // Try caller's own creds first; always fall back to any shared league creds.
+    let creds: { swid: string; espn_s2: string; league_id: number | null; season_id: number | null } | null = null;
+    if (userId) {
+      const { data } = await admin
+        .from("espn_credentials")
+        .select("swid, espn_s2, league_id, season_id")
+        .eq("user_id", userId)
+        .maybeSingle();
+      creds = data;
+    }
 
     if (!creds?.league_id || !creds?.season_id) {
-      const admin = createClient(url, service);
       const { data: shared } = await admin
         .from("espn_credentials")
         .select("swid, espn_s2, league_id, season_id")
