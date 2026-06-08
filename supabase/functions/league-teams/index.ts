@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     const auth = req.headers.get("Authorization");
     if (auth) {
       const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
-      const { data: u } = await sb.auth.getUser();
+      const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
       if (u.user) {
         const { data: prof } = await sb
           .from("profiles")
