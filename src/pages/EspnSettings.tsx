@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { ArrowLeft, Copy, Eye, EyeOff, RefreshCw, Shield } from "lucide-react";
@@ -15,8 +16,9 @@ import ConnectorStatus from "@/components/ConnectorStatus";
 interface League { leagueId: number; leagueName: string; teamId: number; teamName: string; seasonId: number; }
 
 export default function EspnSettings() {
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const nav = useNavigate();
+  const [signingIn, setSigningIn] = useState(false);
   const [swid, setSwid] = useState("");
   const [s2, setS2] = useState("");
   const [season, setSeason] = useState(new Date().getFullYear());
@@ -236,6 +238,27 @@ alert('✓ Auction Coach live sync active!');})();`;
     try { await navigator.clipboard.writeText(url); } catch { /* ignore */ }
     toast.success("Invite link copied");
   };
+
+  if (!authLoading && !user) {
+    const handleSignIn = async () => {
+      setSigningIn(true);
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.href });
+      if (result.error) { toast.error(result.error.message ?? "Sign-in failed"); setSigningIn(false); }
+    };
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Sign in to connect ESPN</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A free account keeps your ESPN cookies and league data saved across sessions.
+          </p>
+        </div>
+        <Button onClick={handleSignIn} disabled={signingIn} size="lg" className="w-full max-w-xs">
+          {signingIn ? "Redirecting…" : "Continue with Google"}
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-3xl p-4 sm:p-6">
