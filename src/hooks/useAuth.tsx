@@ -22,21 +22,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         supabase.rpc("touch_last_seen").then(() => {});
       }
     });
-    // getUser() validates the token with the server — catches stale/expired sessions
-    // that getSession() (localStorage-only) would miss.
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) {
-        // No valid session — sign in anonymously so edge functions can identify the caller.
-        const { error } = await supabase.auth.signInAnonymously();
-        if (error) {
-          // Anonymous sign-ins may be disabled; fall through so loading clears.
-          setLoading(false);
-        }
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) {
+        // Auto sign-in anonymously so RLS-protected queries still work
+        await supabase.auth.signInAnonymously().catch(() => {});
         return;
       }
-      // Valid session already exists; sync state and mark ready.
-      const { data: s } = await supabase.auth.getSession();
-      setSession(s.session);
+      setSession(data.session);
       setLoading(false);
       supabase.rpc("touch_last_seen").then(() => {});
     });
