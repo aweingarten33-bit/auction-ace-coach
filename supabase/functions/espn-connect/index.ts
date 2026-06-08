@@ -105,7 +105,7 @@ Deno.serve(async (req) => {
         : undefined,
     });
   } catch (e) {
-    return j({ error: e instanceof Error ? e.message : String(e) }, 500);
+    return j({ ok: false, error: e instanceof Error ? e.message : String(e) });
   }
 });
 
