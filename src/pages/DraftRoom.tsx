@@ -74,6 +74,9 @@ export default function DraftRoom() {
     watchlist,
     pinPlayer,
     unpinPlayer,
+    slotAllocations,
+    slotNotes,
+    lockedSlots,
   } = useDraftStore();
 
 
