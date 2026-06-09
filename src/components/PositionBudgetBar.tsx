@@ -124,67 +124,6 @@ export default function PositionBudgetBar() {
         </button>
       </div>
 
-      {/* Anchors */}
-      <div className="border-b border-border/50 px-3 py-2.5">
-        <div className="mb-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <Anchor className="h-3 w-3" />
-            Anchors
-            {anchorsTotal > 0 && (
-              <span className="font-mono text-[10px] text-foreground/80">· ${anchorsTotal}</span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={addAnchor}
-            disabled={anchors.length >= 5}
-            className="flex items-center gap-1 rounded-md border border-border bg-secondary/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition hover:text-foreground disabled:opacity-40"
-          >
-            <Plus className="h-3 w-3" />
-            add
-          </button>
-        </div>
-        {anchors.length === 0 ? (
-          <p className="text-[11px] leading-snug text-muted-foreground">
-            Pre-allocate $ to 1–5 must-have players. Rest of the plan rebalances around them.
-          </p>
-        ) : (
-          <div className="space-y-1.5">
-            {anchors.map((a) => (
-              <div key={a.id} className="flex items-center gap-2">
-                <Input
-                  value={a.name}
-                  placeholder="Player name"
-                  onChange={(e) => updateAnchor(a.id, { name: e.target.value })}
-                  className="h-8 flex-1 min-w-0 rounded-lg px-2 text-xs"
-                  aria-label="Anchor player name"
-                />
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <span className="text-sm text-muted-foreground">$</span>
-                  <Input
-                    inputMode="numeric"
-                    value={String(a.price)}
-                    onChange={(e) => {
-                      const n = Number(e.target.value.replace(/[^0-9]/g, ""));
-                      updateAnchor(a.id, { price: Number.isFinite(n) ? n : 0 });
-                    }}
-                    className="h-8 w-14 rounded-lg px-2 text-right font-mono text-sm"
-                    aria-label="Anchor price"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeAnchor(a.id)}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 hover:bg-secondary hover:text-foreground"
-                  aria-label="Remove anchor"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* Reserve buffer */}
       <div className="border-b border-border/50 px-3 py-2.5">
