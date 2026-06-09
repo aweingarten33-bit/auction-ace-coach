@@ -105,10 +105,14 @@ export default function PositionBudgetBar() {
   const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
   const clearSlotAllocations = useDraftStore((s) => s.clearSlotAllocations);
   const strategyId = useDraftStore((s) => s.strategyId);
+  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
   const strategy = getStrategy(strategyId);
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
-  const suggested = useMemo(() => suggestAllocations(settings, strategyId), [settings, strategyId]);
+  const suggested = useMemo(
+    () => suggestAllocations(settings, strategyId, customStrategyRules),
+    [settings, strategyId, customStrategyRules],
+  );
 
   // ── Base plan: user override per slot, else strategy suggestion ────────
   const basePlan = useMemo(() => {
