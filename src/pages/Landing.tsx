@@ -62,19 +62,8 @@ export default function Landing() {
       {/* ── Gradient overlay (CBS navy) ───────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0a1f3d]/80 via-[#0a1f3d]/60 to-[#050d1c]" />
 
-      {/* ── Top broadcast bar ─────────────────────────────────────────────── */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-2 text-[10px] font-bold tracking-[0.3em] text-white/70">
-        <span>● LIVE · DRAFT ROOM</span>
-        <span className="text-red-500">2025 SEASON</span>
-      </div>
-
       {/* ── Main content ──────────────────────────────────────────────────── */}
       <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
-
-        {/* Spinning football */}
-        <div className="mb-6 opacity-90">
-          <SpinningFootball size={150} speed={10} />
-        </div>
 
         {/* CBS-style stacked headline */}
         <h1 className="mb-0 text-center font-bebas leading-[0.95] tracking-wide">
@@ -98,14 +87,6 @@ export default function Landing() {
           />
         </h1>
 
-        {/* Tagline */}
-        <p
-          className="mb-8 mt-6 max-w-xs text-center text-sm leading-relaxed text-white/60"
-          style={{ animation: "fade-in 0.6s 1s ease-out both" }}
-        >
-          Budget-path planning grounded in your league's 3-year price history.
-          Know exactly what to spend and on who.
-        </p>
 
         {/* CTA buttons */}
         <div
