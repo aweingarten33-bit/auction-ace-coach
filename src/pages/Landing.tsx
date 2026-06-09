@@ -184,19 +184,8 @@ export default function Landing() {
           />
         </h1>
 
-        {/* Mini stat row */}
-        <div
-          className="mt-6 flex items-center gap-4 text-[10px] font-bold tracking-[0.25em] text-white/50"
-          style={{ animation: "fade-in 0.6s 1s ease-out both" }}
-        >
-          <span>3-YR HISTORY</span>
-          <span className="h-1 w-1 rounded-full bg-red-500" />
-          <span>SUPERFLEX</span>
-          <span className="h-1 w-1 rounded-full bg-red-500" />
-          <span>LIVE TIERS</span>
-        </div>
-
         {/* CTA buttons */}
+
         <div
           className="mt-8 flex w-full max-w-xs flex-col gap-3"
           style={{ animation: "fade-in 0.6s 1.2s ease-out both" }}
