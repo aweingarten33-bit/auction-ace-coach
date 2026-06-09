@@ -196,14 +196,6 @@ export default function PositionBudgetBar() {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
 
-      {/* ── Strategy section ─────────────────────────── */}
-      <div className="border-b border-border/50 px-4 py-4">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Draft strategy
-        </p>
-        <DraftStrategyPanel />
-      </div>
-
       {/* ── Slot breakdown ────────────────────────────── */}
       <div className="px-4 py-4">
         <div className="mb-3 flex items-center justify-between">
@@ -214,7 +206,7 @@ export default function PositionBudgetBar() {
 
         <p className="mb-3 flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
           <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/70" />
-          When you edit a slot, the leftover or overage is proportionally redistributed across the remaining open slots.
+          Type a value or lock a slot — leftover budget splits evenly across the remaining open slots.
         </p>
         <div className="space-y-2">
           {slots.map((slot) => {
