@@ -187,7 +187,7 @@ export default function PositionBudgetBar() {
     }
     redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
     return { allocations, locked };
-  }, [slots, basePlan, picksByGroup, settings.totalBudget, slotAllocations]);
+  }, [slots, basePlan, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
 
   // Legacy display: total spent by position group (sum of locked slots)
   const spent = useMemo(() => {
