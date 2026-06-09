@@ -193,6 +193,7 @@ export const useDraftStore = create<DraftState>()(
           showMath: false,
           draftPlan: null,
           slotAllocations: {},
+          lockedSlots: {},
           strategyId: "none",
           customStrategyRules: "",
         }),
