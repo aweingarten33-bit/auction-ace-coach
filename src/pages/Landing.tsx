@@ -155,30 +155,9 @@ export default function Landing() {
       <div className="pointer-events-none absolute left-3 bottom-3 h-6 w-6 border-l-2 border-b-2 border-red-500/60" />
       <div className="pointer-events-none absolute right-3 bottom-3 h-6 w-6 border-r-2 border-b-2 border-red-500/60" />
 
-      {/* ── Vertical side label ──────────────────────────────────────────── */}
-      <div className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2">
-        <span
-          className="block text-[9px] font-bold tracking-[0.5em] text-white/25"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          DRAFT • 2025 • SUPERFLEX
-        </span>
-      </div>
-
       {/* ── Main content ──────────────────────────────────────────────────── */}
       <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
 
-        {/* Live chip */}
-        <div
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 backdrop-blur-sm"
-          style={{ animation: "fade-in 0.5s 0.1s ease-out both" }}
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
-          </span>
-          <span className="text-[10px] font-bold tracking-[0.3em] text-red-100">DRAFT ROOM LIVE</span>
-        </div>
 
         {/* CBS-style stacked headline */}
         <h1 className="mb-0 text-center font-bebas leading-[0.95] tracking-wide">
