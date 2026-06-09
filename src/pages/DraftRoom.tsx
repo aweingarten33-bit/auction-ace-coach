@@ -159,7 +159,7 @@ export default function DraftRoom() {
   const myCount = useMemo(() => countByPosition(myItems), [myItems]);
   const spend = useMemo(() => spendByPosition(events), [events]);
   const runs = useMemo(() => recentRuns(events, 6), [events]);
-  const pulse = useMemo(() => computeMarketPulse(events, prices), [events, prices]);
+  
   // Re-price undrafted players in real time as players come off the board.
   const adjustedPrices = useMemo(() => adjustPricesForDrafted(prices, events), [prices, events]);
 
