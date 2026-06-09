@@ -673,7 +673,7 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
       onClick={async () => {
         setBusy(true);
         try {
-          const { error } = await supabase.functions.invoke("espn-refresh-league");
+          const { error } = await supabase.functions.invoke("espn-sync");
           if (error) throw error;
           toast.success("League refreshed from ESPN.");
           onDone();
