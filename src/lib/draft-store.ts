@@ -162,6 +162,12 @@ export const useDraftStore = create<DraftState>()(
       setSlotNote: (id, note) =>
         set((s) => ({ slotNotes: { ...s.slotNotes, [id]: note } })),
       clearSlotNotes: () => set({ slotNotes: {} }),
+      touchedSlots: {},
+      markSlotTouched: (id) =>
+        set((s) => ({ touchedSlots: { ...s.touchedSlots, [id]: true } })),
+      clearTouchedSlots: () => set({ touchedSlots: {} }),
+      plannerStrategy: "stars",
+      setPlannerStrategy: (s) => set({ plannerStrategy: s, touchedSlots: {} }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
