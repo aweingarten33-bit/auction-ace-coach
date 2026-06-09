@@ -48,7 +48,9 @@ Deno.serve(async (req) => {
 
     const { data: snap } = await query.maybeSingle();
     if (!snap) {
-      return j({ error: "No league snapshot yet. Commissioner needs to sync ESPN first." }, 400);
+      // Not an error — just an empty state before the commissioner has synced.
+      // Return 200 so the client doesn't treat this as a runtime failure.
+      return j({ ok: true, teams: [], league: null, empty: true, message: "No league snapshot yet. Commissioner needs to sync ESPN first." });
     }
 
     return j({
@@ -56,6 +58,7 @@ Deno.serve(async (req) => {
       teams: Array.isArray(snap.teams) ? snap.teams : [],
       league: { id: snap.league_id, season: snap.season_id, name: snap.league_name, synced_at: snap.synced_at },
     });
+
   } catch (e) {
     return j({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
