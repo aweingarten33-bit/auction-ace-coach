@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Info, Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
@@ -6,7 +6,7 @@ import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
 
-type AllocationMode = "manual";
+
 
 
 type SlotGroup = Position | "FLEX" | "SUPERFLEX" | "BENCH";
@@ -55,13 +55,6 @@ export default function PositionBudgetBar() {
   const lockedSlots = useDraftStore((s) => s.lockedSlots);
   const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
 
-  const [mode, setMode] = useState<AllocationMode>(() => {
-    try { return (localStorage.getItem("planner-mode") as AllocationMode) || "even"; } catch { return "even"; }
-  });
-  const updateMode = (m: AllocationMode) => {
-    setMode(m);
-    try { localStorage.setItem("planner-mode", m); } catch { /* quota */ }
-  };
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
 
@@ -99,25 +92,7 @@ export default function PositionBudgetBar() {
     const open = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
     const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum);
 
-    // Equal split across the still-open slots (only in "even" mode).
-    // In "manual" mode, untouched slots stay at $0 — user types every value.
     const rounded = open.map(() => 0);
-    if (mode === "even" && open.length > 0) {
-      const floor = remaining >= open.length ? 1 : 0;
-      const spendable = Math.max(0, remaining - floor * open.length);
-      const share = spendable / open.length;
-      for (let j = 0; j < open.length; j += 1) rounded[j] = Math.max(floor, Math.round(floor + share));
-      let diff = remaining - rounded.reduce((sum, v) => sum + v, 0);
-      let i = 0;
-      let guard = 0;
-      while (diff !== 0 && guard < 5000) {
-        const idx = i % open.length;
-        if (diff > 0) { rounded[idx] += 1; diff -= 1; }
-        else if (rounded[idx] > floor) { rounded[idx] -= 1; diff += 1; }
-        i += 1;
-        guard += 1;
-      }
-    }
 
     const allocations: Record<string, number> = {};
     for (const slot of slots) {
