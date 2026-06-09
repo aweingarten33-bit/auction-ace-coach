@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Lock, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Info, Lock, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -243,6 +243,10 @@ export default function PositionBudgetBar() {
           </div>
         </div>
 
+        <p className="mb-3 flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
+          <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/70" />
+          When you edit a slot, the leftover or overage is proportionally redistributed across the remaining open slots.
+        </p>
         <div className="space-y-2">
           {slots.map((slot) => {
             const value = allocations[slot.id] ?? 0;
