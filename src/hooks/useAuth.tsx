@@ -15,24 +15,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    let mounted = true;
+    let initializing = true;
+
+    const applySession = (s: Session | null) => {
+      if (!mounted) return;
       setSession(s);
-      setLoading(false);
       if (s?.user) {
         supabase.rpc("touch_last_seen").then(() => {});
       }
-    });
-    supabase.auth.getSession().then(async ({ data }) => {
-      if (!data.session) {
-        // Auto sign-in anonymously so RLS-protected queries still work
-        await supabase.auth.signInAnonymously().catch(() => {});
-        return;
+    };
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      applySession(s);
+      if (s || !initializing) {
+        setLoading(false);
       }
-      setSession(data.session);
-      setLoading(false);
-      supabase.rpc("touch_last_seen").then(() => {});
     });
-    return () => sub.subscription.unsubscribe();
+
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          applySession(data.session);
+          return;
+        }
+
+        // Auto sign-in anonymously so RLS-protected queries still work.
+        // Keep auth loading until this finishes so protected pages never call
+        // edge functions without a Bearer token on fresh Vercel loads.
+        const { data: anonData } = await supabase.auth.signInAnonymously();
+        applySession(anonData.session ?? null);
+      } finally {
+        initializing = false;
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
   }, []);
 
   return (
