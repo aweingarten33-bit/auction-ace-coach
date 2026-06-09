@@ -56,7 +56,7 @@ interface DraftState {
   // Slots the user has manually edited — never auto-overwrite these.
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
-  plannerStrategy: "stars" | "balanced" | "wr-heavy";
+  plannerStrategy: "stars" | "balanced" | "wr-heavy" | "superflex";
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -97,7 +97,7 @@ interface DraftState {
   clearSlotNotes: () => void;
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
-  setPlannerStrategy: (s: "stars" | "balanced" | "wr-heavy") => void;
+  setPlannerStrategy: (s: "stars" | "balanced" | "wr-heavy" | "superflex") => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
@@ -166,18 +166,32 @@ export const useDraftStore = create<DraftState>()(
       markSlotTouched: (id) =>
         set((s) => ({ touchedSlots: { ...s.touchedSlots, [id]: true } })),
       clearTouchedSlots: () => set({ touchedSlots: {} }),
-      plannerStrategy: "stars",
+      plannerStrategy:
+        DEFAULT_SETTINGS.leagueType === "Superflex" || DEFAULT_SETTINGS.leagueType === "2QB"
+          ? "superflex"
+          : "stars",
       setPlannerStrategy: (s) => set({ plannerStrategy: s, touchedSlots: {} }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
+          // Auto-swap planner strategy when league type flips to/from Superflex.
+          const wasSF = state.settings.leagueType === "Superflex" || state.settings.leagueType === "2QB";
+          const isSF = next.leagueType === "Superflex" || next.leagueType === "2QB";
+          const patch: Partial<DraftState> = { settings: next };
+          if (isSF && !wasSF && state.plannerStrategy !== "superflex") {
+            patch.plannerStrategy = "superflex";
+            patch.touchedSlots = {};
+          } else if (!isSF && wasSF && state.plannerStrategy === "superflex") {
+            patch.plannerStrategy = "stars";
+            patch.touchedSlots = {};
+          }
           // Auto-recompute Vetri values when budget/teams/scoring/leagueType change
           if (state.vetriAutoSync && state.vetriRankings.length) {
             const computed = computeTierValues(state.vetriRankings, next, state.vetriDecay);
             const prices = mergeVetriIntoPrices(state.prices, computed, new Set(state.priceOverrides));
-            return { settings: next, prices };
+            return { ...patch, prices };
           }
-          return { settings: next };
+          return patch;
         }),
       setRoster: (key, value) =>
         set((state) => {
@@ -232,7 +246,10 @@ export const useDraftStore = create<DraftState>()(
           lockedSlots: {},
           slotNotes: {},
           touchedSlots: {},
-          plannerStrategy: "stars",
+          plannerStrategy:
+            DEFAULT_SETTINGS.leagueType === "Superflex" || DEFAULT_SETTINGS.leagueType === "2QB"
+              ? "superflex"
+              : "stars",
           strategyId: "none",
           customStrategyRules: "",
         }),

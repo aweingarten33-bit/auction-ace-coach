@@ -23,7 +23,7 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   BENCH:     "bg-secondary text-black border-border",
 };
 
-const STRATEGIES: StrategyId[] = ["stars", "balanced", "wr-heavy"];
+const STRATEGIES: StrategyId[] = ["stars", "balanced", "wr-heavy", "superflex"];
 
 export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);

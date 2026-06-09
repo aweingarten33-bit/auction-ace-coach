@@ -10,12 +10,13 @@
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "./planner-slots";
 import type { LeagueSettings } from "./draft-types";
 
-export type StrategyId = "stars" | "balanced" | "wr-heavy";
+export type StrategyId = "stars" | "balanced" | "wr-heavy" | "superflex";
 
 export const STRATEGY_LABELS: Record<StrategyId, string> = {
   stars: "Stars & Scrubs",
   balanced: "Balanced",
   "wr-heavy": "WR-Heavy",
+  superflex: "Superflex",
 };
 
 type WeightTable = Partial<Record<SlotGroup, number[]>>;
@@ -47,6 +48,17 @@ const STRATEGIES: Record<StrategyId, WeightTable> = {
     TE:        [6, 2],
     FLEX:      [12, 8],
     SUPERFLEX: [24],
+  },
+  // Superflex / 2QB — QB1 + SF (or QB2) are top-tier assets.
+  // Calibrated from Reddit r/fantasyfootball SF AAVs, Sleeper SF ADP, and
+  // FantasyPros 2025 SF auction values: QB1 ~20%, SF/QB2 ~11%, RB1 ~18%.
+  superflex: {
+    QB:        [40, 22],
+    RB:        [36, 20, 5, 2, 1, 1],
+    WR:        [28, 18, 5, 2, 1, 1],
+    TE:        [8, 2],
+    FLEX:      [5],
+    SUPERFLEX: [22],
   },
 };
 
