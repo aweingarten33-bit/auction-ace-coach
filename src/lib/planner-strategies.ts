@@ -13,7 +13,7 @@ import type { LeagueSettings } from "./draft-types";
 export type StrategyId = "hero-qb" | "balanced-qbs" | "bargain-qb";
 
 export const STRATEGY_LABELS: Record<StrategyId, string> = {
-  "hero-qb": "Hero QB",
+  "hero-qb": "Hero QBs",
   "balanced-qbs": "Balanced QBs",
   "bargain-qb": "Bargain QB",
 };
