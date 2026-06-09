@@ -97,7 +97,7 @@ interface DraftState {
   clearSlotNotes: () => void;
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
-  setPlannerStrategy: (s: "stars" | "balanced" | "wr-heavy" | "superflex") => void;
+  setPlannerStrategy: (s: "elite-qb" | "balanced-sf" | "hero-rb-sf") => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
