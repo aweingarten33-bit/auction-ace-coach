@@ -266,6 +266,51 @@ export type Database = {
         }
         Relationships: []
       }
+      league_snapshots: {
+        Row: {
+          auction_budget: number | null
+          created_at: string
+          importer_user_id: string | null
+          keeper_summary: Json | null
+          league_id: number
+          league_name: string | null
+          num_teams: number | null
+          roster_slots: Json | null
+          scoring: string | null
+          season_id: number
+          synced_at: string
+          teams: Json | null
+        }
+        Insert: {
+          auction_budget?: number | null
+          created_at?: string
+          importer_user_id?: string | null
+          keeper_summary?: Json | null
+          league_id: number
+          league_name?: string | null
+          num_teams?: number | null
+          roster_slots?: Json | null
+          scoring?: string | null
+          season_id: number
+          synced_at?: string
+          teams?: Json | null
+        }
+        Update: {
+          auction_budget?: number | null
+          created_at?: string
+          importer_user_id?: string | null
+          keeper_summary?: Json | null
+          league_id?: number
+          league_name?: string | null
+          num_teams?: number | null
+          roster_slots?: Json | null
+          scoring?: string | null
+          season_id?: number
+          synced_at?: string
+          teams?: Json | null
+        }
+        Relationships: []
+      }
       live_draft_events: {
         Row: {
           created_at: string
