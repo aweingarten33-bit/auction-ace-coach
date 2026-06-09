@@ -109,15 +109,77 @@ export default function PositionBudgetBar() {
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
   const suggested = useMemo(() => suggestAllocations(settings, strategyId), [settings, strategyId]);
-  const allocations = useMemo(() => {
+
+  // ── Base plan: user override per slot, else strategy suggestion ────────
+  const basePlan = useMemo(() => {
     const next: Record<string, number> = {};
     for (const slot of slots) next[slot.id] = slotAllocations[slot.id] ?? suggested[slot.id] ?? 1;
     return next;
   }, [slotAllocations, slots, suggested]);
 
+  // ── Picks I've made (events + keepers), grouped by position ────────────
+  const picksByGroup = useMemo(() => {
+    const out: Record<string, { price: number; name: string }[]> = {};
+    const push = (pos: string | null | undefined, price: number, name: string) => {
+      const g = (pos ?? "UNK") as string;
+      (out[g] ??= []).push({ price, name });
+    };
+    for (const e of events) if (e.drafter === "me") push(e.position, e.price, e.player ?? "Pick");
+    for (const k of keepers) push(k.position, k.cost, k.player ?? "Keeper");
+    for (const g of Object.keys(out)) out[g].sort((a, b) => b.price - a.price);
+    return out;
+  }, [events, keepers]);
+
+  // ── Lock filled slots at the actual price, redistribute leftover ───────
+  const { allocations, locked } = useMemo(() => {
+    const locked: Record<string, { price: number; name: string }> = {};
+    // Assign each pick in a group to the highest-planned unfilled slot in that group.
+    for (const group of Object.keys(picksByGroup)) {
+      const groupSlots = slots
+        .filter((s) => s.group === group)
+        .sort((a, b) => (basePlan[b.id] ?? 0) - (basePlan[a.id] ?? 0));
+      const picks = picksByGroup[group];
+      for (let i = 0; i < Math.min(picks.length, groupSlots.length); i += 1) {
+        locked[groupSlots[i].id] = picks[i];
+      }
+    }
+
+    const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
+    const unfilled = slots.filter((s) => !(s.id in locked));
+    const baseSum = unfilled.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
+    const remaining = Math.max(0, settings.totalBudget - lockedSum);
+
+    // Proportional redistribute with $1 floor, then integer-correct so the
+    // unfilled allocations sum to exactly `remaining`.
+    const floor = remaining >= unfilled.length ? 1 : 0;
+    const spendable = Math.max(0, remaining - floor * unfilled.length);
+    const exact = unfilled.map((slot) => floor + (spendable * (basePlan[slot.id] ?? 0)) / baseSum);
+    const rounded = exact.map((v) => Math.max(floor, Math.round(v)));
+    let diff = remaining - rounded.reduce((sum, v) => sum + v, 0);
+    const order = exact
+      .map((v, i) => ({ i, frac: v - Math.floor(v) }))
+      .sort((a, b) => diff > 0 ? b.frac - a.frac : a.frac - b.frac);
+    let guard = 0;
+    while (diff !== 0 && guard < 1000) {
+      for (const { i } of order) {
+        if (diff === 0) break;
+        if (diff > 0) { rounded[i] += 1; diff -= 1; }
+        else if (rounded[i] > floor) { rounded[i] -= 1; diff += 1; }
+      }
+      guard += 1;
+    }
+
+    const allocations: Record<string, number> = {};
+    for (const slot of slots) {
+      allocations[slot.id] = slot.id in locked ? locked[slot.id].price : 0;
+    }
+    unfilled.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
+    return { allocations, locked };
+  }, [slots, basePlan, picksByGroup, settings.totalBudget]);
+
+  // Legacy display: total spent by position group (sum of locked slots)
   const spent = useMemo(() => {
-    const mine = events.filter((e) => e.drafter === "me");
-    const byPos = spendByPosition(mine);
+    const byPos = spendByPosition(events.filter((e) => e.drafter === "me"));
     for (const k of keepers) {
       const pos = k.position ?? "UNK";
       byPos[pos] = (byPos[pos] ?? 0) + k.cost;
