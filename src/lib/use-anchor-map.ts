@@ -387,31 +387,20 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
 
           let final: number;
           if (tierPrice > 0) {
-            // Tier-first: 70% what the tier costs + 30% your league's history with this player
-            final = 0.70 * tierPrice + 0.30 * leaguePrice;
+            // PURE TIER PRICING — what your league pays for this rank slot,
+            // regardless of what they paid for this specific player in the past
+            // (keeper contracts, etc. shouldn't drag a player's current value down).
+            final = tierPrice;
           } else {
-            // Fallback: variance-aware blending (original behavior)
-            const baseLeagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
-            let disagreement = 0;
-            if (mv && mv.val > 0 && leaguePrice > 0) {
-              const hi = Math.max(mv.val, leaguePrice);
-              const lo = Math.min(mv.val, leaguePrice);
-              disagreement = Math.min(1, (hi - lo) / hi);
-            }
-            const DECAY = 0.6;
-            const FLOOR = seasonsCount >= 3 ? 0.5 : seasonsCount === 2 ? 0.4 : 0.3;
-            const adjustedLeagueWeight = Math.max(FLOOR, baseLeagueWeight * (1 - disagreement * DECAY));
-            final = leaguePrice;
-            if (vv && vv.price > 0) {
-              final = leaguePrice * adjustedLeagueWeight + vv.price * (1 - adjustedLeagueWeight);
-            }
+            // No current market rank (washed-up player no longer in projections).
+            // Fall back to market consensus first, then league history.
             if (mv && mv.val > 0) {
-              const ratio = mv.val / Math.max(1, final);
-              if (seasonsCount >= 3) {
-                if (ratio >= 1.5) final = final * 0.7 + mv.val * 0.3;
-              } else {
-                if (ratio >= 1.5) final = final * 0.6 + mv.val * 0.4;
-                else if (ratio <= 0.5) final = final * 0.7 + mv.val * 0.3;
+              final = mv.val;
+            } else {
+              const baseLeagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
+              final = leaguePrice;
+              if (vv && vv.price > 0) {
+                final = leaguePrice * baseLeagueWeight + vv.price * (1 - baseLeagueWeight);
               }
             }
           }
