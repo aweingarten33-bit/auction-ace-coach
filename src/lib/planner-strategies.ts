@@ -133,7 +133,7 @@ export function computeSlotDollars(
     open.push(slot);
   }
 
-  let pool = Math.max(0, settings.totalBudget - reserved);
+  let pool = Math.max(0, settings.totalBudget - reserved - Math.max(0, extraReserved));
 
   // Pass 2 — distribute pool across open slots by strategy weight.
   const weights = open.map((s) => weightFor(strategy, s));
