@@ -6,7 +6,7 @@ import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
 
-type AllocationMode = "even" | "manual";
+type AllocationMode = "manual";
 
 
 type SlotGroup = Position | "FLEX" | "SUPERFLEX" | "BENCH";
