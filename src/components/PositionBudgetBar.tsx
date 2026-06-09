@@ -134,29 +134,3 @@ export default function PositionBudgetBar() {
   );
 }
 
-function buildSlots(settings: LeagueSettings): PlannerSlot[] {
-  const slots: PlannerSlot[] = [];
-  const add = (group: SlotGroup, count: number, labelFor: (i: number) => string) => {
-    for (let i = 1; i <= count; i += 1) {
-      slots.push({ id: `${group}-${i}`, label: labelFor(i), group });
-    }
-  };
-
-  add("QB",        settings.roster.QB,        (i) => settings.roster.QB === 1 ? "QB" : `QB${i}`);
-  add("RB",        settings.roster.RB,        (i) => `RB${i}`);
-  add("WR",        settings.roster.WR,        (i) => `WR${i}`);
-  add("TE",        settings.roster.TE,        (i) => settings.roster.TE === 1 ? "TE" : `TE${i}`);
-  add("FLEX",      settings.roster.FLEX,      (i) => settings.roster.FLEX === 1 ? "FLEX" : `FLEX${i}`);
-  {
-    const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
-    add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => {
-      if (isSF) return settings.roster.SUPERFLEX === 1 ? `QB${settings.roster.QB + 1}` : `QB${settings.roster.QB + i}`;
-      return settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`;
-    });
-  }
-  add("K",         settings.roster.K,         (i) => settings.roster.K === 1 ? "K" : `K${i}`);
-  add("DST",       settings.roster.DST,       (i) => settings.roster.DST === 1 ? "DST" : `DST${i}`);
-  add("BENCH",     settings.roster.BENCH,     (i) => `BE${i}`);
-
-  return slots;
-}
