@@ -24,7 +24,7 @@ import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
 
 
-const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
+const STEPS = ["League & Roster", "Keepers & Prices"];
 
 export default function SetupWizard() {
   const navigate = useNavigate();
