@@ -49,7 +49,7 @@ import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
-import BestAvailableBoard from "@/components/BestAvailableBoard";
+
 import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
