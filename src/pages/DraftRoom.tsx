@@ -413,13 +413,27 @@ export default function DraftRoom() {
                     {top50InfoOpen ? "Hide" : "What math? →"}
                   </button>
                   {top50InfoOpen && (
-                    <div className="mb-4 space-y-2.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
-                      <p className="font-semibold text-foreground">What type of mathematics was applied:</p>
-                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 proprietary algorithms were built specifically for this system, each handling a distinct part of the pricing model.</p>
-                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring across 3 seasons of your league's draft data.</p>
-                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — a trust/blending framework that determines how much weight to give each data source based on the amount of evidence available.</p>
-                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — the actual prices paid in your league's previous 3 auction drafts are used to calibrate how value gets distributed across players, so the numbers reflect your room specifically.</p>
-                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same foundational concepts used in financial pricing systems and data science analytics models, applied to real-time auction conditions as the draft moves.</p>
+                    <div className="mb-4 space-y-3 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
+                      <div>
+                        <p className="font-semibold text-foreground">1. Value Over Replacement Player (VORP)</p>
+                        <p className="mt-0.5">The core question isn't "how good is this player" — it's "how much better is he than whoever I'd be forced to take if I missed him?" We set a replacement baseline at each position: the last guy who'd realistically get drafted as a starter across all teams. Everything above that line has real auction value. Everything below it doesn't. That gap is what drives the price.</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">2. Your League Calibrates Itself</p>
+                        <p className="mt-0.5">Generic models price every league the same. Ours doesn't. We compute a separate dollar-per-value rate for each position using what your specific room has actually paid over 3 years. If your league historically overpays for RBs and steals TEs, that's already built into the numbers. The model learns your league — not someone else's.</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">3. Decline Detection</p>
+                        <p className="mt-0.5">A simple average would lie to you. If a player cost $48 two years ago and $21 last year, averaging those gives you a useless $34. Instead, the model detects meaningful year-over-year drops and shifts weight aggressively toward recent history — so aging players, injury recoveries, and role changes are priced where they are now, not where they used to be.</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">4. Superflex Scarcity Premium</p>
+                        <p className="mt-0.5">Pure math undersells QBs in superflex because it can't feel the panic in the room when the third-best QB goes. Every team needs two starters, the talent cliff is steep, and people know it. We apply a scarcity premium that reflects the actual auction pressure on elite QBs — not just their projected points.</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-foreground">5. Live Room Temperature</p>
+                        <p className="mt-0.5">No price sheet survives contact with a hot draft room. As picks come in, we continuously measure what managers are actually paying versus what the sheet said they'd pay. If the room is inflated, your remaining prices adjust upward in real time — so you're never bidding with yesterday's data while everyone else is spending today's money.</p>
+                      </div>
                     </div>
                   )}
                   <Top100List
