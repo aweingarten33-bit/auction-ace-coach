@@ -129,10 +129,11 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Buy one elite RB and make sure you still get TWO startable QBs (it's superflex). Then attack WR depth. RB2/RB3 come from value plays and bench upside.",
     weights: {
-      QB: [1.5, 1.0, 0.2],
-      RB: [1.7, 0.4, 0.3, 0.25, 0.2],
-      WR: [1.2, 1.1, 1.0, 0.55, 0.4],
-      TE: [0.8],
+      QB:   [1.5, 1.0, 0.2],
+      RB:   [1.7, 0.4, 0.3, 0.25, 0.2],
+      WR:   [1.2, 1.1, 1.0, 0.55, 0.4],
+      TE:   [0.8],
+      FLEX: [1.1],  // flex skews WR-heavy in Hero RB
     },
     coachGuidance:
       "User is going Hero RB in a SUPERFLEX: ONE elite RB, TWO startable QBs (non-negotiable), then load WR. Approve ONE top-shelf RB bid, then fade RBs hard until cheap upside. Don't let them end up short a QB just to chase a 2nd RB.",
@@ -144,10 +145,12 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Spend almost nothing on RB at the top. Build an elite QB room (this is superflex — you need 2), an elite WR corps, and a strong TE. Hunt RB upside cheap and on waivers.",
     weights: {
-      QB: [1.5, 1.3, 0.2],
-      RB: [0.3, 0.25, 0.2, 0.2, 0.15],
-      WR: [1.4, 1.3, 1.15, 0.8, 0.5],
-      TE: [1.1],
+      QB:    [1.5, 1.3, 0.2],
+      RB:    [0.3, 0.25, 0.2, 0.2, 0.15],
+      WR:    [1.4, 1.3, 1.15, 0.8, 0.5],
+      TE:    [1.1],
+      FLEX:  [1.3],  // flex is a 3rd WR
+      BENCH: [1.2, 1.0, 0.8, 0.6, 0.4, 0.3, 0.3, 0.3],  // RB lottery tickets on bench
     },
     coachGuidance:
       "User is going Zero RB in a SUPERFLEX: almost nothing on RB early. PASS on every RB priced above ~10% of budget. APPROVE elite QB (need 2!), WR, and TE spending. Tell them late RBs are dart throws — but they MUST come out with 2 real QBs.",
@@ -159,10 +162,11 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Spend big on 3 RBs early. Build a fortress at RB — but in superflex you still need to grab 2 startable QBs, even if QB2 is a value play.",
     weights: {
-      QB: [1.3, 0.8, 0.2],
-      RB: [1.5, 1.3, 1.2, 0.6, 0.3],
-      WR: [0.95, 0.85, 0.65, 0.45, 0.4],
-      TE: [0.85],
+      QB:   [1.3, 0.8, 0.2],
+      RB:   [1.5, 1.3, 1.2, 0.6, 0.3],
+      WR:   [0.95, 0.85, 0.65, 0.45, 0.4],
+      TE:   [0.85],
+      FLEX: [1.4],  // flex is the 3rd RB
     },
     coachGuidance:
       "User is going Robust RB in a SUPERFLEX: 3 strong RBs locked in early. APPROVE aggressive RB spending for the first 3 RBs. After that, fade RBs, secure TWO QBs (QB1 strong, QB2 value), and hunt WR value mid-draft.",
@@ -174,10 +178,11 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Not true Zero RB — you grab ONE mid-tier RB ($10–$20ish) as a safety-net anchor so you're not naked at the position. Skip the top RB tier, lock 2 startable QBs (it's superflex), then spend the rest on a deep WR group plus a strong TE.",
     weights: {
-      QB: [1.5, 1.1, 0.2],
-      RB: [0.7, 0.5, 0.3, 0.25, 0.2],
-      WR: [1.3, 1.2, 1.05, 0.75, 0.5],
-      TE: [1.0],
+      QB:   [1.5, 1.1, 0.2],
+      RB:   [0.7, 0.5, 0.3, 0.25, 0.2],
+      WR:   [1.3, 1.2, 1.05, 0.75, 0.5],
+      TE:   [1.0],
+      FLEX: [1.2],  // flex skews WR
     },
     coachGuidance:
       "User is going Anchor RB in a SUPERFLEX (a softer Zero RB — one mid-tier RB anchor, not pure zero): one RB anchor (~10–15% of budget), TWO startable QBs, then heavy WR + TE. Approve ONE moderate RB buy, then fade RBs. Push WR depth hard but never at the cost of QB2.",
