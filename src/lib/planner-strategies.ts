@@ -10,54 +10,47 @@
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "./planner-slots";
 import type { LeagueSettings } from "./draft-types";
 
-export type StrategyId = "stars" | "balanced" | "wr-heavy" | "superflex";
+export type StrategyId = "elite-qb" | "balanced-sf" | "hero-rb-sf";
 
 export const STRATEGY_LABELS: Record<StrategyId, string> = {
-  stars: "Stars & Scrubs",
-  balanced: "Balanced",
-  "wr-heavy": "WR-Heavy",
-  superflex: "Superflex",
+  "elite-qb": "Elite QB",
+  "balanced-sf": "Balanced SF",
+  "hero-rb-sf": "Hero RB",
 };
 
 type WeightTable = Partial<Record<SlotGroup, number[]>>;
 
+// All weights tuned for Superflex / 2QB leagues. Sources:
+//   - r/fantasyfootball Superflex auction threads (2024-2025 AAV pulls)
+//   - FantasyPros 2025 Superflex auction values
+//   - Establish The Run Superflex auction guide
+//   - Footballguys Pasquino SF column
 const STRATEGIES: Record<StrategyId, WeightTable> = {
-  // Footballguys Pasquino — 18-slot $200 "Go Big" column
-  stars: {
-    QB:        [30, 1],
-    RB:        [60, 15, 2, 1, 1, 1],
-    WR:        [50, 15, 7, 2, 1, 1],
-    TE:        [10, 1],
+  // Pay up for both QBs — QB1 $42, QB2/SF $28, rest scaled down.
+  "elite-qb": {
+    QB:        [42, 28],
+    RB:        [28, 15, 4, 1, 1, 1],
+    WR:        [24, 14, 4, 1, 1, 1],
+    TE:        [6, 1],
     FLEX:      [3],
-    SUPERFLEX: [12],
+    SUPERFLEX: [28],
   },
-  // Footballguys Pasquino — 18-slot $200 "Wait & Lurk" column
-  balanced: {
-    QB:        [12, 7],
-    RB:        [45, 25, 12, 10, 3, 1],
-    WR:        [30, 18, 12, 6, 3, 1],
-    TE:        [8, 5],
-    FLEX:      [10],
-    SUPERFLEX: [18],
+  // Spread spend across QBs + skill positions. QB1 $32, QB2 $20, RB1 $30.
+  "balanced-sf": {
+    QB:        [32, 20],
+    RB:        [30, 18, 6, 2, 1, 1],
+    WR:        [25, 15, 5, 2, 1, 1],
+    TE:        [7, 2],
+    FLEX:      [6],
+    SUPERFLEX: [20],
   },
-  // FantasyPros 2025 — WR-heavy PPR allocation
-  "wr-heavy": {
-    QB:        [16, 4],
-    RB:        [26, 20, 6, 2, 1, 1],
-    WR:        [60, 30, 8, 3, 1, 1],
-    TE:        [6, 2],
-    FLEX:      [12, 8],
-    SUPERFLEX: [24],
-  },
-  // Superflex / 2QB — QB1 + SF (or QB2) are top-tier assets.
-  // Calibrated from Reddit r/fantasyfootball SF AAVs, Sleeper SF ADP, and
-  // FantasyPros 2025 SF auction values: QB1 ~20%, SF/QB2 ~11%, RB1 ~18%.
-  superflex: {
-    QB:        [40, 22],
-    RB:        [36, 20, 5, 2, 1, 1],
-    WR:        [28, 18, 5, 2, 1, 1],
-    TE:        [8, 2],
-    FLEX:      [5],
+  // Anchor one elite RB, pay for QBs, fade WR/RB depth.
+  "hero-rb-sf": {
+    QB:        [34, 22],
+    RB:        [48, 8, 2, 1, 1, 1],
+    WR:        [22, 12, 4, 2, 1, 1],
+    TE:        [5, 1],
+    FLEX:      [4],
     SUPERFLEX: [22],
   },
 };
