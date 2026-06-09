@@ -6,10 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Trophy, ArrowRight } from "lucide-react";
-import BackButton from "@/components/BackButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
-import { saveTeamsToCache } from "@/lib/teamLogoGenerator";
 import { toast } from "sonner";
 
 interface Team { id: number; name: string; abbrev?: string }
@@ -46,7 +44,6 @@ export default function TeamPicker() {
           id: t.id, name: t.name, abbrev: t.abbrev,
         }));
         setTeams(list);
-        saveTeamsToCache(list);
       } catch (e) {
         setError(e instanceof Error ? e.message : "Couldn't load teams.");
       } finally {
@@ -68,18 +65,17 @@ export default function TeamPicker() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f6f4ef] text-[#0a0a0a]">
-      <BackButton to="/" />
+    <div className="min-h-screen bg-background text-foreground">
       <main
-        className="mx-auto max-w-md px-5 pt-20 pb-32"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 5rem)" }}
+        className="mx-auto max-w-md px-5 pt-12 pb-32"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 3rem)" }}
       >
         <div className="mb-8">
-          <Trophy className="mb-4 h-10 w-10 text-red-500" strokeWidth={1.5} />
+          <Trophy className="mb-4 h-10 w-10 text-primary" strokeWidth={1.5} />
           <h1 className="mb-3 text-[34px] leading-[1.05] font-semibold tracking-tight">
             Which team are you?
           </h1>
-          <p className="text-sm leading-relaxed text-black/60">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             Pick your team to personalize the dossier — budget remaining, roster needs,
             and AI recommendations get tailored to your specific roster and gaps.
           </p>
@@ -95,7 +91,9 @@ export default function TeamPicker() {
         {error && !loading && (
           <Card className="border-destructive/40 bg-destructive/5 p-4 text-xs text-destructive">
             <p className="mb-1 font-semibold">Couldn't load teams.</p>
-            <p className="text-destructive/80">{error}</p>
+            <p className="text-destructive/80">
+              {error}. The league commissioner may need to connect ESPN first.
+            </p>
             <Button variant="outline" size="sm" className="mt-3" onClick={skip}>
               Continue without picking →
             </Button>
@@ -114,17 +112,17 @@ export default function TeamPicker() {
                     onClick={() => setPicked(t)}
                     className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition ${
                       isPicked
-                        ? "border-red-500 bg-red-500/10"
-                        : "border-black/10 bg-white/60 hover:bg-white"
+                        ? "border-primary bg-primary/10"
+                        : "border-border/60 bg-secondary/20 hover:bg-secondary/40"
                     }`}
                   >
                     {t.abbrev && (
-                      <span className="font-mono text-[11px] font-semibold text-black/50">
+                      <span className="font-mono text-[11px] font-semibold text-muted-foreground">
                         {t.abbrev}
                       </span>
                     )}
                     <span className="flex-1 text-sm font-medium">{t.name}</span>
-                    {isPicked && <ArrowRight className="h-4 w-4 text-red-500" />}
+                    {isPicked && <ArrowRight className="h-4 w-4 text-primary" />}
                   </button>
                 );
               })}

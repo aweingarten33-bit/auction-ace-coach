@@ -40,8 +40,12 @@ Deno.serve(async (req) => {
   try {
     const url = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const admin = createClient(url, serviceKey);
+    const auth = req.headers.get("Authorization");
+    if (!auth) return j({ error: "missing auth" }, 401);
+
+    const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
+    const { data: u } = await sb.auth.getUser();
+    if (!u.user) return j({ error: "unauthorized" }, 401);
 
     const body = (await req.json()) as Body;
     if (!body.swid || !body.espn_s2 || !body.season) {
@@ -62,21 +66,6 @@ Deno.serve(async (req) => {
       return j({ error: "espn_s2 looks truncated", hint: `Got ${s2.length} chars; a real espn_s2 is 300+ chars. In Chrome DevTools → Application → Cookies → espn.com, click the espn_s2 row and copy the full value from the "Cookie Value" panel at the bottom (the table column truncates it).` }, 400);
     }
 
-    // Derive a stable user ID from the ESPN SWID so credentials can be saved
-    // without requiring any client-side login. SHA-256(fanId) → UUID v4 shape.
-    const hashBuf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(fanId));
-    const hb = new Uint8Array(hashBuf.slice(0, 16));
-    hb[6] = (hb[6] & 0x0f) | 0x40;
-    hb[8] = (hb[8] & 0x3f) | 0x80;
-    const hx = Array.from(hb).map(b => b.toString(16).padStart(2, "0")).join("");
-    const stableUserId = `${hx.slice(0,8)}-${hx.slice(8,12)}-${hx.slice(12,16)}-${hx.slice(16,20)}-${hx.slice(20)}`;
-
-    // Ensure a matching row exists in auth.users (FK requirement)
-    const { data: { user: existingUser } } = await admin.auth.admin.getUserById(stableUserId);
-    if (!existingUser) {
-      await admin.auth.admin.createUser({ id: stableUserId, user_metadata: { swid, source: "espn-anon" } });
-    }
-
     const allLeagues = await fetchLeagues(swid, s2);
 
     // Filter for the requested season (and optional sport)
@@ -87,7 +76,7 @@ Deno.serve(async (req) => {
     // Persist creds + optional selection
     if (body.save !== false) {
       const upsertRow: Record<string, unknown> = {
-        user_id: stableUserId,
+        user_id: u.user.id,
         swid, espn_s2: s2,
         season_id: body.season,
         last_verified_at: new Date().toISOString(),
@@ -98,7 +87,7 @@ Deno.serve(async (req) => {
         upsertRow.league_id = null;
         upsertRow.team_id = null;
       }
-      const { error } = await admin.from("espn_credentials").upsert(upsertRow, { onConflict: "user_id" });
+      const { error } = await sb.from("espn_credentials").upsert(upsertRow, { onConflict: "user_id" });
       if (error) return j({ error: error.message }, 500);
     }
 
@@ -116,7 +105,7 @@ Deno.serve(async (req) => {
         : undefined,
     });
   } catch (e) {
-    return j({ ok: false, error: e instanceof Error ? e.message : String(e) });
+    return j({ error: e instanceof Error ? e.message : String(e) }, 500);
   }
 });
 

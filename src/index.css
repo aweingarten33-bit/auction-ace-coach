@@ -836,29 +836,3 @@
 
 /* Bebas display util */
 .font-bebas { font-family: "Bebas Neue", "Anton", "Oswald", sans-serif; letter-spacing: 0.04em; }
-
-@media (prefers-reduced-motion: reduce) { .neu-pressable, .neu-pressable:hover, .neu-pressable:active { transition: none !important; transform: none !important; box-shadow: var(--neu-extruded) !important; } [class*="animate-"] { animation: none !important; transition: none !important; } }
-:root { --mouse-x: 50%; --mouse-y: 50%; }
-
-/* ── Norris link animation (char-by-char vertical swap on hover) ─────────── */
-:root { --norris-time: 25ms; }
-.norris-link { display: inline-block; overflow: hidden; line-height: 1; }
-.norris-link span {
-  position: relative;
-  display: inline-block;
-  color: transparent;
-}
-.norris-link span::before,
-.norris-link span::after {
-  position: absolute;
-  left: 0;
-  content: attr(data-char);
-  color: currentColor;
-  transition: transform ease-in-out calc(var(--norris-time) * 10),
-              opacity ease-in-out calc(var(--norris-time) * 10);
-  transition-delay: calc(var(--index, 0) * var(--norris-time));
-}
-.norris-link span::before { transform: translateY(0); opacity: 1; }
-.norris-link span::after  { transform: translateY(100%); opacity: 0; }
-.norris-link:hover span::before { transform: translateY(-100%); opacity: 0; }
-.norris-link:hover span::after  { transform: translateY(0); opacity: 1; }

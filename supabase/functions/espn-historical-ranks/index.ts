@@ -19,28 +19,21 @@ Deno.serve(async (req) => {
     const url = Deno.env.get("SUPABASE_URL")!;
     const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
     const auth = req.headers.get("Authorization");
-    let userId: string | null = null;
-    if (auth) {
-      const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
-      const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
-      if (u.user) userId = u.user.id;
-    }
+    if (!auth) return j({ error: "missing auth" }, 401);
 
-    const sbAdmin = createClient(url, serviceKey);
+    const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
+    const { data: u } = await sb.auth.getUser();
+    if (!u.user) return j({ error: "unauthorized" }, 401);
+
     const body = await req.json().catch(() => ({}));
     const seasonsBack = Math.min(Math.max(parseInt(body.seasonsBack ?? "3", 10) || 3, 1), 10);
 
-    let creds: { swid: string; espn_s2: string; season_id: number | null } | null = null;
-    if (userId) {
-      const { data } = await sbAdmin.from("espn_credentials").select("swid, espn_s2, season_id").eq("user_id", userId).maybeSingle();
-      creds = data;
-    }
-    if (!creds?.season_id) {
-      const { data: shared } = await sbAdmin.from("espn_credentials").select("swid, espn_s2, season_id").not("season_id", "is", null).order("last_verified_at", { ascending: false }).limit(1).maybeSingle();
-      if (shared?.season_id) creds = shared;
-    }
+    const { data: creds } = await sb
+      .from("espn_credentials")
+      .select("swid, espn_s2, season_id")
+      .eq("user_id", u.user.id)
+      .maybeSingle();
     if (!creds?.season_id) return j({ error: "Connect ESPN first." }, 400);
 
     const cookie = creds.swid && creds.espn_s2 ? `SWID=${creds.swid}; espn_s2=${creds.espn_s2}` : "";

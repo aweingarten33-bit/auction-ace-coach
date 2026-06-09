@@ -22,7 +22,6 @@ import { toast } from "sonner";
 import PlayerAutocomplete from "@/components/PlayerAutocomplete";
 import EspnImportButton from "@/components/EspnImportButton";
 import PriceSheetEditor from "@/components/PriceSheetEditor";
-import BackButton from "@/components/BackButton";
 
 
 const STEPS = ["League & Roster", "Keepers & Prices", "League Context"];
@@ -87,7 +86,6 @@ export default function SetupWizard() {
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <BackButton to="/" />
       <div className="mx-auto max-w-2xl">
         <header className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">

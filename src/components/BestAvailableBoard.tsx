@@ -2,7 +2,6 @@
 // Shows available players your budget can reach, sorted by adjusted value.
 // Highlights the currently nominated player with live bid climbing.
 import { useMemo, useState } from "react";
-import TiltCard from "@/components/TiltCard";
 import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
 import type { DraftEvent, Position, PriceEstimate } from "@/lib/draft-types";
@@ -116,8 +115,8 @@ export default function BestAvailableBoard({ prices, events, maxBid, remaining, 
             {available.map((p) => {
               const isLive = liveKey === norm(p.name);
               return (
-                <TiltCard key={p.name} maxTilt={4} glow={false}>
                 <button
+                  key={p.name}
                   onClick={() => onSelect(p.name, p.position)}
                   className={`flex w-full items-center gap-2 rounded-lg border px-3 py-2 text-left transition hover:border-primary/50 ${
                     isLive
@@ -145,7 +144,6 @@ export default function BestAvailableBoard({ prices, events, maxBid, remaining, 
                     ${p.price}
                   </span>
                 </button>
-                </TiltCard>
               );
             })}
           </div>

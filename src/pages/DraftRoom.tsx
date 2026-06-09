@@ -2,10 +2,6 @@
 // Primary view: available players within your budget, updating in real time.
 // Everything else is one tap away.
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import AnimatedSection from "@/components/AnimatedSection";
-import TiltCard from "@/components/TiltCard";
-import { animateProgress } from "@/lib/animations";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -202,10 +198,6 @@ export default function DraftRoom() {
       ? Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / budget.totalBudget) * 100))
       : 0;
 
-  useEffect(() => {
-    animateProgress(".budget-fill", spentPct, 1.2, 0.3);
-  }, [spentPct]);
-
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
@@ -242,7 +234,7 @@ export default function DraftRoom() {
 
       {/* ── SPEND BAR ───────────────────────────────────────── */}
       <div className="h-1 shrink-0 bg-secondary/50">
-        <div className="budget-fill h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
+        <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
       {/* ── MAIN PLAN VIEW ──────────────────────────────────── */}
@@ -265,7 +257,6 @@ export default function DraftRoom() {
         </button>
         <div className="space-y-4">
 
-          <AnimatedSection delay={0.1}>
           {budget.totalBudget > 0 && (
             <div className="rounded-lg border border-border/60 bg-secondary/20 px-4 py-3">
               <div className="mb-1.5 flex items-center justify-between">
@@ -273,15 +264,12 @@ export default function DraftRoom() {
                 <span className="text-xs text-muted-foreground">${Math.max(0, budget.totalBudget - budget.remaining)} of ${budget.totalBudget} spent</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-secondary/60">
-                <div className="budget-fill h-full bg-primary transition-all" style={{ width: `${Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / Math.max(1, budget.totalBudget)) * 100))}%` }} />
+                <div className="h-full bg-primary transition-all" style={{ width: `${Math.min(100, Math.round(((budget.totalBudget - budget.remaining) / Math.max(1, budget.totalBudget)) * 100))}%` }} />
               </div>
             </div>
           )}
-          </AnimatedSection>
 
-          <AnimatedSection delay={0.2}>
           <PositionBudgetBar onOpenCoach={() => setAiOpen(true)} />
-          </AnimatedSection>
 
           {selectedTeam && (
             <NextTargetCard
@@ -295,11 +283,9 @@ export default function DraftRoom() {
             />
           )}
 
-          <AnimatedSection delay={0.3}>
           {events.length > 0 && (
             <LastPickImpact settings={settings} keepers={keepers} events={events} />
           )}
-          </AnimatedSection>
 
         </div>
       </div> {/* end main plan view */}
@@ -377,25 +363,16 @@ export default function DraftRoom() {
       </div>
 
       {/* ── SLIDE-IN PANEL (search / recent) ───────────────── */}
-      <AnimatePresence>
       {panel && (
         <>
-          <motion.div
-            key="panel-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
             onClick={() => setPanel(null)}
             aria-hidden
           />
-          <motion.div
-            key="panel-content"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          <div
             className="fixed right-0 top-0 bottom-0 z-50 flex w-full flex-col bg-background shadow-[-20px_0_60px_rgba(0,0,0,0.8)] sm:w-[min(100%,460px)]"
+            style={{ animation: "tool-panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           >
             <div
               className="flex shrink-0 items-center gap-3 border-b border-border/60 px-4 py-4"
@@ -438,11 +415,11 @@ export default function DraftRoom() {
                   {top50InfoOpen && (
                     <div className="mb-4 space-y-2.5 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
                       <p className="font-semibold text-foreground">What type of mathematics was applied:</p>
-                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 custom algorithms were created, each serving a specific role in how players get priced.</p>
-                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring.</p>
-                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — the trust/blending concept was utilized to determine how much confidence to place in each data source.</p>
-                      <p>• <span className="font-semibold text-foreground">VORP (Value Over Replacement Player)</span> — VORP adjusted to our league using the previous 3 auction drafts.</p>
-                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same concept hedge funds use in financial pricing systems, applied here through data science and quantitative analytics models.</p>
+                      <p>• <span className="font-semibold text-foreground">Custom Algorithms</span> — 5 proprietary algorithms were built specifically for this system, each handling a distinct part of the pricing model.</p>
+                      <p>• <span className="font-semibold text-foreground">Applied Statistics</span> — weighted averages, proportional distribution, and sample-size trust scoring across 3 seasons of your league's draft data.</p>
+                      <p>• <span className="font-semibold text-foreground">Bayesian Statistical Modeling</span> — a trust/blending framework that determines how much weight to give each data source based on the amount of evidence available.</p>
+                      <p>• <span className="font-semibold text-foreground">Proportional Optimization</span> — the actual prices paid in your league's previous 3 auction drafts are used to calibrate how value gets distributed across players, so the numbers reflect your room specifically.</p>
+                      <p>• <span className="font-semibold text-foreground">Quantitative/Dynamic Pricing</span> — the same foundational concepts used in financial pricing systems and data science analytics models, applied to real-time auction conditions as the draft moves.</p>
                     </div>
                   )}
                   <Top100List
@@ -512,10 +489,9 @@ export default function DraftRoom() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         </>
       )}
-      </AnimatePresence>
 
       {/* Player details modal */}
       {(() => {

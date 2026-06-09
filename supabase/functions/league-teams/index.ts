@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     const auth = req.headers.get("Authorization");
     if (auth) {
       const sb = createClient(url, anon, { global: { headers: { Authorization: auth } } });
-      const { data: u } = await sb.auth.getUser(auth.replace(/^Bearer\s+/i, ""));
+      const { data: u } = await sb.auth.getUser();
       if (u.user) {
         const { data: prof } = await sb
           .from("profiles")
@@ -48,7 +48,7 @@ Deno.serve(async (req) => {
 
     const { data: snap } = await query.maybeSingle();
     if (!snap) {
-      return j({ ok: false, error: "No league snapshot yet. Commissioner needs to sync ESPN first." });
+      return j({ error: "No league snapshot yet. Commissioner needs to sync ESPN first." }, 400);
     }
 
     return j({

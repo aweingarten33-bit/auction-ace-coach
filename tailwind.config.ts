@@ -103,18 +103,12 @@ export default {
           "0%":   { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
-        kenburns: {
-          "0%":   { transform: "scale(1) translate(0, 0)" },
-          "50%":  { transform: "scale(1.08) translate(-1%, 1%)" },
-          "100%": { transform: "scale(1) translate(0, 0)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.3s ease-out",
         "accordion-up":   "accordion-up 0.3s ease-out",
         float:            "float 3s ease-in-out infinite",
         "fade-in":        "fade-in 0.3s ease-out both",
-        kenburns:         "kenburns 24s ease-in-out infinite",
       },
       transitionDuration: {
         300: "300ms",
