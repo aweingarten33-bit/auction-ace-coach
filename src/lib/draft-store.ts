@@ -56,7 +56,7 @@ interface DraftState {
   // Slots the user has manually edited — never auto-overwrite these.
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
-  plannerStrategy: "elite-qb" | "balanced-sf" | "hero-rb-sf";
+  plannerStrategy: "hero-qb" | "balanced-qbs" | "bargain-qb";
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -97,7 +97,7 @@ interface DraftState {
   clearSlotNotes: () => void;
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
-  setPlannerStrategy: (s: "elite-qb" | "balanced-sf" | "hero-rb-sf") => void;
+  setPlannerStrategy: (s: "hero-qb" | "balanced-qbs" | "bargain-qb") => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
@@ -166,7 +166,7 @@ export const useDraftStore = create<DraftState>()(
       markSlotTouched: (id) =>
         set((s) => ({ touchedSlots: { ...s.touchedSlots, [id]: true } })),
       clearTouchedSlots: () => set({ touchedSlots: {} }),
-      plannerStrategy: "balanced-sf",
+      plannerStrategy: "balanced-qbs",
       setPlannerStrategy: (s) => set({ plannerStrategy: s, touchedSlots: {} }),
       setSettings: (s) =>
         set((state) => {
@@ -232,7 +232,7 @@ export const useDraftStore = create<DraftState>()(
           lockedSlots: {},
           slotNotes: {},
           touchedSlots: {},
-          plannerStrategy: "balanced-sf",
+          plannerStrategy: "balanced-qbs",
           strategyId: "none",
           customStrategyRules: "",
         }),
@@ -273,8 +273,8 @@ export const useDraftStore = create<DraftState>()(
       name: "auction-draft-coach-v1",
       version: 2,
       migrate: (persisted: any) => {
-        if (persisted && !["elite-qb", "balanced-sf", "hero-rb-sf"].includes(persisted.plannerStrategy)) {
-          persisted.plannerStrategy = "balanced-sf";
+        if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb"].includes(persisted.plannerStrategy)) {
+          persisted.plannerStrategy = "balanced-qbs";
           persisted.touchedSlots = {};
         }
         return persisted;

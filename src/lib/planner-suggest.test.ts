@@ -20,7 +20,7 @@ const SETTINGS_2QB: LeagueSettings = {
   roster: { QB: 2, RB: 2, WR: 2, TE: 1, FLEX: 1, SUPERFLEX: 0, K: 1, DST: 1, BENCH: 6 },
 };
 
-const STRATEGIES: StrategyId[] = ["elite-qb", "balanced-sf", "hero-rb-sf"];
+const STRATEGIES: StrategyId[] = ["hero-qb", "balanced-qbs", "bargain-qb"];
 
 function sum(o: Record<string, number>) {
   return Object.values(o).reduce((a, b) => a + b, 0);
@@ -48,20 +48,20 @@ describe("computeSlotDollars (superflex-only)", () => {
     });
   }
 
-  it("hero-rb-sf: RB1 is the biggest slot", () => {
-    const out = computeSlotDollars("hero-rb-sf", SETTINGS_SF);
+  it("bargain-qb: RB1 is the biggest slot", () => {
+    const out = computeSlotDollars("bargain-qb", SETTINGS_SF);
     const top = Object.entries(out).sort((a, b) => b[1] - a[1])[0][0];
     expect(top).toBe("RB-1");
   });
 
-  it("elite-qb: QB1 is the biggest slot", () => {
-    const out = computeSlotDollars("elite-qb", SETTINGS_SF);
+  it("hero-qb: QB1 is the biggest slot", () => {
+    const out = computeSlotDollars("hero-qb", SETTINGS_SF);
     const top = Object.entries(out).sort((a, b) => b[1] - a[1])[0][0];
     expect(top).toBe("QB-1");
   });
 
   it("respects locked slot values", () => {
-    const out = computeSlotDollars("elite-qb", SETTINGS_SF, {
+    const out = computeSlotDollars("hero-qb", SETTINGS_SF, {
       lockedSlots: { "QB-1": true },
       currentAllocations: { "QB-1": 70 },
     });
@@ -70,7 +70,7 @@ describe("computeSlotDollars (superflex-only)", () => {
   });
 
   it("respects touched slot values", () => {
-    const out = computeSlotDollars("balanced-sf", SETTINGS_SF, {
+    const out = computeSlotDollars("balanced-qbs", SETTINGS_SF, {
       touchedSlots: { "WR-1": true },
       currentAllocations: { "WR-1": 42 },
     });
