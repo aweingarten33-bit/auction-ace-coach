@@ -122,7 +122,31 @@ export const useDraftStore = create<DraftState>()(
       setSlotAllocation: (id, amount) =>
         set((s) => ({ slotAllocations: { ...s.slotAllocations, [id]: amount } })),
       setSlotAllocations: (a) => set({ slotAllocations: a }),
-      clearSlotAllocations: () => set({ slotAllocations: {} }),
+      clearSlotAllocations: () =>
+        set((s) => ({
+          slotAllocations: {},
+          // Unlock everything too — locks point at slot ids whose values just got cleared.
+          lockedSlots: [],
+        })),
+      lockedSlots: [],
+      toggleSlotLock: (id, currentValue) =>
+        set((s) => {
+          const isLocked = s.lockedSlots.includes(id);
+          if (isLocked) {
+            // Unlock: also drop the frozen override so the slot rejoins auto-redistribute.
+            const { [id]: _drop, ...rest } = s.slotAllocations;
+            return {
+              lockedSlots: s.lockedSlots.filter((x) => x !== id),
+              slotAllocations: rest,
+            };
+          }
+          // Lock: persist the current displayed value as a frozen override.
+          return {
+            lockedSlots: [...s.lockedSlots, id],
+            slotAllocations: { ...s.slotAllocations, [id]: currentValue },
+          };
+        }),
+      clearSlotLocks: () => set({ lockedSlots: [] }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
