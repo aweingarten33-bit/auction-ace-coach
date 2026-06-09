@@ -86,11 +86,15 @@ export default function PositionBudgetBar() {
 
     const draftedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
+    // K and DST are always $1, excluded from redistribution.
+    const dollarSlots = unfilled.filter((s) => s.group === "K" || s.group === "DST");
+    const dollarSum = dollarSlots.length;
+    const nonDollar = unfilled.filter((s) => s.group !== "K" && s.group !== "DST");
     // Both user-locked AND user-typed slots are frozen; only untouched slots auto-fill.
-    const userFrozen = unfilled.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
+    const userFrozen = nonDollar.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
     const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
-    const open = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
-    const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum);
+    const open = nonDollar.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
+    const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum - dollarSum);
 
     // Split remaining budget evenly across untouched open slots (largest-remainder rounding).
     let rounded: number[];
@@ -111,6 +115,7 @@ export default function PositionBudgetBar() {
     const allocations: Record<string, number> = {};
     for (const slot of slots) {
       if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
+      else if (slot.group === "K" || slot.group === "DST") allocations[slot.id] = 1;
       else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
       else allocations[slot.id] = 0;
     }
