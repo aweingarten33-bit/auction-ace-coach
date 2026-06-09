@@ -150,14 +150,18 @@ export default function PositionBudgetBar() {
 
     const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
-    const baseSum = unfilled.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
-    const remaining = Math.max(0, settings.totalBudget - lockedSum);
+    // User-edited slots keep their typed value; only untouched slots redistribute.
+    const userEdited = unfilled.filter((s) => s.id in slotAllocations);
+    const userEditedSum = userEdited.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
+    const redistribute = unfilled.filter((s) => !(s.id in slotAllocations));
+    const baseSum = redistribute.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
+    const remaining = Math.max(0, settings.totalBudget - lockedSum - userEditedSum);
 
     // Proportional redistribute with $1 floor, then integer-correct so the
-    // unfilled allocations sum to exactly `remaining`.
-    const floor = remaining >= unfilled.length ? 1 : 0;
-    const spendable = Math.max(0, remaining - floor * unfilled.length);
-    const exact = unfilled.map((slot) => floor + (spendable * (basePlan[slot.id] ?? 0)) / baseSum);
+    // redistribute allocations sum to exactly `remaining`.
+    const floor = remaining >= redistribute.length ? 1 : 0;
+    const spendable = Math.max(0, remaining - floor * redistribute.length);
+    const exact = redistribute.map((slot) => floor + (spendable * (basePlan[slot.id] ?? 0)) / baseSum);
     const rounded = exact.map((v) => Math.max(floor, Math.round(v)));
     let diff = remaining - rounded.reduce((sum, v) => sum + v, 0);
     const order = exact
@@ -175,9 +179,11 @@ export default function PositionBudgetBar() {
 
     const allocations: Record<string, number> = {};
     for (const slot of slots) {
-      allocations[slot.id] = slot.id in locked ? locked[slot.id].price : 0;
+      if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
+      else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
+      else allocations[slot.id] = 0;
     }
-    unfilled.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
+    redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
     return { allocations, locked };
   }, [slots, basePlan, picksByGroup, settings.totalBudget]);
 
