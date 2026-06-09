@@ -103,7 +103,7 @@ export function computeSlotDollars(
   settings: LeagueSettings,
   opts: ComputeOptions = {},
 ): Record<string, number> {
-  const { touchedSlots = {}, lockedSlots = {}, currentAllocations = {} } = opts;
+  const { touchedSlots = {}, lockedSlots = {}, currentAllocations = {}, extraReserved = 0 } = opts;
   const slots = buildPlannerSlots(settings);
   const out: Record<string, number> = {};
 
