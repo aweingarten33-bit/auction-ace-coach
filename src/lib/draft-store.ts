@@ -49,8 +49,8 @@ interface DraftState {
   draftPlan: { content: string; updatedAt: number; pickCountAtSave: number } | null;
   // Slot $ allocations for the Planner page (id => dollars). Generated lazily from settings.roster.
   slotAllocations: Record<string, number>;
-  // Slot ids the user has explicitly locked — their dollar value is frozen and excluded from auto-redistribute.
-  lockedSlots: string[];
+  // Slots manually locked by the user (frozen — excluded from auto-redistribute).
+  lockedSlots: Record<string, boolean>;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -85,7 +85,7 @@ interface DraftState {
   setSlotAllocation: (id: string, amount: number) => void;
   setSlotAllocations: (a: Record<string, number>) => void;
   clearSlotAllocations: () => void;
-  toggleSlotLock: (id: string, currentValue: number) => void;
+  toggleSlotLock: (id: string) => void;
   clearSlotLocks: () => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
@@ -122,31 +122,16 @@ export const useDraftStore = create<DraftState>()(
       setSlotAllocation: (id, amount) =>
         set((s) => ({ slotAllocations: { ...s.slotAllocations, [id]: amount } })),
       setSlotAllocations: (a) => set({ slotAllocations: a }),
-      clearSlotAllocations: () =>
-        set((s) => ({
-          slotAllocations: {},
-          // Unlock everything too — locks point at slot ids whose values just got cleared.
-          lockedSlots: [],
-        })),
-      lockedSlots: [],
-      toggleSlotLock: (id, currentValue) =>
+      clearSlotAllocations: () => set({ slotAllocations: {} }),
+      lockedSlots: {},
+      toggleSlotLock: (id) =>
         set((s) => {
-          const isLocked = s.lockedSlots.includes(id);
-          if (isLocked) {
-            // Unlock: also drop the frozen override so the slot rejoins auto-redistribute.
-            const { [id]: _drop, ...rest } = s.slotAllocations;
-            return {
-              lockedSlots: s.lockedSlots.filter((x) => x !== id),
-              slotAllocations: rest,
-            };
-          }
-          // Lock: persist the current displayed value as a frozen override.
-          return {
-            lockedSlots: [...s.lockedSlots, id],
-            slotAllocations: { ...s.slotAllocations, [id]: currentValue },
-          };
+          const next = { ...s.lockedSlots };
+          if (next[id]) delete next[id];
+          else next[id] = true;
+          return { lockedSlots: next };
         }),
-      clearSlotLocks: () => set({ lockedSlots: [] }),
+      clearSlotLocks: () => set({ lockedSlots: {} }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
@@ -208,7 +193,7 @@ export const useDraftStore = create<DraftState>()(
           showMath: false,
           draftPlan: null,
           slotAllocations: {},
-          lockedSlots: [],
+          lockedSlots: {},
           strategyId: "none",
           customStrategyRules: "",
         }),

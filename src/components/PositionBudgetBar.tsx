@@ -187,7 +187,7 @@ export default function PositionBudgetBar() {
     }
     redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
     return { allocations, locked };
-  }, [slots, basePlan, picksByGroup, settings.totalBudget, slotAllocations]);
+  }, [slots, basePlan, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
 
   // Legacy display: total spent by position group (sum of locked slots)
   const spent = useMemo(() => {
@@ -247,8 +247,8 @@ export default function PositionBudgetBar() {
               variant="ghost"
               size="icon"
               className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive"
-              onClick={clearSlotAllocations}
-              title="Clear edits"
+              onClick={() => { clearSlotAllocations(); useDraftStore.getState().clearSlotLocks(); }}
+              title="Clear edits & locks"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
@@ -269,7 +269,9 @@ export default function PositionBudgetBar() {
             const groupSpent = groupData?.spent ?? 0;
 
             const lockInfo = locked[slot.id];
-            const isLocked = !!lockInfo;
+            const isDrafted = !!lockInfo;
+            const isUserLocked = !!lockedSlots[slot.id] && !isDrafted;
+            const isLocked = isDrafted || isUserLocked;
 
             return (
               <div key={slot.id} className="flex items-center gap-2.5">
@@ -294,7 +296,7 @@ export default function PositionBudgetBar() {
                     )}
                     style={{ width: `${barPct}%`, opacity: isLocked ? 1 : 0.7 }}
                   />
-                  {isLocked && (
+                  {isDrafted && (
                     <span className="absolute inset-0 flex items-center px-2 text-[10px] font-medium text-foreground/80 truncate">
                       {lockInfo.name}
                     </span>
@@ -320,21 +322,35 @@ export default function PositionBudgetBar() {
                     }}
                     className={cn(
                       "h-8 w-16 rounded-lg px-2 text-right font-mono text-sm",
-                      isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                      isDrafted && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                      isUserLocked && "border-primary/40 bg-primary/5 text-primary disabled:opacity-100",
                     )}
                     aria-label={`${slot.label} allocation`}
-                    title={isLocked ? `Paid $${lockInfo.price} for ${lockInfo.name}` : undefined}
+                    title={isDrafted ? `Paid $${lockInfo.price} for ${lockInfo.name}` : isUserLocked ? `Locked at $${value}` : undefined}
                   />
                 </div>
 
-                {isLocked ? (
+                {isDrafted ? (
                   <Lock className="h-3 w-3 shrink-0 text-success" />
-                ) : isFirstInGroup && groupSpent > 0 ? (
-                  <span className="shrink-0 text-[10px] text-muted-foreground">
-                    ${groupSpent} spent
-                  </span>
                 ) : (
-                  <span className="w-3 shrink-0" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Persist the current displayed value before toggling so the lock freezes it.
+                      if (!isUserLocked) setSlotAllocation(slot.id, value);
+                      toggleSlotLock(slot.id);
+                    }}
+                    className={cn(
+                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-colors",
+                      isUserLocked
+                        ? "bg-primary/15 text-primary hover:bg-primary/25"
+                        : "text-muted-foreground/60 hover:bg-secondary hover:text-foreground",
+                    )}
+                    aria-label={isUserLocked ? `Unlock ${slot.label}` : `Lock ${slot.label}`}
+                    title={isUserLocked ? "Unlock — let this slot redistribute" : "Lock this value"}
+                  >
+                    {isUserLocked ? <Lock className="h-3 w-3" /> : <LockOpen className="h-3 w-3" />}
+                  </button>
                 )}
               </div>
             );
