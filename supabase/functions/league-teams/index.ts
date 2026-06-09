@@ -48,7 +48,8 @@ Deno.serve(async (req) => {
 
     const { data: snap } = await query.maybeSingle();
     if (!snap) {
-      return j({ error: "No league snapshot yet. Commissioner needs to sync ESPN first." }, 400);
+      // Return empty teams instead of 400 — caller (TeamPicker) handles the empty state.
+      return j({ ok: true, teams: [], league: null, notice: "No league snapshot yet. Commissioner needs to sync ESPN first." });
     }
 
     return j({
