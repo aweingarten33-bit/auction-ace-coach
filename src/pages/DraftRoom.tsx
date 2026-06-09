@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
-  Search,
+  
   Settings,
   RefreshCw,
   Wifi,
@@ -55,7 +55,7 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "search" | "top50" | "recent" | "calc";
+type PanelId = "top50" | "recent" | "calc";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -296,13 +296,6 @@ export default function DraftRoom() {
       >
         <div className="flex items-center px-3 py-2">
           <button
-            onClick={() => setPanel("search")}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-          >
-            <Search className="h-4 w-4" />
-            <span className="text-xs font-medium">Find</span>
-          </button>
-          <button
             onClick={() => setPanel("top50")}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
@@ -397,22 +390,13 @@ export default function DraftRoom() {
                 <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
               <h2 className="text-base font-semibold">
-                {panel === "search" && "Find a player"}
-                {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
+              {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
                 {panel === "calc" && "Auction calculator"}
                 {panel === "recent" && "Recent picks"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
               {panel === "calc" && <AuctionCalculator prices={adjustedPrices} />}
-              {panel === "search" && (
-                <LookupSection
-                  prices={adjustedPrices}
-                  anchorMap={anchorMap}
-                  events={events}
-                  onPick={openDetails}
-                />
-              )}
               {panel === "top50" && (
                 <Top100List
                   prices={adjustedPrices}
@@ -669,103 +653,6 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Lookup — search by name or "$X" → undrafted players at/under that price
-// ─────────────────────────────────────────────────────────────────────────────
-function LookupSection({
-  prices,
-  anchorMap,
-  events,
-  onPick,
-}: {
-  prices: PriceEstimate[];
-  anchorMap: Record<string, import("@/lib/decision-engine").AnchorEntry>;
-  events: ReturnType<typeof useDraftStore.getState>["events"];
-  onPick: (name: string, position?: Position) => void;
-}) {
-  const [input, setInput] = useState("");
-  const drafted = useMemo(
-    () => new Set(events.map((e) => norm(e.player))),
-    [events],
-  );
-
-  const pricedPool = useMemo(() => {
-    type Row = { name: string; price: number; position?: PriceEstimate["position"] };
-    const out: Row[] = [];
-    const seen = new Set<string>();
-    for (const p of prices) {
-      const key = norm(p.name);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      const anchor = anchorMap[key]?.price;
-      const finalPrice = anchor && anchor > 0 ? anchor : p.price;
-      out.push({ name: p.name, price: finalPrice, position: p.position });
-    }
-    return out;
-  }, [prices, anchorMap]);
-
-  const trimmed = input.trim();
-  const isDollar = /^\$?\d+$/.test(trimmed);
-  const target = isDollar ? Number(trimmed.replace(/\D/g, "")) : 0;
-
-  const matches = useMemo(() => {
-    const pool = pricedPool.filter((p) => !drafted.has(norm(p.name)));
-    if (isDollar && target > 0) {
-      return pool.filter((p) => p.price > 0 && p.price <= target).sort((a, b) => b.price - a.price).slice(0, 30);
-    }
-    if (!isDollar && trimmed.length >= 2) {
-      const q = norm(trimmed);
-      return pool.filter((p) => norm(p.name).includes(q)).sort((a, b) => b.price - a.price).slice(0, 30);
-    }
-    return [];
-  }, [pricedPool, drafted, target, trimmed, isDollar]);
-
-  return (
-    <div className="space-y-3">
-      <div className="rounded-md border border-border/50 bg-secondary/20 p-2.5 text-xs text-muted-foreground">
-        Type a <span className="font-semibold text-foreground">player name</span> or a{" "}
-        <span className="font-semibold text-foreground">dollar amount</span>. Tap a result to see details.
-      </div>
-      <Input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="e.g. Bijan Robinson  or  25"
-        className="h-9"
-        autoComplete="off"
-        spellCheck={false}
-      />
-      <div className="space-y-1">
-        {trimmed.length === 0 && (
-          <p className="py-4 text-center text-xs text-muted-foreground">
-            Search a player by name, or enter a $ amount.
-          </p>
-        )}
-        {trimmed.length > 0 && matches.length === 0 && (
-          <p className="py-4 text-center text-xs text-muted-foreground">
-            {isDollar ? `No undrafted players priced at or under $${target}.` : "No matches in your price sheet."}
-          </p>
-        )}
-        {matches.map((p) => (
-          <button
-            key={p.name}
-            type="button"
-            onClick={() => onPick(p.name, p.position)}
-            className="flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40"
-          >
-            {p.position && (
-              <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
-                {p.position}
-              </Badge>
-            )}
-            <span className="flex-1 truncate font-medium">{p.name}</span>
-            <span className="font-mono tabular-nums">${p.price}</span>
-            <ChevronRight className="h-3 w-3 text-muted-foreground" />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 function Top100List({
