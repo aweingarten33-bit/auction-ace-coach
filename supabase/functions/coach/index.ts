@@ -209,6 +209,14 @@ function buildUserMessage(p: CoachPayload): string {
   parts.push(`## Market Multiplier\nx${mult.toFixed(3)} (samples=${n}) — convert sheet $ to going $`);
   parts.push(`## Drafted Players (FORBIDDEN — never name any of these)\n${Array.from(draftedSet).join(", ") || "(none yet)"}`);
   parts.push(`## Undrafted Price Sheet (full, sorted by sheet $ desc)\n${undrafted.slice(0, 200).join("\n") || "(empty)"}`);
+  if (p.budgetBoard) {
+    const bb = p.budgetBoard;
+    const rows = bb.slots.map((s) =>
+      `${s.id}\t${s.label}\t$${s.dollars}\t${s.target || "(no target)"}${s.locked ? "\t[LOCKED-DRAFTED]" : ""}`,
+    ).join("\n");
+    const total = bb.slots.reduce((a, b) => a + b.dollars, 0);
+    parts.push(`## Budget Board (live planner snapshot)\ntotalBudget=$${bb.totalBudget}\nplanned=$${total}\nremaining=$${bb.totalBudget - total}\nid\tlabel\t$\ttarget\n${rows}`);
+  }
   if (p.latestEvent) {
     parts.push(`## Latest Event\n${p.latestEvent.drafter === "me" ? "[ME]" : "[OTHER]"} ${p.latestEvent.player}${p.latestEvent.position ? ` (${p.latestEvent.position})` : ""} $${p.latestEvent.price}`);
   }
