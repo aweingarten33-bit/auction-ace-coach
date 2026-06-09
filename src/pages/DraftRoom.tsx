@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
+import { buildCoachGuidance, getStrategy } from "@/lib/strategies";
 import { useAuth } from "@/hooks/useAuth";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
@@ -73,6 +74,8 @@ export default function DraftRoom() {
     pinPlayer,
     unpinPlayer,
   } = useDraftStore();
+  const strategyId = useDraftStore((s) => s.strategyId);
+  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [tab, setTab] = useState<TabId>("plan");
@@ -382,6 +385,11 @@ export default function DraftRoom() {
                   recentRuns: runs,
                   draftedPlayers: events.map((e) => e.player),
                   showMath: false,
+                  strategy: {
+                    id: strategyId,
+                    label: getStrategy(strategyId).label,
+                    guidance: buildCoachGuidance(strategyId, customStrategyRules),
+                  },
                 })}
               />
             </SheetContent>

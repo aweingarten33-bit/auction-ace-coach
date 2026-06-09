@@ -67,11 +67,12 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Spend ~75% of your budget on 3 elite players — usually one elite QB and two elite RB/WR. Fill the rest of the roster with $1–$3 upside lottery tickets, including a cheap QB2.",
     weights: {
-      QB: [1.6, 0.4, 0.15],
-      RB: [1.5, 1.3, 0.4, 0.25, 0.15],
-      WR: [1.4, 1.2, 0.4, 0.25, 0.15],
-      TE: [0.4, 0.15],
-      BENCH: [0.05],
+      QB:    [1.6, 0.4, 0.15],
+      RB:    [1.7, 0.25, 0.2, 0.15, 0.1],
+      WR:    [1.6, 0.25, 0.2, 0.15, 0.1],
+      TE:    [0.3, 0.15],
+      FLEX:  [0.3],
+      BENCH: [0.4, 0.3, 0.2, 0.15, 0.1, 0.1, 0.1, 0.1],
     },
     coachGuidance:
       "User is going Stars & Scrubs in a SUPERFLEX: ~75% on 3 elite pieces (one is usually an elite QB), then $1–3 darts. APPROVE big bids on top-tier QB/RB/WR. Their QB2 should be a cheap upside play, not a mid-tier overpay. PUSH BACK on $15–25 mid-tier plays — they kill this build.",
@@ -128,10 +129,11 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Buy one elite RB and make sure you still get TWO startable QBs (it's superflex). Then attack WR depth. RB2/RB3 come from value plays and bench upside.",
     weights: {
-      QB: [1.5, 1.0, 0.2],
-      RB: [1.7, 0.4, 0.3, 0.25, 0.2],
-      WR: [1.2, 1.1, 1.0, 0.55, 0.4],
-      TE: [0.8],
+      QB:   [1.5, 1.0, 0.2],
+      RB:   [1.7, 0.4, 0.3, 0.25, 0.2],
+      WR:   [1.2, 1.1, 1.0, 0.55, 0.4],
+      TE:   [0.8],
+      FLEX: [1.1],  // flex skews WR-heavy in Hero RB
     },
     coachGuidance:
       "User is going Hero RB in a SUPERFLEX: ONE elite RB, TWO startable QBs (non-negotiable), then load WR. Approve ONE top-shelf RB bid, then fade RBs hard until cheap upside. Don't let them end up short a QB just to chase a 2nd RB.",
@@ -143,10 +145,12 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Spend almost nothing on RB at the top. Build an elite QB room (this is superflex — you need 2), an elite WR corps, and a strong TE. Hunt RB upside cheap and on waivers.",
     weights: {
-      QB: [1.5, 1.3, 0.2],
-      RB: [0.3, 0.25, 0.2, 0.2, 0.15],
-      WR: [1.4, 1.3, 1.15, 0.8, 0.5],
-      TE: [1.1],
+      QB:    [1.5, 1.3, 0.2],
+      RB:    [0.3, 0.25, 0.2, 0.2, 0.15],
+      WR:    [1.4, 1.3, 1.15, 0.8, 0.5],
+      TE:    [1.1],
+      FLEX:  [1.3],  // flex is a 3rd WR
+      BENCH: [1.2, 1.0, 0.8, 0.6, 0.4, 0.3, 0.3, 0.3],  // RB lottery tickets on bench
     },
     coachGuidance:
       "User is going Zero RB in a SUPERFLEX: almost nothing on RB early. PASS on every RB priced above ~10% of budget. APPROVE elite QB (need 2!), WR, and TE spending. Tell them late RBs are dart throws — but they MUST come out with 2 real QBs.",
@@ -158,10 +162,11 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Spend big on 3 RBs early. Build a fortress at RB — but in superflex you still need to grab 2 startable QBs, even if QB2 is a value play.",
     weights: {
-      QB: [1.3, 0.8, 0.2],
-      RB: [1.5, 1.3, 1.2, 0.6, 0.3],
-      WR: [0.95, 0.85, 0.65, 0.45, 0.4],
-      TE: [0.85],
+      QB:   [1.3, 0.8, 0.2],
+      RB:   [1.5, 1.3, 1.2, 0.6, 0.3],
+      WR:   [0.95, 0.85, 0.65, 0.45, 0.4],
+      TE:   [0.85],
+      FLEX: [1.4],  // flex is the 3rd RB
     },
     coachGuidance:
       "User is going Robust RB in a SUPERFLEX: 3 strong RBs locked in early. APPROVE aggressive RB spending for the first 3 RBs. After that, fade RBs, secure TWO QBs (QB1 strong, QB2 value), and hunt WR value mid-draft.",
@@ -173,10 +178,11 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Not true Zero RB — you grab ONE mid-tier RB ($10–$20ish) as a safety-net anchor so you're not naked at the position. Skip the top RB tier, lock 2 startable QBs (it's superflex), then spend the rest on a deep WR group plus a strong TE.",
     weights: {
-      QB: [1.5, 1.1, 0.2],
-      RB: [0.7, 0.5, 0.3, 0.25, 0.2],
-      WR: [1.3, 1.2, 1.05, 0.75, 0.5],
-      TE: [1.0],
+      QB:   [1.5, 1.1, 0.2],
+      RB:   [0.7, 0.5, 0.3, 0.25, 0.2],
+      WR:   [1.3, 1.2, 1.05, 0.75, 0.5],
+      TE:   [1.0],
+      FLEX: [1.2],  // flex skews WR
     },
     coachGuidance:
       "User is going Anchor RB in a SUPERFLEX (a softer Zero RB — one mid-tier RB anchor, not pure zero): one RB anchor (~10–15% of budget), TWO startable QBs, then heavy WR + TE. Approve ONE moderate RB buy, then fade RBs. Push WR depth hard but never at the cost of QB2.",
@@ -210,3 +216,129 @@ export const buildCoachGuidance = (
   }
   return s.coachGuidance;
 };
+
+// ────────────────────────────────────────────────────────────────────────
+// Custom-rules parser
+// Reads the user's free-text rules and derives per-position weight overrides
+// so the budget planner actually reflects the plan. Heuristic regex matcher —
+// won't catch every phrasing, but covers the common patterns:
+//   "punt / skip / fade / cheap / late <pos>"     → fade
+//   "elite / stud / load / heavy / stack <pos>"   → boost top slot
+//   "$NN on N <pos>s" / "spend $NN on <pos>"      → boost first N slots
+//   "never pay over $NN for <pos>" (NN small)     → fade
+//   "target a <pos> in the $NN-NN range"          → moderate
+// ────────────────────────────────────────────────────────────────────────
+
+type PosKey = "QB" | "RB" | "WR" | "TE" | "FLEX";
+
+const POS_ALIASES: Record<PosKey, RegExp> = {
+  QB: /\b(qbs?|quarterbacks?)\b/i,
+  RB: /\b(rbs?|running\s*backs?)\b/i,
+  WR: /\b(wrs?|wide\s*receivers?|receivers?)\b/i,
+  TE: /\b(tes?|tight\s*ends?)\b/i,
+  FLEX: /\bflex\b/i,
+};
+
+// Default curve length per position (matches baseSlotWeight in the planner).
+const POS_LEN: Record<PosKey, number> = { QB: 3, RB: 5, WR: 5, TE: 2, FLEX: 1 };
+
+function fillCurve(len: number, top: number, tail: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < len; i += 1) out.push(i === 0 ? top : tail);
+  return out;
+}
+
+function boostFirstN(len: number, n: number, boost: number, rest: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < len; i += 1) out.push(i < n ? boost : rest);
+  return out;
+}
+
+export function parseCustomStrategyWeights(
+  rules: string | null | undefined,
+): Partial<Record<PosKey | "BENCH", number[]>> {
+  const out: Partial<Record<PosKey | "BENCH", number[]>> = {};
+  const text = (rules ?? "").trim();
+  if (!text) return out;
+  const lower = text.toLowerCase();
+
+  const positions: PosKey[] = ["QB", "RB", "WR", "TE", "FLEX"];
+
+  for (const pos of positions) {
+    const alias = POS_ALIASES[pos];
+    const len = POS_LEN[pos];
+
+    // FADE keywords near the position name
+    const fadeRe = new RegExp(
+      `\\b(punt|skip|fade|avoid|ignore|cheap|late[-\\s]round|no|zero)\\b[^.\\n]{0,30}?${alias.source}`,
+      "i",
+    );
+    const fadeRe2 = new RegExp(
+      `${alias.source}[^.\\n]{0,30}?\\b(punt|skipped|faded?|cheap|late|dart|dart\\s*throw)\\b`,
+      "i",
+    );
+    if (fadeRe.test(text) || fadeRe2.test(text)) {
+      out[pos] = fillCurve(len, 0.35, 0.2);
+      continue;
+    }
+
+    // "never pay over $N for <pos>" — fade if cap is small (<15% budget assumed via $)
+    const capRe = new RegExp(
+      `\\bnever\\s+pay\\s+(?:over|more\\s+than)\\s*\\$?(\\d+)[^.\\n]{0,20}?${alias.source}`,
+      "i",
+    );
+    const cap = text.match(capRe);
+    if (cap) {
+      const v = parseInt(cap[1], 10);
+      if (Number.isFinite(v)) {
+        // Small cap = fade; larger cap = mild trim
+        const top = v <= 5 ? 0.2 : v <= 12 ? 0.6 : 0.9;
+        out[pos] = fillCurve(len, top, Math.min(top, 0.3));
+        continue;
+      }
+    }
+
+    // "$NN on N <pos>s" / "spend $NN on <pos>" / "load up on <pos>" / "stack <pos>"
+    const nOnRe = new RegExp(
+      `\\$?(\\d+)\\s*(?:on|for)\\s*(\\d+)?\\s*(?:elite|top|stud)?\\s*${alias.source}`,
+      "i",
+    );
+    const nOn = text.match(nOnRe);
+    if (nOn) {
+      const n = nOn[2] ? Math.max(1, Math.min(len, parseInt(nOn[2], 10))) : 1;
+      out[pos] = boostFirstN(len, n, 1.6, 0.35);
+      continue;
+    }
+
+    // BOOST keywords (elite / stud / load / heavy / stack / spend up / target)
+    const boostRe = new RegExp(
+      `\\b(elite|stud|studs|load(?:\\s+up)?|heavy|stack|spend\\s+up|target|prioritize|hammer|attack)\\b[^.\\n]{0,30}?${alias.source}`,
+      "i",
+    );
+    const boostRe2 = new RegExp(
+      `${alias.source}[^.\\n]{0,30}?\\b(elite|stud|studs|heavy|stacked?|priority)\\b`,
+      "i",
+    );
+    if (boostRe.test(text) || boostRe2.test(text)) {
+      // "2 elite WRs" → boost first 2
+      const numEliteRe = new RegExp(
+        `\\b(\\d+)\\s*(?:elite|stud|top)\\s*${alias.source}`,
+        "i",
+      );
+      const ne = text.match(numEliteRe);
+      const n = ne ? Math.max(1, Math.min(len, parseInt(ne[1], 10))) : 1;
+      out[pos] = boostFirstN(len, n, 1.6, 0.55);
+      continue;
+    }
+  }
+
+  // Global "stars and scrubs" / "balanced" / "zero rb" shortcut phrases
+  if (/\bstars?\s*(?:and|&|\+)?\s*scrubs?\b/i.test(lower)) {
+    out.RB = out.RB ?? [1.7, 0.25, 0.2, 0.15, 0.1];
+    out.WR = out.WR ?? [1.6, 0.25, 0.2, 0.15, 0.1];
+    out.BENCH = [0.4, 0.3, 0.2, 0.15, 0.1, 0.1, 0.1, 0.1];
+  }
+
+  return out;
+}
+

@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDraftStore } from "@/lib/draft-store";
-import { getStrategy, STRATEGIES } from "@/lib/strategies";
+import { getStrategy, STRATEGIES, parseCustomStrategyWeights } from "@/lib/strategies";
 import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
@@ -105,10 +105,14 @@ export default function PositionBudgetBar() {
   const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
   const clearSlotAllocations = useDraftStore((s) => s.clearSlotAllocations);
   const strategyId = useDraftStore((s) => s.strategyId);
+  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
   const strategy = getStrategy(strategyId);
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
-  const suggested = useMemo(() => suggestAllocations(settings, strategyId), [settings, strategyId]);
+  const suggested = useMemo(
+    () => suggestAllocations(settings, strategyId, customStrategyRules),
+    [settings, strategyId, customStrategyRules],
+  );
 
   // ── Base plan: user override per slot, else strategy suggestion ────────
   const basePlan = useMemo(() => {
@@ -381,8 +385,17 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   return slots;
 }
 
-function suggestAllocations(settings: LeagueSettings, strategyId: string): Record<string, number> {
+function suggestAllocations(
+  settings: LeagueSettings,
+  strategyId: string,
+  customRules?: string,
+): Record<string, number> {
   const strategy = getStrategy(strategyId);
+  // For the "custom" strategy, parse the user's free-text rules into weight overrides
+  // so the budget plan actually reflects what they typed.
+  const effectiveWeights: typeof strategy.weights = strategy.id === "custom"
+    ? parseCustomStrategyWeights(customRules)
+    : strategy.weights;
   const slots = buildSlots(settings);
   if (!slots.length) return {};
 
@@ -393,11 +406,11 @@ function suggestAllocations(settings: LeagueSettings, strategyId: string): Recor
     // so apply the strategy's QB multiplier curve to it (index continues from QBn).
     let mult: number;
     if (isSF && slot.group === "SUPERFLEX") {
-      const qbMults = strategy.weights.QB;
+      const qbMults = effectiveWeights.QB;
       const idx = settings.roster.QB + slot.index - 1;
       mult = qbMults?.[idx] ?? qbMults?.[qbMults.length - 1] ?? 1;
     } else {
-      mult = strategy.weights[slot.group]?.[slot.index - 1] ?? 1;
+      mult = effectiveWeights[slot.group]?.[slot.index - 1] ?? 1;
     }
     return Math.max(0.05, base * mult);
   });
