@@ -46,7 +46,7 @@ import {
 
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
-import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
+import PositionBudgetBar from "@/components/PositionBudgetBar";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
