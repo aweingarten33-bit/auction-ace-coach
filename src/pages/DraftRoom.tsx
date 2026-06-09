@@ -221,7 +221,7 @@ export default function DraftRoom() {
         </Sheet>
 
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate text-sm font-semibold leading-tight">
+          <p className="truncate text-lg font-bold leading-tight">
             Auction Draft Assistant
           </p>
           <div className="mt-0.5 flex items-center gap-1.5">
