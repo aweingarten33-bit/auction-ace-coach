@@ -60,9 +60,6 @@ interface DraftState {
   // Anchor players — named "must-have" targets w/ pre-allocated $.
   // Subtracted from pool before slots are distributed.
   anchors: { id: string; name: string; price: number }[];
-  // Reserve buffer percentage (0–20). Carved out of the budget as an
-  // untouchable cushion for in-draft inflation/snipes.
-  reservePct: number;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -108,7 +105,7 @@ interface DraftState {
   updateAnchor: (id: string, patch: Partial<{ name: string; price: number }>) => void;
   removeAnchor: (id: string) => void;
   clearAnchors: () => void;
-  setReservePct: (pct: number) => void;
+  
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
@@ -200,8 +197,6 @@ export const useDraftStore = create<DraftState>()(
         })),
       removeAnchor: (id) => set((s) => ({ anchors: s.anchors.filter((a) => a.id !== id) })),
       clearAnchors: () => set({ anchors: [] }),
-      reservePct: 0,
-      setReservePct: (pct) => set({ reservePct: Math.max(0, Math.min(20, Math.round(pct))) }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
@@ -268,7 +263,7 @@ export const useDraftStore = create<DraftState>()(
           touchedSlots: {},
           plannerStrategy: "balanced-qbs",
           anchors: [],
-          reservePct: 0,
+          
           strategyId: "none",
           customStrategyRules: "",
         }),

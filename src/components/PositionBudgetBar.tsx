@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Lock, LockOpen, RotateCcw, Shield } from "lucide-react";
+import { Lock, LockOpen, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
@@ -39,13 +39,9 @@ export default function PositionBudgetBar() {
   const clearTouchedSlots = useDraftStore((s) => s.clearTouchedSlots);
   const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
   const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy);
-  const reservePct = useDraftStore((s) => s.reservePct);
-  const setReservePct = useDraftStore((s) => s.setReservePct);
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
-  const reserveDollars = Math.floor((settings.totalBudget * reservePct) / 100);
-  const extraReserved = reserveDollars;
 
   // Auto-fill any slot the user hasn't manually touched/locked.
   useEffect(() => {
@@ -53,7 +49,6 @@ export default function PositionBudgetBar() {
       touchedSlots,
       lockedSlots,
       currentAllocations: slotAllocations,
-      extraReserved,
     });
     const next: Record<string, number> = { ...slotAllocations };
     let changed = false;
@@ -66,19 +61,18 @@ export default function PositionBudgetBar() {
     }
     if (changed) setSlotAllocations(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plannerStrategy, settings, touchedSlots, lockedSlots, extraReserved]);
+  }, [plannerStrategy, settings, touchedSlots, lockedSlots]);
 
   const valueFor = (slot: PlannerSlot) =>
     slot.id in slotAllocations ? slotAllocations[slot.id] : 0;
 
   const slotsPlanned = slots.reduce((sum, s) => sum + valueFor(s), 0);
-  const planned = slotsPlanned + reserveDollars;
+  const planned = slotsPlanned;
   const remaining = settings.totalBudget - planned;
   const openSlots = slots.filter((s) => !lockedSlots[s.id]).length;
   const remainingForBid =
     settings.totalBudget -
-    slots.filter((s) => lockedSlots[s.id]).reduce((a, s) => a + valueFor(s), 0) -
-    reserveDollars;
+    slots.filter((s) => lockedSlots[s.id]).reduce((a, s) => a + valueFor(s), 0);
   const bidCeiling = maxBid(remainingForBid, openSlots);
 
   const handleReset = () => {
@@ -86,7 +80,6 @@ export default function PositionBudgetBar() {
     const fresh = computeSlotDollars(plannerStrategy, settings, {
       lockedSlots,
       currentAllocations: slotAllocations,
-      extraReserved,
     });
     setSlotAllocations({ ...slotAllocations, ...fresh });
   };
@@ -125,31 +118,6 @@ export default function PositionBudgetBar() {
       </div>
 
 
-      {/* Reserve buffer */}
-      <div className="border-b border-border/50 px-3 py-2.5">
-        <div className="mb-1 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <Shield className="h-3 w-3" />
-            Reserve buffer
-          </div>
-          <span className="font-mono text-[11px] text-foreground/80">
-            {reservePct}% · ${reserveDollars}
-          </span>
-        </div>
-        <input
-          type="range"
-          min={0}
-          max={20}
-          step={1}
-          value={reservePct}
-          onChange={(e) => setReservePct(Number(e.target.value))}
-          className="h-1.5 w-full accent-primary"
-          aria-label="Reserve buffer percentage"
-        />
-        <p className="mt-1 text-[10px] leading-snug text-muted-foreground">
-          Untouchable cushion for in-draft inflation & price wars.
-        </p>
-      </div>
 
       <div className="px-4 py-3">
         <div className="space-y-1.5">
@@ -229,11 +197,6 @@ export default function PositionBudgetBar() {
             <span className="text-muted-foreground">Planned</span>
             <span className="font-mono font-semibold">${planned}</span>
             <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
-            {reserveDollars > 0 && (
-              <span className="text-[10px] text-muted-foreground">
-                (slots ${slotsPlanned} + reserve ${reserveDollars})
-              </span>
-            )}
           </div>
           <div className="flex items-center gap-2">
             <span
