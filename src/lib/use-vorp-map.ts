@@ -227,7 +227,7 @@ export function useVorpMap(settings: LeagueSettings): {
         vorp: Math.round(d.vorp),
       });
     }
-    return { out, playersOut };
+    return { out, players: playersOut };
   }, [rows, hist, settings]);
 
   return { map: computed.out, players: computed.players, loading };
