@@ -43,8 +43,17 @@ const STARTER_FOR: Record<Position, (s: LeagueSettings) => number> = {
 
 interface HistRow { name: string; position: Position | null; bid: number; season: number }
 
+export interface VorpPlayer {
+  name: string;
+  position: Position;
+  price: number;
+  projection: number;
+  vorp: number;
+}
+
 export function useVorpMap(settings: LeagueSettings): {
   map: Record<string, VorpEntry>;
+  players: VorpPlayer[];
   loading: boolean;
 } {
   const [rows, setRows] = useState<ProjRow[]>([]);
@@ -93,8 +102,8 @@ export function useVorpMap(settings: LeagueSettings): {
     return () => { cancelled = true; };
   }, []);
 
-  const map = useMemo(() => {
-    if (!rows.length) return {} as Record<string, VorpEntry>;
+  const computed = useMemo(() => {
+    if (!rows.length) return { out: {} as Record<string, VorpEntry>, players: [] as VorpPlayer[] };
 
     // 1) Replacement level per position
     const byPos: Record<Position, ProjRow[]> = { QB: [], RB: [], WR: [], TE: [], K: [], DST: [] };
@@ -199,6 +208,7 @@ export function useVorpMap(settings: LeagueSettings): {
     const qbPremium = isSuperflex ? 1.25 : 1;
 
     const out: Record<string, VorpEntry> = {};
+    const playersOut: VorpPlayer[] = [];
     for (const d of draftable) {
       const dpv = posDPV[d.pos] || globalDPV;
       const mult = d.pos === "QB" ? qbPremium : 1;
@@ -209,9 +219,16 @@ export function useVorpMap(settings: LeagueSettings): {
         projection: Math.round(d.pts),
         replacement: Math.round(replacement[d.pos]),
       };
+      playersOut.push({
+        name: d.name,
+        position: d.pos,
+        price,
+        projection: Math.round(d.pts * 10) / 10,
+        vorp: Math.round(d.vorp),
+      });
     }
-    return out;
+    return { out, players: playersOut };
   }, [rows, hist, settings]);
 
-  return { map, loading };
+  return { map: computed.out, players: computed.players, loading };
 }
