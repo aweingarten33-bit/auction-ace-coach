@@ -231,28 +231,6 @@ export default function PositionBudgetBar() {
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
             $ per roster slot
           </p>
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 gap-1 rounded-lg px-2 text-xs text-muted-foreground"
-              onClick={() => setSlotAllocations(suggested)}
-            >
-              <Sparkles className="h-3 w-3" />
-              Suggest
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive"
-              onClick={() => { clearSlotAllocations(); useDraftStore.getState().clearSlotLocks(); }}
-              title="Clear edits & locks"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
         </div>
 
         <p className="mb-3 flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
