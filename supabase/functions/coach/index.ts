@@ -161,6 +161,11 @@ interface CoachPayload {
   /** Pure-math verdict from the Decision Engine. When present, Coach must
    *  not contradict the verdict, goUpTo, or stopAt — only explain. */
   engineDecision?: EngineDecision;
+  /** Live snapshot of the user's budget planner board. */
+  budgetBoard?: {
+    totalBudget: number;
+    slots: { id: string; label: string; group: string; dollars: number; target: string; locked: boolean }[];
+  };
 }
 
 const MATH_ADDENDUM = ``;
