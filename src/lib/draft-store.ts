@@ -309,11 +309,16 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 2,
-      migrate: (persisted: any) => {
+      version: 3,
+      migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
           persisted.touchedSlots = {};
+        }
+        // v3: blended-values now filters retirees (Todd Gurley etc.). Wipe
+        // cached prices so the auto-loader refetches a clean list.
+        if (persisted && version < 3) {
+          persisted.prices = [];
         }
         return persisted;
       },
