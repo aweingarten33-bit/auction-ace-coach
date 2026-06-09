@@ -3,15 +3,7 @@ import { Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
-import type { LeagueSettings, Position } from "@/lib/draft-types";
-
-type SlotGroup = Position | "FLEX" | "SUPERFLEX" | "BENCH";
-
-interface PlannerSlot {
-  id: string;
-  label: string;
-  group: SlotGroup;
-}
+import { buildPlannerSlots, defaultFor, type PlannerSlot, type SlotGroup } from "@/lib/planner-slots";
 
 const GROUP_COLOR: Record<SlotGroup, string> = {
   QB:        "bg-red-500/20 text-black border-red-500/30",
@@ -24,11 +16,6 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   DST:       "bg-amber-500/20 text-black border-amber-500/30",
   BENCH:     "bg-secondary text-black border-border",
 };
-
-function defaultFor(group: SlotGroup): number {
-  if (group === "K" || group === "DST" || group === "BENCH") return 1;
-  return 0;
-}
 
 export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
