@@ -174,13 +174,24 @@ export const useDraftStore = create<DraftState>()(
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
+          // Auto-swap planner strategy when league type flips to/from Superflex.
+          const wasSF = state.settings.leagueType === "Superflex" || state.settings.leagueType === "2QB";
+          const isSF = next.leagueType === "Superflex" || next.leagueType === "2QB";
+          const patch: Partial<DraftState> = { settings: next };
+          if (isSF && !wasSF && state.plannerStrategy !== "superflex") {
+            patch.plannerStrategy = "superflex";
+            patch.touchedSlots = {};
+          } else if (!isSF && wasSF && state.plannerStrategy === "superflex") {
+            patch.plannerStrategy = "stars";
+            patch.touchedSlots = {};
+          }
           // Auto-recompute Vetri values when budget/teams/scoring/leagueType change
           if (state.vetriAutoSync && state.vetriRankings.length) {
             const computed = computeTierValues(state.vetriRankings, next, state.vetriDecay);
             const prices = mergeVetriIntoPrices(state.prices, computed, new Set(state.priceOverrides));
-            return { settings: next, prices };
+            return { ...patch, prices };
           }
-          return { settings: next };
+          return patch;
         }),
       setRoster: (key, value) =>
         set((state) => {
