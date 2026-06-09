@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Info, Lock, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Info, Lock, LockOpen, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
