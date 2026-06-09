@@ -139,30 +139,12 @@ export default function PositionBudgetBar() {
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
             $ per roster slot
           </p>
-          <div className="inline-flex rounded-md border border-border bg-secondary/40 p-0.5 text-[10px] font-semibold">
-            {(["even", "manual"] as AllocationMode[]).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => updateMode(m)}
-                className={cn(
-                  "rounded-sm px-2 py-0.5 transition-colors",
-                  mode === m
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {m === "even" ? "Even" : "Manual"}
-              </button>
-            ))}
-          </div>
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Manual</span>
         </div>
 
         <p className="mb-3 flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
           <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/70" />
-          {mode === "even"
-            ? "Leftover budget splits evenly across open slots. Lock a value to freeze it."
-            : "Type each slot's value manually. Locked & typed values stay frozen."}
+          Type each slot's value manually. Locked & typed values stay frozen.
         </p>
 
         <div className="space-y-2">
