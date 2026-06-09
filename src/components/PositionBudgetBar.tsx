@@ -269,7 +269,9 @@ export default function PositionBudgetBar() {
             const groupSpent = groupData?.spent ?? 0;
 
             const lockInfo = locked[slot.id];
-            const isLocked = !!lockInfo;
+            const isDrafted = !!lockInfo;
+            const isUserLocked = !!lockedSlots[slot.id] && !isDrafted;
+            const isLocked = isDrafted || isUserLocked;
 
             return (
               <div key={slot.id} className="flex items-center gap-2.5">
