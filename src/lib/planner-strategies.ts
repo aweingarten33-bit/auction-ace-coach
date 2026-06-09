@@ -85,6 +85,8 @@ export interface ComputeOptions {
   lockedSlots?: Record<string, boolean>;
   /** Current allocations (used for locked/touched values). */
   currentAllocations?: Record<string, number>;
+  /** Dollars carved out before slot distribution (anchor players + reserve buffer). */
+  extraReserved?: number;
 }
 
 /**
