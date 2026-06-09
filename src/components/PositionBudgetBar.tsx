@@ -1,13 +1,8 @@
 import { useMemo } from "react";
-import { Info, Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
-import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
-
-
-
 
 type SlotGroup = Position | "FLEX" | "SUPERFLEX" | "BENCH";
 
@@ -15,7 +10,6 @@ interface PlannerSlot {
   id: string;
   label: string;
   group: SlotGroup;
-  index: number;
 }
 
 const GROUP_COLOR: Record<SlotGroup, string> = {
@@ -30,278 +24,95 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   BENCH:     "bg-secondary text-black border-border",
 };
 
-const GROUP_BAR: Record<SlotGroup, string> = {
-  QB:        "bg-red-400",
-  RB:        "bg-emerald-400",
-  WR:        "bg-sky-400",
-  TE:        "bg-orange-400",
-  FLEX:      "bg-violet-400",
-  SUPERFLEX: "bg-red-400",
-  K:         "bg-violet-400",
-  DST:       "bg-amber-400",
-  BENCH:     "bg-secondary-foreground/30",
-};
+// Sensible defaults so the user starts with something reasonable.
+function defaultFor(group: SlotGroup): number {
+  if (group === "K" || group === "DST" || group === "BENCH") return 1;
+  return 0;
+}
 
-
-// ── Main budget planner ───────────────────────────────────────────────────
 export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
-  const keepers = useDraftStore((s) => s.keepers);
-  const events = useDraftStore((s) => s.events);
   const slotAllocations = useDraftStore((s) => s.slotAllocations);
   const setSlotAllocation = useDraftStore((s) => s.setSlotAllocation);
-  const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
-  const clearSlotAllocations = useDraftStore((s) => s.clearSlotAllocations);
-  const lockedSlots = useDraftStore((s) => s.lockedSlots);
-  const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
-
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
 
+  const valueFor = (slot: PlannerSlot) =>
+    slot.id in slotAllocations ? slotAllocations[slot.id] : defaultFor(slot.group);
 
-  // ── Picks I've made (events + keepers), grouped by position ────────────
-  const picksByGroup = useMemo(() => {
-    const out: Record<string, { price: number; name: string }[]> = {};
-    const push = (pos: string | null | undefined, price: number, name: string) => {
-      const g = (pos ?? "UNK") as string;
-      (out[g] ??= []).push({ price, name });
-    };
-    for (const e of events) if (e.drafter === "me") push(e.position, e.price, e.player ?? "Pick");
-    for (const k of keepers) push(k.position, k.cost, k.player ?? "Keeper");
-    for (const g of Object.keys(out)) out[g].sort((a, b) => b.price - a.price);
-    return out;
-  }, [events, keepers]);
-
-  // ── Pure manual board: locked slots stay frozen, unlocked split the leftover equally ──
-  const { allocations, locked } = useMemo(() => {
-    const locked: Record<string, { price: number; name: string }> = {};
-    // Assign each pick in a group to a slot in that group (in pick order).
-    for (const group of Object.keys(picksByGroup)) {
-      const groupSlots = slots.filter((s) => s.group === group);
-      const picks = picksByGroup[group];
-      for (let i = 0; i < Math.min(picks.length, groupSlots.length); i += 1) {
-        locked[groupSlots[i].id] = picks[i];
-      }
-    }
-
-    const draftedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
-    const unfilled = slots.filter((s) => !(s.id in locked));
-    // K and DST are always $1 (locked). BENCH defaults to $1 but is editable.
-    // All three are excluded from the even-split redistribution pool.
-    const isDollarGroup = (g: string) => g === "K" || g === "DST" || g === "BENCH";
-    const dollarSlots = unfilled.filter((s) => isDollarGroup(s.group));
-    const dollarSum = dollarSlots.reduce((sum, s) => {
-      if (s.group === "BENCH") return sum + (slotAllocations[s.id] ?? 1);
-      return sum + 1;
-    }, 0);
-    const nonDollar = unfilled.filter((s) => !isDollarGroup(s.group));
-    // A slot is "frozen" only if user locked it OR typed a value > 0. Zero = untouched.
-    const isTyped = (id: string) => (slotAllocations[id] ?? 0) > 0;
-    const userFrozen = nonDollar.filter((s) => lockedSlots[s.id] || isTyped(s.id));
-    const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
-    const open = nonDollar.filter((s) => !lockedSlots[s.id] && !isTyped(s.id));
-    const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum - dollarSum);
-
-    // Split remaining budget evenly across untouched open slots (largest-remainder rounding).
-    let rounded: number[];
-    if (open.length === 0) {
-      rounded = [];
-    } else {
-      const exact = remaining / open.length;
-      const base = Math.floor(exact);
-      const remainders = open.map((_, i) => ({ i, frac: exact - base }));
-      rounded = open.map(() => base);
-      let leftover = remaining - base * open.length;
-      remainders.sort((a, b) => b.frac - a.frac);
-      for (let k = 0; k < leftover && k < rounded.length; k += 1) {
-        rounded[remainders[k].i] += 1;
-      }
-    }
-
-    const allocations: Record<string, number> = {};
-    for (const slot of slots) {
-      if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
-      else if (slot.group === "K" || slot.group === "DST") allocations[slot.id] = 1;
-      else if (slot.group === "BENCH") allocations[slot.id] = slotAllocations[slot.id] ?? 1;
-      else if (isTyped(slot.id)) allocations[slot.id] = slotAllocations[slot.id];
-      else allocations[slot.id] = 0;
-    }
-    open.forEach((slot, idx) => { allocations[slot.id] = rounded[idx]; });
-    return { allocations, locked };
-  }, [slots, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
-
-
-  // Legacy display: total spent by position group (sum of locked slots)
-  const spent = useMemo(() => {
-    const byPos = spendByPosition(events.filter((e) => e.drafter === "me"));
-    for (const k of keepers) {
-      const pos = k.position ?? "UNK";
-      byPos[pos] = (byPos[pos] ?? 0) + k.cost;
-    }
-    return byPos;
-  }, [events, keepers]);
-
-  const plannedTotal = slots.reduce((sum, slot) => sum + (allocations[slot.id] ?? 0), 0);
-  const delta = plannedTotal - settings.totalBudget;
-  const maxAllocation = Math.max(1, ...slots.map((s) => allocations[s.id] ?? 0));
-
-  // Group slots by position for spent tracking
-  const spentByGroup = useMemo(() => {
-    const out: Record<string, { spent: number; planned: number }> = {};
-    for (const slot of slots) {
-      const g = slot.group;
-      if (!out[g]) out[g] = { spent: spent[g] ?? 0, planned: 0 };
-      out[g].planned += allocations[slot.id] ?? 0;
-    }
-    return out;
-  }, [slots, spent, allocations]);
+  const planned = slots.reduce((sum, s) => sum + valueFor(s), 0);
+  const remaining = settings.totalBudget - planned;
 
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
-
-      {/* ── Slot breakdown ────────────────────────────── */}
       <div className="px-4 py-4">
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            $ per roster slot
-          </p>
-          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Manual</span>
-        </div>
-
-        <p className="mb-3 flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
-          <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/70" />
-          Type each slot's value manually. Locked & typed values stay frozen.
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          $ per roster slot
         </p>
 
         <div className="space-y-2">
           {slots.map((slot) => {
-            const value = allocations[slot.id] ?? 0;
-            const barPct = maxAllocation > 0 ? (value / maxAllocation) * 100 : 0;
-            const groupData = spentByGroup[slot.group];
-            // Show spent on the first slot of each group only
-            const isFirstInGroup = slot.index === 1;
-            const groupSpent = groupData?.spent ?? 0;
-
-            const lockInfo = locked[slot.id];
-            const isDrafted = !!lockInfo;
-            const isUserLocked = !!lockedSlots[slot.id] && !isDrafted;
-            const isDollarSlot = slot.group === "K" || slot.group === "DST";
-            const isLocked = isDrafted || isUserLocked || isDollarSlot;
-
+            const value = valueFor(slot);
             return (
               <div key={slot.id} className="flex items-center gap-2.5">
-                {/* Position badge */}
                 <span
                   className={cn(
                     "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center text-[10px] font-bold",
                     GROUP_COLOR[slot.group],
-                    isLocked && "opacity-60",
                   )}
                 >
                   {slot.label}
                 </span>
-
-                {/* Visual bar */}
-                <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-secondary/40">
-                  <div
-                    className={cn(
-                      "h-full rounded-md transition-all",
-                      GROUP_BAR[slot.group],
-                      isLocked && "opacity-100",
-                    )}
-                    style={{ width: `${barPct}%`, opacity: isLocked ? 1 : 0.7 }}
-                  />
-                  {isDrafted && (
-                    <span className="absolute inset-0 flex items-center px-2 text-[10px] font-medium text-foreground/80 truncate">
-                      {lockInfo.name}
-                    </span>
-                  )}
-                  {!isLocked && isFirstInGroup && groupSpent > 0 && (
-                    <div
-                      className="absolute left-0 top-0 h-full rounded-md bg-white/20"
-                      style={{ width: `${Math.min(100, (groupSpent / Math.max(1, groupData?.planned ?? 1)) * 100)}%` }}
-                    />
-                  )}
-                </div>
-
-                {/* Dollar input (or locked actual price) */}
+                <div className="flex-1" />
                 <div className="flex shrink-0 items-center gap-0.5">
                   <span className="text-sm text-muted-foreground">$</span>
                   <Input
                     inputMode="numeric"
                     value={String(value)}
-                    disabled={isLocked}
                     onChange={(e) => {
                       const n = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
                     }}
-                    className={cn(
-                      "h-8 w-16 rounded-lg px-2 text-right font-mono text-sm",
-                      isDrafted && "border-success/40 bg-success/5 text-success disabled:opacity-100",
-                      isUserLocked && "border-primary/40 bg-primary/5 text-primary disabled:opacity-100",
-                    )}
+                    className="h-8 w-16 rounded-lg px-2 text-right font-mono text-sm"
                     aria-label={`${slot.label} allocation`}
-                    title={isDrafted ? `Paid $${lockInfo.price} for ${lockInfo.name}` : isUserLocked ? `Locked at $${value}` : "Lock this slot to edit its value"}
                   />
                 </div>
-
-                {isDrafted ? (
-                  <Lock className="h-3 w-3 shrink-0 text-success" />
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      // Persist the current displayed value before toggling so the lock freezes it.
-                      if (!isUserLocked) setSlotAllocation(slot.id, value);
-                      toggleSlotLock(slot.id);
-                    }}
-                    className={cn(
-                      "flex h-6 w-6 shrink-0 items-center justify-center rounded-md transition-colors",
-                      isUserLocked
-                        ? "bg-primary/15 text-primary hover:bg-primary/25"
-                        : "text-muted-foreground/60 hover:bg-secondary hover:text-foreground",
-                    )}
-                    aria-label={isUserLocked ? `Unlock ${slot.label}` : `Lock ${slot.label}`}
-                    title={isUserLocked ? "Unlock — let this slot redistribute" : "Lock this value"}
-                  >
-                    {isUserLocked ? <Lock className="h-3 w-3" /> : <LockOpen className="h-3 w-3" />}
-                  </button>
-                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* ── Footer totals ─────────────────────────────── */}
       <div className="border-t border-border/50 px-4 py-3">
-        {(() => {
-          const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
-          const remaining = settings.totalBudget - lockedSum;
-          return (
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-3">
-                <span className="text-muted-foreground">Spent</span>
-                <span className="font-mono font-semibold">${lockedSum}</span>
-                <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
-              </div>
-              <div className="rounded-full border border-primary/40 bg-primary/10 px-3 py-0.5 text-xs font-semibold text-primary">
-                ${remaining} replanned across {slots.length - Object.keys(locked).length} slots
-              </div>
-            </div>
-          );
-        })()}
+        <div className="flex items-center justify-between text-sm">
+          <div className="flex items-center gap-3">
+            <span className="text-muted-foreground">Planned</span>
+            <span className="font-mono font-semibold">${planned}</span>
+            <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
+          </div>
+          <div
+            className={cn(
+              "rounded-full border px-3 py-0.5 text-xs font-semibold",
+              remaining === 0
+                ? "border-success/40 bg-success/10 text-success"
+                : remaining > 0
+                  ? "border-primary/40 bg-primary/10 text-primary"
+                  : "border-destructive/40 bg-destructive/10 text-destructive",
+            )}
+          >
+            {remaining >= 0 ? `$${remaining} left` : `$${Math.abs(remaining)} over`}
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-
 function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   const slots: PlannerSlot[] = [];
   const add = (group: SlotGroup, count: number, labelFor: (i: number) => string) => {
     for (let i = 1; i <= count; i += 1) {
-      slots.push({ id: `${group}-${i}`, label: labelFor(i), group, index: i });
+      slots.push({ id: `${group}-${i}`, label: labelFor(i), group });
     }
   };
 
@@ -323,4 +134,3 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
 
   return slots;
 }
-
