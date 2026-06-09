@@ -257,6 +257,8 @@ export default function DraftRoom() {
           )}
           {/* Strategy picker + per-slot budget allocations */}
           <PositionBudgetBar />
+          {/* DraftMath-style optimal lineup at full budget */}
+          <OptimalTeamCard />
           {/* Next target recommendation */}
           {selectedTeam && (
             <NextTargetCard
