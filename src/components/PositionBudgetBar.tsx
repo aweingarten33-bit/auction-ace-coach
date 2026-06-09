@@ -149,26 +149,26 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
       <div className="px-4 pb-2 pt-0">
 
         {/* Action buttons */}
-        <div className="mb-3 flex items-center justify-end gap-2">
+        <div className="mb-3 flex items-center justify-end gap-1">
           {onOpenCoach && (
             <Button type="button" variant="ghost" size="sm"
-              className="h-9 gap-1.5 rounded-lg px-3 text-sm text-muted-foreground hover:text-primary"
+              className="h-7 gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-primary"
               onClick={onOpenCoach}>
-              <Sparkles className="h-4 w-4" /> Ask
+              <Sparkles className="h-3 w-3" /> Ask
             </Button>
           )}
           <Button type="button" variant="ghost" size="sm"
-            className="h-9 gap-1.5 rounded-lg px-3 text-sm text-muted-foreground hover:text-destructive"
+            className="h-7 gap-1 rounded-lg px-2 text-xs text-muted-foreground hover:text-destructive"
             onClick={() => {
               const zeroed: Record<string, number> = {};
               for (const slot of slots) zeroed[slot.id] = 0;
               setSlotAllocations(zeroed);
             }}>
-            <Trash2 className="h-4 w-4" /> Clear
+            <Trash2 className="h-3 w-3" /> Clear
           </Button>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {slots.map((slot) => {
             const value = allocations[slot.id] ?? 0;
             const groupData = spentByGroup[slot.group];
@@ -176,21 +176,21 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
             const groupSpent = groupData?.spent ?? 0;
 
             return (
-              <div key={slot.id} className="flex min-h-[52px] items-center gap-3">
-                {/* Position badge + optional spent note */}
-                <div className="w-14 shrink-0 flex flex-col items-center gap-0.5">
-                  <span className={cn(
-                    "w-full rounded-md border py-1 text-center text-xs font-bold",
-                    GROUP_COLOR[slot.group],
-                  )}>
-                    {slot.label}
-                  </span>
-                  {isFirstInGroup && groupSpent > 0 && (
-                    <span className="text-[9px] text-muted-foreground">${groupSpent} spent</span>
-                  )}
-                </div>
+              <div key={slot.id} className="flex items-center gap-3">
+                {/* Position badge */}
+                <span className={cn(
+                  "w-14 shrink-0 rounded-md border py-1 text-center text-xs font-bold",
+                  GROUP_COLOR[slot.group],
+                )}>
+                  {slot.label}
+                </span>
 
-                {/* Dollar input */}
+                {/* Spent badge */}
+                <span className="w-16 shrink-0 text-xs text-muted-foreground">
+                  {isFirstInGroup && groupSpent > 0 ? `$${groupSpent} spent` : ""}
+                </span>
+
+                {/* Dollar input — big and obvious */}
                 <div className="flex flex-1 items-center justify-end gap-1">
                   <span className="text-lg font-bold text-muted-foreground">$</span>
                   <Input
@@ -219,7 +219,7 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
                       }
                       setSlotAllocations(next);
                     }}
-                    className="h-12 w-24 rounded-xl px-2 text-right font-mono text-2xl font-bold"
+                    className="h-10 w-20 rounded-lg px-2 text-right font-mono text-xl font-bold"
                     aria-label={`${slot.label} allocation`}
                   />
                 </div>
@@ -229,24 +229,29 @@ export default function PositionBudgetBar({ onOpenCoach }: { onOpenCoach?: () =>
         </div>
       </div>
 
-      {/* ── Delta pill ────────────────────────────────── */}
-      <div className="flex justify-end border-t border-border/50 px-4 py-2">
-        <span className={cn(
-          "rounded-full border px-3 py-1 text-xs font-semibold",
-          delta === 0
-            ? "border-success/40 bg-success/10 text-success"
-            : delta > 0
-              ? "border-destructive/40 bg-destructive/10 text-destructive"
-              : "border-warning/40 bg-warning/10 text-warning",
-        )}>
-          {delta === 0
-            ? "✓ On budget"
-            : delta > 0
-              ? `$${delta} over budget`
-              : `$${Math.abs(delta)} unspent`}
-        </span>
+      {/* ── Footer totals ─────────────────────────────── */}
+      <div className="border-t border-border/50 px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">Total planned</p>
+            <p className="font-mono text-2xl font-bold">${plannedTotal}</p>
+          </div>
+          <div className={cn(
+            "rounded-xl border px-4 py-2 text-sm font-bold",
+            delta === 0
+              ? "border-success/40 bg-success/10 text-success"
+              : delta > 0
+                ? "border-destructive/40 bg-destructive/10 text-destructive"
+                : "border-warning/40 bg-warning/10 text-warning",
+          )}>
+            {delta === 0
+              ? "✓ On budget"
+              : delta > 0
+                ? `$${delta} over`
+                : `$${Math.abs(delta)} unspent`}
+          </div>
+        </div>
       </div>
-
     </div>
   );
 }

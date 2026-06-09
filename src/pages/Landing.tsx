@@ -117,18 +117,9 @@ export default function Landing() {
 
         </div>
 
-        {/* Admin access — subtle, bottom of page */}
-        <Link
-          to="/passcode"
-          className="mt-8 text-[10px] font-mono tracking-widest text-white/20 hover:text-white/40 transition"
-          style={{ animation: "fade-in 0.6s 1.5s ease-out both" }}
-        >
-          ADMIN
-        </Link>
-
         {/* Version stamp */}
         <p
-          className="mt-2 text-[10px] font-mono tracking-widest text-white/20"
+          className="mt-10 text-[10px] font-mono tracking-widest text-white/20"
           style={{ animation: "fade-in 0.6s 1.5s ease-out both" }}
         >
           AUCTION ACE — DRAFT SEASON 2025

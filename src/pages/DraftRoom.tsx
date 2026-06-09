@@ -47,7 +47,6 @@ import {
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
-import { getStrategy, buildCoachGuidance } from "@/lib/strategies";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 import BestAvailableBoard from "@/components/BestAvailableBoard";
@@ -74,13 +73,11 @@ export default function DraftRoom() {
     watchlist,
     pinPlayer,
     unpinPlayer,
-    strategyId,
   } = useDraftStore();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
-  const [top50InfoOpen, setTop50InfoOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
   const [leagueName, setLeagueName] = useState("");
 
@@ -202,14 +199,14 @@ export default function DraftRoom() {
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
       <header
-        className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-3 py-3"
-        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+        className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 py-2"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.5rem)" }}
       >
         {isAdmin && (
           <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 shrink-0" aria-label="Menu">
-                <Menu className="h-6 w-6" strokeWidth={2} />
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Menu">
+                <Menu className="h-5 w-5" strokeWidth={2} />
               </Button>
             </SheetTrigger>
             <SettingsDrawer
@@ -222,11 +219,11 @@ export default function DraftRoom() {
         )}
 
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate text-base font-bold leading-tight">
+          <p className="truncate text-sm font-semibold leading-tight">
             {leagueName || selectedTeam?.name || "Draft Room"}
           </p>
           {selectedTeam && leagueName && (
-            <p className="truncate text-xs text-muted-foreground">{selectedTeam.name}</p>
+            <p className="truncate text-[10px] text-muted-foreground">{selectedTeam.name}</p>
           )}
         </div>
 
@@ -243,15 +240,12 @@ export default function DraftRoom() {
         {/* Top 50 side tab */}
         <button
           onClick={() => setPanel("top50")}
-          className="fixed right-0 z-30 flex flex-col items-center justify-center gap-1.5 rounded-l-2xl border border-r-0 border-primary/40 bg-primary px-2 py-5 shadow-xl active:scale-95 transition"
+          className="fixed right-0 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center justify-center gap-1 rounded-l-xl border border-r-0 border-border bg-card px-1.5 py-4 shadow-lg hover:bg-secondary/60 active:scale-95 transition"
           aria-label="Top 50 Players"
-          style={{ top: "120px" }}
+          style={{ writingMode: "vertical-rl", textOrientation: "mixed" }}
         >
-          <Trophy className="h-5 w-5 text-primary-foreground" />
-          <span
-            className="text-[11px] font-extrabold uppercase tracking-widest text-primary-foreground"
-            style={{ writingMode: "vertical-rl", letterSpacing: "0.15em" }}
-          >
+          <Trophy className="h-4 w-4 text-primary mb-1" style={{ writingMode: "horizontal-tb" }} />
+          <span className="text-[11px] font-bold tracking-widest uppercase text-primary" style={{ writingMode: "vertical-rl", letterSpacing: "0.12em" }}>
             Top 50
           </span>
         </button>
@@ -295,20 +289,20 @@ export default function DraftRoom() {
         className="shrink-0 border-t border-border/60 bg-background/95 backdrop-blur-sm"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="flex items-center px-2 py-1">
+        <div className="flex items-center px-3 py-2">
           <button
             onClick={() => setPanel("search")}
-            className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-muted-foreground active:text-foreground"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
-            <Search className="h-5 w-5" />
-            <span className="text-[11px] font-semibold">Find</span>
+            <Search className="h-4 w-4" />
+            <span className="text-xs font-medium">Find</span>
           </button>
           <button
             onClick={() => setPanel("recent")}
-            className="flex flex-1 flex-col items-center justify-center gap-1 py-2.5 text-muted-foreground active:text-foreground"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
-            <Clock className="h-5 w-5" />
-            <span className="text-[11px] font-semibold">Recent</span>
+            <Clock className="h-4 w-4" />
+            <span className="text-xs font-medium">Recent</span>
           </button>
 
           {/* Coach FAB */}
@@ -317,9 +311,9 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Ask the Coach"
-                className="ml-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-lg active:scale-95 transition"
+                className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-lg active:scale-95 transition"
               >
-                <Sparkles className="h-5 w-5" strokeWidth={1.5} />
+                <Sparkles className="h-4 w-4" strokeWidth={1.5} />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
@@ -350,11 +344,6 @@ export default function DraftRoom() {
                   recentRuns: runs,
                   draftedPlayers: events.map((e) => e.player),
                   showMath: false,
-                  strategy: strategyId ? {
-                    id: strategyId,
-                    label: getStrategy(strategyId).label,
-                    guidance: buildCoachGuidance(strategyId),
-                  } : undefined,
                 })}
               />
             </SheetContent>
@@ -375,20 +364,20 @@ export default function DraftRoom() {
             style={{ animation: "tool-panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           >
             <div
-              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-4 py-4"
-              style={{ paddingTop: "calc(env(safe-area-inset-top) + 1rem)" }}
+              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-3 py-3"
+              style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
             >
               <button
                 onClick={() => setPanel(null)}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary/40 active:bg-secondary/80"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/40 hover:bg-secondary/80"
                 aria-label="Close"
               >
-                <ChevronLeft className="h-5 w-5" strokeWidth={2.5} />
+                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
-              <h2 className="text-lg font-bold leading-tight">
-                {panel === "search" && "Find a Player"}
-                {panel === "top50" && (leagueName ? `Top 50 — ${leagueName}` : "Top 50 Players")}
-                {panel === "recent" && "Recent Picks"}
+              <h2 className="text-base font-semibold">
+                {panel === "search" && "Find a player"}
+                {panel === "top50" && (leagueName ? `Top 50 Players According to ${leagueName}` : "Top 50 Players")}
+                {panel === "recent" && "Recent picks"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
@@ -402,40 +391,9 @@ export default function DraftRoom() {
               )}
               {panel === "top50" && (
                 <>
-                  <p className="mb-2 text-sm leading-relaxed text-foreground/80">
-                    Players ranked by what they're actually worth in your league — based primarily on the previous 3 seasons of draft history combined with some pretty intense math, adjusted live as the draft moves.
+                  <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+                    What players actually went for in your last 3 drafts — not ESPN's generic rankings. Use these as your anchor when bidding.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setTop50InfoOpen((v) => !v)}
-                    className="mb-3 text-xs font-semibold text-primary underline-offset-2 hover:underline"
-                  >
-                    {top50InfoOpen ? "Hide" : "What math? →"}
-                  </button>
-                  {top50InfoOpen && (
-                    <div className="mb-4 space-y-3 rounded-xl border border-border/60 bg-secondary/20 px-3 py-3 text-xs leading-relaxed text-muted-foreground">
-                      <div>
-                        <p className="font-semibold text-foreground">1. Value Over Replacement Player (VORP)</p>
-                        <p className="mt-0.5">The core question isn't "how good is this player" — it's "how much better is he than whoever I'd be forced to take if I missed him?" We set a replacement baseline at each position: the last guy who'd realistically get drafted as a starter across all teams. Everything above that line has real auction value. Everything below it doesn't. That gap is what drives the price.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">2. Your League Calibrates Itself</p>
-                        <p className="mt-0.5">Generic models price every league the same. Ours doesn't. We compute a separate dollar-per-value rate for each position using what your specific room has actually paid over 3 years. If your league historically overpays for RBs and steals TEs, that's already built into the numbers. The model learns your league — not someone else's.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">3. Decline Detection</p>
-                        <p className="mt-0.5">A simple average would lie to you. If a player cost $48 two years ago and $21 last year, averaging those gives you a useless $34. Instead, the model detects meaningful year-over-year drops and shifts weight aggressively toward recent history — so aging players, injury recoveries, and role changes are priced where they are now, not where they used to be.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">4. Superflex Scarcity Premium</p>
-                        <p className="mt-0.5">Pure math undersells QBs in superflex because it can't feel the panic in the room when the third-best QB goes. Every team needs two starters, the talent cliff is steep, and people know it. We apply a scarcity premium that reflects the actual auction pressure on elite QBs — not just their projected points.</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold text-foreground">5. Live Room Temperature</p>
-                        <p className="mt-0.5">No price sheet survives contact with a hot draft room. As picks come in, we continuously measure what managers are actually paying versus what the sheet said they'd pay. If the room is inflated, your remaining prices adjust upward in real time — so you're never bidding with yesterday's data while everyone else is spending today's money.</p>
-                      </div>
-                    </div>
-                  )}
                   <Top100List
                     prices={adjustedPrices}
                     anchorMap={anchorMap}
@@ -590,22 +548,22 @@ function RecentPicksList({
   onPick: (name: string, position?: Position) => void;
 }) {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       {events.map((e, i) => (
         <button
           key={`${e.player}-${i}`}
           type="button"
           onClick={() => onPick(e.player, e.position)}
-          className="flex w-full items-center gap-3 rounded-xl border border-border/40 bg-secondary/20 px-3 py-3 text-left active:bg-secondary/40"
+          className="flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40"
         >
           {e.position && (
-            <Badge variant="outline" className={`${POS_COLORS[e.position] ?? ""} shrink-0 text-xs px-2 py-0.5`}>
+            <Badge variant="outline" className={`${POS_COLORS[e.position] ?? ""} text-[10px] px-1.5 py-0`}>
               {e.position}
             </Badge>
           )}
-          <span className="flex-1 truncate text-sm font-semibold">{e.player}</span>
-          <span className="font-mono text-sm font-bold tabular-nums">${e.price}</span>
-          <span className="w-14 shrink-0 truncate text-right text-xs text-muted-foreground">
+          <span className="flex-1 truncate font-medium">{e.player}</span>
+          <span className="font-mono tabular-nums">${e.price}</span>
+          <span className="w-16 truncate text-right text-[10px] text-muted-foreground">
             {e.drafter === "me" ? "you" : (e as any).drafterName ?? "—"}
           </span>
         </button>
@@ -752,8 +710,8 @@ function LookupSection({
       <Input
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="e.g. Bijan Robinson  or  $25"
-        className="h-12 text-base"
+        placeholder="e.g. Bijan Robinson  or  25"
+        className="h-9"
         autoComplete="off"
         spellCheck={false}
       />
@@ -773,16 +731,16 @@ function LookupSection({
             key={p.name}
             type="button"
             onClick={() => onPick(p.name, p.position)}
-            className="flex w-full items-center gap-3 rounded-xl border border-border/40 bg-secondary/20 px-3 py-3 text-left active:bg-secondary/40"
+            className="flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40"
           >
             {p.position && (
-              <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} shrink-0 text-xs px-2 py-0.5`}>
+              <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
                 {p.position}
               </Badge>
             )}
-            <span className="flex-1 truncate text-sm font-semibold">{p.name}</span>
-            <span className="font-mono text-sm font-bold tabular-nums">${p.price}</span>
-            <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <span className="flex-1 truncate font-medium">{p.name}</span>
+            <span className="font-mono tabular-nums">${p.price}</span>
+            <ChevronRight className="h-3 w-3 text-muted-foreground" />
           </button>
         ))}
       </div>
@@ -824,7 +782,7 @@ function Top100List({
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1">
       {top.map((p, i) => {
         const isPicked = drafted.has(norm(p.name));
         return (
@@ -833,16 +791,16 @@ function Top100List({
             type="button"
             disabled={isPicked}
             onClick={() => !isPicked && onPick(p.name, p.position)}
-            className={`flex w-full items-center gap-3 rounded-xl border border-border/40 bg-secondary/20 px-3 py-3 text-left active:bg-secondary/40 ${isPicked ? "opacity-40" : ""}`}
+            className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isPicked ? "opacity-50" : ""}`}
           >
-            <span className="w-6 shrink-0 text-right font-mono text-xs text-muted-foreground">{i + 1}</span>
+            <span className="w-6 text-right font-mono text-[10px] text-muted-foreground">{i + 1}</span>
             {p.position && (
-              <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} shrink-0 text-xs px-2 py-0.5`}>
+              <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
                 {p.position}
               </Badge>
             )}
-            <span className={`flex-1 truncate text-sm font-semibold ${isPicked ? "line-through" : ""}`}>{p.name}</span>
-            <span className="font-mono text-sm font-bold tabular-nums">${p.price}</span>
+            <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
+            <span className="font-mono tabular-nums">${p.price}</span>
           </button>
         );
       })}

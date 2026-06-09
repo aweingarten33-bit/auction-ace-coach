@@ -100,14 +100,14 @@ export default function AiQuickPanel({ coachContext }: Props) {
 
       <div className="border-t border-border/60 px-3 pb-3 pt-2">
         {history.length === 0 && (
-          <div className="mb-3 flex flex-wrap gap-2">
+          <div className="mb-2 flex flex-wrap gap-1.5">
             {QUICK_PROMPTS.map((p) => (
               <Button
                 key={p}
                 size="sm" variant="outline"
                 disabled={streaming}
                 onClick={() => ask(p)}
-                className="h-9 rounded-full px-3.5 text-xs font-semibold"
+                className="h-7 rounded-full px-2.5 text-[11px] font-normal"
               >
                 {p}
               </Button>
