@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Info, Lock, RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Info, Lock, LockOpen, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -104,6 +104,8 @@ export default function PositionBudgetBar() {
   const setSlotAllocation = useDraftStore((s) => s.setSlotAllocation);
   const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
   const clearSlotAllocations = useDraftStore((s) => s.clearSlotAllocations);
+  const lockedSlots = useDraftStore((s) => s.lockedSlots);
+  const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
   const strategyId = useDraftStore((s) => s.strategyId);
   const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
   const strategy = getStrategy(strategyId);
