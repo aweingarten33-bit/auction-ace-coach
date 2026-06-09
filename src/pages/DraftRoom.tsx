@@ -43,7 +43,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import OpponentHeatmap from "@/components/OpponentHeatmap";
+
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
@@ -272,8 +272,6 @@ export default function DraftRoom() {
           {events.length > 0 && (
             <LastPickImpact settings={settings} keepers={keepers} events={events} />
           )}
-          {/* Opponent spending heatmap */}
-          <OpponentHeatmap settings={settings} />
         </div>
       </div>
 
