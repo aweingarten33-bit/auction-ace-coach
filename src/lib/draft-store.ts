@@ -232,10 +232,7 @@ export const useDraftStore = create<DraftState>()(
           lockedSlots: {},
           slotNotes: {},
           touchedSlots: {},
-          plannerStrategy:
-            DEFAULT_SETTINGS.leagueType === "Superflex" || DEFAULT_SETTINGS.leagueType === "2QB"
-              ? "superflex"
-              : "stars",
+          plannerStrategy: "balanced-sf",
           strategyId: "none",
           customStrategyRules: "",
         }),
