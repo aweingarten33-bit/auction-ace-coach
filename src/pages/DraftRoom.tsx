@@ -220,7 +220,7 @@ export default function DraftRoom() {
 
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate text-sm font-semibold leading-tight">
-            {leagueName || selectedTeam?.name || "Draft Room"}
+            {leagueName || selectedTeam?.name || "Auction Draft Assistant"}
           </p>
           <div className="mt-0.5 flex items-center gap-1.5">
             {selectedTeam && leagueName && (
