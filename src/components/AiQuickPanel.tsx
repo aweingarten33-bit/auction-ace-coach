@@ -46,7 +46,7 @@ const QUICK_PROMPTS = [
   "Find me a cheap backup QB",
   "Where am I weakest?",
   "Build me a $225 plan",
-  "Best QB value left in Superflex?",
+  "Best QB value left?",
   "What's running dry at each position?",
   "How much should I spend on RB1?",
   "Stars-and-scrubs or balanced build?",
