@@ -74,8 +74,8 @@ export default function DraftRoom() {
     pinPlayer,
     unpinPlayer,
   } = useDraftStore();
-  const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
+
+
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelId | null>(null);
