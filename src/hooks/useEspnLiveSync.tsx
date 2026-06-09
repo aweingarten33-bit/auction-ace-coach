@@ -206,7 +206,7 @@ export function useEspnLiveSync({ expectingEvents = true, teamIdOverride = null 
     // Backfill last hour of events so picks/bids that arrived before mount appear
     (async () => {
       const since = new Date(Date.now() - 60 * 60_000).toISOString();
-      const { data } = await (supabase as any)
+      const { data } = await supabase
         .from("live_draft_events")
         .select("id, event_type, player_name, player_position, player_team, price, drafter_team_name, drafter_team_id, occurred_at, created_at")
         .eq("league_id", leagueId)

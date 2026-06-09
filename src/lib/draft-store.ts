@@ -176,12 +176,6 @@ export const useDraftStore = create<DraftState>()(
           vetriDecay: 0.55,
           vetriAutoSync: true,
           priceOverrides: [],
-          quickPrompts: DEFAULT_QUICK_PROMPTS,
-          showMath: false,
-          draftPlan: null,
-          slotAllocations: {},
-          strategyId: "none",
-          customStrategyRules: "",
         }),
       pinPlayer: (name) =>
         set((s) => (s.watchlist.includes(name) ? s : { watchlist: [...s.watchlist, name] })),

@@ -22,13 +22,6 @@ export default function TeamPicker() {
 
   useEffect(() => {
     (async () => {
-      // Ensure visitors have a Supabase session (anonymous is fine) so they can
-      // call edge functions. This is a no-op if they're already signed in.
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        await supabase.auth.signInAnonymously();
-      }
-
       try {
         const { data, error: invokeErr } = await supabase.functions.invoke("league-teams");
         const errMsg =

@@ -66,7 +66,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
               <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
             <div className="text-[12px] text-muted-foreground">
-              Ask anything about your draft. "Should I spend $45 on Bijan?" "Who's the best WR still available?"
+              Ask anything — like talking to Matthew Berry mid-draft. "Should I take Bijan at $45?" "Who's the best WR2 left?"
             </div>
           </div>
         )}

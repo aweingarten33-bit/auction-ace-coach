@@ -12,11 +12,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        display:   ['"Bebas Neue"', '"Anton"', '"Oswald"', "ui-sans-serif", "sans-serif"],
-        headline:  ['"Bebas Neue"', '"Anton"', '"Oswald"', "ui-sans-serif", "sans-serif"],
-        heading:   ['"Bebas Neue"', '"Anton"', "ui-sans-serif", "sans-serif"],
-        condensed: ['"Bebas Neue"', '"Oswald"', "ui-sans-serif", "sans-serif"],
-        editorial: ['"DM Sans"', '"Inter"', "ui-sans-serif", "system-ui", "sans-serif"],
+        display:   ['"Plus Jakarta Sans"', '"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        headline:  ['"Plus Jakarta Sans"', '"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        heading:   ['"Plus Jakarta Sans"', '"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
+        condensed: ['"Plus Jakarta Sans"', "ui-sans-serif", "sans-serif"],
+        editorial: ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
         serif:     ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
         sans:      ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],
         body:      ['"DM Sans"', "ui-sans-serif", "system-ui", "sans-serif"],

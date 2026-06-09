@@ -24,8 +24,7 @@ export function LockProvider({ children }: { children: ReactNode }) {
         : Promise.resolve({ data: null }),
     ]);
     setLocked(!!s?.locked);
-    // Admin via user_roles table OR via passcode stored in user metadata
-    setIsAdmin(!!roleRes.data || !!user?.user_metadata?.is_admin);
+    setIsAdmin(!!roleRes.data);
     setLoading(false);
   };
 
