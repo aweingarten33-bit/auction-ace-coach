@@ -57,6 +57,12 @@ interface DraftState {
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
   plannerStrategy: "hero-qb" | "balanced-qbs" | "bargain-qb";
+  // Anchor players — named "must-have" targets w/ pre-allocated $.
+  // Subtracted from pool before slots are distributed.
+  anchors: { id: string; name: string; price: number }[];
+  // Reserve buffer percentage (0–20). Carved out of the budget as an
+  // untouchable cushion for in-draft inflation/snipes.
+  reservePct: number;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -98,6 +104,11 @@ interface DraftState {
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
   setPlannerStrategy: (s: "hero-qb" | "balanced-qbs" | "bargain-qb") => void;
+  addAnchor: () => void;
+  updateAnchor: (id: string, patch: Partial<{ name: string; price: number }>) => void;
+  removeAnchor: (id: string) => void;
+  clearAnchors: () => void;
+  setReservePct: (pct: number) => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
@@ -168,6 +179,29 @@ export const useDraftStore = create<DraftState>()(
       clearTouchedSlots: () => set({ touchedSlots: {} }),
       plannerStrategy: "balanced-qbs",
       setPlannerStrategy: (s) => set({ plannerStrategy: s, touchedSlots: {} }),
+      anchors: [],
+      addAnchor: () =>
+        set((s) =>
+          s.anchors.length >= 5
+            ? s
+            : { anchors: [...s.anchors, { id: `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, name: "", price: 0 }] },
+        ),
+      updateAnchor: (id, patch) =>
+        set((s) => ({
+          anchors: s.anchors.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  ...(patch.name !== undefined ? { name: patch.name } : {}),
+                  ...(patch.price !== undefined ? { price: Math.max(0, Math.min(999, Math.floor(patch.price))) } : {}),
+                }
+              : a,
+          ),
+        })),
+      removeAnchor: (id) => set((s) => ({ anchors: s.anchors.filter((a) => a.id !== id) })),
+      clearAnchors: () => set({ anchors: [] }),
+      reservePct: 0,
+      setReservePct: (pct) => set({ reservePct: Math.max(0, Math.min(20, Math.round(pct))) }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
@@ -233,6 +267,8 @@ export const useDraftStore = create<DraftState>()(
           slotNotes: {},
           touchedSlots: {},
           plannerStrategy: "balanced-qbs",
+          anchors: [],
+          reservePct: 0,
           strategyId: "none",
           customStrategyRules: "",
         }),

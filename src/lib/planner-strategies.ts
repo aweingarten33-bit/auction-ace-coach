@@ -85,6 +85,8 @@ export interface ComputeOptions {
   lockedSlots?: Record<string, boolean>;
   /** Current allocations (used for locked/touched values). */
   currentAllocations?: Record<string, number>;
+  /** Dollars carved out before slot distribution (anchor players + reserve buffer). */
+  extraReserved?: number;
 }
 
 /**
@@ -101,7 +103,7 @@ export function computeSlotDollars(
   settings: LeagueSettings,
   opts: ComputeOptions = {},
 ): Record<string, number> {
-  const { touchedSlots = {}, lockedSlots = {}, currentAllocations = {} } = opts;
+  const { touchedSlots = {}, lockedSlots = {}, currentAllocations = {}, extraReserved = 0 } = opts;
   const slots = buildPlannerSlots(settings);
   const out: Record<string, number> = {};
 
@@ -131,7 +133,7 @@ export function computeSlotDollars(
     open.push(slot);
   }
 
-  let pool = Math.max(0, settings.totalBudget - reserved);
+  let pool = Math.max(0, settings.totalBudget - reserved - Math.max(0, extraReserved));
 
   // Pass 2 — distribute pool across open slots by strategy weight.
   const weights = open.map((s) => weightFor(strategy, s));
@@ -139,7 +141,7 @@ export function computeSlotDollars(
 
   if (open.length === 0 || totalWeight === 0 || pool === 0) {
     for (const s of open) out[s.id] = pool > 0 && open.length > 0 ? Math.floor(pool / open.length) : 0;
-    return reconcile(out, settings.totalBudget, slots, lockedSlots, touchedSlots);
+    return reconcile(out, settings.totalBudget - Math.max(0, extraReserved), slots, lockedSlots, touchedSlots);
   }
 
   let assigned = 0;
