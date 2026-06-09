@@ -230,10 +230,6 @@ export default function DraftRoom() {
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end">
-          <span className="font-mono text-sm font-bold tabular-nums">${budget.remaining} left</span>
-          <span className="text-[10px] text-muted-foreground">max ${budget.maxBid} · {budget.slotsLeft} slots</span>
-        </div>
       </header>
 
       {/* ── SPEND BAR ───────────────────────────────────────── */}
