@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Lock, LockOpen, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "@/lib/planner-slots";
