@@ -1,102 +1,79 @@
-# Persistent, planner-aware Coach chat — with "Apply to planner"
+Researched ESPN, Yahoo, Sleeper, FantasyPros, Footballguys, Draft Sharks, FantasyLife. The industry has converged on hard numbers — here's what we steal.
 
-Turn the existing "Ask the Coach" sheet into the ChatGPT-style assistant from your screenshots, with two new powers:
+## What you'll see in the planner
 
-1. The chat **saves to your account** — reload, switch devices, it's still there.
-2. The AI can **propose a build** (or a single swap) as a structured card with an **"Apply to planner"** button. One tap fills the slot values and target names. Nothing changes on the board unless you tap.
+Three things change. Everything else stays.
 
-## User flow
+### 1. Auto-filled $ values on load (the "sorcery")
 
-You type: *"Swap Bijan ($50) for Josh Jacobs at $40, what fits?"*
+Every slot opens with a real dollar value, not zero. Computed from a Footballguys/FantasyPros-grade allocation table for your exact roster shape and budget.
 
-Coach replies with normal prose like ChatGPT, **plus** a yellow proposal card at the bottom:
+```text
+Strategy:  ⦿ Stars & Scrubs   ○ Balanced   ○ WR-Heavy
 
-```
-┌─ Proposed build ─────────────────────────┐
-│ QB1   Josh Allen          $67            │
-│ RB1   Josh Jacobs         $40            │
-│ RB2   Omarion Hampton     $20            │
-│ WR1   Malik Nabers        $33            │
-│ ...                                       │
-│ Total $225 / $225  ✓                      │
-│                                           │
-│ [Apply to planner]   [Dismiss]            │
-└───────────────────────────────────────────┘
-```
-
-Tap **Apply** → every slot's $ and target name updates in the planner. Locked slots (already drafted) are skipped, never overwritten. A toast says "Applied — undo" for 5 seconds.
-
-The AI can also propose a **single-slot change** ("set RB2 = $17, target Hampton") which renders as a smaller one-row card with the same Apply button.
-
-## What changes (user-visible)
-
-1. Coach chat persists per user (load on open, save on send).
-2. "New chat" button in the Coach sheet header.
-3. Coach sees the live budget board (slot $, target notes, locks, totals).
-4. Proposal cards inline in chat with **Apply to planner** / **Dismiss**.
-5. Apply respects locked slots and shows an undo toast.
-6. New starter prompts: "Does my current build fit $225?", "Swap X for Y", "Find me a cheap backup QB", "Where am I weakest?"
-
-The planner UI itself doesn't change — same manual board. The only new thing is that "Apply" can write into it.
-
-## What changes (technical)
-
-### 1. Database — one new table
-`coach_messages` on Lovable Cloud:
-- `id`, `user_id`, `role` ('user' | 'assistant'), `content` (text), `proposal` (jsonb, nullable), `created_at`
-- RLS: users read/write only their own rows
-- GRANTs: `authenticated`, `service_role`
-
-`proposal` shape:
-```json
-{
-  "kind": "full" | "patch",
-  "slots": [{ "id": "RB1-1", "label": "RB1", "dollars": 40, "target": "Josh Jacobs" }],
-  "total": 225,
-  "note": "Fits exactly"
-}
+QB1   [ targets… ]   $ 15   🔓
+RB1   [ targets… ]   $ 58   🔓
+RB2   [ targets… ]   $ 20   🔓
+RB3   [ targets… ]   $  4   🔓
+WR1   [ targets… ]   $ 48   🔓
+WR2   [ targets… ]   $ 18   🔓
+WR3   [ targets… ]   $  7   🔓
+TE1   [ targets… ]   $  9   🔓
+FLEX  [ targets… ]   $  3   🔓
+K     —              $  1   🔒
+DST   —              $  1   🔒
+BE1   —              $  1   🔓
+…
+─────────────────────────────────
+Planned $200 / $200      Max bid $185
 ```
 
-### 2. Edge function — extend existing `coach`
-- Accept new fields: `budgetBoard` (slot id, label, $, target, locked, totals) and `userId`.
-- System prompt: include the board as a formatted block + instruction "When proposing $ changes, end your reply with a `<<<PLANNER_PROPOSAL>>> {json} <<<END>>>` block matching the schema." Parser extracts and strips it before display.
-- Persist the user message before streaming, persist the assistant message + parsed proposal on stream end.
+Tap any $ to edit. Lock a slot — auto-fill leaves it alone and rebalances the rest. **Total always equals budget, math reconciled to the dollar.**
 
-### 3. Frontend — `AiQuickPanel` rewrite
-- On mount: load saved messages from `coach_messages` for the signed-in user.
-- Render messages from DB; render `proposal` blocks as a `<ProposalCard />` component.
-- `ProposalCard` calls `applyProposal(proposal)` which loops slots and calls `setSlotAllocation` + `setSlotNote` from the draft store, skipping any `lockedSlots[id]`. Stores previous values for undo. Toast with undo button.
-- New chat button: deletes the user's `coach_messages` rows after confirm.
+### 2. Strategy pills at the top
 
-### 4. `coachContext()` in `DraftRoom.tsx`
-Add to the payload:
-```ts
-budgetBoard: {
-  totalBudget: settings.totalBudget,
-  slots: buildSlots(settings).map(s => ({
-    id: s.id,
-    label: s.label,
-    group: s.group,
-    dollars: slotAllocations[s.id] ?? defaultFor(s.group),
-    target: slotNotes[s.id] ?? "",
-    locked: !!lockedSlots[s.id],
-  })),
-}
+Three presets straight from Footballguys' Pasquino tables (real numbers, not guesses):
+
+- **Stars & Scrubs** — RB1 $58, WR1 $48, top-2 spend ≈ 55%
+- **Balanced** — RB1 $45, WR1 $30, spread evenly
+- **WR-Heavy (PPR)** — WR1 $60, WR2 $30, RB1 $26 (FantasyPros 2025)
+
+Tap a pill → all unlocked slots refill. Locks survive.
+
+### 3. A live "Max Bid" chip in the totals row
+
+The industry-standard formula every platform enforces:
+
+```text
+Max Bid = (Total Budget − Spent) − (Open Slots − 1)
 ```
 
-### 5. Anonymous users
-Not signed in → chat is in-memory only (today's behavior) with a "Sign in to save chats" note. Apply still works since it just writes to the local store.
+So you instantly know the most you could throw at any one player without going broke. Updates as you lock/edit.
 
-## Out of scope (intentionally)
-- Multiple chat threads / scenario tabs.
-- AI auto-applying without your tap.
-- Sharing chats with league members — each member has their own.
-- Touching the planner UI itself — same simple manual board.
+## How the math works
 
-## Verification after build
-1. Send a message → reload → it's still there.
-2. Type "$30 in RB1, target James Cook" → ask "does this fit?" → confirm AI quotes the actual $30.
-3. Ask for a full $225 build → confirm proposal card appears → tap Apply → confirm planner fills in.
-4. Lock a slot, ask for a build → confirm Apply skips the locked slot.
-5. Tap Apply → tap Undo in toast → confirm planner reverts.
-6. Hit "New chat" → confirm rows clear.
+Pure functions. No API calls. No AI gateway. Instant.
+
+1. **Reserve fixed costs**: $1 × K + $1 × DST + $1 × BENCH count.
+2. **Starter pool** = `totalBudget − fixed − sum(locked slots)`.
+3. **Distribute by strategy table** — each strategy is a lookup table mapping `(position, slotIndex) → weight`. Footballguys' 18-slot table is the canonical source; we normalize it to your roster size and budget.
+4. **Round + reconcile** — fractional dollars rounded, ±$1 remainder lands on the highest-weight unlocked slot so sum is exact.
+5. **Re-run** whenever budget, roster, locks, or strategy changes.
+
+## Files
+
+- `src/lib/planner-strategies.ts` *(new)* — three weight tables (Stars/Scrubs, Balanced, WR-Heavy) lifted from the Footballguys + FantasyPros data, plus `computeSlotDollars(strategy, settings, locks)`.
+- `src/lib/planner-suggest.test.ts` *(new)* — verifies sum equals budget for all 3 strategies × common league shapes, locks honored, K/DST/BE always $1.
+- `src/components/PositionBudgetBar.tsx` — render strategy pills above the list, auto-fill on mount, add Max Bid chip to the footer row, "Reset" button. Slot rendering unchanged.
+- `src/lib/draft-store.ts` — add `plannerStrategy: "stars" | "balanced" | "wr-heavy"` (default `"stars"`) and `touchedSlots` flag so manual edits aren't overwritten by re-runs.
+
+## What does NOT change
+
+- No bidding, no nominating, no live auction logic.
+- No new API call or AI gateway.
+- K/DST/BENCH rules from memory still enforced.
+- Layout, colors, lock button, target-name input — all unchanged.
+
+## Memory update
+
+Rewrite the constraint: planner now ships with **3 research-backed presets** (Stars/Scrubs, Balanced, WR-Heavy) computed from Footballguys + FantasyPros tables. Manual edits and locks always win. No live AI, no per-pick suggestions, no bid/nominate UI.
