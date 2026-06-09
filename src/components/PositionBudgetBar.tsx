@@ -26,15 +26,15 @@ interface PlannerSlot {
 }
 
 const GROUP_COLOR: Record<SlotGroup, string> = {
-  QB:        "bg-red-500/20 text-red-300 border-red-500/30",
-  RB:        "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  WR:        "bg-sky-500/20 text-sky-300 border-sky-500/30",
-  TE:        "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  FLEX:      "bg-violet-500/20 text-violet-300 border-violet-500/30",
-  SUPERFLEX: "bg-red-500/20 text-red-300 border-red-500/30",
-  K:         "bg-violet-500/20 text-violet-300 border-violet-500/30",
-  DST:       "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  BENCH:     "bg-secondary text-muted-foreground border-border",
+  QB:        "bg-red-500/20 text-black border-red-500/30",
+  RB:        "bg-emerald-500/20 text-black border-emerald-500/30",
+  WR:        "bg-sky-500/20 text-black border-sky-500/30",
+  TE:        "bg-orange-500/20 text-black border-orange-500/30",
+  FLEX:      "bg-violet-500/20 text-black border-violet-500/30",
+  SUPERFLEX: "bg-red-500/20 text-black border-red-500/30",
+  K:         "bg-violet-500/20 text-black border-violet-500/30",
+  DST:       "bg-amber-500/20 text-black border-amber-500/30",
+  BENCH:     "bg-secondary text-black border-border",
 };
 
 const GROUP_BAR: Record<SlotGroup, string> = {
