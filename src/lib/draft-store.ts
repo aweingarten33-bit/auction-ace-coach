@@ -246,7 +246,10 @@ export const useDraftStore = create<DraftState>()(
           lockedSlots: {},
           slotNotes: {},
           touchedSlots: {},
-          plannerStrategy: "stars",
+          plannerStrategy:
+            DEFAULT_SETTINGS.leagueType === "Superflex" || DEFAULT_SETTINGS.leagueType === "2QB"
+              ? "superflex"
+              : "stars",
           strategyId: "none",
           customStrategyRules: "",
         }),
