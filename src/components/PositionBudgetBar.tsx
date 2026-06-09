@@ -139,12 +139,11 @@ export default function PositionBudgetBar() {
                   {slot.label}
                 </span>
 
-                <Input
+                <SlotTargetsInput
                   value={note}
-                  placeholder="targets…"
-                  onChange={(e) => setSlotNote(slot.id, e.target.value)}
-                  className="h-8 flex-1 min-w-0 rounded-lg px-2 text-xs"
-                  aria-label={`${slot.label} target players`}
+                  onChange={(val) => setSlotNote(slot.id, val)}
+                  group={slot.group}
+                  ariaLabel={`${slot.label} target players`}
                 />
 
                 <div className="flex shrink-0 items-center gap-0.5">
