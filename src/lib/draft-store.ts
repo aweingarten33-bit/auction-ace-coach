@@ -49,6 +49,8 @@ interface DraftState {
   draftPlan: { content: string; updatedAt: number; pickCountAtSave: number } | null;
   // Slot $ allocations for the Planner page (id => dollars). Generated lazily from settings.roster.
   slotAllocations: Record<string, number>;
+  // Slots manually locked by the user (frozen — excluded from auto-redistribute).
+  lockedSlots: Record<string, boolean>;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
