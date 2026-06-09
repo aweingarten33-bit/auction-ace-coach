@@ -111,20 +111,6 @@ export default function PositionBudgetBar() {
   const strategy = getStrategy(strategyId);
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
-  const suggested = useMemo(
-    () => suggestAllocations(settings, strategyId, customStrategyRules),
-    [settings, strategyId, customStrategyRules],
-  );
-
-  // ── Base plan: user-set value (typed or locked) wins, else strategy ────
-  const basePlan = useMemo(() => {
-    const next: Record<string, number> = {};
-    for (const slot of slots) {
-      next[slot.id] = slotAllocations[slot.id] ?? suggested[slot.id] ?? 1;
-    }
-    return next;
-  }, [slotAllocations, slots, suggested]);
-
 
   // ── Picks I've made (events + keepers), grouped by position ────────────
   const picksByGroup = useMemo(() => {
@@ -139,46 +125,39 @@ export default function PositionBudgetBar() {
     return out;
   }, [events, keepers]);
 
-  // ── Lock filled slots at the actual price, redistribute leftover ───────
+  // ── Pure manual board: locked slots stay frozen, unlocked split the leftover equally ──
   const { allocations, locked } = useMemo(() => {
     const locked: Record<string, { price: number; name: string }> = {};
-    // Assign each pick in a group to the highest-planned unfilled slot in that group.
+    // Assign each pick in a group to a slot in that group (in pick order).
     for (const group of Object.keys(picksByGroup)) {
-      const groupSlots = slots
-        .filter((s) => s.group === group)
-        .sort((a, b) => (basePlan[b.id] ?? 0) - (basePlan[a.id] ?? 0));
+      const groupSlots = slots.filter((s) => s.group === group);
       const picks = picksByGroup[group];
       for (let i = 0; i < Math.min(picks.length, groupSlots.length); i += 1) {
         locked[groupSlots[i].id] = picks[i];
       }
     }
 
-    const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
+    const draftedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
-    // Both user-locked AND user-typed values are frozen; only untouched slots redistribute.
+    // Both user-locked AND user-typed slots are frozen; only untouched slots auto-fill.
     const userFrozen = unfilled.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
-    const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0), 0);
-    const redistribute = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
-    const baseSum = redistribute.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
-    const remaining = Math.max(0, settings.totalBudget - lockedSum - userFrozenSum);
+    const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
+    const open = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
+    const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum);
 
-    // Proportional redistribute with $1 floor, then integer-correct so the
-    // redistribute allocations sum to exactly `remaining`.
-    const floor = remaining >= redistribute.length ? 1 : 0;
-    const spendable = Math.max(0, remaining - floor * redistribute.length);
-    const exact = redistribute.map((slot) => floor + (spendable * (basePlan[slot.id] ?? 0)) / baseSum);
-    const rounded = exact.map((v) => Math.max(floor, Math.round(v)));
+    // Equal split across the still-open slots, with $1 floor & integer correction.
+    const floor = remaining >= open.length ? 1 : 0;
+    const spendable = Math.max(0, remaining - floor * open.length);
+    const share = open.length > 0 ? spendable / open.length : 0;
+    const rounded = open.map(() => Math.max(floor, Math.round(floor + share)));
     let diff = remaining - rounded.reduce((sum, v) => sum + v, 0);
-    const order = exact
-      .map((v, i) => ({ i, frac: v - Math.floor(v) }))
-      .sort((a, b) => diff > 0 ? b.frac - a.frac : a.frac - b.frac);
+    let i = 0;
     let guard = 0;
-    while (diff !== 0 && guard < 1000) {
-      for (const { i } of order) {
-        if (diff === 0) break;
-        if (diff > 0) { rounded[i] += 1; diff -= 1; }
-        else if (rounded[i] > floor) { rounded[i] -= 1; diff += 1; }
-      }
+    while (diff !== 0 && open.length > 0 && guard < 5000) {
+      const idx = i % open.length;
+      if (diff > 0) { rounded[idx] += 1; diff -= 1; }
+      else if (rounded[idx] > floor) { rounded[idx] -= 1; diff += 1; }
+      i += 1;
       guard += 1;
     }
 
@@ -188,9 +167,9 @@ export default function PositionBudgetBar() {
       else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
       else allocations[slot.id] = 0;
     }
-    redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
+    open.forEach((slot, idx) => { allocations[slot.id] = rounded[idx]; });
     return { allocations, locked };
-  }, [slots, basePlan, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
+  }, [slots, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
 
   // Legacy display: total spent by position group (sum of locked slots)
   const spent = useMemo(() => {
