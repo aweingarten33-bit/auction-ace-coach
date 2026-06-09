@@ -247,8 +247,8 @@ export default function PositionBudgetBar() {
               variant="ghost"
               size="icon"
               className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive"
-              onClick={clearSlotAllocations}
-              title="Clear edits"
+              onClick={() => { clearSlotAllocations(); useDraftStore.getState().clearSlotLocks(); }}
+              title="Clear edits & locks"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
