@@ -116,16 +116,15 @@ export default function PositionBudgetBar() {
     [settings, strategyId, customStrategyRules],
   );
 
-  // ── Base plan: locked slot uses its frozen value, others use strategy ──
+  // ── Base plan: user-set value (typed or locked) wins, else strategy ────
   const basePlan = useMemo(() => {
     const next: Record<string, number> = {};
     for (const slot of slots) {
-      next[slot.id] = lockedSlots[slot.id]
-        ? (slotAllocations[slot.id] ?? suggested[slot.id] ?? 1)
-        : (suggested[slot.id] ?? 1);
+      next[slot.id] = slotAllocations[slot.id] ?? suggested[slot.id] ?? 1;
     }
     return next;
-  }, [lockedSlots, slotAllocations, slots, suggested]);
+  }, [slotAllocations, slots, suggested]);
+
 
   // ── Picks I've made (events + keepers), grouped by position ────────────
   const picksByGroup = useMemo(() => {
