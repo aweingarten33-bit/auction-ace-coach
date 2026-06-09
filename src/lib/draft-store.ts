@@ -51,6 +51,8 @@ interface DraftState {
   slotAllocations: Record<string, number>;
   // Slots manually locked by the user (frozen — excluded from auto-redistribute).
   lockedSlots: Record<string, boolean>;
+  // Free-text target players per slot (id => "Hurts, Josh Allen").
+  slotNotes: Record<string, string>;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -87,6 +89,8 @@ interface DraftState {
   clearSlotAllocations: () => void;
   toggleSlotLock: (id: string) => void;
   clearSlotLocks: () => void;
+  setSlotNote: (id: string, note: string) => void;
+  clearSlotNotes: () => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
@@ -147,6 +151,10 @@ export const useDraftStore = create<DraftState>()(
           return { lockedSlots: nextLocks, slotAllocations: nextAllocs };
         }),
       clearSlotLocks: () => set({ lockedSlots: {} }),
+      slotNotes: {},
+      setSlotNote: (id, note) =>
+        set((s) => ({ slotNotes: { ...s.slotNotes, [id]: note } })),
+      clearSlotNotes: () => set({ slotNotes: {} }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
@@ -209,6 +217,7 @@ export const useDraftStore = create<DraftState>()(
           draftPlan: null,
           slotAllocations: {},
           lockedSlots: {},
+          slotNotes: {},
           strategyId: "none",
           customStrategyRules: "",
         }),
