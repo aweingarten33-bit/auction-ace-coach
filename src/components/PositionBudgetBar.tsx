@@ -39,51 +39,6 @@ const GROUP_BAR: Record<SlotGroup, string> = {
   BENCH:     "bg-secondary-foreground/30",
 };
 
-// ── DraftStrategyPanel (exported for external use) ────────────────────────
-export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
-  const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
-  const setStrategyId = useDraftStore((s) => s.setStrategyId);
-  const setCustomStrategyRules = useDraftStore((s) => s.setCustomStrategyRules);
-  const strategy = getStrategy(strategyId);
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          {!compact && (
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Strategy
-            </p>
-          )}
-          <Select value={strategy.id} onValueChange={setStrategyId}>
-            <SelectTrigger className="h-9 rounded-lg text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STRATEGIES.map((s) => (
-                <SelectItem key={s.id} value={s.id} className="text-sm">
-                  {s.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      {!compact && (
-        <p className="text-xs leading-relaxed text-muted-foreground">{strategy.description}</p>
-      )}
-      {strategy.id === "custom" && (
-        <Textarea
-          value={customStrategyRules}
-          onChange={(e) => setCustomStrategyRules(e.target.value.slice(0, 700))}
-          placeholder="Write the rules this planner should follow."
-          className="min-h-20 text-xs"
-        />
-      )}
-    </div>
-  );
-}
 
 // ── Main budget planner ───────────────────────────────────────────────────
 export default function PositionBudgetBar() {
