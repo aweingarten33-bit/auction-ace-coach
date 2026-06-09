@@ -297,32 +297,6 @@ export default function SetupWizard() {
             </div>
           )}
 
-          {step === 2 && (
-            <div className="space-y-3">
-              <div>
-                <h2 className="text-sm font-semibold text-foreground">League Context <span className="font-normal text-muted-foreground">(optional)</span></h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Tell the app anything you know about how <em>your</em> league behaves — the more, the better. This is what makes recommendations feel custom to your draft instead of generic.
-                </p>
-              </div>
-              <div className="rounded-md border border-border/60 bg-secondary/30 p-3 text-[11px] leading-relaxed text-muted-foreground">
-                <p className="mb-1.5 font-semibold text-foreground">No wrong answers — dump everything:</p>
-                <ul className="list-disc pl-4 space-y-0.5">
-                  <li>Owner tendencies (who overpays for QBs, who hoards RBs, who panics late)</li>
-                  <li>Nomination patterns (does anyone throw out kickers/DST early?)</li>
-                  <li>What's historically won your league (stars-and-scrubs, balanced, RB-heavy, zero-RB)</li>
-                  <li>House rules, prize structure, rivalries, trash-talk dynamics</li>
-                  <li>Your own goals this year (contend, rebuild, win the championship)</li>
-                </ul>
-              </div>
-              <Textarea
-                rows={10}
-                placeholder={"e.g. 12-team superflex, $225 budget. Frank always overpays for elite QBs ($60+). Mike nominates kickers in round 1 to drain budgets. Last 3 champs went stars-and-scrubs at WR. I'm trying to win — no rebuild. Avoid reaching on rookies, our league fades them hard."}
-                value={settings.context}
-                onChange={(e) => setSettings({ context: e.target.value })}
-              />
-            </div>
-          )}
 
           <div className="mt-6 flex justify-between gap-3">
             <Button variant="outline" onClick={back} disabled={step === 0}>
