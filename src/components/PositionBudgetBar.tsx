@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Lock, LockOpen, RotateCcw, Shield } from "lucide-react";
+import { Lock, LockOpen, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
@@ -39,13 +39,9 @@ export default function PositionBudgetBar() {
   const clearTouchedSlots = useDraftStore((s) => s.clearTouchedSlots);
   const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
   const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy);
-  const reservePct = useDraftStore((s) => s.reservePct);
-  const setReservePct = useDraftStore((s) => s.setReservePct);
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
-  const reserveDollars = Math.floor((settings.totalBudget * reservePct) / 100);
-  const extraReserved = reserveDollars;
 
   // Auto-fill any slot the user hasn't manually touched/locked.
   useEffect(() => {
