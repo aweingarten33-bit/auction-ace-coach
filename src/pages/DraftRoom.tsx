@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
+import { buildCoachGuidance, getStrategy } from "@/lib/strategies";
 import { useAuth } from "@/hooks/useAuth";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
