@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
@@ -24,7 +25,6 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   BENCH:     "bg-secondary text-black border-border",
 };
 
-// Sensible defaults so the user starts with something reasonable.
 function defaultFor(group: SlotGroup): number {
   if (group === "K" || group === "DST" || group === "BENCH") return 1;
   return 0;
@@ -34,6 +34,10 @@ export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
   const slotAllocations = useDraftStore((s) => s.slotAllocations);
   const setSlotAllocation = useDraftStore((s) => s.setSlotAllocation);
+  const lockedSlots = useDraftStore((s) => s.lockedSlots);
+  const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
+  const slotNotes = useDraftStore((s) => s.slotNotes);
+  const setSlotNote = useDraftStore((s) => s.setSlotNote);
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
 
@@ -47,36 +51,71 @@ export default function PositionBudgetBar() {
     <div className="overflow-hidden rounded-xl border border-border bg-card">
       <div className="px-4 py-4">
         <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          $ per roster slot
+          $ per roster slot — lock when drafted
         </p>
 
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {slots.map((slot) => {
             const value = valueFor(slot);
+            const isLocked = !!lockedSlots[slot.id];
+            const note = slotNotes[slot.id] ?? "";
+
             return (
-              <div key={slot.id} className="flex items-center gap-2.5">
+              <div key={slot.id} className="flex items-center gap-2">
                 <span
                   className={cn(
                     "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center text-[10px] font-bold",
                     GROUP_COLOR[slot.group],
+                    isLocked && "opacity-60",
                   )}
                 >
                   {slot.label}
                 </span>
-                <div className="flex-1" />
+
+                <Input
+                  value={note}
+                  placeholder="targets…"
+                  onChange={(e) => setSlotNote(slot.id, e.target.value)}
+                  className="h-8 flex-1 min-w-0 rounded-lg px-2 text-xs"
+                  aria-label={`${slot.label} target players`}
+                />
+
                 <div className="flex shrink-0 items-center gap-0.5">
                   <span className="text-sm text-muted-foreground">$</span>
                   <Input
                     inputMode="numeric"
                     value={String(value)}
+                    disabled={isLocked}
                     onChange={(e) => {
                       const n = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
                     }}
-                    className="h-8 w-16 rounded-lg px-2 text-right font-mono text-sm"
+                    className={cn(
+                      "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
+                      isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                    )}
                     aria-label={`${slot.label} allocation`}
                   />
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Persist current displayed value before locking so it freezes there.
+                    if (!isLocked) setSlotAllocation(slot.id, value);
+                    toggleSlotLock(slot.id);
+                  }}
+                  className={cn(
+                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
+                    isLocked
+                      ? "bg-success/15 text-success hover:bg-success/25"
+                      : "text-muted-foreground/60 hover:bg-secondary hover:text-foreground",
+                  )}
+                  aria-label={isLocked ? `Unlock ${slot.label}` : `Lock ${slot.label} (drafted)`}
+                  title={isLocked ? "Unlock this slot" : "Lock — player drafted at this price"}
+                >
+                  {isLocked ? <Lock className="h-3.5 w-3.5" /> : <LockOpen className="h-3.5 w-3.5" />}
+                </button>
               </div>
             );
           })}
