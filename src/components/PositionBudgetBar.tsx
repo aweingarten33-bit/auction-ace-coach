@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Lock, LockOpen, RotateCcw, Plus, X, Anchor, Shield } from "lucide-react";
+import { Lock, LockOpen, RotateCcw, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
