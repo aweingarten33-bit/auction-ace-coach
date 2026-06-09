@@ -242,10 +242,6 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* ── Marquee strip at bottom ───────────────────────────────────────── */}
-      <div className="absolute inset-x-0 bottom-0">
-        <MarqueeStrip />
-      </div>
     </div>
   );
 }
