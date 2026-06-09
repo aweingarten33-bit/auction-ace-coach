@@ -101,19 +101,23 @@ Deno.serve(async (req) => {
     }
 
     // 2) Sleeper projected_auction_value (raise limit beyond 1000 default)
+    // Require team for skill positions — filters out retirees like Todd Gurley
+    // whose rows linger in sleeper_players with team=null.
     const { data: sleeperRows, error } = await sb
       .from("sleeper_players")
-      .select("player_name, player_name_norm, position, projected_auction_value")
+      .select("player_name, player_name_norm, position, team, status, projected_auction_value")
       .gt("projected_auction_value", 0)
       .order("projected_auction_value", { ascending: false })
       .limit(5000);
     if (error) throw error;
 
-    for (const r of (sleeperRows ?? []) as Array<{ player_name: string; player_name_norm: string; position: string | null; projected_auction_value: number | null }>) {
+    for (const r of (sleeperRows ?? []) as Array<{ player_name: string; player_name_norm: string; position: string | null; team: string | null; status: string | null; projected_auction_value: number | null }>) {
       const k = norm(r.player_name_norm || r.player_name);
       if (!k) continue;
-      let v = Number(r.projected_auction_value || 0);
       const pos = (r.position === "DEF" ? "D/ST" : r.position) || "";
+      // Skip retirees / unsigned skill players (no NFL team)
+      if (!r.team && pos !== "D/ST" && pos !== "DST") continue;
+      let v = Number(r.projected_auction_value || 0);
       // Sleeper's projected_auction_value is single-QB tuned. In SF, inflate QBs
       // and DEFLATE every other position (~22% off) — total budget is fixed, so
       // RB/WR/TE money has to come from somewhere when QBs go up.
@@ -125,9 +129,10 @@ Deno.serve(async (req) => {
       v = v * budgetScale;
       // SF QB cap scales with budget too
       if (superflex && pos === "QB") v = Math.min(50 * budgetScale, v);
-      const cur = rows.get(k) ?? { name: r.player_name, key: k, position: pos, team: "" };
+      const cur = rows.get(k) ?? { name: r.player_name, key: k, position: pos, team: r.team || "" };
       cur.sleeper = Math.max(1, Math.round(v));
       if (!cur.position) cur.position = pos;
+      if (!cur.team && r.team) cur.team = r.team;
       rows.set(k, cur);
     }
 
