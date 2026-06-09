@@ -49,6 +49,7 @@ import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudg
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 import BestAvailableBoard from "@/components/BestAvailableBoard";
+import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -219,9 +220,12 @@ export default function DraftRoom() {
           <p className="truncate text-sm font-semibold leading-tight">
             {leagueName || selectedTeam?.name || "Draft Room"}
           </p>
-          {selectedTeam && leagueName && (
-            <p className="truncate text-[10px] text-muted-foreground">{selectedTeam.name}</p>
-          )}
+          <div className="mt-0.5 flex items-center gap-1.5">
+            {selectedTeam && leagueName && (
+              <span className="truncate text-[10px] text-muted-foreground">{selectedTeam.name}</span>
+            )}
+            <SyncStatusPill compact />
+          </div>
         </div>
 
         <div className="flex shrink-0 flex-col items-end">

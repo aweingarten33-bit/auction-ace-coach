@@ -9,6 +9,7 @@ import { Loader2, Trophy, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { toast } from "sonner";
+import SyncStatusPill from "@/components/SyncStatusPill";
 
 interface Team { id: number; name: string; abbrev?: string }
 
@@ -78,6 +79,7 @@ export default function TeamPicker() {
             Pick your team to personalize the dossier — budget remaining, roster needs,
             and AI recommendations get tailored to your specific roster and gaps.
           </p>
+          <div className="mt-4"><SyncStatusPill /></div>
         </div>
 
         {loading && (
