@@ -141,7 +141,7 @@ export function computeSlotDollars(
 
   if (open.length === 0 || totalWeight === 0 || pool === 0) {
     for (const s of open) out[s.id] = pool > 0 && open.length > 0 ? Math.floor(pool / open.length) : 0;
-    return reconcile(out, settings.totalBudget, slots, lockedSlots, touchedSlots);
+    return reconcile(out, settings.totalBudget - Math.max(0, extraReserved), slots, lockedSlots, touchedSlots);
   }
 
   let assigned = 0;
