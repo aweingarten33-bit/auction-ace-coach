@@ -229,11 +229,9 @@ export default function PositionBudgetBar() {
             <span className="text-muted-foreground">Planned</span>
             <span className="font-mono font-semibold">${planned}</span>
             <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
-            {(anchorsTotal > 0 || reserveDollars > 0) && (
+            {reserveDollars > 0 && (
               <span className="text-[10px] text-muted-foreground">
-                (slots ${slotsPlanned}
-                {anchorsTotal > 0 && ` + anchors $${anchorsTotal}`}
-                {reserveDollars > 0 && ` + reserve $${reserveDollars}`})
+                (slots ${slotsPlanned} + reserve ${reserveDollars})
               </span>
             )}
           </div>
