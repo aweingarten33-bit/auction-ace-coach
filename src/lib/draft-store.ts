@@ -267,6 +267,8 @@ export const useDraftStore = create<DraftState>()(
           slotNotes: {},
           touchedSlots: {},
           plannerStrategy: "balanced-qbs",
+          anchors: [],
+          reservePct: 0,
           strategyId: "none",
           customStrategyRules: "",
         }),
