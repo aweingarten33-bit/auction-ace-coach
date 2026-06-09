@@ -399,10 +399,12 @@ export default function DraftRoom() {
               <h2 className="text-base font-semibold">
                 {panel === "search" && "Find a player"}
                 {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
+                {panel === "calc" && "Auction calculator"}
                 {panel === "recent" && "Recent picks"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
+              {panel === "calc" && <AuctionCalculator prices={adjustedPrices} />}
               {panel === "search" && (
                 <LookupSection
                   prices={adjustedPrices}
