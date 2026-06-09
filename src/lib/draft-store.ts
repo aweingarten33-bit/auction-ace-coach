@@ -166,7 +166,10 @@ export const useDraftStore = create<DraftState>()(
       markSlotTouched: (id) =>
         set((s) => ({ touchedSlots: { ...s.touchedSlots, [id]: true } })),
       clearTouchedSlots: () => set({ touchedSlots: {} }),
-      plannerStrategy: "stars",
+      plannerStrategy:
+        DEFAULT_SETTINGS.leagueType === "Superflex" || DEFAULT_SETTINGS.leagueType === "2QB"
+          ? "superflex"
+          : "stars",
       setPlannerStrategy: (s) => set({ plannerStrategy: s, touchedSlots: {} }),
       setSettings: (s) =>
         set((state) => {
