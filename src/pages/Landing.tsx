@@ -42,12 +42,12 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="grain relative min-h-screen overflow-x-hidden bg-black text-white">
+    <div className="grain relative min-h-screen overflow-x-hidden bg-[#0a1f3d] text-white">
 
       {/* ── Background video ───────────────────────────────────────────────── */}
       <video
         ref={videoRef}
-        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${videoLoaded ? "opacity-30" : "opacity-0"}`}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${videoLoaded ? "opacity-20" : "opacity-0"}`}
         autoPlay
         muted
         loop
@@ -59,44 +59,48 @@ export default function Landing() {
         <source src="/videos/stadium.mp4" type="video/mp4" />
       </video>
 
-      {/* ── Gradient overlay ──────────────────────────────────────────────── */}
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black" />
+      {/* ── Gradient overlay (CBS navy) ───────────────────────────────────── */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0a1f3d]/80 via-[#0a1f3d]/60 to-[#050d1c]" />
 
-      {/* ── Floating location badge ───────────────────────────────────────── */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2">
-        <span
-          className="block text-[9px] font-bold tracking-[0.4em] text-white/20"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          DRAFT ROOM
-        </span>
+      {/* ── Top broadcast bar ─────────────────────────────────────────────── */}
+      <div className="relative z-10 flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-2 text-[10px] font-bold tracking-[0.3em] text-white/70">
+        <span>● LIVE · DRAFT ROOM</span>
+        <span className="text-red-500">2025 SEASON</span>
       </div>
 
       {/* ── Main content ──────────────────────────────────────────────────── */}
-      <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-24">
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
 
         {/* Spinning football */}
         <div className="mb-6 opacity-90">
-          <SpinningFootball size={180} speed={10} />
+          <SpinningFootball size={150} speed={10} />
         </div>
 
-        {/* Headline */}
-        <h1 className="mb-0 text-center font-bebas leading-none tracking-wider">
+        {/* CBS-style stacked headline */}
+        <h1 className="mb-0 text-center font-bebas leading-[0.95] tracking-wide">
           <KineticWord
-            text="AUCTION"
-            className="block text-[clamp(3.5rem,18vw,9rem)] text-white"
-            delay={0.2}
+            text="FANTASY FOOTBALL"
+            className="block text-[clamp(1.8rem,8vw,4rem)] text-white"
+            delay={0.15}
+          />
+          <span className="my-2 block">
+            <span className="mx-auto block h-[3px] w-24 bg-red-600" />
+          </span>
+          <KineticWord
+            text="AUCTION DRAFT"
+            className="block text-[clamp(2.4rem,11vw,5.5rem)] text-white"
+            delay={0.35}
           />
           <KineticWord
-            text="ACE"
-            className="block text-[clamp(3.5rem,18vw,9rem)] text-red-500"
-            delay={0.5}
+            text="ASSISTANT"
+            className="block text-[clamp(2.4rem,11vw,5.5rem)] text-red-500"
+            delay={0.55}
           />
         </h1>
 
         {/* Tagline */}
         <p
-          className="mb-10 mt-6 max-w-xs text-center text-sm leading-relaxed text-white/50"
+          className="mb-8 mt-6 max-w-xs text-center text-sm leading-relaxed text-white/60"
           style={{ animation: "fade-in 0.6s 1s ease-out both" }}
         >
           Budget-path planning grounded in your league's 3-year price history.
@@ -116,18 +120,18 @@ export default function Landing() {
           </Link>
           <Link
             to="/espn"
-            className="block w-full border border-white/20 py-3.5 text-center font-bebas text-lg tracking-widest text-white/70 transition hover:border-white/40 hover:text-white"
+            className="block w-full border border-white/30 bg-white/5 py-3.5 text-center font-bebas text-lg tracking-widest text-white/80 transition hover:border-white/60 hover:text-white"
           >
             CONNECT ESPN
           </Link>
         </div>
 
-        {/* Version stamp */}
+        {/* Broadcast stamp */}
         <p
-          className="mt-10 text-[10px] font-mono tracking-widest text-white/20"
+          className="mt-8 text-[10px] font-mono tracking-[0.3em] text-white/30"
           style={{ animation: "fade-in 0.6s 1.5s ease-out both" }}
         >
-          AUCTION ACE — DRAFT SEASON 2025
+          A FANTASY BROADCAST · 2025
         </p>
       </div>
 
