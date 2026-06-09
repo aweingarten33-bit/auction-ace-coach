@@ -89,6 +89,8 @@ interface DraftState {
   clearSlotAllocations: () => void;
   toggleSlotLock: (id: string) => void;
   clearSlotLocks: () => void;
+  setSlotNote: (id: string, note: string) => void;
+  clearSlotNotes: () => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
