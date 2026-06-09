@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { RotateCcw, Sparkles, Trash2 } from "lucide-react";
+import { Lock, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -109,15 +109,77 @@ export default function PositionBudgetBar() {
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
   const suggested = useMemo(() => suggestAllocations(settings, strategyId), [settings, strategyId]);
-  const allocations = useMemo(() => {
+
+  // ── Base plan: user override per slot, else strategy suggestion ────────
+  const basePlan = useMemo(() => {
     const next: Record<string, number> = {};
     for (const slot of slots) next[slot.id] = slotAllocations[slot.id] ?? suggested[slot.id] ?? 1;
     return next;
   }, [slotAllocations, slots, suggested]);
 
+  // ── Picks I've made (events + keepers), grouped by position ────────────
+  const picksByGroup = useMemo(() => {
+    const out: Record<string, { price: number; name: string }[]> = {};
+    const push = (pos: string | null | undefined, price: number, name: string) => {
+      const g = (pos ?? "UNK") as string;
+      (out[g] ??= []).push({ price, name });
+    };
+    for (const e of events) if (e.drafter === "me") push(e.position, e.price, e.player ?? "Pick");
+    for (const k of keepers) push(k.position, k.cost, k.player ?? "Keeper");
+    for (const g of Object.keys(out)) out[g].sort((a, b) => b.price - a.price);
+    return out;
+  }, [events, keepers]);
+
+  // ── Lock filled slots at the actual price, redistribute leftover ───────
+  const { allocations, locked } = useMemo(() => {
+    const locked: Record<string, { price: number; name: string }> = {};
+    // Assign each pick in a group to the highest-planned unfilled slot in that group.
+    for (const group of Object.keys(picksByGroup)) {
+      const groupSlots = slots
+        .filter((s) => s.group === group)
+        .sort((a, b) => (basePlan[b.id] ?? 0) - (basePlan[a.id] ?? 0));
+      const picks = picksByGroup[group];
+      for (let i = 0; i < Math.min(picks.length, groupSlots.length); i += 1) {
+        locked[groupSlots[i].id] = picks[i];
+      }
+    }
+
+    const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
+    const unfilled = slots.filter((s) => !(s.id in locked));
+    const baseSum = unfilled.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
+    const remaining = Math.max(0, settings.totalBudget - lockedSum);
+
+    // Proportional redistribute with $1 floor, then integer-correct so the
+    // unfilled allocations sum to exactly `remaining`.
+    const floor = remaining >= unfilled.length ? 1 : 0;
+    const spendable = Math.max(0, remaining - floor * unfilled.length);
+    const exact = unfilled.map((slot) => floor + (spendable * (basePlan[slot.id] ?? 0)) / baseSum);
+    const rounded = exact.map((v) => Math.max(floor, Math.round(v)));
+    let diff = remaining - rounded.reduce((sum, v) => sum + v, 0);
+    const order = exact
+      .map((v, i) => ({ i, frac: v - Math.floor(v) }))
+      .sort((a, b) => diff > 0 ? b.frac - a.frac : a.frac - b.frac);
+    let guard = 0;
+    while (diff !== 0 && guard < 1000) {
+      for (const { i } of order) {
+        if (diff === 0) break;
+        if (diff > 0) { rounded[i] += 1; diff -= 1; }
+        else if (rounded[i] > floor) { rounded[i] -= 1; diff += 1; }
+      }
+      guard += 1;
+    }
+
+    const allocations: Record<string, number> = {};
+    for (const slot of slots) {
+      allocations[slot.id] = slot.id in locked ? locked[slot.id].price : 0;
+    }
+    unfilled.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
+    return { allocations, locked };
+  }, [slots, basePlan, picksByGroup, settings.totalBudget]);
+
+  // Legacy display: total spent by position group (sum of locked slots)
   const spent = useMemo(() => {
-    const mine = events.filter((e) => e.drafter === "me");
-    const byPos = spendByPosition(mine);
+    const byPos = spendByPosition(events.filter((e) => e.drafter === "me"));
     for (const k of keepers) {
       const pos = k.position ?? "UNK";
       byPos[pos] = (byPos[pos] ?? 0) + k.cost;
@@ -190,6 +252,9 @@ export default function PositionBudgetBar() {
             const isFirstInGroup = slot.index === 1;
             const groupSpent = groupData?.spent ?? 0;
 
+            const lockInfo = locked[slot.id];
+            const isLocked = !!lockInfo;
+
             return (
               <div key={slot.id} className="flex items-center gap-2.5">
                 {/* Position badge */}
@@ -197,6 +262,7 @@ export default function PositionBudgetBar() {
                   className={cn(
                     "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center text-[10px] font-bold",
                     GROUP_COLOR[slot.group],
+                    isLocked && "opacity-60",
                   )}
                 >
                   {slot.label}
@@ -205,11 +271,19 @@ export default function PositionBudgetBar() {
                 {/* Visual bar */}
                 <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-secondary/40">
                   <div
-                    className={cn("h-full rounded-md transition-all", GROUP_BAR[slot.group])}
-                    style={{ width: `${barPct}%`, opacity: 0.7 }}
+                    className={cn(
+                      "h-full rounded-md transition-all",
+                      GROUP_BAR[slot.group],
+                      isLocked && "opacity-100",
+                    )}
+                    style={{ width: `${barPct}%`, opacity: isLocked ? 1 : 0.7 }}
                   />
-                  {/* Spent indicator — only on first slot of group */}
-                  {isFirstInGroup && groupSpent > 0 && (
+                  {isLocked && (
+                    <span className="absolute inset-0 flex items-center px-2 text-[10px] font-medium text-foreground/80 truncate">
+                      {lockInfo.name}
+                    </span>
+                  )}
+                  {!isLocked && isFirstInGroup && groupSpent > 0 && (
                     <div
                       className="absolute left-0 top-0 h-full rounded-md bg-white/20"
                       style={{ width: `${Math.min(100, (groupSpent / Math.max(1, groupData?.planned ?? 1)) * 100)}%` }}
@@ -217,26 +291,34 @@ export default function PositionBudgetBar() {
                   )}
                 </div>
 
-                {/* Dollar input */}
+                {/* Dollar input (or locked actual price) */}
                 <div className="flex shrink-0 items-center gap-0.5">
                   <span className="text-sm text-muted-foreground">$</span>
                   <Input
                     inputMode="numeric"
                     value={String(value)}
+                    disabled={isLocked}
                     onChange={(e) => {
                       const n = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
                     }}
-                    className="h-8 w-16 rounded-lg px-2 text-right font-mono text-sm"
+                    className={cn(
+                      "h-8 w-16 rounded-lg px-2 text-right font-mono text-sm",
+                      isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                    )}
                     aria-label={`${slot.label} allocation`}
+                    title={isLocked ? `Paid $${lockInfo.price} for ${lockInfo.name}` : undefined}
                   />
                 </div>
 
-                {/* Spent badge on first slot of group */}
-                {isFirstInGroup && groupSpent > 0 && (
+                {isLocked ? (
+                  <Lock className="h-3 w-3 shrink-0 text-success" />
+                ) : isFirstInGroup && groupSpent > 0 ? (
                   <span className="shrink-0 text-[10px] text-muted-foreground">
                     ${groupSpent} spent
                   </span>
+                ) : (
+                  <span className="w-3 shrink-0" />
                 )}
               </div>
             );
@@ -246,26 +328,22 @@ export default function PositionBudgetBar() {
 
       {/* ── Footer totals ─────────────────────────────── */}
       <div className="border-t border-border/50 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-muted-foreground">Planned</span>
-            <span className="font-mono font-semibold">${plannedTotal}</span>
-          </div>
-          <div className={cn(
-            "rounded-full border px-3 py-0.5 text-xs font-semibold",
-            delta === 0
-              ? "border-success/40 bg-success/10 text-success"
-              : delta > 0
-                ? "border-destructive/40 bg-destructive/10 text-destructive"
-                : "border-warning/40 bg-warning/10 text-warning",
-          )}>
-            {delta === 0
-              ? "✓ Balanced"
-              : delta > 0
-                ? `$${delta} over budget`
-                : `$${Math.abs(delta)} unspent`}
-          </div>
-        </div>
+        {(() => {
+          const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
+          const remaining = settings.totalBudget - lockedSum;
+          return (
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-3">
+                <span className="text-muted-foreground">Spent</span>
+                <span className="font-mono font-semibold">${lockedSum}</span>
+                <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
+              </div>
+              <div className="rounded-full border border-primary/40 bg-primary/10 px-3 py-0.5 text-xs font-semibold text-primary">
+                ${remaining} replanned across {slots.length - Object.keys(locked).length} slots
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
