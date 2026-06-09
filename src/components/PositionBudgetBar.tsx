@@ -1,17 +1,7 @@
 import { useMemo } from "react";
-import { Info, Lock, LockOpen, RotateCcw, Sparkles, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Info, Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useDraftStore } from "@/lib/draft-store";
-import { getStrategy, STRATEGIES, parseCustomStrategyWeights } from "@/lib/strategies";
 import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
