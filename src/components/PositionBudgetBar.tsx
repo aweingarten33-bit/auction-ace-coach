@@ -95,10 +95,11 @@ export default function PositionBudgetBar() {
       return sum + 1;
     }, 0);
     const nonDollar = unfilled.filter((s) => !isDollarGroup(s.group));
-    // Both user-locked AND user-typed slots are frozen; only untouched slots auto-fill.
-    const userFrozen = nonDollar.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
+    // A slot is "frozen" only if user locked it OR typed a value > 0. Zero = untouched.
+    const isTyped = (id: string) => (slotAllocations[id] ?? 0) > 0;
+    const userFrozen = nonDollar.filter((s) => lockedSlots[s.id] || isTyped(s.id));
     const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
-    const open = nonDollar.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
+    const open = nonDollar.filter((s) => !lockedSlots[s.id] && !isTyped(s.id));
     const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum - dollarSum);
 
     // Split remaining budget evenly across untouched open slots (largest-remainder rounding).
