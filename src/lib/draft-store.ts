@@ -104,6 +104,11 @@ interface DraftState {
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
   setPlannerStrategy: (s: "hero-qb" | "balanced-qbs" | "bargain-qb") => void;
+  addAnchor: () => void;
+  updateAnchor: (id: string, patch: Partial<{ name: string; price: number }>) => void;
+  removeAnchor: (id: string) => void;
+  clearAnchors: () => void;
+  setReservePct: (pct: number) => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
