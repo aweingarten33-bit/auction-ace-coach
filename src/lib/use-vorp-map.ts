@@ -208,6 +208,7 @@ export function useVorpMap(settings: LeagueSettings): {
     const qbPremium = isSuperflex ? 1.25 : 1;
 
     const out: Record<string, VorpEntry> = {};
+    const playersOut: VorpPlayer[] = [];
     for (const d of draftable) {
       const dpv = posDPV[d.pos] || globalDPV;
       const mult = d.pos === "QB" ? qbPremium : 1;
@@ -218,9 +219,16 @@ export function useVorpMap(settings: LeagueSettings): {
         projection: Math.round(d.pts),
         replacement: Math.round(replacement[d.pos]),
       };
+      playersOut.push({
+        name: d.name,
+        position: d.pos,
+        price,
+        projection: Math.round(d.pts * 10) / 10,
+        vorp: Math.round(d.vorp),
+      });
     }
-    return out;
+    return { out, playersOut };
   }, [rows, hist, settings]);
 
-  return { map, loading };
+  return { map: computed.out, players: computed.players, loading };
 }
