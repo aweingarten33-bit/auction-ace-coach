@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDraftStore } from "@/lib/draft-store";
-import { getStrategy, STRATEGIES } from "@/lib/strategies";
+import { getStrategy, STRATEGIES, parseCustomStrategyWeights } from "@/lib/strategies";
 import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
