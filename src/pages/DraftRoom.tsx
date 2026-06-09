@@ -29,7 +29,7 @@ import {
   spendByPosition,
   recentRuns,
 } from "@/lib/draft-math";
-import { computeMarketPulse } from "@/lib/value";
+
 import { useAnchorMap } from "@/lib/use-anchor-map";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
