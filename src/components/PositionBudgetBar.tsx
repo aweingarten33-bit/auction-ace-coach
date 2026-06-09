@@ -367,7 +367,13 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   add("WR",        settings.roster.WR,        (i) => `WR${i}`);
   add("TE",        settings.roster.TE,        (i) => settings.roster.TE === 1 ? "TE" : `TE${i}`);
   add("FLEX",      settings.roster.FLEX,      (i) => settings.roster.FLEX === 1 ? "FLEX" : `FLEX${i}`);
-  add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`);
+  {
+    const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
+    add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => {
+      if (isSF) return settings.roster.SUPERFLEX === 1 ? `QB${settings.roster.QB + 1}` : `QB${settings.roster.QB + i}`;
+      return settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`;
+    });
+  }
   add("K",         settings.roster.K,         (i) => settings.roster.K === 1 ? "K" : `K${i}`);
   add("DST",       settings.roster.DST,       (i) => settings.roster.DST === 1 ? "DST" : `DST${i}`);
   add("BENCH",     settings.roster.BENCH,     (i) => `BE${i}`);
@@ -412,9 +418,12 @@ function suggestAllocations(settings: LeagueSettings, strategyId: string): Recor
 
 function baseSlotWeight(slot: PlannerSlot, settings: LeagueSettings): number {
   const superflex = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
+  const qbCurve = superflex ? [32, 22, 8] : [15, 5];
   const curves: Partial<Record<SlotGroup, number[]>> = {
-    QB:        superflex ? [32, 22, 8] : [15, 5],
-    SUPERFLEX: [22, 10],
+    QB:        qbCurve,
+    // In superflex/2QB leagues, the SUPERFLEX slot is typically a 2nd QB,
+    // so weight it like the next QB in the curve rather than as a generic flex.
+    SUPERFLEX: superflex ? qbCurve.slice(settings.roster.QB) : [22, 10],
     RB:        [22, 16, 9, 5, 3],
     WR:        [21, 16, 10, 6, 4],
     TE:        [9, 4],
