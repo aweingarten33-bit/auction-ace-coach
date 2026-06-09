@@ -86,10 +86,15 @@ export default function PositionBudgetBar() {
 
     const draftedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
-    // K and DST are always $1, excluded from redistribution.
-    const dollarSlots = unfilled.filter((s) => s.group === "K" || s.group === "DST");
-    const dollarSum = dollarSlots.length;
-    const nonDollar = unfilled.filter((s) => s.group !== "K" && s.group !== "DST");
+    // K and DST are always $1 (locked). BENCH defaults to $1 but is editable.
+    // All three are excluded from the even-split redistribution pool.
+    const isDollarGroup = (g: string) => g === "K" || g === "DST" || g === "BENCH";
+    const dollarSlots = unfilled.filter((s) => isDollarGroup(s.group));
+    const dollarSum = dollarSlots.reduce((sum, s) => {
+      if (s.group === "BENCH") return sum + (slotAllocations[s.id] ?? 1);
+      return sum + 1;
+    }, 0);
+    const nonDollar = unfilled.filter((s) => !isDollarGroup(s.group));
     // Both user-locked AND user-typed slots are frozen; only untouched slots auto-fill.
     const userFrozen = nonDollar.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
     const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
@@ -116,6 +121,7 @@ export default function PositionBudgetBar() {
     for (const slot of slots) {
       if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
       else if (slot.group === "K" || slot.group === "DST") allocations[slot.id] = 1;
+      else if (slot.group === "BENCH") allocations[slot.id] = slotAllocations[slot.id] ?? 1;
       else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
       else allocations[slot.id] = 0;
     }
