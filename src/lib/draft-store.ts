@@ -27,7 +27,7 @@ export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   { id: "qp-next",      label: "What's my next move?",     prompt: "Based on my roster, budget, and what's still available, what's my next move and how much should I be willing to pay?" },
   { id: "qp-thin",      label: "Am I too thin?",           prompt: "Looking at my roster and what's left on the board, am I getting too thin anywhere? Where's my biggest hole?" },
   { id: "qp-value",     label: "Best value left?",         prompt: "What's the single best value still on the board right now and why?" },
-  { id: "qp-qb-value",  label: "Best QB value left?",      prompt: "In this 2QB/Superflex league, who's the best quarterback value still available and what should I pay?" },
+  { id: "qp-qb-value",  label: "Best QB value left?",      prompt: "Who's the best quarterback value still available and what should I pay?" },
   { id: "qp-scarcity",  label: "What's running dry?",      prompt: "Which positions are running out of starters fastest, and should I panic-buy or wait?" },
   { id: "qp-rb-spend",  label: "How much for my RB1?",     prompt: "Given my budget and what's left, how much should I allocate for my starting RB and my backup RBs?" },
   { id: "qp-strategy",  label: "Stars or balanced?",       prompt: "Should I pivot to a stars-and-scrubs build or stay balanced given how the draft is going?" },
