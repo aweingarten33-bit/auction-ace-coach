@@ -309,6 +309,12 @@ export default function DraftRoom() {
             <span className="text-xs font-medium">Top 50</span>
           </button>
           <button
+            onClick={() => setPanel("calc")}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+          >
+            <span className="text-xs font-medium">Calc</span>
+          </button>
+          <button
             onClick={() => setPanel("recent")}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
