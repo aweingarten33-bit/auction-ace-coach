@@ -328,26 +328,22 @@ export default function PositionBudgetBar() {
 
       {/* ── Footer totals ─────────────────────────────── */}
       <div className="border-t border-border/50 px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-muted-foreground">Planned</span>
-            <span className="font-mono font-semibold">${plannedTotal}</span>
-          </div>
-          <div className={cn(
-            "rounded-full border px-3 py-0.5 text-xs font-semibold",
-            delta === 0
-              ? "border-success/40 bg-success/10 text-success"
-              : delta > 0
-                ? "border-destructive/40 bg-destructive/10 text-destructive"
-                : "border-warning/40 bg-warning/10 text-warning",
-          )}>
-            {delta === 0
-              ? "✓ Balanced"
-              : delta > 0
-                ? `$${delta} over budget`
-                : `$${Math.abs(delta)} unspent`}
-          </div>
-        </div>
+        {(() => {
+          const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
+          const remaining = settings.totalBudget - lockedSum;
+          return (
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-3">
+                <span className="text-muted-foreground">Spent</span>
+                <span className="font-mono font-semibold">${lockedSum}</span>
+                <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
+              </div>
+              <div className="rounded-full border border-primary/40 bg-primary/10 px-3 py-0.5 text-xs font-semibold text-primary">
+                ${remaining} replanned across {slots.length - Object.keys(locked).length} slots
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
