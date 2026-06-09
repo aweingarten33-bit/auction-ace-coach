@@ -753,17 +753,58 @@ function Top100List({
     return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 100);
   }, [prices, anchorMap]);
 
-  if (top.length === 0) {
+  // Fallback to Sleeper consensus (Superflex-tuned) when no price sheet is loaded.
+  const [fallback, setFallback] = useState<
+    { name: string; position?: Position; team?: string | null }[]
+  >([]);
+  useEffect(() => {
+    if (top.length > 0) return;
+    let cancelled = false;
+    import("@/lib/sleeper").then(({ loadSleeperPlayers }) => {
+      loadSleeperPlayers()
+        .then((players) => {
+          if (cancelled) return;
+          // SF tuning: boost QBs by treating their search_rank as ~45% of value.
+          const scored = players
+            .filter((p) => p.position && p.search_rank && p.search_rank < 9e8)
+            .map((p) => ({
+              name: p.full_name,
+              position: (p.position as Position) || undefined,
+              team: p.team,
+              score: (p.search_rank ?? 9e9) * (p.position === "QB" ? 0.45 : 1.0),
+            }))
+            .sort((a, b) => a.score - b.score)
+            .slice(0, 100);
+          setFallback(scored);
+        })
+        .catch(() => {});
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [top.length]);
+
+  const usingFallback = top.length === 0;
+  const rows = usingFallback
+    ? fallback.map((r) => ({ name: r.name, position: r.position, price: null as number | null }))
+    : top.map((r) => ({ name: r.name, position: r.position, price: r.price as number | null }));
+
+  if (rows.length === 0) {
     return (
       <p className="py-8 text-center text-xs text-muted-foreground">
-        No price sheet loaded yet.
+        Loading consensus rankings…
       </p>
     );
   }
 
   return (
     <div className="space-y-1">
-      {top.map((p, i) => {
+      {usingFallback && (
+        <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">
+          Superflex consensus (no price sheet loaded)
+        </p>
+      )}
+      {rows.map((p, i) => {
         const isPicked = drafted.has(norm(p.name));
         const isFiftyDivider = i === 50;
         return (
@@ -790,7 +831,7 @@ function Top100List({
                 </Badge>
               )}
               <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
-              <span className="font-mono tabular-nums">${p.price}</span>
+              {p.price != null && <span className="font-mono tabular-nums">${p.price}</span>}
             </button>
           </div>
         );
@@ -798,6 +839,7 @@ function Top100List({
     </div>
   );
 }
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // BudgetSnapshot — read-only summary shown inside the Budget panel.
