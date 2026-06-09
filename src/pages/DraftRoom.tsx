@@ -204,8 +204,7 @@ export default function DraftRoom() {
     <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
       <header
-        className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 pb-2"
-        style={{ paddingTop: "env(safe-area-inset-top)" }}
+        className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 pt-1 pb-2"
       >
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <SheetTrigger asChild>
@@ -351,8 +350,7 @@ export default function DraftRoom() {
             style={{ animation: "tool-panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           >
             <div
-              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-3 pb-2"
-              style={{ paddingTop: "env(safe-area-inset-top)" }}
+              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-3 pt-1 pb-2"
             >
               <button
                 onClick={() => setPanel(null)}
