@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Lock, LockOpen, RotateCcw, Plus, X, Anchor, Shield } from "lucide-react";
+import { Lock, LockOpen, RotateCcw, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
@@ -39,18 +39,13 @@ export default function PositionBudgetBar() {
   const clearTouchedSlots = useDraftStore((s) => s.clearTouchedSlots);
   const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
   const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy);
-  const anchors = useDraftStore((s) => s.anchors);
-  const addAnchor = useDraftStore((s) => s.addAnchor);
-  const updateAnchor = useDraftStore((s) => s.updateAnchor);
-  const removeAnchor = useDraftStore((s) => s.removeAnchor);
   const reservePct = useDraftStore((s) => s.reservePct);
   const setReservePct = useDraftStore((s) => s.setReservePct);
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
-  const anchorsTotal = anchors.reduce((sum, a) => sum + (a.price || 0), 0);
   const reserveDollars = Math.floor((settings.totalBudget * reservePct) / 100);
-  const extraReserved = anchorsTotal + reserveDollars;
+  const extraReserved = reserveDollars;
 
   // Auto-fill any slot the user hasn't manually touched/locked.
   useEffect(() => {
@@ -77,7 +72,7 @@ export default function PositionBudgetBar() {
     slot.id in slotAllocations ? slotAllocations[slot.id] : 0;
 
   const slotsPlanned = slots.reduce((sum, s) => sum + valueFor(s), 0);
-  const planned = slotsPlanned + anchorsTotal + reserveDollars;
+  const planned = slotsPlanned + reserveDollars;
   const remaining = settings.totalBudget - planned;
   const openSlots = slots.filter((s) => !lockedSlots[s.id]).length;
   const remainingForBid =
@@ -129,67 +124,6 @@ export default function PositionBudgetBar() {
         </button>
       </div>
 
-      {/* Anchors */}
-      <div className="border-b border-border/50 px-3 py-2.5">
-        <div className="mb-1.5 flex items-center justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-            <Anchor className="h-3 w-3" />
-            Anchors
-            {anchorsTotal > 0 && (
-              <span className="font-mono text-[10px] text-foreground/80">· ${anchorsTotal}</span>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={addAnchor}
-            disabled={anchors.length >= 5}
-            className="flex items-center gap-1 rounded-md border border-border bg-secondary/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground transition hover:text-foreground disabled:opacity-40"
-          >
-            <Plus className="h-3 w-3" />
-            add
-          </button>
-        </div>
-        {anchors.length === 0 ? (
-          <p className="text-[11px] leading-snug text-muted-foreground">
-            Pre-allocate $ to 1–5 must-have players. Rest of the plan rebalances around them.
-          </p>
-        ) : (
-          <div className="space-y-1.5">
-            {anchors.map((a) => (
-              <div key={a.id} className="flex items-center gap-2">
-                <Input
-                  value={a.name}
-                  placeholder="Player name"
-                  onChange={(e) => updateAnchor(a.id, { name: e.target.value })}
-                  className="h-8 flex-1 min-w-0 rounded-lg px-2 text-xs"
-                  aria-label="Anchor player name"
-                />
-                <div className="flex shrink-0 items-center gap-0.5">
-                  <span className="text-sm text-muted-foreground">$</span>
-                  <Input
-                    inputMode="numeric"
-                    value={String(a.price)}
-                    onChange={(e) => {
-                      const n = Number(e.target.value.replace(/[^0-9]/g, ""));
-                      updateAnchor(a.id, { price: Number.isFinite(n) ? n : 0 });
-                    }}
-                    className="h-8 w-14 rounded-lg px-2 text-right font-mono text-sm"
-                    aria-label="Anchor price"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeAnchor(a.id)}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground/60 hover:bg-secondary hover:text-foreground"
-                  aria-label="Remove anchor"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* Reserve buffer */}
       <div className="border-b border-border/50 px-3 py-2.5">
@@ -295,11 +229,9 @@ export default function PositionBudgetBar() {
             <span className="text-muted-foreground">Planned</span>
             <span className="font-mono font-semibold">${planned}</span>
             <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
-            {(anchorsTotal > 0 || reserveDollars > 0) && (
+            {reserveDollars > 0 && (
               <span className="text-[10px] text-muted-foreground">
-                (slots ${slotsPlanned}
-                {anchorsTotal > 0 && ` + anchors $${anchorsTotal}`}
-                {reserveDollars > 0 && ` + reserve $${reserveDollars}`})
+                (slots ${slotsPlanned} + reserve ${reserveDollars})
               </span>
             )}
           </div>
