@@ -3,15 +3,7 @@ import { Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
-import type { LeagueSettings, Position } from "@/lib/draft-types";
-
-type SlotGroup = Position | "FLEX" | "SUPERFLEX" | "BENCH";
-
-interface PlannerSlot {
-  id: string;
-  label: string;
-  group: SlotGroup;
-}
+import { buildPlannerSlots, defaultFor, type PlannerSlot, type SlotGroup } from "@/lib/planner-slots";
 
 const GROUP_COLOR: Record<SlotGroup, string> = {
   QB:        "bg-red-500/20 text-black border-red-500/30",
@@ -25,11 +17,6 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   BENCH:     "bg-secondary text-black border-border",
 };
 
-function defaultFor(group: SlotGroup): number {
-  if (group === "K" || group === "DST" || group === "BENCH") return 1;
-  return 0;
-}
-
 export default function PositionBudgetBar() {
   const settings = useDraftStore((s) => s.settings);
   const slotAllocations = useDraftStore((s) => s.slotAllocations);
@@ -39,7 +26,7 @@ export default function PositionBudgetBar() {
   const slotNotes = useDraftStore((s) => s.slotNotes);
   const setSlotNote = useDraftStore((s) => s.setSlotNote);
 
-  const slots = useMemo(() => buildSlots(settings), [settings]);
+  const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
   const valueFor = (slot: PlannerSlot) =>
     slot.id in slotAllocations ? slotAllocations[slot.id] : defaultFor(slot.group);
@@ -147,29 +134,3 @@ export default function PositionBudgetBar() {
   );
 }
 
-function buildSlots(settings: LeagueSettings): PlannerSlot[] {
-  const slots: PlannerSlot[] = [];
-  const add = (group: SlotGroup, count: number, labelFor: (i: number) => string) => {
-    for (let i = 1; i <= count; i += 1) {
-      slots.push({ id: `${group}-${i}`, label: labelFor(i), group });
-    }
-  };
-
-  add("QB",        settings.roster.QB,        (i) => settings.roster.QB === 1 ? "QB" : `QB${i}`);
-  add("RB",        settings.roster.RB,        (i) => `RB${i}`);
-  add("WR",        settings.roster.WR,        (i) => `WR${i}`);
-  add("TE",        settings.roster.TE,        (i) => settings.roster.TE === 1 ? "TE" : `TE${i}`);
-  add("FLEX",      settings.roster.FLEX,      (i) => settings.roster.FLEX === 1 ? "FLEX" : `FLEX${i}`);
-  {
-    const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
-    add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => {
-      if (isSF) return settings.roster.SUPERFLEX === 1 ? `QB${settings.roster.QB + 1}` : `QB${settings.roster.QB + i}`;
-      return settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`;
-    });
-  }
-  add("K",         settings.roster.K,         (i) => settings.roster.K === 1 ? "K" : `K${i}`);
-  add("DST",       settings.roster.DST,       (i) => settings.roster.DST === 1 ? "DST" : `DST${i}`);
-  add("BENCH",     settings.roster.BENCH,     (i) => `BE${i}`);
-
-  return slots;
-}

@@ -47,6 +47,7 @@ import {
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
+import { buildPlannerBoard } from "@/lib/planner-slots";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
@@ -73,6 +74,9 @@ export default function DraftRoom() {
     watchlist,
     pinPlayer,
     unpinPlayer,
+    slotAllocations,
+    slotNotes,
+    lockedSlots,
   } = useDraftStore();
 
 
@@ -342,6 +346,7 @@ export default function DraftRoom() {
                     label: "Manual",
                     guidance: "",
                   },
+                  budgetBoard: buildPlannerBoard(settings, slotAllocations, slotNotes, lockedSlots),
                 })}
               />
             </SheetContent>

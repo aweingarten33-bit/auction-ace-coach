@@ -43,6 +43,10 @@ export interface CoachInput {
   draftedPlayers?: string[];
   showMath?: boolean;
   strategy?: { id: string; label: string; guidance: string };
+  budgetBoard?: {
+    totalBudget: number;
+    slots: { id: string; label: string; group: string; dollars: number; target: string; locked: boolean }[];
+  };
 }
 
 /**
