@@ -367,7 +367,13 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   add("WR",        settings.roster.WR,        (i) => `WR${i}`);
   add("TE",        settings.roster.TE,        (i) => settings.roster.TE === 1 ? "TE" : `TE${i}`);
   add("FLEX",      settings.roster.FLEX,      (i) => settings.roster.FLEX === 1 ? "FLEX" : `FLEX${i}`);
-  add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`);
+  {
+    const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
+    add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => {
+      if (isSF) return settings.roster.SUPERFLEX === 1 ? `QB${settings.roster.QB + 1}` : `QB${settings.roster.QB + i}`;
+      return settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`;
+    });
+  }
   add("K",         settings.roster.K,         (i) => settings.roster.K === 1 ? "K" : `K${i}`);
   add("DST",       settings.roster.DST,       (i) => settings.roster.DST === 1 ? "DST" : `DST${i}`);
   add("BENCH",     settings.roster.BENCH,     (i) => `BE${i}`);
