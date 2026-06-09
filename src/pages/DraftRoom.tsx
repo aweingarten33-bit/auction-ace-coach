@@ -351,8 +351,8 @@ export default function DraftRoom() {
             style={{ animation: "tool-panel-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both" }}
           >
             <div
-              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-3 py-3"
-              style={{ paddingTop: "calc(env(safe-area-inset-top) + 0.75rem)" }}
+              className="flex shrink-0 items-center gap-3 border-b border-border/60 px-3 pb-2"
+              style={{ paddingTop: "env(safe-area-inset-top)" }}
             >
               <button
                 onClick={() => setPanel(null)}
