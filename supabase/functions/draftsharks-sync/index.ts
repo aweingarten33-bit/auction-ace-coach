@@ -1,5 +1,6 @@
-// Scrape DraftSharks Superflex auction values via Firecrawl JSON extraction
-// and upsert into public.draftsharks_sf_values. Returns count synced.
+// Scrape DraftSharks Superflex auction values via Firecrawl and parse the FULL
+// HTML table (524+ player rows are all server-rendered, just JS-paginated visually).
+// Stores marketValue (consensus across experts) per player.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -15,13 +16,58 @@ const norm = (s: string) =>
     .trim()
     .replace(/\s/g, "");
 
-interface DSPlayer {
-  overall_rank?: number;
-  name: string;
-  team?: string;
+interface ParsedPlayer {
+  player_name: string;
+  player_name_norm: string;
+  team: string | null;
   position: string;
-  position_rank?: number;
+  overall_rank: number | null;
+  position_rank: number | null;
   value_200: number;
+}
+
+function parseRows(html: string): ParsedPlayer[] {
+  // Strip SVG bodies — they bloat the HTML and trip up regex
+  const stripped = html.replace(/<svg[\s\S]*?<\/svg>/g, "");
+  const rowRe = /<tr class="player-row">([\s\S]*?)<\/tr>/g;
+  const out: ParsedPlayer[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = rowRe.exec(stripped)) !== null) {
+    const row = m[1];
+    const rank = row.match(/<div class="column-title rank-index">\s*(\d+)\s*<\/div>/)?.[1];
+    // Player name — prefer the hide-on-mobile link (full name)
+    const name = row.match(/<a class="hide-on-mobile"[^>]*>\s*([^<]+?)\s*<\/a>/)?.[1]
+              ?? row.match(/href="https:\/\/www\.draftsharks\.com\/fantasy\/points-outlook\/[^"]+"[^>]*>\s*([^<]+?)\s*<\/a>/)?.[1];
+    if (!name) continue;
+    // Team is a <span> inside team-position-logo-container
+    const teamMatch = row.match(/<div class="team-position-logo-container">[\s\S]*?<span>\s*([A-Z]{2,4})\s*<\/span>/);
+    const team = teamMatch ? teamMatch[1] : null;
+    // Position-rank text e.g. "QB1", "RB12" — the wrapping class is unreliable, parse text
+    const posRankText = row.match(/<div class="position-rank[^"]*">\s*([A-Z/]+)(\d+)\s*<\/div>/);
+    if (!posRankText) continue;
+    let position = posRankText[1];
+    const positionRank = Number(posRankText[2]);
+    if (position === "DEF" || position === "D/ST") position = "DST";
+    // Market value (consensus across experts)
+    const valMatch = row.match(/data-attribute="auctionMarketValue"[^>]*data-value="\$(\d+)"/)
+                  ?? row.match(/data-value="\$(\d+)"\s+data-attribute="auctionMarketValue"/);
+    if (!valMatch) continue;
+    const value = Number(valMatch[1]);
+    if (!Number.isFinite(value) || value <= 0) continue;
+    const cleanName = name.trim();
+    const nameNorm = norm(cleanName);
+    if (!nameNorm) continue;
+    out.push({
+      player_name: cleanName,
+      player_name_norm: nameNorm,
+      team,
+      position,
+      overall_rank: rank ? Number(rank) : null,
+      position_rank: positionRank,
+      value_200: Math.max(1, Math.round(value)),
+    });
+  }
+  return out;
 }
 
 Deno.serve(async (req) => {
@@ -41,31 +87,8 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         url: "https://www.draftsharks.com/auction-values/superflex",
-        formats: [{
-          type: "json",
-          prompt: "Extract ALL players in the auction values table — return every single row. Fields per player: overall_rank (int), name (full name string), team (3-letter), position (QB/RB/WR/TE/K/DST), position_rank (int derived from QB1->1, RB2->2, etc.), value_200 (int dollar value in the $200 budget column). Do NOT truncate.",
-          schema: {
-            type: "object",
-            properties: {
-              players: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    overall_rank: { type: "integer" },
-                    name: { type: "string" },
-                    team: { type: "string" },
-                    position: { type: "string" },
-                    position_rank: { type: "integer" },
-                    value_200: { type: "integer" },
-                  },
-                  required: ["name", "position", "value_200"],
-                },
-              },
-            },
-          },
-        }],
-        onlyMainContent: true,
+        formats: ["html"],
+        onlyMainContent: false,
       }),
     });
     if (!fcRes.ok) {
@@ -74,33 +97,22 @@ Deno.serve(async (req) => {
     }
     const fcJson = await fcRes.json();
     const data = fcJson.data ?? fcJson;
-    const players: DSPlayer[] = data?.json?.players ?? [];
-    if (!Array.isArray(players) || players.length === 0) {
-      throw new Error(`No players extracted (got ${players?.length ?? 0})`);
-    }
+    const html: string = data?.html ?? "";
+    if (!html || html.length < 1000) throw new Error(`HTML too small (${html.length})`);
 
-    const fetchedAt = new Date().toISOString();
-    const rows = players
-      .filter((p) => p?.name && p?.position && typeof p?.value_200 === "number" && p.value_200 > 0)
-      .map((p) => ({
-        player_name: p.name,
-        player_name_norm: norm(p.name),
-        team: p.team ?? null,
-        position: p.position === "DEF" ? "DST" : p.position,
-        overall_rank: p.overall_rank ?? null,
-        position_rank: p.position_rank ?? null,
-        value_200: Math.max(1, Math.round(p.value_200)),
-        fetched_at: fetchedAt,
-      }))
-      .filter((r) => r.player_name_norm.length > 0);
+    const parsed = parseRows(html);
+    if (parsed.length === 0) throw new Error("No player rows parsed — selectors may have changed");
 
-    // Dedupe on player_name_norm (keep highest value if duplicates)
-    const byKey = new Map<string, typeof rows[number]>();
-    for (const r of rows) {
-      const cur = byKey.get(r.player_name_norm);
-      if (!cur || r.value_200 > cur.value_200) byKey.set(r.player_name_norm, r);
+    // Dedupe on norm key (keep highest value)
+    const byKey = new Map<string, ParsedPlayer>();
+    for (const p of parsed) {
+      const cur = byKey.get(p.player_name_norm);
+      if (!cur || p.value_200 > cur.value_200) byKey.set(p.player_name_norm, p);
     }
-    const finalRows = Array.from(byKey.values());
+    const finalRows = Array.from(byKey.values()).map((r) => ({
+      ...r,
+      fetched_at: new Date().toISOString(),
+    }));
 
     const { error: upsertErr } = await sb
       .from("draftsharks_sf_values")
@@ -108,7 +120,12 @@ Deno.serve(async (req) => {
     if (upsertErr) throw upsertErr;
 
     return new Response(
-      JSON.stringify({ ok: true, synced: finalRows.length, fetchedAt }),
+      JSON.stringify({
+        ok: true,
+        scraped: parsed.length,
+        synced: finalRows.length,
+        sampleTop5: finalRows.slice(0, 5).map((r) => ({ name: r.player_name, pos: r.position, val: r.value_200 })),
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
