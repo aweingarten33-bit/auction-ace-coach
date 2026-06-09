@@ -269,6 +269,16 @@ export const useDraftStore = create<DraftState>()(
         set((s) => ({ priceOverrides: s.priceOverrides.filter((n) => n !== norm(name)) })),
       clearVetri: () => set({ vetriRankings: [] }),
     }),
-    { name: "auction-draft-coach-v1" }
+    {
+      name: "auction-draft-coach-v1",
+      version: 2,
+      migrate: (persisted: any) => {
+        if (persisted && !["elite-qb", "balanced-sf", "hero-rb-sf"].includes(persisted.plannerStrategy)) {
+          persisted.plannerStrategy = "balanced-sf";
+          persisted.touchedSlots = {};
+        }
+        return persisted;
+      },
+    }
   )
 );
