@@ -151,6 +151,10 @@ export const useDraftStore = create<DraftState>()(
           return { lockedSlots: nextLocks, slotAllocations: nextAllocs };
         }),
       clearSlotLocks: () => set({ lockedSlots: {} }),
+      slotNotes: {},
+      setSlotNote: (id, note) =>
+        set((s) => ({ slotNotes: { ...s.slotNotes, [id]: note } })),
+      clearSlotNotes: () => set({ slotNotes: {} }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
