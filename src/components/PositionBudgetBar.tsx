@@ -92,7 +92,21 @@ export default function PositionBudgetBar() {
     const open = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
     const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum);
 
-    const rounded = open.map(() => 0);
+    // Split remaining budget evenly across untouched open slots (largest-remainder rounding).
+    let rounded: number[];
+    if (open.length === 0) {
+      rounded = [];
+    } else {
+      const exact = remaining / open.length;
+      const base = Math.floor(exact);
+      const remainders = open.map((_, i) => ({ i, frac: exact - base }));
+      rounded = open.map(() => base);
+      let leftover = remaining - base * open.length;
+      remainders.sort((a, b) => b.frac - a.frac);
+      for (let k = 0; k < leftover && k < rounded.length; k += 1) {
+        rounded[remainders[k].i] += 1;
+      }
+    }
 
     const allocations: Record<string, number> = {};
     for (const slot of slots) {
