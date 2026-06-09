@@ -43,8 +43,17 @@ const STARTER_FOR: Record<Position, (s: LeagueSettings) => number> = {
 
 interface HistRow { name: string; position: Position | null; bid: number; season: number }
 
+export interface VorpPlayer {
+  name: string;
+  position: Position;
+  price: number;
+  projection: number;
+  vorp: number;
+}
+
 export function useVorpMap(settings: LeagueSettings): {
   map: Record<string, VorpEntry>;
+  players: VorpPlayer[];
   loading: boolean;
 } {
   const [rows, setRows] = useState<ProjRow[]>([]);
