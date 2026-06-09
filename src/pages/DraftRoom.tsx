@@ -29,7 +29,7 @@ import {
   spendByPosition,
   recentRuns,
 } from "@/lib/draft-math";
-import { computeMarketPulse } from "@/lib/value";
+
 import { useAnchorMap } from "@/lib/use-anchor-map";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
@@ -48,7 +48,6 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { buildPlannerBoard } from "@/lib/planner-slots";
-import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
 import SyncStatusPill from "@/components/SyncStatusPill";
@@ -160,7 +159,7 @@ export default function DraftRoom() {
   const myCount = useMemo(() => countByPosition(myItems), [myItems]);
   const spend = useMemo(() => spendByPosition(events), [events]);
   const runs = useMemo(() => recentRuns(events, 6), [events]);
-  const pulse = useMemo(() => computeMarketPulse(events, prices), [events, prices]);
+  
   // Re-price undrafted players in real time as players come off the board.
   const adjustedPrices = useMemo(() => adjustPricesForDrafted(prices, events), [prices, events]);
 
@@ -256,18 +255,6 @@ export default function DraftRoom() {
           )}
           {/* Strategy picker + per-slot budget allocations */}
           <PositionBudgetBar />
-          {/* Next target recommendation */}
-          {selectedTeam && (
-            <NextTargetCard
-              settings={settings}
-              gaps={gaps}
-              spend={spend}
-              remaining={budget.remaining}
-              prices={adjustedPrices}
-              events={events}
-              pulse={pulse}
-            />
-          )}
           {/* Last pick delta */}
           {events.length > 0 && (
             <LastPickImpact settings={settings} keepers={keepers} events={events} />
