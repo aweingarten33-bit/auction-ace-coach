@@ -297,7 +297,7 @@ export default function PositionBudgetBar() {
                   <Input
                     inputMode="numeric"
                     value={String(value)}
-                    disabled={isLocked}
+                    disabled={isDrafted || !isUserLocked}
                     onChange={(e) => {
                       const n = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
@@ -308,7 +308,7 @@ export default function PositionBudgetBar() {
                       isUserLocked && "border-primary/40 bg-primary/5 text-primary disabled:opacity-100",
                     )}
                     aria-label={`${slot.label} allocation`}
-                    title={isDrafted ? `Paid $${lockInfo.price} for ${lockInfo.name}` : isUserLocked ? `Locked at $${value}` : undefined}
+                    title={isDrafted ? `Paid $${lockInfo.price} for ${lockInfo.name}` : isUserLocked ? `Locked at $${value}` : "Lock this slot to edit its value"}
                   />
                 </div>
 
