@@ -48,7 +48,6 @@ import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { buildPlannerBoard } from "@/lib/planner-slots";
-import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
 import SyncStatusPill from "@/components/SyncStatusPill";
@@ -256,18 +255,6 @@ export default function DraftRoom() {
           )}
           {/* Strategy picker + per-slot budget allocations */}
           <PositionBudgetBar />
-          {/* Next target recommendation */}
-          {selectedTeam && (
-            <NextTargetCard
-              settings={settings}
-              gaps={gaps}
-              spend={spend}
-              remaining={budget.remaining}
-              prices={adjustedPrices}
-              events={events}
-              pulse={pulse}
-            />
-          )}
           {/* Last pick delta */}
           {events.length > 0 && (
             <LastPickImpact settings={settings} keepers={keepers} events={events} />
