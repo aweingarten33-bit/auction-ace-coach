@@ -366,9 +366,17 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         const out: Record<string, AnchorEntry> = {};
         for (const [k, v] of leagueAgg) {
           if (v.bySeason.size === 0) continue;
+          // Skip players who no longer exist in any current-season source
+          // (retired, cut, out of the league — e.g. Cam Akers). If they have
+          // zero presence in market AND zero projections, drop them entirely
+          // so old keeper bids don't anchor a ghost player.
+          const inMarket = blendedMap.has(k) || espnMap.has(k) || sleeperMap.has(k) || berryMap.has(k);
+          const inProjections = !!vorpMap[k];
+          if (!inMarket && !inProjections) continue;
           const leaguePrice = weightedLeague(v.bySeason);
           const mv = marketConsensus(k);
           const vv = vorpMap[k];
+
 
           // ─── Tier-first pricing ──────────────────────────────────────────
           // Primary anchor = what your league has historically paid for THIS TIER
