@@ -79,6 +79,7 @@ export default function TeamPicker() {
             Pick your team to personalize the dossier — budget remaining, roster needs,
             and AI recommendations get tailored to your specific roster and gaps.
           </p>
+          <div className="mt-4"><SyncStatusPill /></div>
         </div>
 
         {loading && (
