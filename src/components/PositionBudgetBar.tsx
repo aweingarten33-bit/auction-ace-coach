@@ -385,8 +385,17 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   return slots;
 }
 
-function suggestAllocations(settings: LeagueSettings, strategyId: string): Record<string, number> {
+function suggestAllocations(
+  settings: LeagueSettings,
+  strategyId: string,
+  customRules?: string,
+): Record<string, number> {
   const strategy = getStrategy(strategyId);
+  // For the "custom" strategy, parse the user's free-text rules into weight overrides
+  // so the budget plan actually reflects what they typed.
+  const effectiveWeights: typeof strategy.weights = strategy.id === "custom"
+    ? parseCustomStrategyWeights(customRules)
+    : strategy.weights;
   const slots = buildSlots(settings);
   if (!slots.length) return {};
 
