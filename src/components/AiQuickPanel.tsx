@@ -129,7 +129,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
       if (!isAuthed || !user) return null;
       const { data, error } = await supabase
         .from("coach_messages")
-        .insert({ user_id: user.id, role: msg.role, content: msg.content, proposal: msg.proposal })
+        .insert({ user_id: user.id, role: msg.role, content: msg.content, proposal: msg.proposal as unknown as never })
         .select("id")
         .single();
       if (error) {
