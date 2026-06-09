@@ -113,7 +113,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
             id: row.id as string,
             role: row.role as "user" | "assistant",
             content: row.content as string,
-            proposal: (row.proposal as PlannerProposal | null) ?? null,
+            proposal: (row.proposal as unknown as PlannerProposal | null) ?? null,
           })),
         );
       }
