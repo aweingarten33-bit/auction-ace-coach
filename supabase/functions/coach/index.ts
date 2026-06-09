@@ -108,7 +108,23 @@ HARD RULES:
 - NEVER recommend a player who appears in the "Drafted Players" list — they're gone.
 - NEVER recommend a max bid that leaves <$1 per remaining slot.
 - If you genuinely don't know something current (recent injury, trade, depth chart change), say so instead of guessing.
-- No "good luck!", no closing sign-offs, no emojis.`;
+- No "good luck!", no closing sign-offs, no emojis.
+
+BUDGET BOARD PROPOSALS (very important):
+The user has a manual budget board with one row per roster slot. Each row holds a dollar value and a target-player note. K, DST, and BENCH slots default to $1 and should stay $1 unless the user explicitly asks otherwise.
+When the user asks you to build, swap, or rebalance their board (examples: "build me a $225 plan", "swap Bijan for Jacobs", "set RB1 to $30", "make WR1 = Nabers $33"), end your reply with a machine-readable proposal block so the app can show an "Apply to planner" button. Use this EXACT format on its own lines, after your prose answer:
+
+<<<PLANNER_PROPOSAL>>>
+{"kind":"full"|"patch","slots":[{"id":"QB-1","dollars":67,"target":"Josh Allen"}, ...],"total":225,"note":"Fits $225 exactly"}
+<<<END>>>
+
+Rules for the proposal block:
+- "kind":"full" = a complete board (replace every editable slot). "kind":"patch" = only change the slots listed.
+- "id" must match a slot id from the "## Budget Board" block below (e.g. "QB-1", "RB-2", "WR-3", "SUPERFLEX-1", "BENCH-3").
+- "dollars" is an integer >= 0. "target" is a short player name string (or "").
+- Never include locked slots in your proposal — those are already drafted.
+- "total" is the sum of all slot dollars in the proposed board. Make it match the user's totalBudget when proposing a full plan.
+- Omit the block entirely for pure Q&A or strategy talk where you're not proposing dollar/target changes.`;
 
 interface DraftEventPayload { player: string; position?: string; price: number; drafter: "me" | "other" }
 interface EngineDecision {
