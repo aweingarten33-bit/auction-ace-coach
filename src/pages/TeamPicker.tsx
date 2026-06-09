@@ -31,12 +31,8 @@ export default function TeamPicker() {
 
       try {
         const { data, error: invokeErr } = await supabase.functions.invoke("league-teams");
-        const errMsg =
-          (data && typeof data === "object" && "error" in data ? (data as any).error : null) ||
-          invokeErr?.message ||
-          null;
-        if (errMsg) {
-          setError(typeof errMsg === "string" ? errMsg : "Couldn't load teams.");
+        if (invokeErr) {
+          setError(invokeErr.message);
           setLoading(false);
           return;
         }
@@ -44,6 +40,9 @@ export default function TeamPicker() {
           id: t.id, name: t.name, abbrev: t.abbrev,
         }));
         setTeams(list);
+        if ((data as any)?.empty || list.length === 0) {
+          setError("No league synced yet — the commissioner needs to connect ESPN first.");
+        }
       } catch (e) {
         setError(e instanceof Error ? e.message : "Couldn't load teams.");
       } finally {
