@@ -72,7 +72,7 @@ export default function PositionBudgetBar() {
     slot.id in slotAllocations ? slotAllocations[slot.id] : 0;
 
   const slotsPlanned = slots.reduce((sum, s) => sum + valueFor(s), 0);
-  const planned = slotsPlanned + anchorsTotal + reserveDollars;
+  const planned = slotsPlanned + reserveDollars;
   const remaining = settings.totalBudget - planned;
   const openSlots = slots.filter((s) => !lockedSlots[s.id]).length;
   const remainingForBid =
