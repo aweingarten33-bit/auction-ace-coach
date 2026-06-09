@@ -53,6 +53,10 @@ interface DraftState {
   lockedSlots: Record<string, boolean>;
   // Free-text target players per slot (id => "Hurts, Josh Allen").
   slotNotes: Record<string, string>;
+  // Slots the user has manually edited — never auto-overwrite these.
+  touchedSlots: Record<string, boolean>;
+  // Active budget-planner strategy preset.
+  plannerStrategy: "stars" | "balanced" | "wr-heavy";
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
@@ -91,6 +95,9 @@ interface DraftState {
   clearSlotLocks: () => void;
   setSlotNote: (id: string, note: string) => void;
   clearSlotNotes: () => void;
+  markSlotTouched: (id: string) => void;
+  clearTouchedSlots: () => void;
+  setPlannerStrategy: (s: "stars" | "balanced" | "wr-heavy") => void;
   setStrategyId: (id: string) => void;
   setCustomStrategyRules: (text: string) => void;
 }
