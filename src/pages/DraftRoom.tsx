@@ -244,14 +244,11 @@ export default function DraftRoom() {
         <div className="space-y-4">
           {/* Budget summary */}
           {selectedTeam && (
-            <BudgetSnapshot
-              teamName={selectedTeam.name}
-              remaining={budget.remaining}
-              total={budget.totalBudget}
-              maxBid={budget.maxBid}
-              slotsLeft={budget.slotsLeft}
-              gaps={gaps}
-            />
+            <div className="flex items-center gap-3 text-sm">
+              <span className="font-semibold">{selectedTeam.name}</span>
+              <span className="text-muted-foreground">${budget.remaining} left</span>
+              <span className="text-muted-foreground">Max ${budget.maxBid}</span>
+            </div>
           )}
           {/* Strategy picker + per-slot budget allocations */}
           <PositionBudgetBar />
