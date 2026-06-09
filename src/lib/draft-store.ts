@@ -106,7 +106,16 @@ export const useDraftStore = create<DraftState>()(
       vetriAutoSync: true,
       priceOverrides: [],
       strategyId: "none",
-      setStrategyId: (id) => set({ strategyId: id }),
+      setStrategyId: (id) =>
+        set((s) => {
+          // Clear allocations for any slot the user hasn't locked, so the new
+          // strategy's suggestions become visible immediately.
+          const kept: Record<string, number> = {};
+          for (const [slotId, amt] of Object.entries(s.slotAllocations)) {
+            if (s.lockedSlots[slotId]) kept[slotId] = amt;
+          }
+          return { strategyId: id, slotAllocations: kept };
+        }),
       customStrategyRules: "",
       setCustomStrategyRules: (text) => set({ customStrategyRules: text }),
       quickPrompts: DEFAULT_QUICK_PROMPTS,
@@ -126,10 +135,16 @@ export const useDraftStore = create<DraftState>()(
       lockedSlots: {},
       toggleSlotLock: (id) =>
         set((s) => {
-          const next = { ...s.lockedSlots };
-          if (next[id]) delete next[id];
-          else next[id] = true;
-          return { lockedSlots: next };
+          const nextLocks = { ...s.lockedSlots };
+          const nextAllocs = { ...s.slotAllocations };
+          if (nextLocks[id]) {
+            // Unlocking → release the value so the slot rejoins redistribute.
+            delete nextLocks[id];
+            delete nextAllocs[id];
+          } else {
+            nextLocks[id] = true;
+          }
+          return { lockedSlots: nextLocks, slotAllocations: nextAllocs };
         }),
       clearSlotLocks: () => set({ lockedSlots: {} }),
       setSettings: (s) =>

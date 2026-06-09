@@ -116,12 +116,16 @@ export default function PositionBudgetBar() {
     [settings, strategyId, customStrategyRules],
   );
 
-  // ── Base plan: user override per slot, else strategy suggestion ────────
+  // ── Base plan: locked slot uses its frozen value, others use strategy ──
   const basePlan = useMemo(() => {
     const next: Record<string, number> = {};
-    for (const slot of slots) next[slot.id] = slotAllocations[slot.id] ?? suggested[slot.id] ?? 1;
+    for (const slot of slots) {
+      next[slot.id] = lockedSlots[slot.id]
+        ? (slotAllocations[slot.id] ?? suggested[slot.id] ?? 1)
+        : (suggested[slot.id] ?? 1);
+    }
     return next;
-  }, [slotAllocations, slots, suggested]);
+  }, [lockedSlots, slotAllocations, slots, suggested]);
 
   // ── Picks I've made (events + keepers), grouped by position ────────────
   const picksByGroup = useMemo(() => {
@@ -152,12 +156,12 @@ export default function PositionBudgetBar() {
 
     const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
-    // User-edited slots keep their typed value; only untouched slots redistribute.
-    const userEdited = unfilled.filter((s) => s.id in slotAllocations);
-    const userEditedSum = userEdited.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
-    const redistribute = unfilled.filter((s) => !(s.id in slotAllocations));
+    // User-locked slots stay frozen; only unlocked slots redistribute.
+    const userLocked = unfilled.filter((s) => lockedSlots[s.id]);
+    const userLockedSum = userLocked.reduce((s, slot) => s + (slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0), 0);
+    const redistribute = unfilled.filter((s) => !lockedSlots[s.id]);
     const baseSum = redistribute.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
-    const remaining = Math.max(0, settings.totalBudget - lockedSum - userEditedSum);
+    const remaining = Math.max(0, settings.totalBudget - lockedSum - userLockedSum);
 
     // Proportional redistribute with $1 floor, then integer-correct so the
     // redistribute allocations sum to exactly `remaining`.
@@ -182,7 +186,7 @@ export default function PositionBudgetBar() {
     const allocations: Record<string, number> = {};
     for (const slot of slots) {
       if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
-      else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
+      else if (lockedSlots[slot.id]) allocations[slot.id] = slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0;
       else allocations[slot.id] = 0;
     }
     redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
@@ -293,7 +297,7 @@ export default function PositionBudgetBar() {
                   <Input
                     inputMode="numeric"
                     value={String(value)}
-                    disabled={isLocked}
+                    disabled={isDrafted || !isUserLocked}
                     onChange={(e) => {
                       const n = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
@@ -304,7 +308,7 @@ export default function PositionBudgetBar() {
                       isUserLocked && "border-primary/40 bg-primary/5 text-primary disabled:opacity-100",
                     )}
                     aria-label={`${slot.label} allocation`}
-                    title={isDrafted ? `Paid $${lockInfo.price} for ${lockInfo.name}` : isUserLocked ? `Locked at $${value}` : undefined}
+                    title={isDrafted ? `Paid $${lockInfo.price} for ${lockInfo.name}` : isUserLocked ? `Locked at $${value}` : "Lock this slot to edit its value"}
                   />
                 </div>
 
