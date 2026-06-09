@@ -406,11 +406,11 @@ function suggestAllocations(
     // so apply the strategy's QB multiplier curve to it (index continues from QBn).
     let mult: number;
     if (isSF && slot.group === "SUPERFLEX") {
-      const qbMults = strategy.weights.QB;
+      const qbMults = effectiveWeights.QB;
       const idx = settings.roster.QB + slot.index - 1;
       mult = qbMults?.[idx] ?? qbMults?.[qbMults.length - 1] ?? 1;
     } else {
-      mult = strategy.weights[slot.group]?.[slot.index - 1] ?? 1;
+      mult = effectiveWeights[slot.group]?.[slot.index - 1] ?? 1;
     }
     return Math.max(0.05, base * mult);
   });
