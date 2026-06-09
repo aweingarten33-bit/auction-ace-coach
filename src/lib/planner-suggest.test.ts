@@ -42,9 +42,13 @@ describe("computeSlotDollars (superflex-only)", () => {
       expect(out["DST-1"]).toBe(1);
       for (let i = 1; i <= 6; i += 1) expect(out[`BENCH-${i}`]).toBe(1);
     });
-    it(`${strat}: QB1 is a premium asset`, () => {
+    it(`${strat}: QB position is intentional (hero/balanced premium, bargain punt)`, () => {
       const out = computeSlotDollars(strat, SETTINGS_SF);
-      expect(out["QB-1"]).toBeGreaterThanOrEqual(15);
+      if (strat === "bargain-qb") {
+        expect(out["QB-1"]).toBeLessThanOrEqual(15);
+      } else {
+        expect(out["QB-1"]).toBeGreaterThanOrEqual(15);
+      }
     });
   }
 
