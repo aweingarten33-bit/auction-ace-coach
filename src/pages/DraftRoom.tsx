@@ -338,9 +338,9 @@ export default function DraftRoom() {
                   draftedPlayers: events.map((e) => e.player),
                   showMath: false,
                   strategy: {
-                    id: strategyId,
-                    label: getStrategy(strategyId).label,
-                    guidance: buildCoachGuidance(strategyId, customStrategyRules),
+                    id: "none",
+                    label: "Manual",
+                    guidance: "",
                   },
                 })}
               />
