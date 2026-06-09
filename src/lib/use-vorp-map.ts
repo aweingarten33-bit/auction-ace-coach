@@ -102,8 +102,8 @@ export function useVorpMap(settings: LeagueSettings): {
     return () => { cancelled = true; };
   }, []);
 
-  const map = useMemo(() => {
-    if (!rows.length) return {} as Record<string, VorpEntry>;
+  const computed = useMemo(() => {
+    if (!rows.length) return { out: {} as Record<string, VorpEntry>, players: [] as VorpPlayer[] };
 
     // 1) Replacement level per position
     const byPos: Record<Position, ProjRow[]> = { QB: [], RB: [], WR: [], TE: [], K: [], DST: [] };
