@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Lock, LockOpen, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "@/lib/planner-slots";
@@ -139,12 +140,11 @@ export default function PositionBudgetBar() {
                   {slot.label}
                 </span>
 
-                <Input
+                <SlotTargetsInput
                   value={note}
-                  placeholder="targets…"
-                  onChange={(e) => setSlotNote(slot.id, e.target.value)}
-                  className="h-8 flex-1 min-w-0 rounded-lg px-2 text-xs"
-                  aria-label={`${slot.label} target players`}
+                  onChange={(val) => setSlotNote(slot.id, val)}
+                  group={slot.group}
+                  ariaLabel={`${slot.label} target players`}
                 />
 
                 <div className="flex shrink-0 items-center gap-0.5">
