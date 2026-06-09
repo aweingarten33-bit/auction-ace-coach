@@ -1,18 +1,12 @@
 // Optimal Team builder — DraftMath-style.
 //
-// Given the user's league settings + a projection/$ map, return the lineup
+// Given the user's league settings + projection/$ map, return the lineup
 // with the highest total projected points that fits the budget and roster.
+// Pure research view, 2QB/Superflex assumption.
 //
-// Pure research view: no bidding, no live picks. Just "if you spent every
-// dollar perfectly, this is the best 2QB lineup you could build."
-//
-// Algorithm: beam search over starter slots (fast & near-optimal).
-//   - Bench/K/DST reserved at $1 each (matches planner memory rule).
-//   - Slot order: QB, QB-or-RB/WR/TE (SUPERFLEX), RB, RB, WR, WR, TE, FLEX.
-//   - At each slot we expand the top N eligible candidates not already picked
-//     and keep the top K states by projection sum.
+// Algorithm: beam search over starter slots. Bench/K/DST reserved at $1.
 import type { LeagueSettings, Position } from "./draft-types";
-import type { VorpEntry } from "./use-vorp-map";
+import type { VorpPlayer } from "./use-vorp-map";
 
 export interface OptimalPlayer {
   name: string;
@@ -25,21 +19,19 @@ export interface OptimalLineup {
   picks: { slot: string; player: OptimalPlayer }[];
   totalProjection: number;
   totalSpent: number;
-  reservedDollar: number; // bench + K + DST count
+  reservedDollar: number;
   budget: number;
   feasible: boolean;
 }
 
 interface Candidate extends OptimalPlayer {
-  key: string; // normalized name
+  key: string;
 }
 
 interface SlotDef {
   label: string;
   eligible: Position[];
 }
-
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 function buildSlotOrder(settings: LeagueSettings): SlotDef[] {
   const slots: SlotDef[] = [];
@@ -64,46 +56,46 @@ const CANDIDATES_PER_SLOT = 24;
 
 export function computeOptimalTeam(
   settings: LeagueSettings,
-  vorpMap: Record<string, VorpEntry>,
-  vorpPositions: Map<string, Position>,
+  players: VorpPlayer[],
 ): OptimalLineup {
   const slots = buildSlotOrder(settings);
   const benchCount = settings.roster.BENCH + settings.roster.K + settings.roster.DST;
-  const reserved = benchCount; // $1 each
+  const reserved = benchCount;
   const startersBudget = Math.max(slots.length, settings.totalBudget - reserved);
 
-  // Build candidate pool per position.
   const pool: Record<Position, Candidate[]> = { QB: [], RB: [], WR: [], TE: [], K: [], DST: [] };
-  for (const [key, entry] of Object.entries(vorpMap)) {
-    const pos = vorpPositions.get(key);
-    if (!pos || pos === "K" || pos === "DST") continue;
-    pool[pos].push({
-      key,
-      name: key, // replaced below when we have the display name
-      position: pos,
-      price: entry.price,
-      projection: entry.projection,
+  for (const p of players) {
+    if (p.position === "K" || p.position === "DST") continue;
+    pool[p.position].push({
+      key: p.name.toLowerCase().replace(/[^a-z0-9]/g, ""),
+      name: p.name,
+      position: p.position,
+      price: Math.max(1, p.price),
+      projection: p.projection,
     });
   }
   for (const p of Object.keys(pool) as Position[]) {
     pool[p].sort((a, b) => b.projection - a.projection);
   }
 
-  // Beam search.
   let beam: State[] = [{ picks: [], spent: 0, proj: 0, used: new Set() }];
   for (let i = 0; i < slots.length; i++) {
     const slot = slots[i];
     const remainingSlotsAfter = slots.length - i - 1;
+    const seen = new Set<string>();
     const candidates: Candidate[] = [];
     for (const pos of slot.eligible) {
-      for (const c of pool[pos].slice(0, CANDIDATES_PER_SLOT)) candidates.push(c);
+      for (const c of pool[pos].slice(0, CANDIDATES_PER_SLOT)) {
+        if (seen.has(c.key)) continue;
+        seen.add(c.key);
+        candidates.push(c);
+      }
     }
     const next: State[] = [];
     for (const st of beam) {
       for (const c of candidates) {
         if (st.used.has(c.key)) continue;
         const newSpent = st.spent + c.price;
-        // Need at least $1 for each remaining starter slot.
         if (newSpent + remainingSlotsAfter > startersBudget) continue;
         const used = new Set(st.used);
         used.add(c.key);
@@ -123,12 +115,8 @@ export function computeOptimalTeam(
   const best = beam[0];
   if (!best) {
     return {
-      picks: [],
-      totalProjection: 0,
-      totalSpent: 0,
-      reservedDollar: reserved,
-      budget: settings.totalBudget,
-      feasible: false,
+      picks: [], totalProjection: 0, totalSpent: 0,
+      reservedDollar: reserved, budget: settings.totalBudget, feasible: false,
     };
   }
 

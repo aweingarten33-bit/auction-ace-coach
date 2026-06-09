@@ -47,6 +47,7 @@ import {
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
+import OptimalTeamCard from "@/components/OptimalTeamCard";
 import { buildPlannerBoard } from "@/lib/planner-slots";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
@@ -256,6 +257,8 @@ export default function DraftRoom() {
           )}
           {/* Strategy picker + per-slot budget allocations */}
           <PositionBudgetBar />
+          {/* DraftMath-style optimal lineup at full budget */}
+          <OptimalTeamCard />
           {/* Next target recommendation */}
           {selectedTeam && (
             <NextTargetCard
