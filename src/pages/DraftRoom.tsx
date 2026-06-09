@@ -49,6 +49,7 @@ import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
+import AuctionCalculator from "@/components/AuctionCalculator";
 
 import SyncStatusPill from "@/components/SyncStatusPill";
 
