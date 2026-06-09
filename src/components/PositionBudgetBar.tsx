@@ -123,7 +123,7 @@ export default function PositionBudgetBar() {
       if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
       else if (slot.group === "K" || slot.group === "DST") allocations[slot.id] = 1;
       else if (slot.group === "BENCH") allocations[slot.id] = slotAllocations[slot.id] ?? 1;
-      else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
+      else if (isTyped(slot.id)) allocations[slot.id] = slotAllocations[slot.id];
       else allocations[slot.id] = 0;
     }
     open.forEach((slot, idx) => { allocations[slot.id] = rounded[idx]; });
