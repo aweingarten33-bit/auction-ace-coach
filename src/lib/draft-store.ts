@@ -56,7 +56,7 @@ interface DraftState {
   // Slots the user has manually edited — never auto-overwrite these.
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
-  plannerStrategy: "stars" | "balanced" | "wr-heavy" | "superflex";
+  plannerStrategy: "elite-qb" | "balanced-sf" | "hero-rb-sf";
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
