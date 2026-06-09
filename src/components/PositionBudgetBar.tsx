@@ -1,17 +1,7 @@
 import { useMemo } from "react";
-import { Info, Lock, LockOpen, RotateCcw, Sparkles, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Info, Lock, LockOpen } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useDraftStore } from "@/lib/draft-store";
-import { getStrategy, STRATEGIES, parseCustomStrategyWeights } from "@/lib/strategies";
 import { spendByPosition } from "@/lib/draft-math";
 import { cn } from "@/lib/utils";
 import type { LeagueSettings, Position } from "@/lib/draft-types";
@@ -49,51 +39,6 @@ const GROUP_BAR: Record<SlotGroup, string> = {
   BENCH:     "bg-secondary-foreground/30",
 };
 
-// ── DraftStrategyPanel (exported for external use) ────────────────────────
-export function DraftStrategyPanel({ compact = false }: { compact?: boolean }) {
-  const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
-  const setStrategyId = useDraftStore((s) => s.setStrategyId);
-  const setCustomStrategyRules = useDraftStore((s) => s.setCustomStrategyRules);
-  const strategy = getStrategy(strategyId);
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-3">
-        <div className="min-w-0 flex-1">
-          {!compact && (
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-              Strategy
-            </p>
-          )}
-          <Select value={strategy.id} onValueChange={setStrategyId}>
-            <SelectTrigger className="h-9 rounded-lg text-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STRATEGIES.map((s) => (
-                <SelectItem key={s.id} value={s.id} className="text-sm">
-                  {s.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-      {!compact && (
-        <p className="text-xs leading-relaxed text-muted-foreground">{strategy.description}</p>
-      )}
-      {strategy.id === "custom" && (
-        <Textarea
-          value={customStrategyRules}
-          onChange={(e) => setCustomStrategyRules(e.target.value.slice(0, 700))}
-          placeholder="Write the rules this planner should follow."
-          className="min-h-20 text-xs"
-        />
-      )}
-    </div>
-  );
-}
 
 // ── Main budget planner ───────────────────────────────────────────────────
 export default function PositionBudgetBar() {
@@ -106,25 +51,8 @@ export default function PositionBudgetBar() {
   const clearSlotAllocations = useDraftStore((s) => s.clearSlotAllocations);
   const lockedSlots = useDraftStore((s) => s.lockedSlots);
   const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
-  const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
-  const strategy = getStrategy(strategyId);
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
-  const suggested = useMemo(
-    () => suggestAllocations(settings, strategyId, customStrategyRules),
-    [settings, strategyId, customStrategyRules],
-  );
-
-  // ── Base plan: user-set value (typed or locked) wins, else strategy ────
-  const basePlan = useMemo(() => {
-    const next: Record<string, number> = {};
-    for (const slot of slots) {
-      next[slot.id] = slotAllocations[slot.id] ?? suggested[slot.id] ?? 1;
-    }
-    return next;
-  }, [slotAllocations, slots, suggested]);
-
 
   // ── Picks I've made (events + keepers), grouped by position ────────────
   const picksByGroup = useMemo(() => {
@@ -139,46 +67,39 @@ export default function PositionBudgetBar() {
     return out;
   }, [events, keepers]);
 
-  // ── Lock filled slots at the actual price, redistribute leftover ───────
+  // ── Pure manual board: locked slots stay frozen, unlocked split the leftover equally ──
   const { allocations, locked } = useMemo(() => {
     const locked: Record<string, { price: number; name: string }> = {};
-    // Assign each pick in a group to the highest-planned unfilled slot in that group.
+    // Assign each pick in a group to a slot in that group (in pick order).
     for (const group of Object.keys(picksByGroup)) {
-      const groupSlots = slots
-        .filter((s) => s.group === group)
-        .sort((a, b) => (basePlan[b.id] ?? 0) - (basePlan[a.id] ?? 0));
+      const groupSlots = slots.filter((s) => s.group === group);
       const picks = picksByGroup[group];
       for (let i = 0; i < Math.min(picks.length, groupSlots.length); i += 1) {
         locked[groupSlots[i].id] = picks[i];
       }
     }
 
-    const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
+    const draftedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
-    // Both user-locked AND user-typed values are frozen; only untouched slots redistribute.
+    // Both user-locked AND user-typed slots are frozen; only untouched slots auto-fill.
     const userFrozen = unfilled.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
-    const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0), 0);
-    const redistribute = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
-    const baseSum = redistribute.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
-    const remaining = Math.max(0, settings.totalBudget - lockedSum - userFrozenSum);
+    const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? 0), 0);
+    const open = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
+    const remaining = Math.max(0, settings.totalBudget - draftedSum - userFrozenSum);
 
-    // Proportional redistribute with $1 floor, then integer-correct so the
-    // redistribute allocations sum to exactly `remaining`.
-    const floor = remaining >= redistribute.length ? 1 : 0;
-    const spendable = Math.max(0, remaining - floor * redistribute.length);
-    const exact = redistribute.map((slot) => floor + (spendable * (basePlan[slot.id] ?? 0)) / baseSum);
-    const rounded = exact.map((v) => Math.max(floor, Math.round(v)));
+    // Equal split across the still-open slots, with $1 floor & integer correction.
+    const floor = remaining >= open.length ? 1 : 0;
+    const spendable = Math.max(0, remaining - floor * open.length);
+    const share = open.length > 0 ? spendable / open.length : 0;
+    const rounded = open.map(() => Math.max(floor, Math.round(floor + share)));
     let diff = remaining - rounded.reduce((sum, v) => sum + v, 0);
-    const order = exact
-      .map((v, i) => ({ i, frac: v - Math.floor(v) }))
-      .sort((a, b) => diff > 0 ? b.frac - a.frac : a.frac - b.frac);
+    let i = 0;
     let guard = 0;
-    while (diff !== 0 && guard < 1000) {
-      for (const { i } of order) {
-        if (diff === 0) break;
-        if (diff > 0) { rounded[i] += 1; diff -= 1; }
-        else if (rounded[i] > floor) { rounded[i] -= 1; diff += 1; }
-      }
+    while (diff !== 0 && open.length > 0 && guard < 5000) {
+      const idx = i % open.length;
+      if (diff > 0) { rounded[idx] += 1; diff -= 1; }
+      else if (rounded[idx] > floor) { rounded[idx] -= 1; diff += 1; }
+      i += 1;
       guard += 1;
     }
 
@@ -188,9 +109,9 @@ export default function PositionBudgetBar() {
       else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
       else allocations[slot.id] = 0;
     }
-    redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
+    open.forEach((slot, idx) => { allocations[slot.id] = rounded[idx]; });
     return { allocations, locked };
-  }, [slots, basePlan, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
+  }, [slots, picksByGroup, settings.totalBudget, slotAllocations, lockedSlots]);
 
   // Legacy display: total spent by position group (sum of locked slots)
   const spent = useMemo(() => {
@@ -220,14 +141,6 @@ export default function PositionBudgetBar() {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-card">
 
-      {/* ── Strategy section ─────────────────────────── */}
-      <div className="border-b border-border/50 px-4 py-4">
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          Draft strategy
-        </p>
-        <DraftStrategyPanel />
-      </div>
-
       {/* ── Slot breakdown ────────────────────────────── */}
       <div className="px-4 py-4">
         <div className="mb-3 flex items-center justify-between">
@@ -238,7 +151,7 @@ export default function PositionBudgetBar() {
 
         <p className="mb-3 flex items-start gap-1.5 text-[11px] leading-snug text-muted-foreground">
           <Info className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground/70" />
-          When you edit a slot, the leftover or overage is proportionally redistributed across the remaining open slots.
+          Type a value or lock a slot — leftover budget splits evenly across the remaining open slots.
         </p>
         <div className="space-y-2">
           {slots.map((slot) => {
@@ -390,78 +303,3 @@ function buildSlots(settings: LeagueSettings): PlannerSlot[] {
   return slots;
 }
 
-function suggestAllocations(
-  settings: LeagueSettings,
-  strategyId: string,
-  customRules?: string,
-): Record<string, number> {
-  const strategy = getStrategy(strategyId);
-  // For the "custom" strategy, parse the user's free-text rules into weight overrides
-  // so the budget plan actually reflects what they typed.
-  const effectiveWeights: typeof strategy.weights = strategy.id === "custom"
-    ? parseCustomStrategyWeights(customRules)
-    : strategy.weights;
-  const slots = buildSlots(settings);
-  if (!slots.length) return {};
-
-  const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
-  const weights = slots.map((slot) => {
-    const base = baseSlotWeight(slot, settings);
-    // In Superflex/2QB leagues the SUPERFLEX slot is effectively the next QB,
-    // so apply the strategy's QB multiplier curve to it (index continues from QBn).
-    let mult: number;
-    if (isSF && slot.group === "SUPERFLEX") {
-      const qbMults = effectiveWeights.QB;
-      const idx = settings.roster.QB + slot.index - 1;
-      mult = qbMults?.[idx] ?? qbMults?.[qbMults.length - 1] ?? 1;
-    } else {
-      mult = effectiveWeights[slot.group]?.[slot.index - 1] ?? 1;
-    }
-    return Math.max(0.05, base * mult);
-  });
-
-  const floor = settings.totalBudget >= slots.length ? 1 : 0;
-  const spendable = Math.max(0, settings.totalBudget - floor * slots.length);
-  const weightTotal = weights.reduce((sum, w) => sum + w, 0) || 1;
-  const exact = weights.map((w) => floor + (spendable * w) / weightTotal);
-  const rounded = exact.map((v) => Math.max(floor, Math.round(v)));
-
-  let diff = settings.totalBudget - rounded.reduce((sum, v) => sum + v, 0);
-  const order = exact
-    .map((v, i) => ({ i, frac: v - Math.floor(v), weight: weights[i] }))
-    .sort((a, b) => diff > 0 ? b.frac - a.frac : b.weight - a.weight);
-
-  let guard = 0;
-  while (diff !== 0 && guard < 1000) {
-    for (const { i } of order) {
-      if (diff === 0) break;
-      if (diff > 0) { rounded[i] += 1; diff -= 1; }
-      else if (rounded[i] > floor) { rounded[i] -= 1; diff += 1; }
-    }
-    guard += 1;
-  }
-
-  return Object.fromEntries(slots.map((slot, i) => [slot.id, rounded[i]]));
-}
-
-function baseSlotWeight(slot: PlannerSlot, settings: LeagueSettings): number {
-  const superflex = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
-  // In Superflex/2QB the 2nd QB is a premium starter, not a value pick — weight it
-  // closer to QB1 than to RB2/WR2 so the planner actually budgets real $ for it.
-  const qbCurve = superflex ? [34, 30, 8] : [15, 5];
-  const curves: Partial<Record<SlotGroup, number[]>> = {
-    QB:        qbCurve,
-    // In superflex/2QB leagues, the SUPERFLEX slot is typically a 2nd QB,
-    // so weight it like the next QB in the curve rather than as a generic flex.
-    SUPERFLEX: superflex ? qbCurve.slice(settings.roster.QB) : [22, 10],
-    RB:        [22, 16, 9, 5, 3],
-    WR:        [21, 16, 10, 6, 4],
-    TE:        [9, 4],
-    FLEX:      [9, 6],
-    BENCH:     [2.2, 2, 1.8, 1.5, 1.2, 1, 1, 1],
-    K:         [0.5],
-    DST:       [0.5],
-  };
-  const curve = curves[slot.group] ?? [1];
-  return curve[Math.min(slot.index - 1, curve.length - 1)] ?? 1;
-}

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
-import { buildCoachGuidance, getStrategy } from "@/lib/strategies";
+
 import { useAuth } from "@/hooks/useAuth";
 import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
@@ -46,7 +46,7 @@ import {
 
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
-import PositionBudgetBar, { DraftStrategyPanel } from "@/components/PositionBudgetBar";
+import PositionBudgetBar from "@/components/PositionBudgetBar";
 import NextTargetCard from "@/components/NextTargetCard";
 import LastPickImpact from "@/components/LastPickImpact";
 
@@ -74,8 +74,8 @@ export default function DraftRoom() {
     pinPlayer,
     unpinPlayer,
   } = useDraftStore();
-  const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
+
+
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelId | null>(null);
@@ -338,9 +338,9 @@ export default function DraftRoom() {
                   draftedPlayers: events.map((e) => e.player),
                   showMath: false,
                   strategy: {
-                    id: strategyId,
-                    label: getStrategy(strategyId).label,
-                    guidance: buildCoachGuidance(strategyId, customStrategyRules),
+                    id: "none",
+                    label: "Manual",
+                    guidance: "",
                   },
                 })}
               />
