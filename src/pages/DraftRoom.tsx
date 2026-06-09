@@ -763,7 +763,7 @@ function Top100List({
       const finalPrice = anchor && anchor > 0 ? anchor : p.price;
       if (finalPrice > 0) byName.set(key, { name: p.name, price: finalPrice, position: p.position });
     }
-    return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 50);
+    return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 100);
   }, [prices, anchorMap]);
 
   if (top.length === 0) {
@@ -778,23 +778,34 @@ function Top100List({
     <div className="space-y-1">
       {top.map((p, i) => {
         const isPicked = drafted.has(norm(p.name));
+        const isFiftyDivider = i === 50;
         return (
-          <button
-            key={p.name}
-            type="button"
-            disabled={isPicked}
-            onClick={() => !isPicked && onPick(p.name, p.position)}
-            className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isPicked ? "opacity-50" : ""}`}
-          >
-            <span className="w-6 text-right font-mono text-[10px] text-muted-foreground">{i + 1}</span>
-            {p.position && (
-              <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
-                {p.position}
-              </Badge>
+          <div key={p.name}>
+            {isFiftyDivider && (
+              <div className="my-2 flex items-center gap-2">
+                <div className="h-[3px] flex-1 bg-foreground" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground">
+                  Next 50
+                </span>
+                <div className="h-[3px] flex-1 bg-foreground" />
+              </div>
             )}
-            <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
-            <span className="font-mono tabular-nums">${p.price}</span>
-          </button>
+            <button
+              type="button"
+              disabled={isPicked}
+              onClick={() => !isPicked && onPick(p.name, p.position)}
+              className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isPicked ? "opacity-50" : ""}`}
+            >
+              <span className="w-6 text-right font-mono text-[10px] text-muted-foreground">{i + 1}</span>
+              {p.position && (
+                <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
+                  {p.position}
+                </Badge>
+              )}
+              <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
+              <span className="font-mono tabular-nums">${p.price}</span>
+            </button>
+          </div>
         );
       })}
     </div>
