@@ -72,21 +72,18 @@ export default function Landing() {
           0%   { transform: translateY(-100%); }
           100% { transform: translateY(100vh); }
         }
-        .title-shimmer {
-          background: linear-gradient(90deg, #fff 0%, #fff 35%, #ffd9d9 50%, #fff 65%, #fff 100%);
+        .title-shimmer span, .red-shimmer span {
           background-size: 200% 100%;
           -webkit-background-clip: text;
           background-clip: text;
           -webkit-text-fill-color: transparent;
-          animation: title-shimmer 4s linear infinite;
+          animation: char-up 0.7s cubic-bezier(0.16,1,0.3,1) both, title-shimmer 4s linear infinite;
         }
-        .red-shimmer {
-          background: linear-gradient(90deg, #ef4444 0%, #ef4444 35%, #fca5a5 50%, #ef4444 65%, #ef4444 100%);
-          background-size: 200% 100%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-          animation: title-shimmer 4s linear infinite;
+        .title-shimmer span {
+          background-image: linear-gradient(90deg, #fff 0%, #fff 35%, #ffd9d9 50%, #fff 65%, #fff 100%);
+        }
+        .red-shimmer span {
+          background-image: linear-gradient(90deg, #ef4444 0%, #ef4444 35%, #fca5a5 50%, #ef4444 65%, #ef4444 100%);
         }
       `}</style>
 
