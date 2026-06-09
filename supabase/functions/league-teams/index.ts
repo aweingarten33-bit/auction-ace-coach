@@ -48,14 +48,7 @@ Deno.serve(async (req) => {
 
     const { data: snap } = await query.maybeSingle();
     if (!snap) {
-      // Return 200 with empty teams so the client doesn't treat this as a hard
-      // error (supabase-js throws on non-2xx, which causes a blank screen).
-      return j({
-        ok: true,
-        teams: [],
-        league: null,
-        error: "No league snapshot yet. Commissioner needs to sync ESPN first.",
-      }, 200);
+      return j({ error: "No league snapshot yet. Commissioner needs to sync ESPN first." }, 400);
     }
 
     return j({

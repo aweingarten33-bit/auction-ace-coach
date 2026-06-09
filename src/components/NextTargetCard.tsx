@@ -85,15 +85,17 @@ export default function NextTargetCard({
     );
   }
   if (top.underBy >= 5) {
-    reasons.push(`Budget: you've only spent $${top.spent} on ${top.pos} — you have $${top.underBy} more to work with here.`);
+    reasons.push(
+      `Budget: spent $${top.spent} of $${top.target} fair share — $${top.underBy} headroom.`,
+    );
   }
   if (top.top > 0) {
-    reasons.push(`Best ${top.pos} still available is priced around $${top.top} in your league.`);
+    reasons.push(`Board: top ${top.pos} left priced at ~$${top.top}.`);
   }
   if (pulse.confident && pulse.multiplier > 1.05) {
-    reasons.push(`⚠ The room is spending hot right now — expect to pay more than usual.`);
+    reasons.push(`⚠ Room is hot overall (×${pulse.multiplier.toFixed(2)}); expect overpays.`);
   } else if (pulse.confident && pulse.multiplier < 0.95) {
-    reasons.push(`The room is spending light — good time to grab value.`);
+    reasons.push(`Market is cooling (×${pulse.multiplier.toFixed(2)}) — value window open.`);
   }
 
   const runnerUp = scored[1];
