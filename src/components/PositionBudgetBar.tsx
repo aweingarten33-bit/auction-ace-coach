@@ -155,12 +155,12 @@ export default function PositionBudgetBar() {
 
     const lockedSum = Object.values(locked).reduce((s, p) => s + p.price, 0);
     const unfilled = slots.filter((s) => !(s.id in locked));
-    // User-locked slots stay frozen; only unlocked slots redistribute.
-    const userLocked = unfilled.filter((s) => lockedSlots[s.id]);
-    const userLockedSum = userLocked.reduce((s, slot) => s + (slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0), 0);
-    const redistribute = unfilled.filter((s) => !lockedSlots[s.id]);
+    // Both user-locked AND user-typed values are frozen; only untouched slots redistribute.
+    const userFrozen = unfilled.filter((s) => lockedSlots[s.id] || s.id in slotAllocations);
+    const userFrozenSum = userFrozen.reduce((s, slot) => s + (slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0), 0);
+    const redistribute = unfilled.filter((s) => !lockedSlots[s.id] && !(s.id in slotAllocations));
     const baseSum = redistribute.reduce((s, slot) => s + (basePlan[slot.id] ?? 0), 0) || 1;
-    const remaining = Math.max(0, settings.totalBudget - lockedSum - userLockedSum);
+    const remaining = Math.max(0, settings.totalBudget - lockedSum - userFrozenSum);
 
     // Proportional redistribute with $1 floor, then integer-correct so the
     // redistribute allocations sum to exactly `remaining`.
@@ -185,7 +185,7 @@ export default function PositionBudgetBar() {
     const allocations: Record<string, number> = {};
     for (const slot of slots) {
       if (slot.id in locked) allocations[slot.id] = locked[slot.id].price;
-      else if (lockedSlots[slot.id]) allocations[slot.id] = slotAllocations[slot.id] ?? basePlan[slot.id] ?? 0;
+      else if (slot.id in slotAllocations) allocations[slot.id] = slotAllocations[slot.id];
       else allocations[slot.id] = 0;
     }
     redistribute.forEach((slot, i) => { allocations[slot.id] = rounded[i]; });
