@@ -26,7 +26,7 @@ export default function PositionBudgetBar() {
   const slotNotes = useDraftStore((s) => s.slotNotes);
   const setSlotNote = useDraftStore((s) => s.setSlotNote);
 
-  const slots = useMemo(() => buildSlots(settings), [settings]);
+  const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
   const valueFor = (slot: PlannerSlot) =>
     slot.id in slotAllocations ? slotAllocations[slot.id] : defaultFor(slot.group);
