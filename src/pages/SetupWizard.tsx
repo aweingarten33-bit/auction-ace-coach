@@ -108,7 +108,7 @@ export default function SetupWizard() {
             </Button>
             {setupComplete && (
               <Button size="sm" variant="outline" onClick={() => navigate("/draft-room")}>
-                Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
+                Open Auction Draft Assistant <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             )}
           </div>
