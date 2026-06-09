@@ -49,12 +49,13 @@ import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
+import AuctionCalculator from "@/components/AuctionCalculator";
 
 import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "search" | "top50" | "recent";
+type PanelId = "search" | "top50" | "recent" | "calc";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -308,6 +309,12 @@ export default function DraftRoom() {
             <span className="text-xs font-medium">Top 50</span>
           </button>
           <button
+            onClick={() => setPanel("calc")}
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+          >
+            <span className="text-xs font-medium">Calc</span>
+          </button>
+          <button
             onClick={() => setPanel("recent")}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
@@ -392,10 +399,12 @@ export default function DraftRoom() {
               <h2 className="text-base font-semibold">
                 {panel === "search" && "Find a player"}
                 {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
+                {panel === "calc" && "Auction calculator"}
                 {panel === "recent" && "Recent picks"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
+              {panel === "calc" && <AuctionCalculator prices={adjustedPrices} />}
               {panel === "search" && (
                 <LookupSection
                   prices={adjustedPrices}
