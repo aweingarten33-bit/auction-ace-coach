@@ -418,9 +418,12 @@ function suggestAllocations(settings: LeagueSettings, strategyId: string): Recor
 
 function baseSlotWeight(slot: PlannerSlot, settings: LeagueSettings): number {
   const superflex = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
+  const qbCurve = superflex ? [32, 22, 8] : [15, 5];
   const curves: Partial<Record<SlotGroup, number[]>> = {
-    QB:        superflex ? [32, 22, 8] : [15, 5],
-    SUPERFLEX: [22, 10],
+    QB:        qbCurve,
+    // In superflex/2QB leagues, the SUPERFLEX slot is typically a 2nd QB,
+    // so weight it like the next QB in the curve rather than as a generic flex.
+    SUPERFLEX: superflex ? qbCurve.slice(settings.roster.QB) : [22, 10],
     RB:        [22, 16, 9, 5, 3],
     WR:        [21, 16, 10, 6, 4],
     TE:        [9, 4],
