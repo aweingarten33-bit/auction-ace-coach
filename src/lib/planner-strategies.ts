@@ -10,48 +10,57 @@
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "./planner-slots";
 import type { LeagueSettings } from "./draft-types";
 
-export type StrategyId = "elite-qb" | "balanced-sf" | "hero-rb-sf";
+export type StrategyId = "hero-qb" | "balanced-qbs" | "bargain-qb";
 
 export const STRATEGY_LABELS: Record<StrategyId, string> = {
-  "elite-qb": "Elite QB",
-  "balanced-sf": "Balanced SF",
-  "hero-rb-sf": "Hero RB",
+  "hero-qb": "Hero QB",
+  "balanced-qbs": "Balanced QBs",
+  "bargain-qb": "Bargain QB",
 };
 
 type WeightTable = Partial<Record<SlotGroup, number[]>>;
 
-// All weights tuned for Superflex / 2QB leagues. Sources:
-//   - r/fantasyfootball Superflex auction threads (2024-2025 AAV pulls)
-//   - FantasyPros 2025 Superflex auction values
-//   - Establish The Run Superflex auction guide
-//   - Footballguys Pasquino SF column
+// Industry-canonical SF auction archetypes. Sources cross-referenced:
+//   - The Fantasy Footballers (Wenrich, Aug 2024) — names the 3 SF auction
+//     strategies: Hero QB ($45-55 on QB1 + cheap QB2), Balanced Spending
+//     (two QB8-15 in $25-30 range), Bargain Basement (punt QBs, stars at
+//     RB/WR, roster 3-4 cheap QBs).
+//     https://www.thefantasyfootballers.com/analysis/superflex-auction-draft-roster-construction-strategies-fantasy-football/
+//   - Football Absurdity (Hoovler, Aug 2024) — "top QBs should go $50+" in
+//     SF; winning mock spent $80 on two elite WRs + $7 backup QB and sniped
+//     the rest.
+//   - Razzball B_Don 2024 SF Auction Values, Draft Sharks SF auction values
+//     (price tiers cross-checked).
 const STRATEGIES: Record<StrategyId, WeightTable> = {
-  // Pay up for both QBs — QB1 $42, QB2/SF $28, rest scaled down.
-  "elite-qb": {
-    QB:        [42, 28],
-    RB:        [28, 15, 4, 1, 1, 1],
-    WR:        [24, 14, 4, 1, 1, 1],
-    TE:        [6, 1],
-    FLEX:      [3],
-    SUPERFLEX: [28],
-  },
-  // Spread spend across QBs + skill positions. QB1 $32, QB2 $20, RB1 $30.
-  "balanced-sf": {
-    QB:        [32, 20],
-    RB:        [30, 18, 6, 2, 1, 1],
-    WR:        [25, 15, 5, 2, 1, 1],
-    TE:        [7, 2],
-    FLEX:      [6],
-    SUPERFLEX: [20],
-  },
-  // Anchor one elite RB, pay for QBs, fade WR/RB depth.
-  "hero-rb-sf": {
-    QB:        [34, 22],
-    RB:        [48, 8, 2, 1, 1, 1],
-    WR:        [22, 12, 4, 2, 1, 1],
+  // FFers "Hero QB": one elite QB at $45-55 (Allen/Hurts/Mahomes tier),
+  // pair with a $1-5 pocket-passer QB2. Skill positions stay strong.
+  "hero-qb": {
+    QB:        [50, 3],
+    RB:        [30, 18, 4, 1, 1, 1],
+    WR:        [28, 15, 4, 1, 1, 1],
     TE:        [5, 1],
+    FLEX:      [3],
+    SUPERFLEX: [3],
+  },
+  // FFers "Balanced Spending": two QB8-15 starters in the $22-28 band,
+  // leaves real money for an RB1/WR1 anchor.
+  "balanced-qbs": {
+    QB:        [28, 22],
+    RB:        [28, 16, 4, 1, 1, 1],
+    WR:        [24, 14, 4, 1, 1, 1],
+    TE:        [6, 2],
     FLEX:      [4],
     SUPERFLEX: [22],
+  },
+  // FFers "Bargain Basement": punt the QB position ($5-10 + $1-3 dart),
+  // load up RB1/WR1 like Football Absurdity's winning $80 stars mock.
+  "bargain-qb": {
+    QB:        [8, 3],
+    RB:        [48, 22, 6, 2, 1, 1],
+    WR:        [38, 18, 6, 2, 1, 1],
+    TE:        [6, 1],
+    FLEX:      [4],
+    SUPERFLEX: [3],
   },
 };
 
