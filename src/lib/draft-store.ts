@@ -179,6 +179,29 @@ export const useDraftStore = create<DraftState>()(
       clearTouchedSlots: () => set({ touchedSlots: {} }),
       plannerStrategy: "balanced-qbs",
       setPlannerStrategy: (s) => set({ plannerStrategy: s, touchedSlots: {} }),
+      anchors: [],
+      addAnchor: () =>
+        set((s) =>
+          s.anchors.length >= 5
+            ? s
+            : { anchors: [...s.anchors, { id: `a-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, name: "", price: 0 }] },
+        ),
+      updateAnchor: (id, patch) =>
+        set((s) => ({
+          anchors: s.anchors.map((a) =>
+            a.id === id
+              ? {
+                  ...a,
+                  ...(patch.name !== undefined ? { name: patch.name } : {}),
+                  ...(patch.price !== undefined ? { price: Math.max(0, Math.min(999, Math.floor(patch.price))) } : {}),
+                }
+              : a,
+          ),
+        })),
+      removeAnchor: (id) => set((s) => ({ anchors: s.anchors.filter((a) => a.id !== id) })),
+      clearAnchors: () => set({ anchors: [] }),
+      reservePct: 0,
+      setReservePct: (pct) => set({ reservePct: Math.max(0, Math.min(20, Math.round(pct))) }),
       setSettings: (s) =>
         set((state) => {
           const next = { ...state.settings, ...s };
