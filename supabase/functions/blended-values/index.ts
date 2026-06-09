@@ -78,8 +78,9 @@ Deno.serve(async (req) => {
     const lists: RankList[] = flJson?.lists ?? [];
 
     const curves = superflex ? SF_CURVES : STD_CURVES;
-    type Row = { name: string; key: string; position: string; team: string; berry?: number; sleeper?: number };
+    type Row = { name: string; key: string; position: string; team: string; berry?: number; sleeper?: number; draftsharks?: number };
     const rows = new Map<string, Row>();
+
 
     for (const list of lists) {
       if (list.kind !== "ranking") continue; // skip sleepers/breakouts (no rank)
@@ -130,10 +131,29 @@ Deno.serve(async (req) => {
       rows.set(k, cur);
     }
 
-    // 3) Blend: average available sources (1 source = use it directly)
-    const out: Record<string, { name: string; position: string; team: string; berry: number | null; sleeper: number | null; blended: number }> = {};
+    // 3) DraftSharks Superflex auction values (only relevant when superflex)
+    if (superflex) {
+      const { data: dsRows } = await sb
+        .from("draftsharks_sf_values")
+        .select("player_name, player_name_norm, position, value_200")
+        .limit(5000);
+      for (const r of (dsRows ?? []) as Array<{ player_name: string; player_name_norm: string; position: string | null; value_200: number | null }>) {
+        const k = norm(r.player_name_norm || r.player_name);
+        if (!k) continue;
+        const v = Math.max(1, Math.round(Number(r.value_200 || 0) * budgetScale));
+        if (v <= 0) continue;
+        const pos = (r.position === "DEF" ? "D/ST" : r.position) || "";
+        const cur = rows.get(k) ?? { name: r.player_name, key: k, position: pos, team: "" };
+        cur.draftsharks = v;
+        if (!cur.position) cur.position = pos;
+        rows.set(k, cur);
+      }
+    }
+
+    // 4) Blend: average available sources (1 source = use it directly)
+    const out: Record<string, { name: string; position: string; team: string; berry: number | null; sleeper: number | null; draftsharks: number | null; blended: number }> = {};
     for (const [k, r] of rows) {
-      const inputs = [r.berry, r.sleeper].filter((x): x is number => typeof x === "number" && x > 0);
+      const inputs = [r.berry, r.sleeper, r.draftsharks].filter((x): x is number => typeof x === "number" && x > 0);
       if (inputs.length === 0) continue;
       const blended = Math.max(1, Math.round(inputs.reduce((a, b) => a + b, 0) / inputs.length));
       out[k] = {
@@ -142,9 +162,11 @@ Deno.serve(async (req) => {
         team: r.team,
         berry: r.berry ?? null,
         sleeper: r.sleeper ?? null,
+        draftsharks: r.draftsharks ?? null,
         blended,
       };
     }
+
 
     return new Response(
       JSON.stringify({
