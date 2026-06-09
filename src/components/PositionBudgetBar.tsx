@@ -106,9 +106,6 @@ export default function PositionBudgetBar() {
   const clearSlotAllocations = useDraftStore((s) => s.clearSlotAllocations);
   const lockedSlots = useDraftStore((s) => s.lockedSlots);
   const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
-  const strategyId = useDraftStore((s) => s.strategyId);
-  const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
-  const strategy = getStrategy(strategyId);
 
   const slots = useMemo(() => buildSlots(settings), [settings]);
 
