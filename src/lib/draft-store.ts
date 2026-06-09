@@ -51,6 +51,8 @@ interface DraftState {
   slotAllocations: Record<string, number>;
   // Slots manually locked by the user (frozen — excluded from auto-redistribute).
   lockedSlots: Record<string, boolean>;
+  // Free-text target players per slot (id => "Hurts, Josh Allen").
+  slotNotes: Record<string, string>;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
