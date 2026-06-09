@@ -32,15 +32,14 @@ type WeightTable = Partial<Record<SlotGroup, number[]>>;
 //   - Razzball B_Don 2024 SF Auction Values, Draft Sharks SF auction values
 //     (price tiers cross-checked).
 const STRATEGIES: Record<StrategyId, WeightTable> = {
-  // FFers "Hero QB": one elite QB at $45-55 (Allen/Hurts/Mahomes tier),
-  // pair with a $1-5 pocket-passer QB2. Skill positions stay strong.
+  // Two elite QBs — QB1 + SF both get star money, QB3 is a dart throw.
   "hero-qb": {
-    QB:        [50, 3],
-    RB:        [30, 18, 4, 1, 1, 1],
-    WR:        [28, 15, 4, 1, 1, 1],
+    QB:        [42, 3],
+    RB:        [22, 12, 3, 1, 1, 1],
+    WR:        [20, 12, 3, 1, 1, 1],
     TE:        [5, 1],
-    FLEX:      [3],
-    SUPERFLEX: [3],
+    FLEX:      [4],
+    SUPERFLEX: [35],
   },
   // FFers "Balanced Spending": two QB8-15 starters in the $22-28 band,
   // leaves real money for an RB1/WR1 anchor.
