@@ -57,6 +57,12 @@ interface DraftState {
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
   plannerStrategy: "hero-qb" | "balanced-qbs" | "bargain-qb";
+  // Anchor players — named "must-have" targets w/ pre-allocated $.
+  // Subtracted from pool before slots are distributed.
+  anchors: { id: string; name: string; price: number }[];
+  // Reserve buffer percentage (0–20). Carved out of the budget as an
+  // untouchable cushion for in-draft inflation/snipes.
+  reservePct: number;
   // Chosen draft strategy id (see src/lib/strategies.ts). "none" = no preset.
   strategyId: string;
   // User-written rules text used when strategyId === "custom".
