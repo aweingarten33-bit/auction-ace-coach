@@ -296,7 +296,7 @@ export default function PositionBudgetBar() {
                     )}
                     style={{ width: `${barPct}%`, opacity: isLocked ? 1 : 0.7 }}
                   />
-                  {isLocked && (
+                  {isDrafted && (
                     <span className="absolute inset-0 flex items-center px-2 text-[10px] font-medium text-foreground/80 truncate">
                       {lockInfo.name}
                     </span>
