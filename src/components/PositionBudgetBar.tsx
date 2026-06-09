@@ -252,6 +252,9 @@ export default function PositionBudgetBar() {
             const isFirstInGroup = slot.index === 1;
             const groupSpent = groupData?.spent ?? 0;
 
+            const lockInfo = locked[slot.id];
+            const isLocked = !!lockInfo;
+
             return (
               <div key={slot.id} className="flex items-center gap-2.5">
                 {/* Position badge */}
@@ -259,6 +262,7 @@ export default function PositionBudgetBar() {
                   className={cn(
                     "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center text-[10px] font-bold",
                     GROUP_COLOR[slot.group],
+                    isLocked && "opacity-60",
                   )}
                 >
                   {slot.label}
@@ -267,11 +271,19 @@ export default function PositionBudgetBar() {
                 {/* Visual bar */}
                 <div className="relative h-5 flex-1 overflow-hidden rounded-md bg-secondary/40">
                   <div
-                    className={cn("h-full rounded-md transition-all", GROUP_BAR[slot.group])}
-                    style={{ width: `${barPct}%`, opacity: 0.7 }}
+                    className={cn(
+                      "h-full rounded-md transition-all",
+                      GROUP_BAR[slot.group],
+                      isLocked && "opacity-100",
+                    )}
+                    style={{ width: `${barPct}%`, opacity: isLocked ? 1 : 0.7 }}
                   />
-                  {/* Spent indicator — only on first slot of group */}
-                  {isFirstInGroup && groupSpent > 0 && (
+                  {isLocked && (
+                    <span className="absolute inset-0 flex items-center px-2 text-[10px] font-medium text-foreground/80 truncate">
+                      {lockInfo.name}
+                    </span>
+                  )}
+                  {!isLocked && isFirstInGroup && groupSpent > 0 && (
                     <div
                       className="absolute left-0 top-0 h-full rounded-md bg-white/20"
                       style={{ width: `${Math.min(100, (groupSpent / Math.max(1, groupData?.planned ?? 1)) * 100)}%` }}
@@ -279,26 +291,34 @@ export default function PositionBudgetBar() {
                   )}
                 </div>
 
-                {/* Dollar input */}
+                {/* Dollar input (or locked actual price) */}
                 <div className="flex shrink-0 items-center gap-0.5">
                   <span className="text-sm text-muted-foreground">$</span>
                   <Input
                     inputMode="numeric"
                     value={String(value)}
+                    disabled={isLocked}
                     onChange={(e) => {
                       const n = Number(e.target.value.replace(/[^0-9]/g, ""));
                       setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
                     }}
-                    className="h-8 w-16 rounded-lg px-2 text-right font-mono text-sm"
+                    className={cn(
+                      "h-8 w-16 rounded-lg px-2 text-right font-mono text-sm",
+                      isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                    )}
                     aria-label={`${slot.label} allocation`}
+                    title={isLocked ? `Paid $${lockInfo.price} for ${lockInfo.name}` : undefined}
                   />
                 </div>
 
-                {/* Spent badge on first slot of group */}
-                {isFirstInGroup && groupSpent > 0 && (
+                {isLocked ? (
+                  <Lock className="h-3 w-3 shrink-0 text-success" />
+                ) : isFirstInGroup && groupSpent > 0 ? (
                   <span className="shrink-0 text-[10px] text-muted-foreground">
                     ${groupSpent} spent
                   </span>
+                ) : (
+                  <span className="w-3 shrink-0" />
                 )}
               </div>
             );
