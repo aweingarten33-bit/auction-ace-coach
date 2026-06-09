@@ -9,6 +9,7 @@ import { Loader2, Trophy, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { toast } from "sonner";
+import SyncStatusPill from "@/components/SyncStatusPill";
 
 interface Team { id: number; name: string; abbrev?: string }
 
