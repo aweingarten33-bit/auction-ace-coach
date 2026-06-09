@@ -241,82 +241,41 @@ export default function DraftRoom() {
         <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
-      {/* ── TAB TOGGLE ──────────────────────────────────────── */}
-      <div className="flex shrink-0 gap-1 border-b border-border/60 bg-background px-3 py-2">
-        <button
-          onClick={() => setTab("plan")}
-          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${
-            tab === "plan"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Plan
-        </button>
-        <button
-          onClick={() => setTab("board")}
-          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition ${
-            tab === "board"
-              ? "bg-primary text-primary-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Board {liveBid && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-warning align-middle" />}
-        </button>
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
+        <div className="space-y-4">
+          {/* Budget summary */}
+          {selectedTeam && (
+            <BudgetSnapshot
+              teamName={selectedTeam.name}
+              remaining={budget.remaining}
+              total={budget.totalBudget}
+              maxBid={budget.maxBid}
+              slotsLeft={budget.slotsLeft}
+              gaps={gaps}
+            />
+          )}
+          {/* Strategy picker + per-slot budget allocations */}
+          <PositionBudgetBar />
+          {/* Next target recommendation */}
+          {selectedTeam && (
+            <NextTargetCard
+              settings={settings}
+              gaps={gaps}
+              spend={spend}
+              remaining={budget.remaining}
+              prices={adjustedPrices}
+              events={events}
+              pulse={pulse}
+            />
+          )}
+          {/* Last pick delta */}
+          {events.length > 0 && (
+            <LastPickImpact settings={settings} keepers={keepers} events={events} />
+          )}
+          {/* Opponent spending heatmap */}
+          <OpponentHeatmap settings={settings} />
+        </div>
       </div>
-
-      {/* ── PLAN TAB ────────────────────────────────────────── */}
-      {tab === "plan" && (
-        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
-          <div className="space-y-4">
-            {/* Budget summary */}
-            {selectedTeam && (
-              <BudgetSnapshot
-                teamName={selectedTeam.name}
-                remaining={budget.remaining}
-                total={budget.totalBudget}
-                maxBid={budget.maxBid}
-                slotsLeft={budget.slotsLeft}
-                gaps={gaps}
-              />
-            )}
-            {/* Strategy picker + per-slot budget allocations */}
-            <PositionBudgetBar />
-            {/* Next target recommendation */}
-            {selectedTeam && (
-              <NextTargetCard
-                settings={settings}
-                gaps={gaps}
-                spend={spend}
-                remaining={budget.remaining}
-                prices={adjustedPrices}
-                events={events}
-                pulse={pulse}
-              />
-            )}
-            {/* Last pick delta */}
-            {events.length > 0 && (
-              <LastPickImpact settings={settings} keepers={keepers} events={events} />
-            )}
-            {/* Opponent spending heatmap */}
-            <OpponentHeatmap settings={settings} />
-          </div>
-        </div>
-      )}
-
-      {/* ── BOARD TAB ───────────────────────────────────────── */}
-      {tab === "board" && (
-        <div className="min-h-0 flex-1 overflow-hidden">
-          <BestAvailableBoard
-            prices={adjustedPrices}
-            events={events}
-            maxBid={budget.maxBid}
-            remaining={budget.remaining}
-            liveBid={liveBid}
-            onSelect={openDetails}
-          />
-        </div>
-      )}
 
       {/* ── BOTTOM BAR ──────────────────────────────────────── */}
       <div
