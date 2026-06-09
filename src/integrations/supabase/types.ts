@@ -32,6 +32,45 @@ export type Database = {
         }
         Relationships: []
       }
+      draftsharks_sf_values: {
+        Row: {
+          fetched_at: string
+          id: string
+          overall_rank: number | null
+          player_name: string
+          player_name_norm: string
+          position: string
+          position_rank: number | null
+          team: string | null
+          updated_at: string
+          value_200: number
+        }
+        Insert: {
+          fetched_at?: string
+          id?: string
+          overall_rank?: number | null
+          player_name: string
+          player_name_norm: string
+          position: string
+          position_rank?: number | null
+          team?: string | null
+          updated_at?: string
+          value_200: number
+        }
+        Update: {
+          fetched_at?: string
+          id?: string
+          overall_rank?: number | null
+          player_name?: string
+          player_name_norm?: string
+          position?: string
+          position_rank?: number | null
+          team?: string | null
+          updated_at?: string
+          value_200?: number
+        }
+        Relationships: []
+      }
       espn_credentials: {
         Row: {
           created_at: string
