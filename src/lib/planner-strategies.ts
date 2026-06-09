@@ -70,9 +70,9 @@ function isFixedDollarSlot(group: SlotGroup): boolean {
 }
 
 function weightFor(strategy: StrategyId, slot: PlannerSlot): number {
-  const row = STRATEGIES[strategy][slot.group];
+  const table = STRATEGIES[strategy] ?? STRATEGIES["balanced-qbs"];
+  const row = table[slot.group];
   if (!row || row.length === 0) return 1;
-  // slot.id is e.g. "RB-1"; pull the index off the end
   const idxStr = slot.id.split("-").pop() ?? "1";
   const idx = Math.max(1, parseInt(idxStr, 10) || 1);
   return row[Math.min(idx, row.length) - 1] ?? row[row.length - 1];
