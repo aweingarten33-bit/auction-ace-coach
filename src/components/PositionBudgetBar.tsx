@@ -39,18 +39,13 @@ export default function PositionBudgetBar() {
   const clearTouchedSlots = useDraftStore((s) => s.clearTouchedSlots);
   const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
   const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy);
-  const anchors = useDraftStore((s) => s.anchors);
-  const addAnchor = useDraftStore((s) => s.addAnchor);
-  const updateAnchor = useDraftStore((s) => s.updateAnchor);
-  const removeAnchor = useDraftStore((s) => s.removeAnchor);
   const reservePct = useDraftStore((s) => s.reservePct);
   const setReservePct = useDraftStore((s) => s.setReservePct);
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
-  const anchorsTotal = anchors.reduce((sum, a) => sum + (a.price || 0), 0);
   const reserveDollars = Math.floor((settings.totalBudget * reservePct) / 100);
-  const extraReserved = anchorsTotal + reserveDollars;
+  const extraReserved = reserveDollars;
 
   // Auto-fill any slot the user hasn't manually touched/locked.
   useEffect(() => {
