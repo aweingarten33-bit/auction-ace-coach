@@ -78,7 +78,6 @@ export default function DraftRoom() {
   const customStrategyRules = useDraftStore((s) => s.customStrategyRules);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [tab, setTab] = useState<TabId>("plan");
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
