@@ -232,7 +232,7 @@ export default function DraftRoom() {
       : 0;
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-background text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
       <header
         className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 pt-1 pb-2"
