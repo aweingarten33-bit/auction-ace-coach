@@ -346,6 +346,7 @@ export default function DraftRoom() {
                     label: "Manual",
                     guidance: "",
                   },
+                  budgetBoard: buildPlannerBoard(settings, slotAllocations, slotNotes, lockedSlots),
                 })}
               />
             </SheetContent>
