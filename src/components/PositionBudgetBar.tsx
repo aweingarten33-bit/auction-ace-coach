@@ -386,9 +386,19 @@ function suggestAllocations(settings: LeagueSettings, strategyId: string): Recor
   const slots = buildSlots(settings);
   if (!slots.length) return {};
 
+  const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
   const weights = slots.map((slot) => {
     const base = baseSlotWeight(slot, settings);
-    const mult = strategy.weights[slot.group]?.[slot.index - 1] ?? 1;
+    // In Superflex/2QB leagues the SUPERFLEX slot is effectively the next QB,
+    // so apply the strategy's QB multiplier curve to it (index continues from QBn).
+    let mult: number;
+    if (isSF && slot.group === "SUPERFLEX") {
+      const qbMults = strategy.weights.QB;
+      const idx = settings.roster.QB + slot.index - 1;
+      mult = qbMults?.[idx] ?? qbMults?.[qbMults.length - 1] ?? 1;
+    } else {
+      mult = strategy.weights[slot.group]?.[slot.index - 1] ?? 1;
+    }
     return Math.max(0.05, base * mult);
   });
 
