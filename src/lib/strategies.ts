@@ -67,11 +67,12 @@ export const STRATEGIES: Strategy[] = [
     description:
       "Spend ~75% of your budget on 3 elite players — usually one elite QB and two elite RB/WR. Fill the rest of the roster with $1–$3 upside lottery tickets, including a cheap QB2.",
     weights: {
-      QB: [1.6, 0.4, 0.15],
-      RB: [1.5, 1.3, 0.4, 0.25, 0.15],
-      WR: [1.4, 1.2, 0.4, 0.25, 0.15],
-      TE: [0.4, 0.15],
-      BENCH: [0.05],
+      QB:    [1.6, 0.4, 0.15],
+      RB:    [1.7, 0.25, 0.2, 0.15, 0.1],
+      WR:    [1.6, 0.25, 0.2, 0.15, 0.1],
+      TE:    [0.3, 0.15],
+      FLEX:  [0.3],
+      BENCH: [0.4, 0.3, 0.2, 0.15, 0.1, 0.1, 0.1, 0.1],
     },
     coachGuidance:
       "User is going Stars & Scrubs in a SUPERFLEX: ~75% on 3 elite pieces (one is usually an elite QB), then $1–3 darts. APPROVE big bids on top-tier QB/RB/WR. Their QB2 should be a cheap upside play, not a mid-tier overpay. PUSH BACK on $15–25 mid-tier plays — they kill this build.",
