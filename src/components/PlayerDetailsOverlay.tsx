@@ -21,6 +21,7 @@ interface Props {
   anchor?: AnchorEntry;
   posRank?: number;
   totalAtPos?: number;
+  overallRank?: number;
   // Unused legacy props (kept so call sites don't break) — overlay is intentionally simple now.
   remaining?: number;
   maxBid?: number;
