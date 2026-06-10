@@ -51,7 +51,7 @@ let inflight: Promise<SleeperPlayer[]> | null = null;
 async function fetchProjectionsByPlayerId(): Promise<Map<string, SleeperProjection>> {
   try {
     const resp = await fetch(
-      "https://api.sleeper.com/projections/nfl/2025?season_type=regular&order_by=ppr",
+      "https://api.sleeper.com/projections/nfl/2026?season_type=regular&order_by=ppr",
     );
     if (!resp.ok) return new Map();
     const raw: Array<{ player_id: string; stats?: Record<string, number | null> }> = await resp.json();
