@@ -20,54 +20,54 @@
     --foreground:        40 35% 95%;          /* parchment cream */
     --muted-bg:          216 34% 20%;
 
-    --card:              216 36% 18%;
-    --card-foreground:   40 35% 95%;
+    --card:              216 28% 28%;         /* lighter slate panel */
+    --card-foreground:   40 35% 97%;
 
-    --popover:           216 38% 16%;
-    --popover-foreground:40 35% 95%;
+    --popover:           216 24% 32%;         /* even lighter popover */
+    --popover-foreground:40 35% 97%;
 
-    /* ---------- ACCENTS — Burgundy seal + Restrained Gold ---------- */
-    --primary:           350 55% 38%;         /* oxblood burgundy */
-    --primary-foreground: 40 35% 95%;
-    --primary-glow:      350 58% 48%;
+    /* ---------- ACCENTS — Burgundy seal + White ---------- */
+    --primary:           350 55% 42%;         /* oxblood burgundy */
+    --primary-foreground: 40 35% 97%;
+    --primary-glow:      350 58% 52%;
 
-    --secondary:         216 32% 24%;
-    --secondary-foreground: 40 35% 95%;
+    --secondary:         216 22% 36%;         /* lifted secondary surface */
+    --secondary-foreground: 40 35% 97%;
 
-    --accent:            40 35% 96%;          /* white / parchment */
+    --accent:            40 35% 97%;
     --accent-foreground: 216 42% 12%;
-    --accent-secondary:  350 55% 38%;
+    --accent-secondary:  350 55% 42%;
 
-    --muted:             216 28% 24%;
-    --muted-foreground:  216 14% 76%;
+    --muted:             216 22% 32%;
+    --muted-foreground:  216 14% 82%;
 
-    --destructive:       350 55% 42%;
-    --destructive-foreground: 40 35% 95%;
+    --destructive:       350 55% 45%;
+    --destructive-foreground: 40 35% 97%;
 
-    --warning:           40 35% 96%;
+    --warning:           40 35% 97%;
     --warning-foreground: 216 42% 12%;
 
-    --success:           40 35% 96%;
+    --success:           40 35% 97%;
     --success-foreground: 216 42% 12%;
 
-    --border:            40 35% 95% / 0.32;
-    --input:             216 32% 19%;
-    --ring:              40 35% 96%;
+    --border:            40 35% 95% / 0.45;
+    --input:             216 22% 34%;
+    --ring:              40 35% 97%;
 
     --radius: 0.375rem;
 
     /* ---------- SURFACES + SHADOWS ---------- */
-    --surface:           216 36% 18%;
-    --surface-2:         216 30% 24%;
+    --surface:           216 26% 30%;
+    --surface-2:         216 22% 36%;
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    --neu-extruded:       inset 0 0 0 1px rgba(255,255,255,0.32), 0 6px 20px rgba(0,0,0,0.4);
-    --neu-extruded-hover: inset 0 0 0 1px rgba(255,255,255,0.45), 0 12px 28px rgba(0,0,0,0.5);
-    --neu-extruded-sm:    inset 0 0 0 1px rgba(255,255,255,0.24), 0 3px 10px rgba(0,0,0,0.3);
-    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.32);
-    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.45);
-    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.20);
+    --neu-extruded:       inset 0 0 0 1px rgba(255,255,255,0.45), 0 6px 20px rgba(0,0,0,0.4);
+    --neu-extruded-hover: inset 0 0 0 1px rgba(255,255,255,0.60), 0 12px 28px rgba(0,0,0,0.5);
+    --neu-extruded-sm:    inset 0 0 0 1px rgba(255,255,255,0.35), 0 3px 10px rgba(0,0,0,0.3);
+    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.45);
+    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.60);
+    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.30);
 
     /* ---------- LEGACY ALIASES — routed to new dark palette ---------- */
     --bone:              40 25% 96%;
