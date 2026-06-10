@@ -300,12 +300,20 @@ export default function DraftRoom() {
             const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
             const moneyLeft = budget.totalBudget - allocated;
             return (
-              <div className="flex items-center gap-4">
-                <span className="font-semibold">{selectedTeam.name}</span>
-                <span className="text-xl font-bold">Budget ${budget.totalBudget}</span>
-                <span className={`text-xl font-bold ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
-                  Money left ${moneyLeft}
-                </span>
+              <div className="space-y-1">
+                <div className="text-sm font-semibold text-muted-foreground">{selectedTeam.name}</div>
+                <div className="flex items-baseline gap-4">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
+                    <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Money left</span>
+                    <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
+                      ${moneyLeft}
+                    </span>
+                  </div>
+                </div>
               </div>
             );
           })()}
