@@ -234,7 +234,8 @@ export default function DraftRoom() {
           />
         </Sheet>
 
-        <div className="min-w-0 flex-1 leading-tight">
+        <div className="min-w-0 flex-1 leading-tight flex items-center gap-2">
+          <HelmetIcon size={24} className="shrink-0 drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)]" />
           <p className="truncate font-bebas text-lg tracking-wider leading-tight">
             <span className="text-foreground">Auction Draft</span>{" "}
             <span className="text-accent">Assistant</span>
