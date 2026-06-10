@@ -60,11 +60,51 @@ function cacheGet(key: string): string | null {
 function cacheSet(key: string, body: string) {
   CACHE.set(key, { body, expiresAt: Date.now() + CACHE_TTL_MS });
   if (CACHE.size > 200) {
-    // evict oldest
     const oldest = [...CACHE.entries()].sort((a, b) => a[1].expiresAt - b[1].expiresAt)[0];
     if (oldest) CACHE.delete(oldest[0]);
   }
 }
+
+// ---------- Firecrawl cache (30 min, in-memory per isolate) ----------
+interface WebSource { title: string; url: string; description: string }
+const FC_CACHE = new Map<string, { results: WebSource[]; expiresAt: number }>();
+const FC_TTL_MS = 30 * 60_000;
+function fcCacheGet(key: string): WebSource[] | null {
+  const hit = FC_CACHE.get(key);
+  if (!hit) return null;
+  if (hit.expiresAt <= Date.now()) { FC_CACHE.delete(key); return null; }
+  return hit.results;
+}
+function fcCacheSet(key: string, results: WebSource[]) {
+  FC_CACHE.set(key, { results, expiresAt: Date.now() + FC_TTL_MS });
+  if (FC_CACHE.size > 100) {
+    const oldest = [...FC_CACHE.entries()].sort((a, b) => a[1].expiresAt - b[1].expiresAt)[0];
+    if (oldest) FC_CACHE.delete(oldest[0]);
+  }
+}
+
+// ---------- Heuristic: should we hit the web for this question? ----------
+// PDF price sheet is always the source of truth for "who/what/how much" filter
+// questions. We only burn a Firecrawl call when the question needs recency
+// (news, injuries, depth chart, training camp, trades, suspensions, etc.) or
+// names a specific player we don't have priced on the sheet.
+const WEB_TRIGGER_RE = /\b(news|injur|hurt|status|update|latest|recent|trade|signed|signing|cut|release|waiver|holdout|suspend|practice|preseason|report|rumou?r|depth chart|starter|starting|inactive|active|return|comeback|hype|buzz|camp|breaking|today|yesterday|this week|right now|currently)\b/i;
+function decideWebSearch(question: string, pricesCount: number, knownNames: Set<string>): { search: boolean; reason: string } {
+  const q = question.trim();
+  if (!q) return { search: false, reason: "no question text" };
+  if (WEB_TRIGGER_RE.test(q)) return { search: true, reason: "question mentions news/injury/recency keyword" };
+  // Capitalized two-word phrase = likely a player name. If not on the sheet, search.
+  const nameMatch = q.match(/\b([A-Z][a-z]+ [A-Z][a-z'.-]+)\b/);
+  if (nameMatch) {
+    const norm = nameMatch[1].toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!knownNames.has(norm)) {
+      return { search: true, reason: `mentions "${nameMatch[1]}" not on PDF sheet` };
+    }
+  }
+  if (pricesCount === 0) return { search: true, reason: "no PDF prices loaded — fall back to web" };
+  return { search: false, reason: "answerable from PDF price sheet alone" };
+}
+
 
 function rateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
