@@ -49,13 +49,45 @@ export interface CoachInput {
   };
 }
 
+export interface WebSource {
+  title: string;
+  url: string;
+  description: string;
+}
+
+export interface CoachConfidence {
+  label: "high" | "medium" | "low";
+  pdf: number;
+  web: number;
+  score: number;
+  basis: string;
+}
+
+export interface CoachMeta {
+  searched: boolean;
+  searchReason: string;
+  searchQuery: string;
+  firecrawlCache: "hit" | "miss" | "skip" | "error";
+  sources: WebSource[];
+  confidence: CoachConfidence;
+  debug: {
+    undraftedPriceCount: number;
+    draftedCount: number;
+    historyTurns: number;
+    systemPromptChars: number;
+    userMessageChars: number;
+    webSnippets: { idx: number; title: string; url: string; description: string }[];
+  };
+}
+
 /**
  * Streams the coach response token-by-token.
  * Throws ApiError on HTTP failure (caller can branch on .status).
  */
 export async function streamCoach(
   body: CoachInput,
-  onChunk: (delta: string) => void
+  onChunk: (delta: string) => void,
+  onMeta?: (meta: CoachMeta) => void,
 ): Promise<void> {
   const resp = await fetch(COACH_URL, {
     method: "POST",
@@ -87,7 +119,12 @@ export async function streamCoach(
       const json = line.slice(6).trim();
       if (json === "[DONE]") { done = true; break; }
       try {
-        const c = JSON.parse(json).choices?.[0]?.delta?.content as string | undefined;
+        const parsed = JSON.parse(json);
+        if (parsed?.meta && onMeta) {
+          onMeta(parsed.meta as CoachMeta);
+          continue;
+        }
+        const c = parsed.choices?.[0]?.delta?.content as string | undefined;
         if (c) onChunk(c);
       } catch {
         buf = line + "\n" + buf;

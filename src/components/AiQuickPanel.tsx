@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CoachMessage from "@/components/CoachMessage";
-import { ApiError, streamCoach } from "@/lib/api";
+import CoachMeta from "@/components/CoachMeta";
+import { ApiError, streamCoach, type CoachMeta as CoachMetaT } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useDraftStore } from "@/lib/draft-store";
@@ -95,6 +96,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
+  const [streamingMeta, setStreamingMeta] = useState<CoachMetaT | null>(null);
+  const [metaByMsgId, setMetaByMsgId] = useState<Record<string, CoachMetaT>>({});
   const [input, setInput] = useState("");
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -161,12 +164,14 @@ export default function AiQuickPanel({ coachContext }: Props) {
       setInput("");
       setStreaming(true);
       setStreamingText("");
+      setStreamingMeta(null);
       // Fire-and-forget persistence.
       persistMessage(userMsg).then((id) => {
         if (id) setHistory((h) => h.map((m) => (m === userMsg ? { ...m, id } : m)));
       });
 
       let acc = "";
+      let capturedMeta: CoachMetaT | null = null;
       try {
         const ctx = coachContext();
         await streamCoach(
@@ -181,6 +186,10 @@ export default function AiQuickPanel({ coachContext }: Props) {
             acc += chunk;
             setStreamingText(extractProposal(acc).clean);
             scrollRef.current?.scrollTo({ top: 1e9 });
+          },
+          (meta) => {
+            capturedMeta = meta;
+            setStreamingMeta(meta);
           },
         );
       } catch (e) {
@@ -198,14 +207,29 @@ export default function AiQuickPanel({ coachContext }: Props) {
             proposal,
           };
           setHistory((h) => [...h, assistantMsg]);
+          if (capturedMeta) {
+            setMetaByMsgId((m) => ({ ...m, [assistantMsg.id]: capturedMeta! }));
+          }
           persistMessage({ role: "assistant", content: clean, proposal }).then((id) => {
-            if (id) setHistory((h) => h.map((m) => (m === assistantMsg ? { ...m, id } : m)));
+            if (id) {
+              setHistory((h) => h.map((m) => (m === assistantMsg ? { ...m, id } : m)));
+              if (capturedMeta) {
+                setMetaByMsgId((m) => {
+                  const next = { ...m };
+                  delete next[assistantMsg.id];
+                  next[id] = capturedMeta!;
+                  return next;
+                });
+              }
+            }
           });
         }
         setStreamingText("");
+        setStreamingMeta(null);
         inputRef.current?.focus();
       }
     },
+
     [coachContext, history, persistMessage, streaming],
   );
 
@@ -381,6 +405,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
               <div className="min-w-0 flex-1">
                 <CoachMessage content={m.content} />
                 {m.proposal && renderProposal(m.proposal, m.id)}
+                {metaByMsgId[m.id] && <CoachMeta meta={metaByMsgId[m.id]} />}
               </div>
             </div>
           ),
@@ -392,9 +417,11 @@ export default function AiQuickPanel({ coachContext }: Props) {
             </div>
             <div className="min-w-0 flex-1">
               <CoachMessage content={streamingText} />
+              {streamingMeta && <CoachMeta meta={streamingMeta} />}
             </div>
           </div>
         )}
+
       </div>
 
       <div className="border-t border-border/60 px-3 pb-3 pt-2">
