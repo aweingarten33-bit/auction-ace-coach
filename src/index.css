@@ -17,44 +17,46 @@
     /* ---------- CORE SURFACE — Superman Returns suit ----------
        Muted royal-navy base (suit fabric), warm cream foreground.
        Antique shield-gold + burgundy cape as accents. */
-    --background:        38 44% 97%;            /* bright warm ivory */
-    --background-alt:    38 38% 93%;
-    --foreground:        222 50% 8%;             /* near-black ink, high contrast */
-    --muted-bg:          38 32% 90%;
+    /* ---------- BANKSY: cream wall + stencil black + signal red ---------- */
+    --background:        38 28% 92%;            /* aged plaster wall */
+    --background-alt:    38 24% 88%;
+    --foreground:        0 0% 6%;                /* stencil black */
+    --muted-bg:          38 20% 86%;
 
-    --card:              0 0% 100%;              /* pure vellum */
-    --card-foreground:   222 50% 8%;
+    --card:              38 32% 96%;             /* fresh wall patch */
+    --card-foreground:   0 0% 6%;
 
-    --popover:           0 0% 100%;
-    --popover-foreground:222 50% 8%;
+    --popover:           38 32% 96%;
+    --popover-foreground:0 0% 6%;
 
-    /* ---------- ACCENTS — saturated editorial navy + rich gold ---------- */
-    --primary:           222 78% 22%;            /* deep saturated navy */
-    --primary-foreground: 38 44% 98%;
-    --primary-glow:      222 70% 38%;
+    /* Primary = the can of black spray */
+    --primary:           0 0% 8%;
+    --primary-foreground: 38 28% 94%;
+    --primary-glow:      0 0% 22%;
 
-    --secondary:         38 30% 88%;             /* warm linen */
-    --secondary-foreground: 222 50% 8%;
+    --secondary:         38 18% 82%;             /* weathered wall */
+    --secondary-foreground: 0 0% 6%;
 
-    --accent:            36 88% 48%;             /* rich saturated gold */
-    --accent-foreground: 222 50% 8%;
-    --accent-secondary:  222 78% 22%;
+    /* Accent = signature signal red */
+    --accent:            4 92% 48%;
+    --accent-foreground: 38 32% 96%;
+    --accent-secondary:  0 0% 8%;
 
-    --muted:             38 22% 82%;
-    --muted-foreground:  222 22% 28%;
+    --muted:             38 14% 78%;
+    --muted-foreground:  0 0% 28%;
 
-    --destructive:       4 78% 42%;              /* deep crimson */
-    --destructive-foreground: 38 44% 98%;
+    --destructive:       4 92% 48%;
+    --destructive-foreground: 38 32% 96%;
 
-    --warning:           36 92% 50%;
-    --warning-foreground: 222 50% 8%;
+    --warning:           4 92% 48%;
+    --warning-foreground: 38 32% 96%;
 
-    --success:           150 56% 28%;            /* deep emerald */
-    --success-foreground: 38 44% 98%;
+    --success:           0 0% 8%;
+    --success-foreground: 38 32% 96%;
 
-    --border:            38 18% 70%;
-    --input:             38 28% 92%;
-    --ring:              36 88% 48%;
+    --border:            0 0% 18%;
+    --input:             38 24% 88%;
+    --ring:              4 92% 48%;
 
     --radius: 0.75rem;
 
@@ -72,42 +74,42 @@
     --neu-inset-deep:     inset 5px 5px 10px rgba(120,95,70,0.20), inset -5px -5px 10px rgba(255,255,255,0.95);
     --neu-inset-sm:       inset 2px 2px 5px rgba(120,95,70,0.12), inset -2px -2px 5px rgba(255,255,255,0.9);
 
-    /* ---------- LEGACY ALIASES — remapped to editorial palette ---------- */
-    --bone:              38 44% 97%;
-    --paper:             222 22% 28%;
-    --void:              222 50% 8%;
-    --ink:               222 50% 8%;
-    --charcoal:          0 0% 100%;
-    --gunmetal:          38 30% 88%;
-    --steel-blue:        222 78% 22%;
-    --blood:             4 78% 42%;
-    --signal-red:        4 78% 42%;
-    --dirty-gold:        36 88% 48%;
-    --warning-yellow:    36 92% 50%;
-    --signal:            36 88% 48%;
-    --brass:             36 88% 48%;
-    --brass-light:       36 78% 60%;
-    --brass-dark:        36 92% 36%;
-    --crimson:           4 78% 42%;
-    --crimson-spatter:   4 78% 42%;
-    --parchment:         38 44% 97%;
-    --ink-faded:         222 22% 28%;
-    --wood-grain:        38 30% 88%;
-    --bloodred:          4 78% 42%;
-    --steel:             222 22% 28%;
-    --sungold:           36 88% 48%;
-    --sungold-2:         36 78% 60%;
-    --krypton:           0 0% 100%;
-    --kryptonite:        36 88% 48%;
+    /* ---------- LEGACY ALIASES — Banksy palette ---------- */
+    --bone:              38 28% 92%;
+    --paper:             0 0% 28%;
+    --void:              0 0% 6%;
+    --ink:               0 0% 6%;
+    --charcoal:          38 32% 96%;
+    --gunmetal:          38 18% 82%;
+    --steel-blue:        0 0% 8%;
+    --blood:             4 92% 48%;
+    --signal-red:        4 92% 48%;
+    --dirty-gold:        4 92% 48%;
+    --warning-yellow:    4 92% 48%;
+    --signal:            4 92% 48%;
+    --brass:             4 92% 48%;
+    --brass-light:       4 88% 60%;
+    --brass-dark:        4 92% 36%;
+    --crimson:           4 92% 48%;
+    --crimson-spatter:   4 92% 48%;
+    --parchment:         38 28% 92%;
+    --ink-faded:         0 0% 28%;
+    --wood-grain:        38 18% 82%;
+    --bloodred:          4 92% 48%;
+    --steel:             0 0% 28%;
+    --sungold:           4 92% 48%;
+    --sungold-2:         4 88% 60%;
+    --krypton:           38 32% 96%;
+    --kryptonite:        4 92% 48%;
 
     --shadow-card:       var(--neu-extruded);
     --shadow-floating:   var(--neu-extruded-hover);
     --shadow-pressed:    var(--neu-inset);
     --shadow-recessed:   var(--neu-inset-sm);
     --shadow-sharp:      var(--neu-extruded);
-    --shadow-glow:       0 0 0 1px hsl(var(--accent) / 0.5), 0 0 24px hsl(var(--accent) / 0.35);
-    --shadow-primary:    0 0 0 1px hsl(var(--primary) / 0.5), 0 0 24px hsl(var(--primary) / 0.4);
-    --shadow-led-green:  0 0 14px hsl(var(--accent) / 0.55);
+    --shadow-glow:       0 0 0 1px hsl(var(--accent) / 0.6), 0 0 24px hsl(var(--accent) / 0.45);
+    --shadow-primary:    0 0 0 1px hsl(var(--primary) / 0.6), 0 0 24px hsl(var(--primary) / 0.4);
+    --shadow-led-green:  0 0 14px hsl(var(--accent) / 0.6);
     --shadow-engraved:   var(--neu-inset);
     --shadow-wax-seal:   var(--neu-extruded);
     --shadow-brut-sm:    var(--neu-extruded-sm);
@@ -115,15 +117,15 @@
     --shadow-brut-lg:    var(--neu-extruded-hover);
     --shadow-brut-xl:    var(--neu-extruded-hover);
 
-    /* Sidebar — same editorial palette */
-    --sidebar-background: 38 44% 97%;
-    --sidebar-foreground: 222 50% 8%;
-    --sidebar-primary:    222 78% 22%;
-    --sidebar-primary-foreground: 38 44% 98%;
-    --sidebar-accent:     38 30% 90%;
-    --sidebar-accent-foreground: 222 50% 8%;
-    --sidebar-border:     38 18% 75%;
-    --sidebar-ring:       36 88% 48%;
+    /* Sidebar — Banksy */
+    --sidebar-background: 38 28% 92%;
+    --sidebar-foreground: 0 0% 6%;
+    --sidebar-primary:    0 0% 8%;
+    --sidebar-primary-foreground: 38 32% 96%;
+    --sidebar-accent:     38 18% 84%;
+    --sidebar-accent-foreground: 0 0% 6%;
+    --sidebar-border:     0 0% 18%;
+    --sidebar-ring:       4 92% 48%;
   }
 
 
