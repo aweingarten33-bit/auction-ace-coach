@@ -85,36 +85,21 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050d1c] p-4 text-white md:p-8">
-      {/* ambient stadium glow */}
-      <div
-        className="pointer-events-none absolute -left-1/4 -top-1/4 h-[60vh] w-[60vh] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(59,130,246,0.25) 0%, transparent 60%)" }}
-      />
-      <div
-        className="pointer-events-none absolute -right-1/4 -bottom-1/4 h-[60vh] w-[60vh] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(239,68,68,0.25) 0%, transparent 60%)" }}
-      />
-      {/* corner brackets */}
-      <div className="pointer-events-none absolute left-3 top-3 h-5 w-5 border-l-2 border-t-2 border-red-500/60" />
-      <div className="pointer-events-none absolute right-3 top-3 h-5 w-5 border-r-2 border-t-2 border-red-500/60" />
-      <div className="pointer-events-none absolute left-3 bottom-3 h-5 w-5 border-l-2 border-b-2 border-red-500/60" />
-      <div className="pointer-events-none absolute right-3 bottom-3 h-5 w-5 border-r-2 border-b-2 border-red-500/60" />
-
-      <div className="relative mx-auto max-w-2xl">
+    <div className="min-h-screen bg-background p-4 text-foreground md:p-8">
+      <div className="mx-auto max-w-2xl">
         <header className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-red-600 shadow-[0_0_18px_rgba(239,68,68,0.55)]">
-              <Trophy className="h-5 w-5 text-white" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary shadow-[0_0_18px_hsl(var(--primary)/0.45)]">
+              <Trophy className="h-5 w-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="font-bebas text-xl tracking-wider text-white">Draft Setup</h1>
-              <p className="text-[11px] uppercase tracking-[0.18em] text-white/50">{STEPS[step]}</p>
+              <h1 className="font-bebas text-xl tracking-wider text-foreground">Draft Setup</h1>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground">{STEPS[step]}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {setupComplete && (
-              <Button size="sm" variant="outline" onClick={() => navigate("/draft-room")} className="border-white/20 bg-white/5 text-white hover:bg-white/10">
+              <Button size="sm" variant="outline" onClick={() => navigate("/draft-room")}>
                 Open Draft Room <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             )}
@@ -122,18 +107,18 @@ export default function SetupWizard() {
         </header>
 
 
-        <Progress value={progress} className="mb-6 h-1.5 bg-white/10" />
+        <Progress value={progress} className="mb-6 h-1.5" />
 
-        <Card className="border-white/10 bg-white/[0.04] p-5 text-white backdrop-blur-sm md:p-6">
+        <Card className="p-5 md:p-6">
           <button
             onClick={() => setSettingsOpen((o) => !o)}
             className="flex w-full items-center justify-between gap-3 text-left mb-2"
           >
             <div>
-              <h2 className="text-sm font-semibold text-white">Draft Settings</h2>
-              <p className="text-xs text-white/50">{STEPS[step]}</p>
+              <h2 className="text-sm font-semibold text-foreground">Draft Settings</h2>
+              <p className="text-xs text-muted-foreground">{STEPS[step]}</p>
             </div>
-            {settingsOpen ? <ChevronUp className="h-4 w-4 text-white/60" /> : <ChevronDown className="h-4 w-4 text-white/60" />}
+            {settingsOpen ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
           </button>
 
           {settingsOpen && (<>
