@@ -198,12 +198,6 @@ export default function Landing() {
             <span className="relative z-10">GET STARTED</span>
             <span className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/30 transition-transform duration-700 group-hover:translate-x-[500%]" />
           </Link>
-          <Link
-            to="/espn"
-            className="group relative block w-full overflow-hidden border border-white/30 bg-white/5 py-4 text-center font-bebas text-xl tracking-[0.3em] text-white/85 backdrop-blur-sm transition hover:border-white/70 hover:bg-white/10 hover:text-white"
-          >
-            CONNECT ESPN
-          </Link>
         </div>
       </div>
 
