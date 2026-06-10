@@ -229,7 +229,7 @@ function buildUserMessage(p: CoachPayload): string {
   parts.push(`## Recent picks (last ${p.recentRuns?.window})\n${JSON.stringify(p.recentRuns?.counts)}`);
   parts.push(`## Market Multiplier\nx${mult.toFixed(3)} (samples=${n}) — convert sheet $ to going $`);
   parts.push(`## Drafted Players (FORBIDDEN — never name any of these)\n${Array.from(draftedSet).join(", ") || "(none yet)"}`);
-  parts.push(`## Undrafted Price Sheet (full, sorted by sheet $ desc)\n${undrafted.slice(0, 200).join("\n") || "(empty)"}`);
+  parts.push(`## Undrafted Price Sheet (FULL list from user's PDF, sorted by sheet $ desc — sleepers/$1-$3 guys are at the bottom)\n${undrafted.join("\n") || "(empty)"}`);
   if (p.budgetBoard) {
     const bb = p.budgetBoard;
     const rows = bb.slots.map((s) =>
