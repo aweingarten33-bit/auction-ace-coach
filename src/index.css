@@ -14,60 +14,60 @@
 
 @layer base {
   :root {
-    /* ---------- CORE SURFACE — Dark Navy + Red + Dark Gold (HIGH CONTRAST) ---------- */
-    --background:        222 60% 6%;          /* deeper, richer navy */
-    --background-alt:    222 55% 9%;
-    --foreground:        45 40% 98%;          /* crisper warm white */
-    --muted-bg:          222 50% 11%;
+    /* ---------- CORE SURFACE — Dark Navy + Red + Dark Gold (MAX CONTRAST) ---------- */
+    --background:        224 80% 4%;          /* near-black navy */
+    --background-alt:    224 70% 7%;
+    --foreground:        48 60% 99%;          /* bright warm white */
+    --muted-bg:          224 65% 9%;
 
-    --card:              222 52% 11%;         /* lifted navy panel */
-    --card-foreground:   45 40% 98%;
+    --card:              224 65% 9%;
+    --card-foreground:   48 60% 99%;
 
-    --popover:           222 55% 9%;
-    --popover-foreground:45 40% 98%;
+    --popover:           224 70% 7%;
+    --popover-foreground:48 60% 99%;
 
-    /* ---------- ACCENTS — Signal Red + Dark Gold (SATURATED) ---------- */
-    --primary:           0 95% 56%;           /* punchy signal red */
+    /* ---------- ACCENTS — Signal Red + Dark Gold (MAX SATURATION) ---------- */
+    --primary:           2 100% 54%;          /* searing signal red */
     --primary-foreground: 0 0% 100%;
-    --primary-glow:      0 100% 65%;
+    --primary-glow:      6 100% 64%;
 
-    --secondary:         222 45% 16%;
-    --secondary-foreground: 45 40% 98%;
+    --secondary:         224 55% 14%;
+    --secondary-foreground: 48 60% 99%;
 
-    --accent:            44 95% 56%;          /* vivid dark gold */
-    --accent-foreground: 222 60% 6%;
-    --accent-secondary:  0 95% 56%;
+    --accent:            45 100% 55%;         /* electric gold */
+    --accent-foreground: 224 80% 4%;
+    --accent-secondary:  2 100% 54%;
 
-    --muted:             222 40% 16%;
-    --muted-foreground:  220 20% 78%;
+    --muted:             224 50% 14%;
+    --muted-foreground:  220 25% 82%;
 
-    --destructive:       0 92% 54%;
+    --destructive:       2 100% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning:           44 100% 58%;
-    --warning-foreground: 222 60% 6%;
+    --warning:           45 100% 58%;
+    --warning-foreground: 224 80% 4%;
 
-    --success:           44 95% 54%;
-    --success-foreground: 222 60% 6%;
+    --success:           45 100% 54%;
+    --success-foreground: 224 80% 4%;
 
-    --border:            222 40% 24%;
-    --input:             222 50% 13%;
-    --ring:              44 95% 56%;
+    --border:            224 50% 28%;
+    --input:             224 60% 11%;
+    --ring:              45 100% 55%;
 
     --radius: 0.75rem;
 
     /* ---------- SURFACES + SHADOWS (dark-mode aware) ---------- */
-    --surface:           222 52% 12%;
-    --surface-2:         222 45% 16%;
+    --surface:           224 60% 10%;
+    --surface-2:         224 50% 15%;
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    --neu-extruded:       0 1px 0 rgba(255,255,255,0.06), 0 10px 28px rgba(0,0,0,0.6);
-    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.08), 0 16px 36px rgba(0,0,0,0.7);
-    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.05), 0 6px 14px rgba(0,0,0,0.5);
-    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.08);
-    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.12);
-    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.06);
+    --neu-extruded:       0 1px 0 rgba(255,255,255,0.08), 0 12px 32px rgba(0,0,0,0.75);
+    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.10), 0 18px 42px rgba(0,0,0,0.85);
+    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.06), 0 6px 16px rgba(0,0,0,0.6);
+    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.10);
+    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.14);
+    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.08);
 
     /* ---------- LEGACY ALIASES — routed to new dark palette ---------- */
     --bone:              40 25% 96%;
