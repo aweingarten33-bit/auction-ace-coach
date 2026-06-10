@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { loadSleeperPlayers, searchPlayers, type SleeperPlayer } from "@/lib/sleeper";
 import { POS_COLORS } from "@/lib/positions";
