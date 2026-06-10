@@ -485,18 +485,21 @@ export default function DraftRoom() {
           const samePos = prices
             .filter((p) => p.position === pos && p.price > 0)
             .map((p) => ({ name: p.name, price: p.price }));
-          // If player isn't in the sheet but has an anchor price (e.g. ESPN-only),
-          // include them so they can still be ranked within their position.
-          if (detailFor && !samePos.some((p) => norm(p.name) === key)) {
-            const anchorPrice = anchor?.price;
-            if (anchorPrice && anchorPrice > 0) {
-              samePos.push({ name: detailFor.name, price: anchorPrice });
+          // Only meaningful when the position pool is actually populated.
+          // (If we only have anchor data and no sheet prices, a "#1 of 1"
+          // would be misleading — leave it blank instead.)
+          if (samePos.length >= 5) {
+            if (detailFor && !samePos.some((p) => norm(p.name) === key)) {
+              const anchorPrice = anchor?.price;
+              if (anchorPrice && anchorPrice > 0) {
+                samePos.push({ name: detailFor.name, price: anchorPrice });
+              }
             }
+            samePos.sort((a, b) => b.price - a.price);
+            totalAtPos = samePos.length;
+            const idx = samePos.findIndex((p) => norm(p.name) === key);
+            if (idx >= 0) posRank = idx + 1;
           }
-          samePos.sort((a, b) => b.price - a.price);
-          totalAtPos = samePos.length;
-          const idx = samePos.findIndex((p) => norm(p.name) === key);
-          if (idx >= 0) posRank = idx + 1;
         }
         return (
           <PlayerDetailsOverlay
