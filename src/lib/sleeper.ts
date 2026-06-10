@@ -40,8 +40,8 @@ export interface SleeperPlayer {
   projection?: SleeperProjection | null;
 }
 
-const CACHE_KEY = "sleeper_players_v3"; // bumped: now includes projections
-const CACHE_TS_KEY = "sleeper_players_ts_v3";
+const CACHE_KEY = "sleeper_players_v4"; // bumped: 2026 projections
+const CACHE_TS_KEY = "sleeper_players_ts_v4";
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FANTASY_POS = new Set(["QB", "RB", "WR", "TE", "K", "DEF"]);
 
@@ -51,7 +51,7 @@ let inflight: Promise<SleeperPlayer[]> | null = null;
 async function fetchProjectionsByPlayerId(): Promise<Map<string, SleeperProjection>> {
   try {
     const resp = await fetch(
-      "https://api.sleeper.com/projections/nfl/2025?season_type=regular&order_by=ppr",
+      "https://api.sleeper.com/projections/nfl/2026?season_type=regular&order_by=ppr",
     );
     if (!resp.ok) return new Map();
     const raw: Array<{ player_id: string; stats?: Record<string, number | null> }> = await resp.json();
