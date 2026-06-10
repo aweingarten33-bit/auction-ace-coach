@@ -50,7 +50,7 @@
     --success:           42 55% 50%;
     --success-foreground: 216 42% 12%;
 
-    --border:            216 22% 32%;
+    --border:            40 35% 95% / 0.18;
     --input:             216 32% 19%;
     --ring:              42 58% 54%;
 
@@ -62,12 +62,12 @@
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    --neu-extruded:       0 1px 0 rgba(255,255,255,0.05), 0 6px 20px rgba(0,0,0,0.4);
-    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.07), 0 12px 28px rgba(0,0,0,0.5);
-    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04), 0 3px 10px rgba(0,0,0,0.3);
-    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.06);
-    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.09);
-    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.04);
+    --neu-extruded:       inset 0 0 0 1px rgba(255,255,255,0.18), 0 6px 20px rgba(0,0,0,0.4);
+    --neu-extruded-hover: inset 0 0 0 1px rgba(255,255,255,0.28), 0 12px 28px rgba(0,0,0,0.5);
+    --neu-extruded-sm:    inset 0 0 0 1px rgba(255,255,255,0.14), 0 3px 10px rgba(0,0,0,0.3);
+    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.18);
+    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.28);
+    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.12);
 
     /* ---------- LEGACY ALIASES — routed to new dark palette ---------- */
     --bone:              40 25% 96%;
