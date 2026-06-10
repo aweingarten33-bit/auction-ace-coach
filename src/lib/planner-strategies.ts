@@ -10,13 +10,15 @@
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "./planner-slots";
 import type { LeagueSettings } from "./draft-types";
 
-export type StrategyId = "hero-qb" | "balanced-qbs" | "bargain-qb";
+export type StrategyId = "hero-qb" | "balanced-qbs" | "bargain-qb" | "manual";
 
 export const STRATEGY_LABELS: Record<StrategyId, string> = {
   "hero-qb": "Hero QBs",
   "balanced-qbs": "Balanced QBs",
   "bargain-qb": "Bargain QB",
+  "manual": "Manual",
 };
+
 
 type WeightTable = Partial<Record<SlotGroup, number[]>>;
 
