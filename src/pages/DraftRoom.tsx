@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
+  Calculator,
   
   Settings,
   RefreshCw,
