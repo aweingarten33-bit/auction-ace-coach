@@ -475,18 +475,43 @@ Deno.serve(async (req: Request) => {
       }),
     });
 
+    // Graceful SSE fallback — keep the UI consistent (meta + content + [DONE])
+    // instead of returning a 500 JSON blob that the streaming client can't render.
+    const fallbackSse = (msg: string, status = 200, extraHeaders: Record<string, string> = {}) => {
+      const body = metaSse +
+        `data: ${JSON.stringify({ choices: [{ delta: { content: msg } }] })}\n\n` +
+        `data: [DONE]\n\n`;
+      return new Response(body, {
+        status,
+        headers: { ...cors, ...extraHeaders, "Content-Type": "text/event-stream", "X-Fallback": "1" },
+      });
+    };
+
     if (!resp.ok) {
-      if (resp.status === 429)
-        return new Response(JSON.stringify({ error: "Rate limit upstream" }), { status: 429, headers: { ...cors, "Content-Type": "application/json" } });
-      if (resp.status === 402)
-        return new Response(JSON.stringify({ error: "AI credits exhausted" }), { status: 402, headers: { ...cors, "Content-Type": "application/json" } });
-      const t = await resp.text();
+      const t = await resp.text().catch(() => "");
       console.error("AI gateway error", resp.status, t);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+      if (resp.status === 429) {
+        return fallbackSse(
+          "⚠️ The AI is rate-limited right now — give it ~30s and ask again. Your price sheet and planner are still loaded.",
+          200,
+          { "Retry-After": "30" },
+        );
+      }
+      if (resp.status === 402) {
+        return fallbackSse(
+          "⚠️ AI credits are exhausted on this workspace — top them up in Settings → Workspace → Usage to keep the coach live. Your PDF and planner are still intact.",
+        );
+      }
+      const inputNote = pricesCount === 0
+        ? "no PDF prices loaded"
+        : `${pricesCount} priced players loaded${decision.search ? `, ${sources.length} web source${sources.length === 1 ? "" : "s"} fetched` : ", web search skipped"}`;
+      return fallbackSse(
+        `⚠️ Coach AI couldn't generate a reply (gateway error ${resp.status}). Inputs that were available: ${inputNote}. Try again in a moment.`,
+      );
     }
 
     if (!resp.body) {
-      return new Response(JSON.stringify({ error: "Empty AI response" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+      return fallbackSse("⚠️ The AI returned an empty response. Try asking again.");
     }
     // Tee stream: forward to client AND accumulate completion for cache
     const [forwardStream, captureStream] = resp.body.tee();
