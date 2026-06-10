@@ -301,7 +301,6 @@ export default function DraftRoom() {
             const moneyLeft = budget.totalBudget - allocated;
             return (
               <div className="space-y-1">
-                <div className="text-sm font-semibold text-muted-foreground">{selectedTeam.name}</div>
                 <div className="flex items-baseline gap-4">
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
