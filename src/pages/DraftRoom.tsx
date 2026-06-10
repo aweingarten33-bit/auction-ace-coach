@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Menu,
+  Calculator,
   
   Settings,
   RefreshCw,
@@ -300,9 +301,10 @@ export default function DraftRoom() {
         
           <button
             onClick={() => setPanel("calc")}
+            aria-label="Auction calculator"
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
-            <span className="text-xs font-medium">Calc</span>
+            <Calculator className="h-5 w-5" />
           </button>
           <button
             onClick={() => setPanel("recent")}
