@@ -378,7 +378,7 @@ export default function AuctionPlayerCard({
 
       {/* ── FOOTER ─────────────────────────────────────── */}
       <div className="bg-[#1b2238] px-3 py-1.5 text-center text-[9px] font-bold uppercase tracking-[0.2em] text-[#f5efe4]/70">
-        Research only · Matthew Berry/Fantasy Life + Sleeper blend
+        Research only · PDF cheat sheet + DraftSharks blend
       </div>
     </div>
   );
