@@ -71,7 +71,9 @@ function isFixedDollarSlot(group: SlotGroup): boolean {
 }
 
 function weightFor(strategy: StrategyId, slot: PlannerSlot): number {
-  const table = STRATEGIES[strategy] ?? STRATEGIES["balanced-qbs"];
+  const key = (strategy === "manual" ? "balanced-qbs" : strategy) as Exclude<StrategyId, "manual">;
+  const table = STRATEGIES[key] ?? STRATEGIES["balanced-qbs"];
+
   const row = table[slot.group];
   if (!row || row.length === 0) return 1;
   const idxStr = slot.id.split("-").pop() ?? "1";
