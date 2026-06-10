@@ -447,64 +447,6 @@ export default function DraftRoom() {
                   />
                 </div>
               )}
-              {panel === "recent" && (
-                <div className="space-y-4">
-                  {events.length === 0 ? (
-                    <p className="py-8 text-center text-sm text-muted-foreground">No picks yet.</p>
-                  ) : (
-                    <RecentPicksList
-                      events={events.slice(-20).reverse()}
-                      onPick={(n, p) => { setPanel(null); openDetails(n, p); }}
-                    />
-                  )}
-                  {myItems.length > 0 && (
-                    <section>
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Your roster ({myItems.length})
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {myItems.map((it) => (
-                          <button
-                            key={it.player}
-                            type="button"
-                            onClick={() => { setPanel(null); openDetails(it.player, it.position); }}
-                            className="flex items-center gap-1.5 rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs hover:bg-secondary/60"
-                          >
-                            {it.position && (
-                              <span className={`text-[9px] font-semibold ${POS_COLORS[it.position] ?? ""}`}>
-                                {it.position}
-                              </span>
-                            )}
-                            <span className="font-medium">{it.player}</span>
-                            {it.price != null && (
-                              <span className="font-mono text-[10px] text-muted-foreground">${it.price}</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                  {watchlist.length > 0 && (
-                    <section>
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Pinned ({watchlist.length})
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {watchlist.map((name) => (
-                          <button
-                            key={name}
-                            type="button"
-                            onClick={() => { setPanel(null); openDetails(name); }}
-                            className="rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs font-medium hover:bg-secondary/60"
-                          >
-                            {name}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </>
