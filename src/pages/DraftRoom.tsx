@@ -243,7 +243,7 @@ export default function DraftRoom() {
       </header>
 
       {/* ── SPEND BAR ───────────────────────────────────────── */}
-      <div className="h-[3px] shrink-0 bg-muted">
+      <div className="-mt-6 h-[3px] shrink-0 bg-muted">
         <div
           className="h-full transition-all"
           style={{
