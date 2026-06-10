@@ -483,24 +483,32 @@ export default function DraftRoom() {
         let posRank: number | undefined;
         let totalAtPos: number | undefined;
         const pos = detailFor?.position ?? sheet?.position;
+
+        // Preferred source: ESPN player ranks (always populated post-connect)
+        const espnRank = detailFor ? lookupRank(detailFor.name) : null;
+        if (espnRank?.pos_rank && (espnRank.position === pos || !pos)) {
+          posRank = espnRank.pos_rank;
+        }
+
         if (pos) {
           const samePos = prices
             .filter((p) => p.position === pos && p.price > 0)
             .map((p) => ({ name: p.name, price: p.price }));
-          // Only meaningful when the position pool is actually populated.
-          // (If we only have anchor data and no sheet prices, a "#1 of 1"
-          // would be misleading — leave it blank instead.)
           if (samePos.length >= 5) {
-            if (detailFor && !samePos.some((p) => norm(p.name) === key)) {
-              const anchorPrice = anchor?.price;
-              if (anchorPrice && anchorPrice > 0) {
-                samePos.push({ name: detailFor.name, price: anchorPrice });
-              }
-            }
-            samePos.sort((a, b) => b.price - a.price);
             totalAtPos = samePos.length;
-            const idx = samePos.findIndex((p) => norm(p.name) === key);
-            if (idx >= 0) posRank = idx + 1;
+            // Fall back to sheet-based rank only if ESPN didn't provide one
+            if (posRank == null) {
+              if (detailFor && !samePos.some((p) => norm(p.name) === key)) {
+                const anchorPrice = anchor?.price;
+                if (anchorPrice && anchorPrice > 0) {
+                  samePos.push({ name: detailFor.name, price: anchorPrice });
+                  totalAtPos = samePos.length;
+                }
+              }
+              samePos.sort((a, b) => b.price - a.price);
+              const idx = samePos.findIndex((p) => norm(p.name) === key);
+              if (idx >= 0) posRank = idx + 1;
+            }
           }
         }
         return (
