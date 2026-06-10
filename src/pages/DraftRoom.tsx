@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/sheet";
 
 import AiQuickPanel from "@/components/AiQuickPanel";
+import coachHelmet from "@/assets/coach-helmet.png";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
