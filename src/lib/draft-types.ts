@@ -55,8 +55,8 @@ export const DEFAULT_ROSTER: RosterSlots = {
   TE: 1,
   FLEX: 0,
   SUPERFLEX: 1,
-  K: 0,
-  DST: 0,
+  K: 1,
+  DST: 1,
   BENCH: 9,
 };
 
