@@ -12,6 +12,7 @@ import { PriceEstimate, Position } from "@/lib/draft-types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { buildTierPrices, tierForPosRank, injuryMultiplier, type AuctionRow } from "@/lib/league-tier-prices";
+import cheatSheet2026 from "@/assets/cheat-sheet-2026.json";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
@@ -237,26 +238,25 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   };
 
   // FIX: accept optional position so auto-fill and future imports can carry it through
-  const mergeImported = (incoming: { name: string; price: number; position?: Position }[], filename: string) => {
+  const mergeImported = (incoming: { name: string; price: number; position?: Position }[], filename: string, mode: "merge" | "replace" = "merge") => {
     if (!incoming.length) {
       toast.error("No players found in file");
       return;
     }
     const map = new Map<string, PriceEstimate>();
-    for (const p of prices) map.set(p.name.toLowerCase(), p);
+    if (mode === "merge") for (const p of prices) map.set(p.name.toLowerCase(), p);
     for (const p of incoming) {
       const existing = map.get(p.name.toLowerCase());
       map.set(p.name.toLowerCase(), {
         name: p.name,
         price: p.price,
-        // Prefer incoming position if provided; keep existing position as fallback
         position: p.position ?? existing?.position,
       });
     }
     const merged = Array.from(map.values());
     setPrices(merged);
     setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
-    toast.success(`Imported ${incoming.length} players from ${filename}`);
+    toast.success(`${mode === "replace" ? "Replaced with" : "Imported"} ${incoming.length} players from ${filename}`);
   };
 
   const handleUpload = async (file: File) => {
@@ -311,7 +311,8 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         throw new Error(t.error || `Parse failed (${resp.status})`);
       }
       const { players } = await resp.json() as { players: { name: string; price: number }[] };
-      mergeImported(players || [], file.name);
+      // PDF/image is a full cheat sheet upload — REPLACE existing prices entirely
+      mergeImported(players || [], file.name, "replace");
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || "Upload failed");
@@ -366,18 +367,54 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     setPrices(next);
     setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
   };
+  // Accepts "Name", "Name - 25", "Name $25", "Name 25"
+  const parseQuickInput = (raw: string): { name: string; price?: number } => {
+    const s = raw.trim();
+    const m = s.match(/^(.+?)\s*[-–:]?\s*\$?(\d+)\s*$/);
+    if (m && m[1] && !/\d/.test(m[1].trim())) {
+      return { name: m[1].trim(), price: parseInt(m[2], 10) };
+    }
+    return { name: s };
+  };
+
+  // Auto-fill price from existing sheet when the typed name matches
+  useEffect(() => {
+    const { name, price } = parseQuickInput(quickName);
+    if (price != null) {
+      setQuickPrice(String(price));
+      return;
+    }
+    if (!name || name.length < 2) return;
+    const k = name.toLowerCase();
+    const hit = prices.find((p) => p.name.toLowerCase() === k);
+    if (hit) setQuickPrice(String(hit.price));
+  }, [quickName, prices]);
+
   const addQuick = () => {
-    const name = quickName.trim();
-    const price = parseInt(quickPrice, 10);
+    const { name, price: parsedPrice } = parseQuickInput(quickName);
+    const price = parsedPrice ?? parseInt(quickPrice, 10);
     if (!name) return toast.error("Player name required");
     if (!Number.isFinite(price) || price <= 0) return toast.error("Valid price required");
-    if (prices.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-      return toast.error("Already in your sheet");
-    }
-    const next = [...prices, { name, price }];
+    const existing = prices.find((p) => p.name.toLowerCase() === name.toLowerCase());
+    const next = existing
+      ? prices.map((p) => (p.name.toLowerCase() === name.toLowerCase() ? { ...p, price } : p))
+      : [...prices, { name, price }];
     setPrices(next);
     setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
     setQuickName(""); setQuickPrice("");
+    toast.success(`${existing ? "Updated" : "Added"} ${name} — $${price}`);
+  };
+
+  const loadCheatSheet2026 = () => {
+    const sheet = cheatSheet2026 as { name: string; position?: string; team?: string; price: number }[];
+    const incoming = sheet.map((p) => ({
+      name: p.name,
+      price: p.price,
+      position: (p.position as Position | undefined) ?? undefined,
+    }));
+    setPrices(incoming);
+    setPricesText(incoming.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    toast.success(`Loaded 2026 cheat sheet — ${incoming.length} players ($${incoming.reduce((a, b) => a + b.price, 0)} total)`);
   };
 
   return (
@@ -416,6 +453,20 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div className="h-px flex-1 bg-border" />
       </div>
 
+      {/* PRESET: 2026 Superflex cheat sheet (350 players, Josh Allen $69 anchor) */}
+      <div className="rounded-md border border-border/60 bg-secondary/20 p-3">
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={loadCheatSheet2026}
+        >
+          <Sparkles className="mr-2 h-4 w-4" /> Load 2026 Superflex cheat sheet (350 players)
+        </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          Replaces all current prices. 12-team, $225, 4pt-passTD, 0.5 PPR. Allen $69 anchor.
+        </p>
+      </div>
+
       {/* FALLBACK: Upload CSV / XLSX / PDF / image */}
       <div className="rounded-md border border-dashed border-border/60 bg-secondary/20 p-3">
         <input
@@ -437,9 +488,45 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           {uploading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> Upload CSV / Excel / PDF / screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> Upload your own PDF / CSV / Excel / screenshot</>
           )}
         </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          PDFs are AI-parsed and replace the current prices.
+        </p>
+      </div>
+
+      {/* Quick add — type a name, price auto-fills from the sheet (or use "Name - 25" syntax) */}
+      <div className="rounded-md border border-border/60 bg-secondary/10 p-2">
+        <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">
+          Quick add / update — type "Player Name" (auto-fills $) or "Player Name - 25"
+        </p>
+        <div className="flex items-center gap-1.5">
+          <PlayerAutocomplete
+            value={quickName}
+            onChange={setQuickName}
+            onSelect={(p) => {
+              const hit = prices.find((x) => x.name.toLowerCase() === p.full_name.toLowerCase());
+              if (hit) setQuickPrice(String(hit.price));
+            }}
+            onEnter={addQuick}
+            placeholder="Player name…"
+            className="flex-1"
+          />
+          <span className="text-xs text-muted-foreground">$</span>
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={quickPrice}
+            onChange={(e) => setQuickPrice(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") addQuick(); }}
+            className="h-9 w-16 text-right font-mono text-xs"
+            placeholder="$"
+          />
+          <Button size="sm" onClick={addQuick} className="h-9 px-2">
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Filter / list */}
