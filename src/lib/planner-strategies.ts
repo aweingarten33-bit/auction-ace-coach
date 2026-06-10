@@ -202,6 +202,97 @@ function reconcile(
 }
 
 /**
+ * Proportional rebalance: when the user has manually edited (touched) any
+ * slot, redistribute the remaining pool across untouched/unlocked starter
+ * slots in proportion to their **current** dollar values (not strategy
+ * weights). This keeps the shape the user has been steering toward — bumping
+ * WR1 pulls a little from every other slot, including WR3 / TE / RB, instead
+ * of dumping all the change onto a couple of high-weight starters.
+ *
+ * Falls back to strategy weights only when every open slot is at $0.
+ */
+export function rebalanceProportional(
+  strategy: StrategyId,
+  settings: LeagueSettings,
+  opts: ComputeOptions = {},
+): Record<string, number> {
+  const { touchedSlots = {}, lockedSlots = {}, currentAllocations = {} } = opts;
+  const slots = buildPlannerSlots(settings);
+  const out: Record<string, number> = {};
+
+  let reserved = 0;
+  const open: PlannerSlot[] = [];
+  for (const slot of slots) {
+    if (isFixedDollarSlot(slot.group)) {
+      const v =
+        slot.group === "BENCH" && touchedSlots[slot.id]
+          ? Math.max(1, Number.isFinite(currentAllocations[slot.id]) ? currentAllocations[slot.id] : 1)
+          : 1;
+      out[slot.id] = v;
+      reserved += v;
+      continue;
+    }
+    if (lockedSlots[slot.id] || touchedSlots[slot.id]) {
+      const v = Math.max(0, Number.isFinite(currentAllocations[slot.id]) ? currentAllocations[slot.id] : 0);
+      out[slot.id] = v;
+      reserved += v;
+      continue;
+    }
+    open.push(slot);
+  }
+
+  const pool = Math.max(0, settings.totalBudget - reserved);
+
+  if (open.length === 0) return out;
+  if (pool === 0) {
+    for (const s of open) out[s.id] = 0;
+    return out;
+  }
+
+  // Base distribution = current $ on each open slot. If all zero, fall back
+  // to the strategy weight table.
+  let base = open.map((s) =>
+    Math.max(0, Number.isFinite(currentAllocations[s.id]) ? currentAllocations[s.id] : 0),
+  );
+  let total = base.reduce((a, b) => a + b, 0);
+  if (total === 0) {
+    base = open.map((s) => weightFor(strategy, s));
+    total = base.reduce((a, b) => a + b, 0) || 1;
+  }
+
+  // Scale each open slot, never below $1.
+  const raws = base.map((b) => Math.max(1, (b / total) * pool));
+  const floors = raws.map((r) => Math.max(1, Math.floor(r)));
+  let assigned = floors.reduce((a, b) => a + b, 0);
+  let remainder = pool - assigned;
+
+  // Hamilton's largest-remainder for positive leftover.
+  if (remainder > 0) {
+    const order = raws
+      .map((r, i) => ({ i, f: r - Math.floor(r) }))
+      .sort((a, b) => b.f - a.f);
+    let k = 0;
+    while (remainder > 0 && order.length > 0) {
+      floors[order[k % order.length].i] += 1;
+      remainder -= 1;
+      k += 1;
+    }
+  }
+  // If raws were < $1 and got bumped up to $1, peel back from the largest.
+  let safety = 0;
+  while (remainder < 0 && safety++ < 1000) {
+    let maxI = 0;
+    for (let i = 1; i < floors.length; i++) if (floors[i] > floors[maxI]) maxI = i;
+    if (floors[maxI] <= 1) break;
+    floors[maxI] -= 1;
+    remainder += 1;
+  }
+
+  open.forEach((s, i) => (out[s.id] = floors[i]));
+  return out;
+}
+
+/**
  * Industry-standard max bid: most you can pay for one player and still
  * afford $1 for every other open slot. (Yahoo, ESPN, Sleeper all use this.)
  */
