@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=Delius+Swash+Caps&family=Permanent+Marker&family=Caveat:wght@500;700&family=Architects+Daughter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;700&family=Delius+Swash+Caps&family=Permanent+Marker&family=Caveat:wght@500;700&family=Architects+Daughter&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,60 +14,60 @@
 
 @layer base {
   :root {
-    /* ---------- CORE SURFACE — Professional Blue + Burgundy + Gold ---------- */
-    --background:        218 38% 14%;         /* refined deep blue */
-    --background-alt:    218 35% 18%;
-    --foreground:        40 30% 97%;          /* clean warm white */
-    --muted-bg:          218 32% 21%;
+    /* ---------- CORE SURFACE — Law Firm: Navy + Cream + Gold + Burgundy ---------- */
+    --background:        216 42% 13%;         /* deep counsel navy */
+    --background-alt:    216 38% 17%;
+    --foreground:        40 35% 95%;          /* parchment cream */
+    --muted-bg:          216 34% 20%;
 
-    --card:              218 34% 19%;
-    --card-foreground:   40 30% 97%;
+    --card:              216 36% 18%;
+    --card-foreground:   40 35% 95%;
 
-    --popover:           218 35% 17%;
-    --popover-foreground:40 30% 97%;
+    --popover:           216 38% 16%;
+    --popover-foreground:40 35% 95%;
 
-    /* ---------- ACCENTS — Burgundy + Antique Gold ---------- */
-    --primary:           350 62% 42%;         /* deep burgundy */
-    --primary-foreground: 40 30% 97%;
-    --primary-glow:      350 68% 52%;
+    /* ---------- ACCENTS — Burgundy seal + Restrained Gold ---------- */
+    --primary:           350 55% 38%;         /* oxblood burgundy */
+    --primary-foreground: 40 35% 95%;
+    --primary-glow:      350 58% 48%;
 
-    --secondary:         218 30% 24%;
-    --secondary-foreground: 40 30% 97%;
+    --secondary:         216 32% 24%;
+    --secondary-foreground: 40 35% 95%;
 
-    --accent:            42 72% 56%;          /* antique gold */
-    --accent-foreground: 218 38% 12%;
-    --accent-secondary:  350 62% 42%;
+    --accent:            42 58% 54%;          /* restrained antique gold */
+    --accent-foreground: 216 42% 12%;
+    --accent-secondary:  350 55% 38%;
 
-    --muted:             218 28% 24%;
-    --muted-foreground:  218 15% 78%;
+    --muted:             216 28% 24%;
+    --muted-foreground:  216 14% 76%;
 
-    --destructive:       350 62% 45%;
-    --destructive-foreground: 40 30% 97%;
+    --destructive:       350 55% 42%;
+    --destructive-foreground: 40 35% 95%;
 
-    --warning:           42 80% 58%;
-    --warning-foreground: 218 38% 12%;
+    --warning:           42 65% 56%;
+    --warning-foreground: 216 42% 12%;
 
-    --success:           42 72% 52%;
-    --success-foreground: 218 38% 12%;
+    --success:           42 55% 50%;
+    --success-foreground: 216 42% 12%;
 
-    --border:            218 25% 32%;
-    --input:             218 32% 20%;
-    --ring:              42 72% 56%;
+    --border:            216 22% 32%;
+    --input:             216 32% 19%;
+    --ring:              42 58% 54%;
 
-    --radius: 0.625rem;
+    --radius: 0.375rem;
 
     /* ---------- SURFACES + SHADOWS ---------- */
-    --surface:           218 34% 19%;
-    --surface-2:         218 30% 24%;
+    --surface:           216 36% 18%;
+    --surface-2:         216 30% 24%;
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    --neu-extruded:       0 1px 0 rgba(255,255,255,0.06), 0 8px 24px rgba(0,0,0,0.45);
-    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.08), 0 14px 32px rgba(0,0,0,0.55);
-    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.05), 0 4px 12px rgba(0,0,0,0.35);
-    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.07);
-    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.10);
-    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.05);
+    --neu-extruded:       0 1px 0 rgba(255,255,255,0.05), 0 6px 20px rgba(0,0,0,0.4);
+    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.07), 0 12px 28px rgba(0,0,0,0.5);
+    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04), 0 3px 10px rgba(0,0,0,0.3);
+    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.06);
+    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.09);
+    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.04);
 
     /* ---------- LEGACY ALIASES — routed to new dark palette ---------- */
     --bone:              40 25% 96%;
@@ -220,15 +220,15 @@
   .dark .min-h-screen.bg-background::before { content: none !important; }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    font-family: "Libre Baskerville", "Georgia", ui-serif, serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
     color: hsl(var(--foreground));
     text-transform: none;
     text-shadow: none;
   }
-  h1 { font-weight: 800; letter-spacing: -0.035em; }
+  h1 { font-weight: 700; letter-spacing: -0.02em; }
 
   ::selection { background: hsl(var(--primary) / 0.35); color: hsl(var(--foreground)); }
 }
