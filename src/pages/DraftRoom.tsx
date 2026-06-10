@@ -348,7 +348,9 @@ export default function DraftRoom() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="flex items-center px-3 py-2">
-        
+          {/* Left spacer to mirror the Coach FAB width (h-9 w-9 + ml-2) so the calculator label is truly centered */}
+          <div className="h-9 w-9 mr-2 shrink-0" aria-hidden="true" />
+
           <button
             onClick={() => setPanel("calc")}
             aria-label="Auction calculator"
