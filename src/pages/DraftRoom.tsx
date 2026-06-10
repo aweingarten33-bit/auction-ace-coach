@@ -59,7 +59,7 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "recent" | "calc";
+type PanelId = "calc";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -359,13 +359,6 @@ export default function DraftRoom() {
             <Calculator className="h-5 w-5" />
             <span className="text-xs font-medium">Auction calculator</span>
           </button>
-          <button
-            onClick={() => setPanel("recent")}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-          >
-            <Clock className="h-4 w-4" />
-            <span className="text-xs font-medium">Recent</span>
-          </button>
 
           {/* Coach FAB */}
           <Sheet open={aiOpen} onOpenChange={setAiOpen}>
@@ -443,7 +436,6 @@ export default function DraftRoom() {
               </button>
               <h2 className="text-base font-semibold">
                 {panel === "calc" && "Auction calculator"}
-                {panel === "recent" && "Recent picks"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
