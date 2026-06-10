@@ -14,60 +14,60 @@
 
 @layer base {
   :root {
-    /* ---------- CORE SURFACE — Dark Navy + Red + Dark Gold ---------- */
-    --background:        220 45% 9%;          /* deep navy */
-    --background-alt:    220 42% 12%;
-    --foreground:        40 25% 96%;          /* warm near-white */
-    --muted-bg:          220 35% 14%;
+    /* ---------- CORE SURFACE — Dark Navy + Red + Dark Gold (HIGH CONTRAST) ---------- */
+    --background:        222 60% 6%;          /* deeper, richer navy */
+    --background-alt:    222 55% 9%;
+    --foreground:        45 40% 98%;          /* crisper warm white */
+    --muted-bg:          222 50% 11%;
 
-    --card:              220 38% 14%;         /* lifted navy panel */
-    --card-foreground:   40 25% 96%;
+    --card:              222 52% 11%;         /* lifted navy panel */
+    --card-foreground:   45 40% 98%;
 
-    --popover:           220 42% 12%;
-    --popover-foreground:40 25% 96%;
+    --popover:           222 55% 9%;
+    --popover-foreground:45 40% 98%;
 
-    /* ---------- ACCENTS — Signal Red + Dark Gold ---------- */
-    --primary:           0 78% 58%;           /* bright signal red */
+    /* ---------- ACCENTS — Signal Red + Dark Gold (SATURATED) ---------- */
+    --primary:           0 95% 56%;           /* punchy signal red */
     --primary-foreground: 0 0% 100%;
-    --primary-glow:      0 85% 66%;
+    --primary-glow:      0 100% 65%;
 
-    --secondary:         220 32% 18%;
-    --secondary-foreground: 40 25% 96%;
+    --secondary:         222 45% 16%;
+    --secondary-foreground: 45 40% 98%;
 
-    --accent:            42 78% 58%;          /* dark gold (bright) */
-    --accent-foreground: 220 45% 9%;
-    --accent-secondary:  0 78% 58%;           /* red co-accent */
+    --accent:            44 95% 56%;          /* vivid dark gold */
+    --accent-foreground: 222 60% 6%;
+    --accent-secondary:  0 95% 56%;
 
-    --muted:             220 30% 18%;
-    --muted-foreground:  220 15% 72%;
+    --muted:             222 40% 16%;
+    --muted-foreground:  220 20% 78%;
 
-    --destructive:       0 78% 55%;
+    --destructive:       0 92% 54%;
     --destructive-foreground: 0 0% 100%;
 
-    --warning:           42 90% 60%;
-    --warning-foreground: 220 45% 9%;
+    --warning:           44 100% 58%;
+    --warning-foreground: 222 60% 6%;
 
-    --success:           42 78% 55%;
-    --success-foreground: 220 45% 9%;
+    --success:           44 95% 54%;
+    --success-foreground: 222 60% 6%;
 
-    --border:            220 28% 22%;
-    --input:             220 35% 16%;
-    --ring:              42 78% 58%;
+    --border:            222 40% 24%;
+    --input:             222 50% 13%;
+    --ring:              44 95% 56%;
 
     --radius: 0.75rem;
 
     /* ---------- SURFACES + SHADOWS (dark-mode aware) ---------- */
-    --surface:           220 38% 14%;
-    --surface-2:         220 32% 18%;
+    --surface:           222 52% 12%;
+    --surface-2:         222 45% 16%;
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    --neu-extruded:       0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.45);
-    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.07), 0 14px 32px rgba(0,0,0,0.55);
-    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04), 0 4px 12px rgba(0,0,0,0.35);
-    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.06);
-    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.09);
-    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.05);
+    --neu-extruded:       0 1px 0 rgba(255,255,255,0.06), 0 10px 28px rgba(0,0,0,0.6);
+    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.08), 0 16px 36px rgba(0,0,0,0.7);
+    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.05), 0 6px 14px rgba(0,0,0,0.5);
+    --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.08);
+    --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.12);
+    --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.06);
 
     /* ---------- LEGACY ALIASES — routed to new dark palette ---------- */
     --bone:              40 25% 96%;
