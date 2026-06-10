@@ -19,8 +19,6 @@ import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
-import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { supabase } from "@/integrations/supabase/client";
 import {
   adjustPricesForDrafted,
@@ -54,7 +52,7 @@ import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
 import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
 
-import SyncStatusPill from "@/components/SyncStatusPill";
+
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -67,7 +65,6 @@ type PanelId = "calc";
 export default function DraftRoom() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { team: selectedTeam } = useSelectedTeam();
   const {
     settings,
     keepers,
@@ -107,8 +104,6 @@ export default function DraftRoom() {
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
-  const [leagueName, setLeagueName] = useState("");
-
   // Redirect to setup if no data yet (admin only; guests can view).
   useEffect(() => {
     const isGuest = !user || user.is_anonymous;
@@ -116,40 +111,6 @@ export default function DraftRoom() {
       navigate("/setup", { replace: true });
     }
   }, [user, setupComplete, prices.length, events.length, navigate]);
-
-  // Live sync — picks auto-tag as "me", nominations show the current bid climbing
-  const { liveBid } = useEspnLiveSync({
-    expectingEvents: setupComplete,
-    teamIdOverride: selectedTeam?.id ?? null,
-  });
-
-  // Pull league name from ESPN, with cache fallback
-  useEffect(() => {
-    (async () => {
-      const cached = localStorage.getItem("league_name_cache");
-      if (cached) setLeagueName(cached);
-      try {
-        const { data } = await supabase.functions.invoke("league-teams");
-        const name = (data as any)?.league?.name as string | undefined;
-        if (name) {
-          setLeagueName(name);
-          try { localStorage.setItem("league_name_cache", name); } catch { /* ignore */ }
-          return;
-        }
-      } catch { /* fall through */ }
-      const { data: ev } = await supabase
-        .from("live_draft_events")
-        .select("raw")
-        .order("created_at", { ascending: false })
-        .limit(25);
-      const rows = (ev ?? []) as Array<{ raw: any }>;
-      const found = rows.find((r) => r?.raw?.league?.name)?.raw?.league?.name as string | undefined;
-      if (found) {
-        setLeagueName(found);
-        try { localStorage.setItem("league_name_cache", found); } catch { /* ignore */ }
-      }
-    })();
-  }, []);
 
   const { lookup: lookupRank } = usePlayerRanks();
 
@@ -270,7 +231,6 @@ export default function DraftRoom() {
             onClose={() => setDrawerOpen(false)}
             onSignOut={async () => { await signOut(); navigate("/auth"); }}
             onGoToSetup={() => navigate("/setup")}
-            onGoToEspn={() => navigate("/espn")}
           />
         </Sheet>
 
@@ -279,10 +239,7 @@ export default function DraftRoom() {
             Auction Draft Assistant
           </p>
           <div className="mt-0.5 flex items-center gap-1.5">
-            {selectedTeam && leagueName && (
-              <span className="truncate text-[10px] text-muted-foreground">{selectedTeam.name}</span>
-            )}
-            <SyncStatusPill compact />
+            <span className="text-[10px] text-muted-foreground">Manual mode</span>
           </div>
         </div>
 
@@ -519,7 +476,7 @@ export default function DraftRoom() {
             open={!!detailFor}
             onOpenChange={(o) => !o && setDetailFor(null)}
             name={detailFor?.name ?? ""}
-            leagueName={leagueName}
+            leagueName={""}
             position={detailFor?.position}
             sheetPrice={sheet?.price}
             anchor={anchor}
@@ -611,12 +568,10 @@ function SettingsDrawer({
   onClose,
   onSignOut,
   onGoToSetup,
-  onGoToEspn,
 }: {
   onClose: () => void;
   onSignOut: () => void;
   onGoToSetup: () => void;
-  onGoToEspn: () => void;
 }) {
   return (
     <SheetContent side="bottom" className="flex h-[60vh] flex-col gap-0 rounded-t-3xl border-t border-border/60 p-0">
@@ -637,15 +592,6 @@ function SettingsDrawer({
         </button>
         <button
           type="button"
-          onClick={() => { onClose(); onGoToEspn(); }}
-          className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left hover:bg-secondary/40"
-        >
-          <Wifi className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm">ESPN connection</span>
-        </button>
-        <RefreshLeagueButton onDone={onClose} />
-        <button
-          type="button"
           onClick={onSignOut}
           className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-destructive hover:bg-destructive/10"
         >
@@ -654,33 +600,6 @@ function SettingsDrawer({
         </button>
       </div>
     </SheetContent>
-  );
-}
-
-function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
-  const [busy, setBusy] = useState(false);
-  return (
-    <button
-      type="button"
-      disabled={busy}
-      onClick={async () => {
-        setBusy(true);
-        try {
-          const { error } = await supabase.functions.invoke("espn-sync");
-          if (error) throw error;
-          toast.success("League refreshed from ESPN.");
-          onDone();
-        } catch (e) {
-          toast.error(e instanceof Error ? e.message : "Refresh failed.");
-        } finally {
-          setBusy(false);
-        }
-      }}
-      className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left hover:bg-secondary/40 disabled:opacity-60"
-    >
-      <RefreshCw className={`h-4 w-4 text-muted-foreground ${busy ? "animate-spin" : ""}`} />
-      <span className="text-sm">{busy ? "Refreshing..." : "Refresh league from ESPN"}</span>
-    </button>
   );
 }
 
