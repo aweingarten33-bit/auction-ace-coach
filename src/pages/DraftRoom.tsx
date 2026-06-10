@@ -723,6 +723,10 @@ function RefreshLeagueButton({ onDone }: { onDone: () => void }) {
 
 
 // ─────────────────────────────────────────────────────────────────────────────
+const POSITION_FILTER_OPTIONS: (Position | "ALL")[] = [
+  "ALL", "QB", "RB", "WR", "TE", "K", "DST",
+];
+
 function Top100List({
   prices,
   anchorMap,
@@ -734,6 +738,8 @@ function Top100List({
   events: ReturnType<typeof useDraftStore.getState>["events"];
   onPick: (name: string, position?: Position) => void;
 }) {
+  const [search, setSearch] = useState("");
+  const [posFilter, setPosFilter] = useState<Position | "ALL">("ALL");
   const drafted = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
   const top = useMemo(() => {
     type Row = { name: string; price: number; position?: PriceEstimate["position"] };
@@ -746,9 +752,19 @@ function Top100List({
     }
     return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 100);
   }, [prices, anchorMap]);
-  const rows = top.map((r) => ({ name: r.name, position: r.position, price: r.price as number | null }));
 
-  if (rows.length === 0) {
+  const filtered = useMemo(() => {
+    const s = norm(search);
+    return top.filter((p) => {
+      if (s && !norm(p.name).includes(s)) return false;
+      if (posFilter !== "ALL" && p.position !== posFilter) return false;
+      return true;
+    });
+  }, [top, search, posFilter]);
+
+  const rows = filtered.map((r) => ({ name: r.name, position: r.position, price: r.price as number | null }));
+
+  if (top.length === 0) {
     return (
       <p className="py-8 text-center text-xs text-muted-foreground">
         Loading consensus rankings…
@@ -757,39 +773,66 @@ function Top100List({
   }
 
   return (
-    <div className="space-y-1">
-      {rows.map((p, i) => {
-        const isPicked = drafted.has(norm(p.name));
-        const isFiftyDivider = i === 50;
-        return (
-          <div key={p.name}>
-            {isFiftyDivider && (
-              <div className="my-2 flex items-center gap-2">
-                <div className="h-[3px] flex-1 bg-foreground" />
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground">
-                  Next 50
-                </span>
-                <div className="h-[3px] flex-1 bg-foreground" />
-              </div>
-            )}
-            <button
-              type="button"
-              disabled={isPicked}
-              onClick={() => !isPicked && onPick(p.name, p.position)}
-              className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isPicked ? "opacity-50" : ""}`}
-            >
-              <span className="w-6 text-right font-mono text-[10px] text-muted-foreground">{i + 1}</span>
-              {p.position && (
-                <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
-                  {p.position}
-                </Badge>
+    <div className="space-y-2">
+      <Input
+        placeholder="Search players…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="h-10 text-sm"
+      />
+      <div className="flex flex-wrap gap-1.5">
+        {POSITION_FILTER_OPTIONS.map((pos) => (
+          <button
+            key={pos}
+            type="button"
+            onClick={() => setPosFilter(pos)}
+            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
+              posFilter === pos
+                ? "bg-foreground text-background"
+                : "bg-secondary/40 text-muted-foreground hover:bg-secondary/60"
+            }`}
+          >
+            {pos}
+          </button>
+        ))}
+      </div>
+      <div className="space-y-1">
+        {rows.length === 0 && (
+          <p className="py-6 text-center text-xs text-muted-foreground">No players match.</p>
+        )}
+        {rows.map((p, i) => {
+          const isPicked = drafted.has(norm(p.name));
+          const isFiftyDivider = i === 50 && search.trim() === "" && posFilter === "ALL";
+          return (
+            <div key={p.name}>
+              {isFiftyDivider && (
+                <div className="my-2 flex items-center gap-2">
+                  <div className="h-[3px] flex-1 bg-foreground" />
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground">
+                    Next 50
+                  </span>
+                  <div className="h-[3px] flex-1 bg-foreground" />
+                </div>
               )}
-              <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
-              {p.price != null && <span className="font-mono tabular-nums">${p.price}</span>}
-            </button>
-          </div>
-        );
-      })}
+              <button
+                type="button"
+                disabled={isPicked}
+                onClick={() => !isPicked && onPick(p.name, p.position)}
+                className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isPicked ? "opacity-50" : ""}`}
+              >
+                <span className="w-6 text-right font-mono text-[10px] text-muted-foreground">{i + 1}</span>
+                {p.position && (
+                  <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
+                    {p.position}
+                  </Badge>
+                )}
+                <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
+                {p.price != null && <span className="font-mono tabular-nums">${p.price}</span>}
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
