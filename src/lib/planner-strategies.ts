@@ -10,13 +10,15 @@
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "./planner-slots";
 import type { LeagueSettings } from "./draft-types";
 
-export type StrategyId = "hero-qb" | "balanced-qbs" | "bargain-qb";
+export type StrategyId = "hero-qb" | "balanced-qbs" | "bargain-qb" | "manual";
 
 export const STRATEGY_LABELS: Record<StrategyId, string> = {
   "hero-qb": "Hero QBs",
   "balanced-qbs": "Balanced QBs",
   "bargain-qb": "Bargain QB",
+  "manual": "Manual",
 };
+
 
 type WeightTable = Partial<Record<SlotGroup, number[]>>;
 
@@ -31,7 +33,7 @@ type WeightTable = Partial<Record<SlotGroup, number[]>>;
 //     the rest.
 //   - Razzball B_Don 2024 SF Auction Values, Draft Sharks SF auction values
 //     (price tiers cross-checked).
-const STRATEGIES: Record<StrategyId, WeightTable> = {
+const STRATEGIES: Record<Exclude<StrategyId, "manual">, WeightTable> = {
   // Two elite QBs — QB1 + SF both get star money, QB3 is a dart throw.
   "hero-qb": {
     QB:        [42, 3],
@@ -69,7 +71,9 @@ function isFixedDollarSlot(group: SlotGroup): boolean {
 }
 
 function weightFor(strategy: StrategyId, slot: PlannerSlot): number {
-  const table = STRATEGIES[strategy] ?? STRATEGIES["balanced-qbs"];
+  const key = (strategy === "manual" ? "balanced-qbs" : strategy) as Exclude<StrategyId, "manual">;
+  const table = STRATEGIES[key] ?? STRATEGIES["balanced-qbs"];
+
   const row = table[slot.group];
   if (!row || row.length === 0) return 1;
   const idxStr = slot.id.split("-").pop() ?? "1";
