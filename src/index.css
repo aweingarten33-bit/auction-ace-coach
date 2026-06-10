@@ -34,7 +34,7 @@
     --secondary:         216 32% 24%;
     --secondary-foreground: 40 35% 95%;
 
-    --accent:            42 58% 54%;          /* restrained antique gold */
+    --accent:            40 35% 96%;          /* white / parchment */
     --accent-foreground: 216 42% 12%;
     --accent-secondary:  350 55% 38%;
 
@@ -44,15 +44,15 @@
     --destructive:       350 55% 42%;
     --destructive-foreground: 40 35% 95%;
 
-    --warning:           42 65% 56%;
+    --warning:           40 35% 96%;
     --warning-foreground: 216 42% 12%;
 
-    --success:           42 55% 50%;
+    --success:           40 35% 96%;
     --success-foreground: 216 42% 12%;
 
     --border:            40 35% 95% / 0.18;
     --input:             216 32% 19%;
-    --ring:              42 58% 54%;
+    --ring:              40 35% 96%;
 
     --radius: 0.375rem;
 
