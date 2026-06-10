@@ -269,18 +269,18 @@ Deno.serve(async (req: Request) => {
     // ---------- Optional live web search via Firecrawl ----------
     let webContext = "";
     const q = (payload.userQuestion || "").trim();
-    const shouldSearch = !!FIRECRAWL_API_KEY && q.length > 0 && q.split(/\s+/).length >= 3;
+    const shouldSearch = !!FIRECRAWL_API_KEY && q.length > 0;
     if (shouldSearch) {
       try {
         const searchQuery = `${q} fantasy football 2026 ESPN OR FantasyPros OR "Matthew Berry"`;
         const fcRes = await fetch("https://api.firecrawl.dev/v2/search", {
           method: "POST",
           headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ query: searchQuery, limit: 3, tbs: "qdr:m" }),
+          body: JSON.stringify({ query: searchQuery, limit: 5, tbs: "qdr:w" }),
         });
         if (fcRes.ok) {
           const fc = await fcRes.json();
-          const results = (fc?.data ?? fc?.web ?? []).slice(0, 3);
+          const results = (fc?.data ?? fc?.web ?? []).slice(0, 5);
           if (results.length) {
             webContext = results
               .map((r: { url?: string; title?: string; description?: string }, i: number) =>
