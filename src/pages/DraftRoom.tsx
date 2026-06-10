@@ -200,7 +200,7 @@ export default function DraftRoom() {
       : 0;
 
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-background text-foreground">
+    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-transparent text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
       <header className="flex shrink-0 items-center gap-2 border-b border-border bg-background/95 px-2 pt-1 pb-1.5 backdrop-blur-sm">
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
