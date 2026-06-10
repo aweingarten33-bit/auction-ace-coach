@@ -49,6 +49,7 @@ import {
 import AiQuickPanel from "@/components/AiQuickPanel";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
@@ -294,34 +295,51 @@ export default function DraftRoom() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
-        <div className="space-y-4">
-          {/* Budget summary */}
-          {selectedTeam && (() => {
-            const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
-            const moneyLeft = budget.totalBudget - allocated;
-            return (
-              <div className="flex items-baseline justify-between gap-4 pr-[52px]">
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
-                  <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
+        <Tabs defaultValue="planner" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="planner">Budget Planner</TabsTrigger>
+            <TabsTrigger value="top100">Top 100</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="planner" className="space-y-4">
+            {/* Budget summary */}
+            {selectedTeam && (() => {
+              const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
+              const moneyLeft = budget.totalBudget - allocated;
+              return (
+                <div className="flex items-baseline justify-between gap-4 pr-[52px]">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
+                    <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Money left</span>
+                    <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
+                      ${moneyLeft}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Money left</span>
-                  <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
-                    ${moneyLeft}
-                  </span>
-                </div>
-              </div>
-            );
-          })()}
-          {/* Strategy picker + per-slot budget allocations */}
-          <PositionBudgetBar />
-          {/* Last pick delta */}
-          {events.length > 0 && (
-            <LastPickImpact settings={settings} keepers={keepers} events={events} />
-          )}
-        </div>
+              );
+            })()}
+            {/* Strategy picker + per-slot budget allocations */}
+            <PositionBudgetBar />
+            {/* Last pick delta */}
+            {events.length > 0 && (
+              <LastPickImpact settings={settings} keepers={keepers} events={events} />
+            )}
+          </TabsContent>
+
+          <TabsContent value="top100">
+            <Top100List
+              prices={adjustedPrices}
+              anchorMap={anchorMap}
+              events={events}
+              onPick={(name, position) => openDetails(name, position)}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
+
 
       {/* ── BOTTOM BAR (fixed/frozen) ──────────────────────── */}
       <div
