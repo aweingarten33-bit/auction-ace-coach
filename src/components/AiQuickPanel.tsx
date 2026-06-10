@@ -164,12 +164,14 @@ export default function AiQuickPanel({ coachContext }: Props) {
       setInput("");
       setStreaming(true);
       setStreamingText("");
+      setStreamingMeta(null);
       // Fire-and-forget persistence.
       persistMessage(userMsg).then((id) => {
         if (id) setHistory((h) => h.map((m) => (m === userMsg ? { ...m, id } : m)));
       });
 
       let acc = "";
+      let capturedMeta: CoachMetaT | null = null;
       try {
         const ctx = coachContext();
         await streamCoach(
@@ -184,6 +186,10 @@ export default function AiQuickPanel({ coachContext }: Props) {
             acc += chunk;
             setStreamingText(extractProposal(acc).clean);
             scrollRef.current?.scrollTo({ top: 1e9 });
+          },
+          (meta) => {
+            capturedMeta = meta;
+            setStreamingMeta(meta);
           },
         );
       } catch (e) {
@@ -201,14 +207,29 @@ export default function AiQuickPanel({ coachContext }: Props) {
             proposal,
           };
           setHistory((h) => [...h, assistantMsg]);
+          if (capturedMeta) {
+            setMetaByMsgId((m) => ({ ...m, [assistantMsg.id]: capturedMeta! }));
+          }
           persistMessage({ role: "assistant", content: clean, proposal }).then((id) => {
-            if (id) setHistory((h) => h.map((m) => (m === assistantMsg ? { ...m, id } : m)));
+            if (id) {
+              setHistory((h) => h.map((m) => (m === assistantMsg ? { ...m, id } : m)));
+              if (capturedMeta) {
+                setMetaByMsgId((m) => {
+                  const next = { ...m };
+                  delete next[assistantMsg.id];
+                  next[id] = capturedMeta!;
+                  return next;
+                });
+              }
+            }
           });
         }
         setStreamingText("");
+        setStreamingMeta(null);
         inputRef.current?.focus();
       }
     },
+
     [coachContext, history, persistMessage, streaming],
   );
 
