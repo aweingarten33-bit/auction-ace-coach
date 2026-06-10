@@ -17,44 +17,44 @@
     /* ---------- CORE SURFACE — Superman Returns suit ----------
        Muted royal-navy base (suit fabric), warm cream foreground.
        Antique shield-gold + burgundy cape as accents. */
-    --background:        38 30% 96%;            /* warm ivory paper */
-    --background-alt:    38 26% 92%;
-    --foreground:        220 18% 14%;           /* deep ink */
-    --muted-bg:          38 22% 90%;
+    --background:        38 44% 97%;            /* bright warm ivory */
+    --background-alt:    38 38% 93%;
+    --foreground:        222 50% 8%;             /* near-black ink, high contrast */
+    --muted-bg:          38 32% 90%;
 
-    --card:              38 32% 98%;            /* bright vellum */
-    --card-foreground:   220 18% 14%;
+    --card:              0 0% 100%;              /* pure vellum */
+    --card-foreground:   222 50% 8%;
 
-    --popover:           38 32% 98%;
-    --popover-foreground:220 18% 14%;
+    --popover:           0 0% 100%;
+    --popover-foreground:222 50% 8%;
 
-    /* ---------- ACCENTS — editorial navy + antique gold ---------- */
-    --primary:           218 38% 22%;           /* deep editorial navy */
-    --primary-foreground: 38 30% 96%;
-    --primary-glow:      218 32% 34%;
+    /* ---------- ACCENTS — saturated editorial navy + rich gold ---------- */
+    --primary:           222 78% 22%;            /* deep saturated navy */
+    --primary-foreground: 38 44% 98%;
+    --primary-glow:      222 70% 38%;
 
-    --secondary:         38 20% 88%;            /* warm linen */
-    --secondary-foreground: 220 18% 14%;
+    --secondary:         38 30% 88%;             /* warm linen */
+    --secondary-foreground: 222 50% 8%;
 
-    --accent:            36 52% 46%;            /* burnished antique gold */
-    --accent-foreground: 38 30% 98%;
-    --accent-secondary:  218 38% 22%;
+    --accent:            36 88% 48%;             /* rich saturated gold */
+    --accent-foreground: 222 50% 8%;
+    --accent-secondary:  222 78% 22%;
 
-    --muted:             38 16% 84%;
-    --muted-foreground:  220 10% 38%;
+    --muted:             38 22% 82%;
+    --muted-foreground:  222 22% 28%;
 
-    --destructive:       6 56% 40%;             /* oxblood */
-    --destructive-foreground: 38 30% 96%;
+    --destructive:       4 78% 42%;              /* deep crimson */
+    --destructive-foreground: 38 44% 98%;
 
-    --warning:           36 70% 48%;
-    --warning-foreground: 220 18% 14%;
+    --warning:           36 92% 50%;
+    --warning-foreground: 222 50% 8%;
 
-    --success:           150 28% 32%;           /* muted forest */
-    --success-foreground: 38 30% 96%;
+    --success:           150 56% 28%;            /* deep emerald */
+    --success-foreground: 38 44% 98%;
 
-    --border:            38 14% 78%;
-    --input:             38 22% 92%;
-    --ring:              36 52% 46%;
+    --border:            38 18% 70%;
+    --input:             38 28% 92%;
+    --ring:              36 88% 48%;
 
     --radius: 0.75rem;
 
