@@ -103,7 +103,7 @@ export default function AuctionCalculator({
         {open && suggestions.length > 0 && (
           <div className="absolute left-0 right-0 z-50 mt-1 max-h-72 overflow-auto rounded-md border border-border bg-popover shadow-lg">
             {suggestions.map((p, i) => {
-              const hit = priceByName.get(norm(p.full_name));
+              const hit = priceByName.get(norm(p.name));
               return (
                 <button
                     key={p.name}
