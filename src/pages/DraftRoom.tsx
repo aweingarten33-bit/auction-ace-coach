@@ -478,7 +478,7 @@ export default function DraftRoom() {
       {/* Player details modal */}
       {(() => {
         const key = detailFor ? norm(detailFor.name) : "";
-        const sheet = detailFor ? prices.find((p) => norm(p.name) === key) : undefined;
+        const sheet = detailFor ? adjustedPrices.find((p) => norm(p.name) === key) : undefined;
         const anchor = key ? anchorMap[key] : undefined;
         let posRank: number | undefined;
         let totalAtPos: number | undefined;
