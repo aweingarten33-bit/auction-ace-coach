@@ -203,7 +203,7 @@ export default function DraftRoom() {
   return (
     <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-background text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <header className="flex shrink-0 items-center gap-2 border-b border-border bg-background/95 px-2 pt-1 pb-1.5 backdrop-blur-sm">
+      <header className="flex shrink-0 items-center gap-1 border-b border-border bg-background/95 px-1.5 py-0 backdrop-blur-sm">
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <Button
             variant="ghost"
@@ -237,7 +237,7 @@ export default function DraftRoom() {
           <img
             src={auctionDraftBadge}
             alt="Auction Draft Assist"
-            className="h-20 w-auto object-contain invert brightness-200"
+            className="h-28 w-full max-w-[320px] object-contain invert brightness-200"
           />
         </div>
       </header>
