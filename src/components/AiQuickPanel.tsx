@@ -405,6 +405,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
               <div className="min-w-0 flex-1">
                 <CoachMessage content={m.content} />
                 {m.proposal && renderProposal(m.proposal, m.id)}
+                {metaByMsgId[m.id] && <CoachMeta meta={metaByMsgId[m.id]} />}
               </div>
             </div>
           ),
@@ -416,9 +417,11 @@ export default function AiQuickPanel({ coachContext }: Props) {
             </div>
             <div className="min-w-0 flex-1">
               <CoachMessage content={streamingText} />
+              {streamingMeta && <CoachMeta meta={streamingMeta} />}
             </div>
           </div>
         )}
+
       </div>
 
       <div className="border-t border-border/60 px-3 pb-3 pt-2">
