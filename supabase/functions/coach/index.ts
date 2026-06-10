@@ -280,7 +280,7 @@ Deno.serve(async (req: Request) => {
         });
         if (fcRes.ok) {
           const fc = await fcRes.json();
-          const results = (fc?.data ?? fc?.web ?? []).slice(0, 3);
+          const results = (fc?.data ?? fc?.web ?? []).slice(0, 5);
           if (results.length) {
             webContext = results
               .map((r: { url?: string; title?: string; description?: string }, i: number) =>
