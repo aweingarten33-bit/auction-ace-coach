@@ -294,33 +294,35 @@ export default function DraftRoom() {
         <div className="h-full bg-primary transition-all" style={{ width: `${spentPct}%` }} />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
-        <Tabs defaultValue="planner" className="space-y-4">
+      <Tabs defaultValue="planner" className="flex min-h-0 flex-1 flex-col">
+        {/* Frozen sub-header: tabs + budget summary stay above the scroll */}
+        <div className="shrink-0 space-y-3 border-b border-border/40 bg-background/95 px-3 pb-3 pt-3 backdrop-blur-sm">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="planner">Budget Planner</TabsTrigger>
             <TabsTrigger value="top100">Top 100</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="planner" className="space-y-4">
-            {/* Budget summary */}
-            {selectedTeam && (() => {
-              const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
-              const moneyLeft = budget.totalBudget - allocated;
-              return (
-                <div className="flex items-baseline justify-between gap-4 pr-[52px]">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
-                    <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-xs uppercase tracking-wide text-muted-foreground">Money left</span>
-                    <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
-                      ${moneyLeft}
-                    </span>
-                  </div>
+          {selectedTeam && (() => {
+            const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
+            const moneyLeft = budget.totalBudget - allocated;
+            return (
+              <div className="flex items-baseline justify-between gap-4 pr-[52px]">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
+                  <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
                 </div>
-              );
-            })()}
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Money left</span>
+                  <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
+                    ${moneyLeft}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
+          <TabsContent value="planner" className="space-y-4 mt-0">
             {/* Strategy picker + per-slot budget allocations */}
             <PositionBudgetBar />
             {/* Last pick delta */}
@@ -329,7 +331,7 @@ export default function DraftRoom() {
             )}
           </TabsContent>
 
-          <TabsContent value="top100">
+          <TabsContent value="top100" className="mt-0">
             <Top100List
               prices={adjustedPrices}
               anchorMap={anchorMap}
@@ -337,8 +339,9 @@ export default function DraftRoom() {
               onPick={(name, position) => openDetails(name, position)}
             />
           </TabsContent>
-        </Tabs>
-      </div>
+        </div>
+      </Tabs>
+
 
 
       {/* ── BOTTOM BAR (fixed/frozen) ──────────────────────── */}
