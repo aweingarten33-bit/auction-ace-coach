@@ -148,7 +148,7 @@ export default function AuctionPlayerCard({
   const whyParts: string[] = [rosterLine];
   if (suggested != null && marketAvg != null) {
     const roundedMarket = Math.round(marketAvg);
-    const math = `${fmt(suggested)} price vs ${fmt(roundedMarket)} Berry/Sleeper value = ${delta! >= 0 ? "+" : "-"}${fmt(Math.abs(delta!))}`;
+    const math = `${fmt(suggested)} price vs ${fmt(roundedMarket)} blended value = ${delta! >= 0 ? "+" : "-"}${fmt(Math.abs(delta!))}`;
     if (delta! < 0) {
       whyParts.push(`${math}; discount if you still need ${position ?? "this position"}.`);
     } else if (delta! > 0) {
@@ -157,9 +157,6 @@ export default function AuctionPlayerCard({
       whyParts.push(`${math}; fair blend, not generic app pricing.`);
     }
   }
-  if (berryVal != null || sleeperVal != null) {
-    whyParts.push(`Analyst blend uses Matthew Berry/Fantasy Life${berryVal != null ? ` ${fmt(berryVal)}` : ""} + Sleeper${sleeperVal != null ? ` ${fmt(sleeperVal)}` : ""}.`);
-  }
   if (posRank && totalAtPos) {
     whyParts.push(`${position}${posRank} of ${totalAtPos} by auction value, so compare him to your remaining ${position} need.`);
   }
@@ -167,18 +164,19 @@ export default function AuctionPlayerCard({
     whyParts.push(`You still need ${myGap.starterShort} starting ${position}; this card is judging him against that hole.`);
   }
 
-  // Path-to-smash: based on rank + Fantasy Life/Sleeper context
+  // Path-to-smash: based on rank + blended value context
   const pathParts: string[] = [];
   if (posRank && posRank <= 6) {
-    pathParts.push(`Top-${posRank} ${position} profile; Berry/Fantasy Life + Sleeper value says ceiling is already priced like a difference-maker.`);
+    pathParts.push(`Top-${posRank} ${position} profile; the blended value already prices him like a difference-maker.`);
   } else if (posRank && posRank <= 15) {
     pathParts.push(`Mid-tier ${position}; payoff is beating the blended ${marketAvg ? fmt(marketAvg) : "market"} number while your expensive slots stay intact.`);
   } else if (posRank) {
-    pathParts.push(`Late ${position}; path is cheap depth, injury-away upside, or Sleeper depth-chart movement.`);
+    pathParts.push(`Late ${position}; path is cheap depth or injury-away upside.`);
   }
   if (lastSold && marketAvg != null && lastSold.bid < marketAvg - 2) {
     pathParts.push(`Your league last paid ${fmt(lastSold.bid)} in '${String(lastSold.season).slice(2)}, below today's ${fmt(marketAvg)} blend.`);
   }
+
 
   // Risk: injury status from anchor + price-vs-budget
   const riskParts: string[] = [];
