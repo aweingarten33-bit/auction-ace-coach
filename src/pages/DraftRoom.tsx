@@ -353,7 +353,7 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Ask the Coach"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-[0_0_18px_hsl(var(--primary)/0.55)] active:scale-95 transition hover:brightness-110"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent/70 text-accent-foreground shadow-[0_0_18px_hsl(var(--accent)/0.55)] active:scale-95 transition hover:brightness-110"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={1.75} />
               </button>
