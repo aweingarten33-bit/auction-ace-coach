@@ -2,7 +2,7 @@
 // - Loads/saves messages in Lovable Cloud per signed-in user (RLS).
 // - Parses <<<PLANNER_PROPOSAL>>>...<<<END>>> blocks from assistant text and
 //   renders them as cards with a one-tap "Apply to planner" button.
-// - Anonymous users get an in-memory chat with a "Sign in to save" notice.
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Sparkles, Send, Plus, Check, X, RotateCcw } from "lucide-react";
 import ReactMarkdown from "react-markdown";
@@ -360,9 +360,6 @@ export default function AiQuickPanel({ coachContext }: Props) {
     <div className="flex h-full flex-col overflow-hidden">
       {/* Header strip — new chat + auth notice */}
       <div className="flex items-center justify-between border-b border-border/60 px-3 py-1.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-          {isAuthed ? "Chat saved to your account" : "Sign in to save chats"}
-        </span>
         <Button
           variant="ghost"
           size="sm"
