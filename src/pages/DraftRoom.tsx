@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
+import auctionDraftBadge from "@/assets/auction-draft-assist-badge.png";
 
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -233,10 +234,11 @@ export default function DraftRoom() {
         </Sheet>
 
         <div className="min-w-0 flex-1 leading-tight">
-          <p className="truncate font-bebas text-lg tracking-wider leading-tight">
-            <span className="text-foreground">Auction Draft</span>{" "}
-            <span className="text-accent">Assistant</span>
-          </p>
+          <img
+            src={auctionDraftBadge}
+            alt="Auction Draft Assist"
+            className="h-10 w-auto object-contain dark:invert"
+          />
         </div>
       </header>
 
