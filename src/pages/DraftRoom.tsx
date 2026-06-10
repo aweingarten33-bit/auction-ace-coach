@@ -200,26 +200,14 @@ export default function DraftRoom() {
       : 0;
 
   return (
-    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-[#050d1c] text-white">
-      {/* ambient stadium glow */}
-      <div
-        className="pointer-events-none absolute -left-1/3 -top-1/4 h-[50vh] w-[50vh] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 60%)" }}
-      />
-      <div
-        className="pointer-events-none absolute -right-1/3 top-1/3 h-[50vh] w-[50vh] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(239,68,68,0.16) 0%, transparent 60%)" }}
-      />
-
+    <div className="relative flex h-[100dvh] flex-col overflow-hidden bg-background text-foreground">
       {/* ── HEADER ─────────────────────────────────────────── */}
-      <header
-        className="relative z-10 flex shrink-0 items-center gap-2 border-b border-white/10 bg-[#050d1c]/80 px-2 pt-1 pb-1.5 backdrop-blur-sm"
-      >
+      <header className="flex shrink-0 items-center gap-2 border-b border-border bg-background/95 px-2 pt-1 pb-1.5 backdrop-blur-sm">
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 text-white hover:bg-white/10 hover:text-white"
+            className="h-8 w-8 shrink-0"
             aria-label="Menu"
             onClick={() => {
               if (sessionStorage.getItem("menu_unlocked") === "1") {
@@ -246,41 +234,29 @@ export default function DraftRoom() {
 
         <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate font-bebas text-lg tracking-wider leading-tight">
-            <span className="text-white">Auction Draft</span>{" "}
-            <span className="text-[#c9a14a]">Assistant</span>
+            <span className="text-foreground">Auction Draft</span>{" "}
+            <span className="text-accent">Assistant</span>
           </p>
         </div>
-
       </header>
 
       {/* ── SPEND BAR ───────────────────────────────────────── */}
-      <div className="relative z-10 h-[3px] shrink-0 bg-white/5">
+      <div className="h-[3px] shrink-0 bg-muted">
         <div
           className="h-full transition-all"
           style={{
             width: `${spentPct}%`,
-            background: "linear-gradient(90deg, #ef4444 0%, #c9a14a 100%)",
-            boxShadow: "0 0 10px rgba(239,68,68,0.6)",
+            background: "linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)",
+            boxShadow: "0 0 10px hsl(var(--primary) / 0.6)",
           }}
         />
       </div>
 
-      <Tabs defaultValue="planner" className="relative z-10 flex min-h-0 flex-1 flex-col">
-        {/* Frozen sub-header: tabs + budget summary stay above the scroll */}
-        <div className="shrink-0 space-y-2 border-b border-white/10 bg-[#050d1c]/85 px-2.5 pb-2 pt-2 backdrop-blur-sm">
-          <TabsList className="grid w-full grid-cols-2 bg-white/5 border border-white/10">
-            <TabsTrigger
-              value="planner"
-              className="data-[state=active]:bg-[#c9a14a]/15 data-[state=active]:text-[#c9a14a] data-[state=active]:shadow-[0_0_12px_rgba(201,161,74,0.25)] text-white/60"
-            >
-              Budget Planner
-            </TabsTrigger>
-            <TabsTrigger
-              value="top100"
-              className="data-[state=active]:bg-[#c9a14a]/15 data-[state=active]:text-[#c9a14a] data-[state=active]:shadow-[0_0_12px_rgba(201,161,74,0.25)] text-white/60"
-            >
-              Top 100
-            </TabsTrigger>
+      <Tabs defaultValue="planner" className="flex min-h-0 flex-1 flex-col">
+        <div className="shrink-0 space-y-2 border-b border-border bg-background/95 px-2.5 pb-2 pt-2 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="planner">Budget Planner</TabsTrigger>
+            <TabsTrigger value="top100">Top 100</TabsTrigger>
           </TabsList>
           {(() => {
             const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
@@ -288,8 +264,8 @@ export default function DraftRoom() {
             return (
               <div className="flex items-baseline justify-between gap-3 pr-[44px]">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/50">Budget</span>
-                  <span className="text-xl font-bold tabular-nums text-white">$</span>
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Budget</span>
+                  <span className="text-xl font-bold tabular-nums text-foreground">$</span>
                   <input
                     type="number"
                     inputMode="numeric"
@@ -299,18 +275,18 @@ export default function DraftRoom() {
                       const v = Math.max(1, Math.floor(Number(e.target.value) || 0));
                       useDraftStore.getState().setSettings({ totalBudget: v });
                     }}
-                    className="w-16 bg-transparent text-xl font-bold tabular-nums text-center text-white outline-none focus:ring-0 border-b border-transparent focus:border-[#c9a14a]"
+                    className="w-16 bg-transparent text-xl font-bold tabular-nums text-center text-foreground outline-none focus:ring-0 border-b border-transparent focus:border-accent"
                     aria-label="Total auction budget"
                   />
                 </div>
                 <div className="flex items-baseline gap-1">
                   <span
-                    className={`text-xl font-bold tabular-nums ${moneyLeft >= 0 ? "text-[#c9a14a]" : "text-red-400"}`}
-                    style={moneyLeft >= 0 ? { textShadow: "0 0 12px rgba(201,161,74,0.35)" } : undefined}
+                    className={`text-xl font-bold tabular-nums ${moneyLeft >= 0 ? "text-accent" : "text-destructive"}`}
+                    style={moneyLeft >= 0 ? { textShadow: "0 0 12px hsl(var(--accent) / 0.4)" } : undefined}
                   >
                     ${moneyLeft}
                   </span>
-                  <span className="text-[10px] uppercase tracking-[0.18em] text-white/50">left</span>
+                  <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">left</span>
                 </div>
               </div>
             );
@@ -319,9 +295,7 @@ export default function DraftRoom() {
 
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-20 pt-2">
           <TabsContent value="planner" className="space-y-2 mt-0">
-            {/* Strategy picker + per-slot budget allocations */}
             <PositionBudgetBar />
-            {/* Last pick delta */}
             {events.length > 0 && (
               <LastPickImpact settings={settings} keepers={keepers} events={events} />
             )}
@@ -343,7 +317,7 @@ export default function DraftRoom() {
 
       {/* ── BOTTOM BAR (fixed/frozen) ──────────────────────── */}
       <div
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#050d1c]/90 backdrop-blur-sm"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="flex items-center justify-center gap-16 px-3 py-2">
@@ -352,15 +326,15 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Auction calculator"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#c9a14a]/40 bg-white/5 text-[#c9a14a] shadow-[0_0_14px_rgba(201,161,74,0.25)] hover:bg-[#c9a14a]/10 active:scale-95 transition"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-card text-accent shadow-[0_0_14px_hsl(var(--accent)/0.3)] hover:bg-accent/10 active:scale-95 transition"
               >
                 <Calculator className="h-4 w-4" />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
-              <SheetHeader className="border-b border-border/60 px-4 py-3">
+              <SheetHeader className="border-b border-border px-4 py-3">
                 <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <Calculator className="h-4 w-4 text-primary" />
+                  <Calculator className="h-4 w-4 text-accent" />
                   Auction calculator
                 </SheetTitle>
               </SheetHeader>
@@ -379,7 +353,7 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Ask the Coach"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-[0_0_18px_rgba(239,68,68,0.55)] active:scale-95 transition hover:from-red-400 hover:to-red-600"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-[0_0_18px_hsl(var(--primary)/0.55)] active:scale-95 transition hover:brightness-110"
               >
                 <Sparkles className="h-4 w-4" strokeWidth={1.75} />
               </button>
