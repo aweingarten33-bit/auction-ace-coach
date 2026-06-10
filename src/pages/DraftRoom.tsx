@@ -351,10 +351,9 @@ export default function DraftRoom() {
           <button
             onClick={() => setPanel("calc")}
             aria-label="Auction calculator"
-            className="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
+            className="flex items-center rounded-md p-2 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
             <Calculator className="h-5 w-5" />
-            <span className="text-xs font-medium">Auction calculator</span>
           </button>
 
           {/* Coach FAB */}
