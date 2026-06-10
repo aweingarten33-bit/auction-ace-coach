@@ -311,8 +311,9 @@ export const useDraftStore = create<DraftState>()(
       name: "auction-draft-coach-v1",
       version: 7,
       migrate: (persisted: any, version: number) => {
-        if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb"].includes(persisted.plannerStrategy)) {
+        if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
+
           persisted.touchedSlots = {};
         }
         // v3: blended-values now filters retirees (Todd Gurley etc.). Wipe
