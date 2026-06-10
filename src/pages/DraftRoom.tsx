@@ -387,7 +387,6 @@ export default function DraftRoom() {
                 <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
               <h2 className="text-base font-semibold">
-              {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
                 {panel === "calc" && "Auction calculator"}
                 {panel === "recent" && "Recent picks"}
               </h2>
@@ -397,14 +396,6 @@ export default function DraftRoom() {
                 <AuctionCalculator
                   prices={adjustedPrices}
                   onShowDetails={(name, position) => setDetailFor({ name, position })}
-                />
-              )}
-              {panel === "top50" && (
-                <Top100List
-                  prices={adjustedPrices}
-                  anchorMap={anchorMap}
-                  events={events}
-                  onPick={openDetails}
                 />
               )}
               {panel === "recent" && (
