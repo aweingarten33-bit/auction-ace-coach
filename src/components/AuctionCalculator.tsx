@@ -11,7 +11,13 @@ import { useDraftStore } from "@/lib/draft-store";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-export default function AuctionCalculator({ prices }: { prices: PriceEstimate[] }) {
+export default function AuctionCalculator({
+  prices,
+  onShowDetails,
+}: {
+  prices: PriceEstimate[];
+  onShowDetails?: (name: string, position?: Position) => void;
+}) {
   const { settings } = useDraftStore();
   const [name, setName] = useState("");
   const [position, setPosition] = useState<Position | undefined>(undefined);
@@ -142,6 +148,15 @@ export default function AuctionCalculator({ prices }: { prices: PriceEstimate[] 
         <p className="mt-1 text-[10px] text-muted-foreground">
           Auto-filled from blended SF values. Edit to override.
         </p>
+        {name.trim() && onShowDetails && (
+          <button
+            type="button"
+            onClick={() => onShowDetails(name.trim(), position)}
+            className="mt-2 text-xs font-medium text-primary underline-offset-2 hover:underline"
+          >
+            View player card →
+          </button>
+        )}
       </div>
 
       {/* Risk slider */}

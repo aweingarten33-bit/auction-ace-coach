@@ -396,7 +396,12 @@ export default function DraftRoom() {
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
-              {panel === "calc" && <AuctionCalculator prices={adjustedPrices} />}
+              {panel === "calc" && (
+                <AuctionCalculator
+                  prices={adjustedPrices}
+                  onShowDetails={(name, position) => setDetailFor({ name, position })}
+                />
+              )}
               {panel === "top50" && (
                 <Top100List
                   prices={adjustedPrices}
