@@ -63,7 +63,7 @@ interface DraftState {
   // Slots the user has manually edited — never auto-overwrite these.
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
-  plannerStrategy: "hero-qb" | "balanced-qbs" | "bargain-qb";
+  plannerStrategy: "hero-qb" | "balanced-qbs" | "bargain-qb" | "manual";
   // Anchor players — named "must-have" targets w/ pre-allocated $.
   // Subtracted from pool before slots are distributed.
   anchors: { id: string; name: string; price: number }[];
