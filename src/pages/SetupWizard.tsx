@@ -85,7 +85,7 @@ export default function SetupWizard() {
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <div className="min-h-screen bg-background p-4 text-foreground md:p-8">
+    <div className="min-h-screen bg-transparent p-4 text-foreground md:p-8">
       <div className="mx-auto max-w-2xl">
         <header className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
