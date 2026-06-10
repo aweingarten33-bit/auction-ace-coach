@@ -43,7 +43,7 @@ export function buildPlannerSlots(settings: LeagueSettings): PlannerSlot[] {
   {
     const isSF = settings.leagueType === "Superflex" || settings.leagueType === "2QB";
     add("SUPERFLEX", settings.roster.SUPERFLEX, (i) => {
-      if (isSF) return settings.roster.SUPERFLEX === 1 ? `QB${settings.roster.QB + 1}` : `QB${settings.roster.QB + i}`;
+      if (isSF) return settings.roster.SUPERFLEX === 1 ? "Superflex" : `Superflex ${i}`;
       return settings.roster.SUPERFLEX === 1 ? "SF" : `SF${i}`;
     });
   }
