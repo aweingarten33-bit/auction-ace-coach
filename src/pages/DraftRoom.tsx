@@ -317,7 +317,7 @@ export default function DraftRoom() {
                       const v = Math.max(1, Math.floor(Number(e.target.value) || 0));
                       useDraftStore.getState().setSettings({ totalBudget: v });
                     }}
-                    className="w-20 bg-transparent text-2xl font-bold tabular-nums outline-none focus:ring-0 border-b border-transparent focus:border-border"
+                    className="w-20 bg-transparent text-2xl font-bold tabular-nums text-center outline-none focus:ring-0 border-b border-transparent focus:border-border"
                     aria-label="Total auction budget"
                   />
                 </div>
