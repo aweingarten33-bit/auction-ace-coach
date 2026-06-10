@@ -65,7 +65,6 @@ type PanelId = "calc";
 export default function DraftRoom() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { team: selectedTeam } = useSelectedTeam();
   const {
     settings,
     keepers,
@@ -105,8 +104,6 @@ export default function DraftRoom() {
   const [panel, setPanel] = useState<PanelId | null>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [detailFor, setDetailFor] = useState<{ name: string; position?: Position } | null>(null);
-  const [leagueName, setLeagueName] = useState("");
-
   // Redirect to setup if no data yet (admin only; guests can view).
   useEffect(() => {
     const isGuest = !user || user.is_anonymous;
@@ -114,40 +111,6 @@ export default function DraftRoom() {
       navigate("/setup", { replace: true });
     }
   }, [user, setupComplete, prices.length, events.length, navigate]);
-
-  // Live sync — picks auto-tag as "me", nominations show the current bid climbing
-  const { liveBid } = useEspnLiveSync({
-    expectingEvents: setupComplete,
-    teamIdOverride: selectedTeam?.id ?? null,
-  });
-
-  // Pull league name from ESPN, with cache fallback
-  useEffect(() => {
-    (async () => {
-      const cached = localStorage.getItem("league_name_cache");
-      if (cached) setLeagueName(cached);
-      try {
-        const { data } = await supabase.functions.invoke("league-teams");
-        const name = (data as any)?.league?.name as string | undefined;
-        if (name) {
-          setLeagueName(name);
-          try { localStorage.setItem("league_name_cache", name); } catch { /* ignore */ }
-          return;
-        }
-      } catch { /* fall through */ }
-      const { data: ev } = await supabase
-        .from("live_draft_events")
-        .select("raw")
-        .order("created_at", { ascending: false })
-        .limit(25);
-      const rows = (ev ?? []) as Array<{ raw: any }>;
-      const found = rows.find((r) => r?.raw?.league?.name)?.raw?.league?.name as string | undefined;
-      if (found) {
-        setLeagueName(found);
-        try { localStorage.setItem("league_name_cache", found); } catch { /* ignore */ }
-      }
-    })();
-  }, []);
 
   const { lookup: lookupRank } = usePlayerRanks();
 
@@ -268,7 +231,6 @@ export default function DraftRoom() {
             onClose={() => setDrawerOpen(false)}
             onSignOut={async () => { await signOut(); navigate("/auth"); }}
             onGoToSetup={() => navigate("/setup")}
-            onGoToEspn={() => navigate("/espn")}
           />
         </Sheet>
 
@@ -277,10 +239,7 @@ export default function DraftRoom() {
             Auction Draft Assistant
           </p>
           <div className="mt-0.5 flex items-center gap-1.5">
-            {selectedTeam && leagueName && (
-              <span className="truncate text-[10px] text-muted-foreground">{selectedTeam.name}</span>
-            )}
-            <SyncStatusPill compact />
+            <span className="text-[10px] text-muted-foreground">Manual mode</span>
           </div>
         </div>
 
