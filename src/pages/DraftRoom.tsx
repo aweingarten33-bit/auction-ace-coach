@@ -297,12 +297,7 @@ export default function DraftRoom() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="flex items-center px-3 py-2">
-          <button
-            onClick={() => setPanel("top50")}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-          >
-            <span className="text-xs font-medium">Top 50</span>
-          </button>
+        
           <button
             onClick={() => setPanel("calc")}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
