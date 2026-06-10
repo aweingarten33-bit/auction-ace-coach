@@ -83,26 +83,13 @@ function fcCacheSet(key: string, results: WebSource[]) {
   }
 }
 
-// ---------- Heuristic: should we hit the web for this question? ----------
-// PDF price sheet is always the source of truth for "who/what/how much" filter
-// questions. We only burn a Firecrawl call when the question needs recency
-// (news, injuries, depth chart, training camp, trades, suspensions, etc.) or
-// names a specific player we don't have priced on the sheet.
-const WEB_TRIGGER_RE = /\b(news|injur|hurt|status|update|latest|recent|trade|signed|signing|cut|release|waiver|holdout|suspend|practice|preseason|report|rumou?r|depth chart|starter|starting|inactive|active|return|comeback|hype|buzz|camp|breaking|today|yesterday|this week|right now|currently)\b/i;
-function decideWebSearch(question: string, pricesCount: number, knownNames: Set<string>): { search: boolean; reason: string } {
+// ---------- Web search policy ----------
+// PDF price sheet is the primary source of truth, but we ALWAYS pull fresh web
+// context too so answers reflect current news/injuries/depth-chart moves.
+function decideWebSearch(question: string, _pricesCount: number, _knownNames: Set<string>): { search: boolean; reason: string } {
   const q = question.trim();
   if (!q) return { search: false, reason: "no question text" };
-  if (WEB_TRIGGER_RE.test(q)) return { search: true, reason: "question mentions news/injury/recency keyword" };
-  // Capitalized two-word phrase = likely a player name. If not on the sheet, search.
-  const nameMatch = q.match(/\b([A-Z][a-z]+ [A-Z][a-z'.-]+)\b/);
-  if (nameMatch) {
-    const norm = nameMatch[1].toLowerCase().replace(/[^a-z0-9]/g, "");
-    if (!knownNames.has(norm)) {
-      return { search: true, reason: `mentions "${nameMatch[1]}" not on PDF sheet` };
-    }
-  }
-  if (pricesCount === 0) return { search: true, reason: "no PDF prices loaded — fall back to web" };
-  return { search: false, reason: "answerable from PDF price sheet alone" };
+  return { search: true, reason: "always-on web search (PDF used first, web layered on top)" };
 }
 
 
