@@ -426,7 +426,7 @@ Deno.serve(async (req: Request) => {
         model: "openai/gpt-5.5",
         messages,
         stream: true,
-        max_tokens: 1200,
+        max_completion_tokens: 1200,
       }),
     });
 
