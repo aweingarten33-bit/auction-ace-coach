@@ -51,6 +51,8 @@ import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
 import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
+import HelmetIcon from "@/components/HelmetIcon";
+import FootballIcon from "@/components/FootballIcon";
 
 
 
