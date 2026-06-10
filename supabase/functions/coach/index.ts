@@ -176,7 +176,7 @@ HOW TO ANSWER FILTERED LIST QUESTIONS (e.g. "top 5 RBs starting at $15", "best W
   - "under $X" / "below $X" → going$ <= X.
   - "at position P" → only rows tagged (P). For "FLEX", include RB/WR/TE.
 - Then sort by sheet$ descending (that's the projection rank) and list EXACTLY the number requested.
-- Format each line: "1. **Name** (POS, sheet $X, going ~$Y) — short reason." Reason should reference role/opportunity, not invented stats.
+- Format each line: "1. **Name** (POS, ~$Y) — short reason." Use the projected/going price only. Never print "sheet$X" or "going$X" tokens — those are internal labels.
 - If fewer than N players match, say so and list what's there. Never pad with drafted players or made-up names.
 - For "sleepers": pull from the Undrafted Price Sheet where going$ is cheap (≤ $8) but sheet$ is meaningfully higher than going$ (value gap), OR a clear upside role (rookie RB1, new WR1, ascending TE). Always name 3-5 real undrafted players from the sheet.
 - Double-check every player you name is NOT in the Drafted Players list before sending.
