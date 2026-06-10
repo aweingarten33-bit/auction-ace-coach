@@ -364,21 +364,19 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify({ query: searchQuery, limit: 5, tbs: "qdr:w" }),
           });
           if (fcRes.ok) {
-            const fc = await fcRes.json();
-            const webField = fc?.web;
-            const rawList = Array.isArray(fc?.data) ? fc.data
-              : Array.isArray(webField) ? webField
-              : Array.isArray(webField?.results) ? webField.results
-              : Array.isArray(fc?.data?.web) ? fc.data.web
-              : [];
-            const raw = rawList.slice(0, 5);
-            sources = raw.map((r: { url?: string; title?: string; description?: string }) => ({
-              title: r.title || "",
-              url: r.url || "",
-              description: r.description || "",
-            })).filter((s: WebSource) => s.url);
-            fcCacheStatus = "miss";
-            if (sources.length) fcCacheSet(fcKey, sources);
+            let fc: unknown = null;
+            try { fc = await fcRes.json(); } catch (parseErr) {
+              console.warn("Firecrawl JSON parse failed", parseErr);
+            }
+            try {
+              sources = parseFirecrawlResults(fc).slice(0, 5);
+              fcCacheStatus = "miss";
+              if (sources.length) fcCacheSet(fcKey, sources);
+            } catch (shapeErr) {
+              console.warn("Firecrawl shape parse failed", shapeErr);
+              sources = [];
+              fcCacheStatus = "error";
+            }
           } else {
             console.warn("Firecrawl search failed", fcRes.status, await fcRes.text());
             fcCacheStatus = "error";
