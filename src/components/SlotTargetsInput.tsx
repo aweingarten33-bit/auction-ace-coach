@@ -86,11 +86,12 @@ export default function SlotTargetsInput({
 
   return (
     <div ref={wrapRef} className={`relative min-w-0 flex-1 ${className || ""}`}>
-      <Input
+      <textarea
         ref={inputRef}
         value={value}
         placeholder={placeholder}
         aria-label={ariaLabel}
+        rows={1}
         onChange={(e) => {
           onChange(e.target.value);
           setOpen(true);
@@ -112,7 +113,8 @@ export default function SlotTargetsInput({
             setOpen(false);
           }
         }}
-        className="h-8 w-full rounded-lg px-2 text-xs"
+        className="block w-full resize-none overflow-hidden rounded-lg border border-input bg-background px-2 py-1.5 text-xs leading-snug ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        style={{ minHeight: "2rem", maxHeight: "4.5rem" }}
       />
       {open && suggestions.length > 0 && (
         <div className="absolute left-0 z-50 mt-1 max-h-72 w-[min(20rem,calc(100vw-2rem))] overflow-auto rounded-md border border-border bg-popover shadow-lg">
