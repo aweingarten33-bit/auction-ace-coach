@@ -11,7 +11,13 @@ import { useDraftStore } from "@/lib/draft-store";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-export default function AuctionCalculator({ prices }: { prices: PriceEstimate[] }) {
+export default function AuctionCalculator({
+  prices,
+  onShowDetails,
+}: {
+  prices: PriceEstimate[];
+  onShowDetails?: (name: string, position?: Position) => void;
+}) {
   const { settings } = useDraftStore();
   const [name, setName] = useState("");
   const [position, setPosition] = useState<Position | undefined>(undefined);
