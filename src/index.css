@@ -17,44 +17,44 @@
     /* ---------- CORE SURFACE — Superman Returns suit ----------
        Muted royal-navy base (suit fabric), warm cream foreground.
        Antique shield-gold + burgundy cape as accents. */
-    --background:        222 48% 11%;         /* deep suit navy */
-    --background-alt:    222 45% 15%;
-    --foreground:        40 30% 94%;          /* warm cream */
-    --muted-bg:          222 40% 17%;
+    --background:        222 25% 9%;          /* deep professional slate */
+    --background-alt:    222 22% 12%;
+    --foreground:        210 20% 96%;          /* clean off-white */
+    --muted-bg:          222 20% 14%;
 
-    --card:              222 42% 16%;         /* lifted navy panel (suit highlight) */
-    --card-foreground:   40 30% 94%;
+    --card:              222 22% 13%;          /* lifted slate panel */
+    --card-foreground:   210 20% 96%;
 
-    --popover:           222 45% 14%;
-    --popover-foreground:40 30% 94%;
+    --popover:           222 24% 11%;
+    --popover-foreground:210 20% 96%;
 
-    /* ---------- ACCENTS — shield gold + cape burgundy ---------- */
-    --primary:           350 52% 32%;         /* cape burgundy */
-    --primary-foreground: 40 30% 94%;
-    --primary-glow:      350 55% 44%;
+    /* ---------- ACCENTS — restrained navy + brand gold ---------- */
+    --primary:           212 88% 55%;          /* confident blue */
+    --primary-foreground: 210 20% 98%;
+    --primary-glow:      212 92% 65%;
 
-    --secondary:         222 38% 20%;         /* suit highlight */
-    --secondary-foreground: 40 30% 94%;
+    --secondary:         222 18% 18%;
+    --secondary-foreground: 210 20% 96%;
 
-    --accent:            38 62% 52%;          /* antique shield gold */
-    --accent-foreground: 222 48% 11%;
-    --accent-secondary:  350 52% 32%;         /* burgundy co-accent */
+    --accent:            42 78% 58%;           /* tasteful gold */
+    --accent-foreground: 222 25% 9%;
+    --accent-secondary:  212 88% 55%;
 
-    --muted:             222 35% 22%;
-    --muted-foreground:  220 18% 72%;
+    --muted:             222 16% 22%;
+    --muted-foreground:  220 12% 68%;
 
-    --destructive:       350 60% 42%;         /* brighter burgundy for warnings */
-    --destructive-foreground: 40 30% 94%;
+    --destructive:       0 70% 50%;
+    --destructive-foreground: 210 20% 98%;
 
-    --warning:           38 78% 58%;
-    --warning-foreground: 222 48% 11%;
+    --warning:           38 92% 58%;
+    --warning-foreground: 222 25% 9%;
 
-    --success:           38 62% 52%;
-    --success-foreground: 222 48% 11%;
+    --success:           152 60% 45%;
+    --success-foreground: 210 20% 98%;
 
-    --border:            222 32% 26%;
-    --input:             222 40% 18%;
-    --ring:              38 62% 52%;
+    --border:            222 18% 22%;
+    --input:             222 22% 15%;
+    --ring:              212 88% 55%;
 
     --radius: 0.75rem;
 
