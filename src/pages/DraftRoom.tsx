@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/sheet";
 
 import AiQuickPanel from "@/components/AiQuickPanel";
+import coachHelmet from "@/assets/coach-helmet.png";
 import PlayerDetailsOverlay from "@/components/PlayerDetailsOverlay";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -353,9 +354,9 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Ask the Coach"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent/70 text-accent-foreground shadow-[0_0_18px_hsl(var(--accent)/0.55)] active:scale-95 transition hover:brightness-110"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent/70 text-accent-foreground shadow-[0_0_18px_hsl(var(--accent)/0.55)] active:scale-95 transition hover:brightness-110 overflow-hidden"
               >
-                <Sparkles className="h-4 w-4" strokeWidth={1.75} />
+                <img src={coachHelmet} alt="" loading="lazy" width={40} height={40} className="h-9 w-9 object-contain" />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
