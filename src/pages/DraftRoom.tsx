@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
+import auctionDraftBadge from "@/assets/auction-draft-assist-badge.png";
 
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
