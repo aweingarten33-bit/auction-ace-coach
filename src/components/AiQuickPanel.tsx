@@ -96,6 +96,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [streamingText, setStreamingText] = useState("");
+  const [streamingMeta, setStreamingMeta] = useState<CoachMetaT | null>(null);
+  const [metaByMsgId, setMetaByMsgId] = useState<Record<string, CoachMetaT>>({});
   const [input, setInput] = useState("");
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
