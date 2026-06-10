@@ -353,9 +353,9 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Auction calculator"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-lg active:scale-95 transition"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-secondary/30 text-muted-foreground shadow-lg hover:bg-secondary/50 hover:text-foreground active:scale-95 transition"
               >
-                <Calculator className="h-4 w-4" strokeWidth={1.5} />
+                <Calculator className="h-4 w-4" />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
