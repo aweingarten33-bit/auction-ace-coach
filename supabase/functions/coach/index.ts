@@ -83,6 +83,50 @@ function fcCacheSet(key: string, results: WebSource[]) {
   }
 }
 
+// ---------- Firecrawl v2 response parser (exported for tests) ----------
+// v2 has been seen returning results under several shapes:
+//   { data: [ ... ] }                 (legacy)
+//   { data: { web: [ ... ] } }
+//   { web: [ ... ] }
+//   { web: { results: [ ... ] } }
+//   { data: { web: { results: [...] } } }
+// We accept all of them and never throw.
+export function parseFirecrawlResults(fc: unknown): WebSource[] {
+  if (!fc || typeof fc !== "object") return [];
+  const root = fc as Record<string, unknown>;
+  const data = root.data as Record<string, unknown> | unknown[] | undefined;
+  const webField = root.web as Record<string, unknown> | unknown[] | undefined;
+  const dataWeb = (data && !Array.isArray(data) ? (data as Record<string, unknown>).web : undefined) as
+    | Record<string, unknown>
+    | unknown[]
+    | undefined;
+
+  const candidates: unknown[] = [
+    Array.isArray(data) ? data : undefined,
+    Array.isArray(webField) ? webField : undefined,
+    webField && !Array.isArray(webField) && Array.isArray((webField as Record<string, unknown>).results)
+      ? (webField as Record<string, unknown>).results
+      : undefined,
+    Array.isArray(dataWeb) ? dataWeb : undefined,
+    dataWeb && !Array.isArray(dataWeb) && Array.isArray((dataWeb as Record<string, unknown>).results)
+      ? (dataWeb as Record<string, unknown>).results
+      : undefined,
+  ];
+  const rawList = (candidates.find((c) => Array.isArray(c) && (c as unknown[]).length > 0) as unknown[] | undefined) ?? [];
+  return rawList
+    .map((r): WebSource => {
+      const o = (r && typeof r === "object" ? r : {}) as Record<string, unknown>;
+      return {
+        title: typeof o.title === "string" ? o.title : "",
+        url: typeof o.url === "string" ? o.url : "",
+        description: typeof o.description === "string" ? o.description : "",
+      };
+    })
+    .filter((s) => s.url);
+}
+
+
+
 // ---------- Web search policy ----------
 // PDF price sheet is the primary source of truth, but we ALWAYS pull fresh web
 // context too so answers reflect current news/injuries/depth-chart moves.
@@ -125,7 +169,7 @@ You ALSO have access to live draft state when available (budget, roster, drafted
 HOW TO ANSWER "WHAT ARE MY OPTIONS AT [POSITION]?":
 This is the most important question type. When the user asks about their options at a position (e.g. "what are my RB options?", "who can I get at WR?", "what QBs fit my budget?"), give them BOTH:
 1. **Strategic paths** — name 2 distinct approaches with tradeoffs. Examples: "Spend $40+ on an elite RB now (Stars & Scrubs) vs. wait for $15-20 RBs later (Zero RB)." Be specific to their budget and what's left on the board.
-2. **Specific players** — for each path, name 2-3 actual players from the Undrafted Price Sheet that fit the budget, with their sheet price and going price. Format: "**Player Name** (sheet $X, going ~$Y) — one-line reason."
+2. **Specific players** — for each path, name 2-3 actual players from the Undrafted Price Sheet that fit the budget. Format: "**Player Name** (~$Y) — one-line reason." Use the projected/going price only — do NOT print the raw "sheet $X" token.
 Always filter against the "Drafted Players" list — never name a player who's gone.
 
 HOW TO ANSWER FILTERED LIST QUESTIONS (e.g. "top 5 RBs starting at $15", "best WRs under $10", "cheapest QBs", "sleepers at RB"):
@@ -135,7 +179,7 @@ HOW TO ANSWER FILTERED LIST QUESTIONS (e.g. "top 5 RBs starting at $15", "best W
   - "under $X" / "below $X" → going$ <= X.
   - "at position P" → only rows tagged (P). For "FLEX", include RB/WR/TE.
 - Then sort by sheet$ descending (that's the projection rank) and list EXACTLY the number requested.
-- Format each line: "1. **Name** (POS, sheet $X, going ~$Y) — short reason." Reason should reference role/opportunity, not invented stats.
+- Format each line: "1. **Name** (POS, ~$Y) — short reason." Use the projected/going price only. Never print "sheet$X" or "going$X" tokens — those are internal labels.
 - If fewer than N players match, say so and list what's there. Never pad with drafted players or made-up names.
 - For "sleepers": pull from the Undrafted Price Sheet where going$ is cheap (≤ $8) but sheet$ is meaningfully higher than going$ (value gap), OR a clear upside role (rookie RB1, new WR1, ascending TE). Always name 3-5 real undrafted players from the sheet.
 - Double-check every player you name is NOT in the Drafted Players list before sending.
@@ -323,21 +367,19 @@ Deno.serve(async (req: Request) => {
             body: JSON.stringify({ query: searchQuery, limit: 5, tbs: "qdr:w" }),
           });
           if (fcRes.ok) {
-            const fc = await fcRes.json();
-            const webField = fc?.web;
-            const rawList = Array.isArray(fc?.data) ? fc.data
-              : Array.isArray(webField) ? webField
-              : Array.isArray(webField?.results) ? webField.results
-              : Array.isArray(fc?.data?.web) ? fc.data.web
-              : [];
-            const raw = rawList.slice(0, 5);
-            sources = raw.map((r: { url?: string; title?: string; description?: string }) => ({
-              title: r.title || "",
-              url: r.url || "",
-              description: r.description || "",
-            })).filter((s: WebSource) => s.url);
-            fcCacheStatus = "miss";
-            if (sources.length) fcCacheSet(fcKey, sources);
+            let fc: unknown = null;
+            try { fc = await fcRes.json(); } catch (parseErr) {
+              console.warn("Firecrawl JSON parse failed", parseErr);
+            }
+            try {
+              sources = parseFirecrawlResults(fc).slice(0, 5);
+              fcCacheStatus = "miss";
+              if (sources.length) fcCacheSet(fcKey, sources);
+            } catch (shapeErr) {
+              console.warn("Firecrawl shape parse failed", shapeErr);
+              sources = [];
+              fcCacheStatus = "error";
+            }
           } else {
             console.warn("Firecrawl search failed", fcRes.status, await fcRes.text());
             fcCacheStatus = "error";
@@ -436,18 +478,43 @@ Deno.serve(async (req: Request) => {
       }),
     });
 
+    // Graceful SSE fallback — keep the UI consistent (meta + content + [DONE])
+    // instead of returning a 500 JSON blob that the streaming client can't render.
+    const fallbackSse = (msg: string, status = 200, extraHeaders: Record<string, string> = {}) => {
+      const body = metaSse +
+        `data: ${JSON.stringify({ choices: [{ delta: { content: msg } }] })}\n\n` +
+        `data: [DONE]\n\n`;
+      return new Response(body, {
+        status,
+        headers: { ...cors, ...extraHeaders, "Content-Type": "text/event-stream", "X-Fallback": "1" },
+      });
+    };
+
     if (!resp.ok) {
-      if (resp.status === 429)
-        return new Response(JSON.stringify({ error: "Rate limit upstream" }), { status: 429, headers: { ...cors, "Content-Type": "application/json" } });
-      if (resp.status === 402)
-        return new Response(JSON.stringify({ error: "AI credits exhausted" }), { status: 402, headers: { ...cors, "Content-Type": "application/json" } });
-      const t = await resp.text();
+      const t = await resp.text().catch(() => "");
       console.error("AI gateway error", resp.status, t);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+      if (resp.status === 429) {
+        return fallbackSse(
+          "⚠️ The AI is rate-limited right now — give it ~30s and ask again. Your price sheet and planner are still loaded.",
+          200,
+          { "Retry-After": "30" },
+        );
+      }
+      if (resp.status === 402) {
+        return fallbackSse(
+          "⚠️ AI credits are exhausted on this workspace — top them up in Settings → Workspace → Usage to keep the coach live. Your PDF and planner are still intact.",
+        );
+      }
+      const inputNote = pricesCount === 0
+        ? "no PDF prices loaded"
+        : `${pricesCount} priced players loaded${decision.search ? `, ${sources.length} web source${sources.length === 1 ? "" : "s"} fetched` : ", web search skipped"}`;
+      return fallbackSse(
+        `⚠️ Coach AI couldn't generate a reply (gateway error ${resp.status}). Inputs that were available: ${inputNote}. Try again in a moment.`,
+      );
     }
 
     if (!resp.body) {
-      return new Response(JSON.stringify({ error: "Empty AI response" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+      return fallbackSse("⚠️ The AI returned an empty response. Try asking again.");
     }
     // Tee stream: forward to client AND accumulate completion for cache
     const [forwardStream, captureStream] = resp.body.tee();
