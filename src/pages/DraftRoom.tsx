@@ -56,7 +56,7 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "top50" | "recent" | "calc";
+type PanelId = "recent" | "calc";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
