@@ -522,6 +522,7 @@ export default function DraftRoom() {
             anchor={anchor}
             posRank={posRank}
             totalAtPos={totalAtPos}
+            overallRank={espnRank?.overall_rank ?? undefined}
             remaining={budget.remaining}
             maxBid={budget.maxBid}
             slotsLeft={budget.slotsLeft}
