@@ -156,7 +156,7 @@ export default function Landing() {
       <div className="pointer-events-none absolute right-3 bottom-3 h-6 w-6 border-r-2 border-b-2 border-red-500/60" />
 
       {/* ── Main content ──────────────────────────────────────────────────── */}
-      <div className="relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
+      <div className="relative flex min-h-screen flex-col items-center justify-center px-6 pb-16 pt-[20vh]">
 
 
         {/* CBS-style stacked headline */}
@@ -187,15 +187,16 @@ export default function Landing() {
         {/* CTA buttons */}
 
         <div
-          className="mt-8 flex w-full max-w-xs flex-col gap-3"
+          className="mt-10 flex w-full max-w-xs flex-col gap-3"
           style={{ animation: "fade-in 0.6s 1.2s ease-out both" }}
         >
           <Link
             to="/team"
-            className="group relative block w-full overflow-hidden border border-red-400 bg-gradient-to-b from-red-500 to-red-600 py-4 text-center font-bebas text-xl tracking-[0.3em] text-white transition hover:from-red-400 hover:to-red-500"
+            className="group relative flex w-full items-center justify-center gap-3 overflow-hidden border border-red-400 bg-gradient-to-b from-red-500 to-red-600 py-4 text-center font-bebas text-xl tracking-[0.3em] text-white transition hover:from-red-400 hover:to-red-500"
             style={{ animation: "cta-glow 2.4s ease-in-out infinite" }}
           >
             <span className="relative z-10">GET STARTED</span>
+            <span className="relative z-10 inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
             <span className="absolute inset-y-0 -left-1/3 w-1/3 -skew-x-12 bg-white/30 transition-transform duration-700 group-hover:translate-x-[500%]" />
           </Link>
         </div>
