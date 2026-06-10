@@ -432,7 +432,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && ask(input)}
-            placeholder="Ask Coach AI…"
+            placeholder="Ask the AI coach…"
             disabled={streaming}
             className="h-9 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
           />
@@ -440,7 +440,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
             onClick={() => ask(input)}
             disabled={streaming || !input.trim()}
             size="sm"
-            className="h-8 w-8 shrink-0 rounded-full p-0"
+            className="h-8 w-8 shrink-0 rounded-full bg-primary p-0 text-primary-foreground hover:bg-primary/90"
           >
             <Send className="h-3.5 w-3.5" />
           </Button>
