@@ -358,18 +358,6 @@ export default function AiQuickPanel({ coachContext }: Props) {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      {/* Header strip — new chat + auth notice */}
-      <div className="flex items-center justify-between border-b border-border/60 px-3 py-1.5">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 gap-1 rounded-full px-2 text-[11px]"
-          onClick={newChat}
-          disabled={streaming || (!hasMessages && !isAuthed)}
-        >
-          <RotateCcw className="h-3 w-3" /> New chat
-        </Button>
-      </div>
 
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3 text-sm">
         {loading && (
