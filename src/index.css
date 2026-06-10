@@ -207,70 +207,12 @@
   }
 
   body {
-    @apply text-foreground;
+    @apply bg-background text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
     font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.5;
-    background-color: hsl(222 65% 5%);
-  }
-
-  /* BADASS background — applied to every .bg-background surface so the
-     look survives page wrappers. Blacked-out carbon base, with a hot
-     gold edge slashing across burgundy and a counter-streak of
-     electric blue. Built for a guy. */
-  .bg-background {
-    background-color: hsl(222 65% 5%) !important;
-    background-image:
-      /* electric blue counter-streak */
-      linear-gradient(-62deg,
-        transparent 0%,
-        transparent 62%,
-        hsl(212 100% 55% / 0) 66%,
-        hsl(212 100% 60% / 0.18) 71%,
-        hsl(212 100% 70% / 0.28) 73%,
-        hsl(212 100% 60% / 0.18) 75%,
-        hsl(212 100% 55% / 0) 80%,
-        transparent 100%),
-      /* hot gold rim slash */
-      linear-gradient(118deg,
-        transparent 0%,
-        transparent 40%,
-        hsl(38 100% 60% / 0) 42%,
-        hsl(38 100% 65% / 0.35) 45%,
-        hsl(45 100% 75% / 0.55) 46.5%,
-        hsl(38 100% 65% / 0.35) 48%,
-        hsl(38 100% 60% / 0) 51%,
-        transparent 100%),
-      /* burgundy core slash under the gold */
-      linear-gradient(118deg,
-        transparent 0%,
-        transparent 32%,
-        hsl(350 70% 30% / 0) 36%,
-        hsl(350 80% 42% / 0.40) 44%,
-        hsl(350 85% 48% / 0.55) 47%,
-        hsl(350 80% 42% / 0.40) 50%,
-        hsl(350 70% 30% / 0) 58%,
-        transparent 100%),
-      /* carbon-fiber weave grit */
-      repeating-linear-gradient(45deg,
-        hsl(222 40% 9% / 0.55) 0px,
-        hsl(222 40% 9% / 0.55) 1px,
-        transparent 1px,
-        transparent 3px),
-      repeating-linear-gradient(-45deg,
-        hsl(222 40% 9% / 0.45) 0px,
-        hsl(222 40% 9% / 0.45) 1px,
-        transparent 1px,
-        transparent 3px),
-      /* vignette */
-      radial-gradient(ellipse 100% 80% at 50% 40%,
-        hsl(222 55% 11%) 0%,
-        hsl(222 65% 6%) 65%,
-        hsl(222 75% 3%) 100%) !important;
-    background-attachment: fixed !important;
-    background-size: 100% 100%, 100% 100%, 100% 100%, 6px 6px, 6px 6px, 100% 100% !important;
-    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat !important;
+    background-color: hsl(var(--background));
   }
 
 
