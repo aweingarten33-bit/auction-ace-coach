@@ -202,7 +202,7 @@ export default function PlayerDetailsOverlay({
           <div className="rounded-md border border-border/60 bg-secondary/30 p-3">
             <div className="mb-2 flex items-baseline justify-between">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                2025 Projections{loading && <span className="ml-1 normal-case opacity-60">· loading…</span>}
+                2026 Projections{loading && <span className="ml-1 normal-case opacity-60">· loading…</span>}
               </p>
               {projPts != null && (
                 <p className="font-mono text-xs">
