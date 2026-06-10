@@ -353,7 +353,7 @@ export default function DraftRoom() {
             aria-label="Auction calculator"
             className="flex items-center rounded-md p-2 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
           >
-            <Calculator className="h-5 w-5" />
+            <Calculator className="h-4 w-4" />
           </button>
 
           {/* Coach FAB */}
