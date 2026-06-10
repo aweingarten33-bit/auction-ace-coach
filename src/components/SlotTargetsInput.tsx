@@ -37,7 +37,15 @@ export default function SlotTargetsInput({
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-grow textarea up to 3 lines so 2-3 target names stay visible.
+  useEffect(() => {
+    const ta = inputRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = `${Math.min(ta.scrollHeight, 72)}px`;
+  }, [value]);
 
   useEffect(() => {
     loadSleeperPlayers().then(setPlayers).catch(() => {});
