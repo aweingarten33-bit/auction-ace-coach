@@ -107,7 +107,7 @@ interface DraftState {
   clearSlotNotes: () => void;
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
-  setPlannerStrategy: (s: "hero-qb" | "balanced-qbs" | "bargain-qb") => void;
+  setPlannerStrategy: (s: "hero-qb" | "balanced-qbs" | "bargain-qb" | "manual") => void;
   addAnchor: () => void;
   updateAnchor: (id: string, patch: Partial<{ name: string; price: number }>) => void;
   removeAnchor: (id: string) => void;
