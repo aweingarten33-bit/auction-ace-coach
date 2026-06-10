@@ -213,14 +213,59 @@
     font-weight: 400;
     line-height: 1.5;
     background-color: hsl(var(--background));
-    background-image: none;
+    /* Returns suit slash composition — blue suit, burgundy cape, shield gold,
+       leaning diagonals overlapping like fabric folds. */
+    background-image:
+      /* gold shield slash */
+      linear-gradient(115deg,
+        transparent 0%,
+        transparent 38%,
+        hsl(38 62% 52% / 0.28) 41%,
+        hsl(38 72% 60% / 0.42) 44%,
+        hsl(38 62% 52% / 0.28) 47%,
+        transparent 50%,
+        transparent 100%),
+      /* burgundy cape slash */
+      linear-gradient(118deg,
+        transparent 0%,
+        transparent 55%,
+        hsl(350 55% 34% / 0.45) 60%,
+        hsl(350 60% 42% / 0.55) 66%,
+        hsl(350 55% 30% / 0.40) 72%,
+        transparent 78%,
+        transparent 100%),
+      /* suit blue slash */
+      linear-gradient(112deg,
+        transparent 0%,
+        transparent 8%,
+        hsl(222 55% 22% / 0.55) 14%,
+        hsl(222 60% 30% / 0.70) 22%,
+        hsl(222 55% 22% / 0.45) 30%,
+        transparent 36%,
+        transparent 100%),
+      /* ambient depth wash */
+      radial-gradient(ellipse at 20% 10%, hsl(222 60% 22% / 0.55) 0%, transparent 55%),
+      radial-gradient(ellipse at 85% 90%, hsl(350 55% 26% / 0.45) 0%, transparent 60%);
+    background-attachment: fixed;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
   }
 
-  /* Strip all the swirl/halftone overlays — DICE is pure flat black */
-  .dark body { background-image: none !important; background-attachment: initial; }
-  .dark body::before, .dark body::after { content: none !important; }
-  .dark .bg-background { background-image: none !important; background-color: hsl(var(--background)) !important; }
-  .dark .min-h-screen.bg-background::before { content: none !important; }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      /* fine connecting fiber slashes */
+      repeating-linear-gradient(115deg,
+        transparent 0 22px,
+        hsl(40 30% 94% / 0.018) 22px 23px,
+        transparent 23px 60px);
+    mix-blend-mode: screen;
+  }
+
 
   h1, h2, h3, h4, h5, h6 {
     font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
