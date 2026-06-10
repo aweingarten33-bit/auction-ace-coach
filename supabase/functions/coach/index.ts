@@ -123,6 +123,9 @@ export function parseFirecrawlResults(fc: unknown): WebSource[] {
       };
     })
     .filter((s) => s.url);
+}
+
+
 
 // ---------- Web search policy ----------
 // PDF price sheet is the primary source of truth, but we ALWAYS pull fresh web
