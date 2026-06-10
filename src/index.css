@@ -14,88 +14,90 @@
 
 @layer base {
   :root {
-    /* ---------- CORE SURFACE — Dark Navy + Red + Dark Gold ---------- */
-    --background:        220 45% 9%;          /* deep navy */
-    --background-alt:    220 42% 12%;
-    --foreground:        40 25% 96%;          /* warm near-white */
-    --muted-bg:          220 35% 14%;
+    /* ---------- CORE SURFACE — Superman Returns suit ----------
+       Muted royal-navy base (suit fabric), warm cream foreground.
+       Antique shield-gold + burgundy cape as accents. */
+    --background:        222 48% 11%;         /* deep suit navy */
+    --background-alt:    222 45% 15%;
+    --foreground:        40 30% 94%;          /* warm cream */
+    --muted-bg:          222 40% 17%;
 
-    --card:              220 38% 14%;         /* lifted navy panel */
-    --card-foreground:   40 25% 96%;
+    --card:              222 42% 16%;         /* lifted navy panel (suit highlight) */
+    --card-foreground:   40 30% 94%;
 
-    --popover:           220 42% 12%;
-    --popover-foreground:40 25% 96%;
+    --popover:           222 45% 14%;
+    --popover-foreground:40 30% 94%;
 
-    /* ---------- ACCENTS — Signal Red + Dark Gold ---------- */
-    --primary:           0 78% 58%;           /* bright signal red */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow:      0 85% 66%;
+    /* ---------- ACCENTS — shield gold + cape burgundy ---------- */
+    --primary:           350 52% 32%;         /* cape burgundy */
+    --primary-foreground: 40 30% 94%;
+    --primary-glow:      350 55% 44%;
 
-    --secondary:         220 32% 18%;
-    --secondary-foreground: 40 25% 96%;
+    --secondary:         222 38% 20%;         /* suit highlight */
+    --secondary-foreground: 40 30% 94%;
 
-    --accent:            42 78% 58%;          /* dark gold (bright) */
-    --accent-foreground: 220 45% 9%;
-    --accent-secondary:  0 78% 58%;           /* red co-accent */
+    --accent:            38 62% 52%;          /* antique shield gold */
+    --accent-foreground: 222 48% 11%;
+    --accent-secondary:  350 52% 32%;         /* burgundy co-accent */
 
-    --muted:             220 30% 18%;
-    --muted-foreground:  220 15% 72%;
+    --muted:             222 35% 22%;
+    --muted-foreground:  220 18% 72%;
 
-    --destructive:       0 78% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive:       350 60% 42%;         /* brighter burgundy for warnings */
+    --destructive-foreground: 40 30% 94%;
 
-    --warning:           42 90% 60%;
-    --warning-foreground: 220 45% 9%;
+    --warning:           38 78% 58%;
+    --warning-foreground: 222 48% 11%;
 
-    --success:           42 78% 55%;
-    --success-foreground: 220 45% 9%;
+    --success:           38 62% 52%;
+    --success-foreground: 222 48% 11%;
 
-    --border:            220 28% 22%;
-    --input:             220 35% 16%;
-    --ring:              42 78% 58%;
+    --border:            222 32% 26%;
+    --input:             222 40% 18%;
+    --ring:              38 62% 52%;
 
     --radius: 0.75rem;
 
-    /* ---------- SURFACES + SHADOWS (dark-mode aware) ---------- */
-    --surface:           220 38% 14%;
-    --surface-2:         220 32% 18%;
+    /* ---------- SURFACES + SHADOWS ---------- */
+    --surface:           222 42% 16%;
+    --surface-2:         222 38% 20%;
     --shadow-light-rgb:  255, 255, 255;
     --shadow-dark-rgb:   0, 0, 0;
 
-    --neu-extruded:       0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.45);
-    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.07), 0 14px 32px rgba(0,0,0,0.55);
-    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04), 0 4px 12px rgba(0,0,0,0.35);
+    --neu-extruded:       0 1px 0 rgba(255,255,255,0.05), 0 8px 24px rgba(0,0,0,0.5);
+    --neu-extruded-hover: 0 1px 0 rgba(255,255,255,0.07), 0 14px 32px rgba(0,0,0,0.6);
+    --neu-extruded-sm:    0 1px 0 rgba(255,255,255,0.04), 0 4px 12px rgba(0,0,0,0.4);
     --neu-inset:          inset 0 0 0 1px rgba(255,255,255,0.06);
     --neu-inset-deep:     inset 0 0 0 1px rgba(255,255,255,0.09);
     --neu-inset-sm:       inset 0 0 0 1px rgba(255,255,255,0.05);
 
-    /* ---------- LEGACY ALIASES — routed to new dark palette ---------- */
-    --bone:              40 25% 96%;
-    --paper:             220 15% 72%;
-    --void:              220 45% 9%;
-    --ink:               220 45% 9%;
-    --charcoal:          220 38% 14%;
-    --gunmetal:          220 32% 18%;
-    --steel-blue:        220 40% 28%;
-    --blood:             0 78% 58%;
-    --signal-red:        0 78% 58%;
-    --dirty-gold:        42 78% 58%;
-    --warning-yellow:    42 90% 60%;
-    --signal:            42 78% 58%;
-    --brass:             42 78% 58%;
-    --brass-light:       42 85% 68%;
-    --brass-dark:        42 70% 42%;
-    --crimson:           0 78% 55%;
-    --crimson-spatter:   0 78% 55%;
-    --parchment:         40 25% 96%;
+    /* ---------- LEGACY ALIASES ---------- */
+    --bone:              40 30% 94%;
+    --paper:             220 18% 72%;
+    --void:              222 48% 11%;
+    --ink:               222 48% 11%;
+    --charcoal:          222 42% 16%;
+    --gunmetal:          222 38% 20%;
+    --steel-blue:        222 45% 28%;
+    --blood:             350 52% 32%;
+    --signal-red:        350 52% 32%;
+    --dirty-gold:        38 62% 52%;
+    --warning-yellow:    38 78% 58%;
+    --signal:            38 62% 52%;
+    --brass:             38 62% 52%;
+    --brass-light:       38 72% 64%;
+    --brass-dark:        38 58% 38%;
+    --crimson:           350 52% 32%;
+    --crimson-spatter:   350 52% 32%;
+    --parchment:         40 30% 94%;
     --ink-faded:         220 15% 60%;
-    --wood-grain:        220 38% 14%;
-    --bloodred:          0 78% 55%;
-    --steel:             220 15% 65%;
-    --sungold:           42 78% 58%;
-    --sungold-2:         42 85% 68%;
-    --krypton:           220 38% 14%;
-    --kryptonite:        42 78% 58%;
+    --wood-grain:        222 42% 16%;
+    --bloodred:          350 52% 32%;
+    --steel:             220 18% 65%;
+    --sungold:           38 62% 52%;
+    --sungold-2:         38 72% 64%;
+    --krypton:           222 42% 16%;
+    --kryptonite:        38 62% 52%;
 
     --shadow-card:       var(--neu-extruded);
     --shadow-floating:   var(--neu-extruded-hover);
@@ -113,15 +115,16 @@
     --shadow-brut-xl:    var(--neu-extruded-hover);
 
     /* Sidebar */
-    --sidebar-background: 220 45% 9%;
-    --sidebar-foreground: 40 25% 96%;
-    --sidebar-primary:    0 78% 58%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent:     220 32% 18%;
-    --sidebar-accent-foreground: 40 25% 96%;
-    --sidebar-border:     220 28% 22%;
-    --sidebar-ring:       42 78% 58%;
+    --sidebar-background: 222 48% 11%;
+    --sidebar-foreground: 40 30% 94%;
+    --sidebar-primary:    350 52% 32%;
+    --sidebar-primary-foreground: 40 30% 94%;
+    --sidebar-accent:     222 38% 20%;
+    --sidebar-accent-foreground: 40 30% 94%;
+    --sidebar-border:     222 32% 26%;
+    --sidebar-ring:       38 62% 52%;
   }
+
 
 
   .dark {
