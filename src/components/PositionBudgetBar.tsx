@@ -14,15 +14,15 @@ import {
 } from "@/lib/planner-strategies";
 
 const GROUP_COLOR: Record<SlotGroup, string> = {
-  QB:        "bg-red-500/20 text-black border-red-500/30",
-  RB:        "bg-emerald-500/20 text-black border-emerald-500/30",
-  WR:        "bg-sky-500/20 text-black border-sky-500/30",
-  TE:        "bg-orange-500/20 text-black border-orange-500/30",
-  FLEX:      "bg-violet-500/20 text-black border-violet-500/30",
-  SUPERFLEX: "bg-red-500/20 text-black border-red-500/30",
-  K:         "bg-violet-500/20 text-black border-violet-500/30",
-  DST:       "bg-amber-500/20 text-black border-amber-500/30",
-  BENCH:     "bg-secondary text-black border-border",
+ QB:        "bg-red-500/20 text-white border-red-500/30",
+ RB:        "bg-emerald-500/20 text-white border-emerald-500/30",
+ WR:        "bg-sky-500/20 text-white border-sky-500/30",
+ TE:        "bg-orange-500/20 text-white border-orange-500/30",
+ FLEX:      "bg-violet-500/20 text-white border-violet-500/30",
+ SUPERFLEX: "bg-red-500/20 text-white border-red-500/30",
+ K:         "bg-violet-500/20 text-white border-violet-500/30",
+ DST:       "bg-amber-500/20 text-white border-amber-500/30",
+ BENCH:     "bg-secondary text-white border-border",
 };
 
 const STRATEGIES: StrategyId[] = ["hero-qb", "balanced-qbs", "bargain-qb", "manual"];
