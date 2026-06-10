@@ -31,6 +31,7 @@ import {
 } from "@/lib/draft-math";
 
 import { useAnchorMap } from "@/lib/use-anchor-map";
+import { usePlayerRanks } from "@/lib/league-tier-prices";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { Button } from "@/components/ui/button";
@@ -160,6 +161,7 @@ export default function DraftRoom() {
   }, []);
 
   const { map: anchorMap } = useAnchorMap();
+  const { lookup: lookupRank } = usePlayerRanks();
 
   // ── Computed ────────────────────────────────────────────────────────────
   const budget = useMemo(
@@ -481,22 +483,33 @@ export default function DraftRoom() {
         let posRank: number | undefined;
         let totalAtPos: number | undefined;
         const pos = detailFor?.position ?? sheet?.position;
+
+        // Preferred source: ESPN player ranks (always populated post-connect)
+        const espnRank = detailFor ? lookupRank(detailFor.name) : null;
+        if (espnRank?.pos_rank && (espnRank.position === pos || !pos)) {
+          posRank = espnRank.pos_rank;
+        }
+
         if (pos) {
           const samePos = prices
             .filter((p) => p.position === pos && p.price > 0)
             .map((p) => ({ name: p.name, price: p.price }));
-          // If player isn't in the sheet but has an anchor price (e.g. ESPN-only),
-          // include them so they can still be ranked within their position.
-          if (detailFor && !samePos.some((p) => norm(p.name) === key)) {
-            const anchorPrice = anchor?.price;
-            if (anchorPrice && anchorPrice > 0) {
-              samePos.push({ name: detailFor.name, price: anchorPrice });
+          if (samePos.length >= 5) {
+            totalAtPos = samePos.length;
+            // Fall back to sheet-based rank only if ESPN didn't provide one
+            if (posRank == null) {
+              if (detailFor && !samePos.some((p) => norm(p.name) === key)) {
+                const anchorPrice = anchor?.price;
+                if (anchorPrice && anchorPrice > 0) {
+                  samePos.push({ name: detailFor.name, price: anchorPrice });
+                  totalAtPos = samePos.length;
+                }
+              }
+              samePos.sort((a, b) => b.price - a.price);
+              const idx = samePos.findIndex((p) => norm(p.name) === key);
+              if (idx >= 0) posRank = idx + 1;
             }
           }
-          samePos.sort((a, b) => b.price - a.price);
-          totalAtPos = samePos.length;
-          const idx = samePos.findIndex((p) => norm(p.name) === key);
-          if (idx >= 0) posRank = idx + 1;
         }
         return (
           <PlayerDetailsOverlay
