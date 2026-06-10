@@ -51,7 +51,7 @@ export interface Keeper {
 export const DEFAULT_ROSTER: RosterSlots = {
   QB: 1,
   RB: 2,
-  WR: 2,
+  WR: 3,
   TE: 1,
   FLEX: 0,
   SUPERFLEX: 1,

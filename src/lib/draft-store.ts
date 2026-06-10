@@ -309,7 +309,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 3,
+      version: 4,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -319,6 +319,14 @@ export const useDraftStore = create<DraftState>()(
         // cached prices so the auto-loader refetches a clean list.
         if (persisted && version < 3) {
           persisted.prices = [];
+        }
+        // v4: default roster now has 3 WR slots (was 2).
+        if (persisted && version < 4 && persisted.settings?.roster) {
+          if ((persisted.settings.roster.WR ?? 0) < 3) {
+            persisted.settings.roster.WR = 3;
+          }
+          persisted.slotAllocations = {};
+          persisted.touchedSlots = {};
         }
         return persisted;
       },
