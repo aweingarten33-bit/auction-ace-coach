@@ -215,7 +215,7 @@
     line-height: 1.5;
     background-color: hsl(var(--background));
     /* Banksy spray-grain tile — real spray dots + drips across the wall */
-    background-image: url('/src/assets/banksy-spray-grain.png');
+    background-image: url('./assets/banksy-spray-grain.png');
     background-size: 520px 520px;
     background-repeat: repeat;
     background-attachment: fixed;
@@ -226,12 +226,12 @@
     content: "";
     position: fixed;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
     right: -40px;
     bottom: -20px;
     width: min(46vw, 520px);
     height: min(46vw, 520px);
-    background-image: url('/src/assets/banksy-stencil.png');
+    background-image: url('./assets/banksy-stencil.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: bottom right;
@@ -243,7 +243,7 @@
     content: "";
     position: fixed;
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
     left: -80px;
     top: 8%;
     width: 360px;
