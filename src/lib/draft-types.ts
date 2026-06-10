@@ -57,7 +57,7 @@ export const DEFAULT_ROSTER: RosterSlots = {
   SUPERFLEX: 1,
   K: 0,
   DST: 0,
-  BENCH: 6,
+  BENCH: 9,
 };
 
 export const DEFAULT_SETTINGS: LeagueSettings = {
