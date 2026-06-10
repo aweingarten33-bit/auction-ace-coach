@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Menu,
   Calculator,
-  
+  X,
   Settings,
   RefreshCw,
   Wifi,
@@ -772,29 +772,58 @@ function Top100List({
     );
   }
 
+  const activeFilters = search.trim() !== "" || posFilter !== "ALL";
+  const clearFilters = () => {
+    setSearch("");
+    setPosFilter("ALL");
+  };
+
   return (
     <div className="space-y-2">
-      <Input
-        placeholder="Search players…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="h-10 text-sm"
-      />
-      <div className="flex flex-wrap gap-1.5">
-        {POSITION_FILTER_OPTIONS.map((pos) => (
+      <div className="relative">
+        <Input
+          placeholder="Search players…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="h-10 pr-9 text-sm"
+        />
+        {search.trim() !== "" && (
           <button
-            key={pos}
             type="button"
-            onClick={() => setPosFilter(pos)}
-            className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide transition ${
-              posFilter === pos
-                ? "bg-foreground text-background"
-                : "bg-secondary/40 text-muted-foreground hover:bg-secondary/60"
-            }`}
+            onClick={() => setSearch("")}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:text-foreground"
+            aria-label="Clear search"
           >
-            {pos}
+            <X className="h-4 w-4" />
           </button>
-        ))}
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="flex flex-1 overflow-hidden rounded-lg border border-border bg-secondary/20">
+          {POSITION_FILTER_OPTIONS.map((pos) => (
+            <button
+              key={pos}
+              type="button"
+              onClick={() => setPosFilter(pos)}
+              className={`flex-1 px-1 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
+                posFilter === pos
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:bg-secondary/40"
+              }`}
+            >
+              {pos}
+            </button>
+          ))}
+        </div>
+        {activeFilters && (
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="shrink-0 rounded-lg border border-border px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground transition hover:bg-secondary/40 hover:text-foreground"
+          >
+            Reset
+          </button>
+        )}
       </div>
       <div className="space-y-1">
         {rows.length === 0 && (
