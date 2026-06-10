@@ -19,8 +19,6 @@ import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
 
 import { useAuth } from "@/hooks/useAuth";
-import { useEspnLiveSync } from "@/hooks/useEspnLiveSync";
-import { useSelectedTeam } from "@/hooks/useSelectedTeam";
 import { supabase } from "@/integrations/supabase/client";
 import {
   adjustPricesForDrafted,
@@ -54,7 +52,7 @@ import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
 import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
 
-import SyncStatusPill from "@/components/SyncStatusPill";
+
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
