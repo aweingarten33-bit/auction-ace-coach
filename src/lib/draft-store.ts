@@ -309,7 +309,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 5,
+      version: 6,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -332,6 +332,17 @@ export const useDraftStore = create<DraftState>()(
         if (persisted && version < 5 && persisted.settings?.roster) {
           if ((persisted.settings.roster.BENCH ?? 0) < 9) {
             persisted.settings.roster.BENCH = 9;
+          }
+          persisted.slotAllocations = {};
+          persisted.touchedSlots = {};
+        }
+        // v6: default roster now has 1 K and 1 DST slot (was 0).
+        if (persisted && version < 6 && persisted.settings?.roster) {
+          if ((persisted.settings.roster.K ?? 0) < 1) {
+            persisted.settings.roster.K = 1;
+          }
+          if ((persisted.settings.roster.DST ?? 0) < 1) {
+            persisted.settings.roster.DST = 1;
           }
           persisted.slotAllocations = {};
           persisted.touchedSlots = {};
