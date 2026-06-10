@@ -236,8 +236,8 @@ export default function DraftRoom() {
         <div className="min-w-0 flex-1 leading-tight">
           <img
             src={auctionDraftBadge}
-            alt="Auction Draft Assistant"
-            className="h-36 w-full max-w-[420px] object-contain invert brightness-200"
+            alt="Auction Draft Assist"
+            className="h-28 w-full max-w-[320px] object-contain invert brightness-200"
           />
         </div>
       </header>
