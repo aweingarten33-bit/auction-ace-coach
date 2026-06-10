@@ -324,7 +324,13 @@ Deno.serve(async (req: Request) => {
           });
           if (fcRes.ok) {
             const fc = await fcRes.json();
-            const raw = (fc?.data ?? fc?.web ?? []).slice(0, 5);
+            const webField = fc?.web;
+            const rawList = Array.isArray(fc?.data) ? fc.data
+              : Array.isArray(webField) ? webField
+              : Array.isArray(webField?.results) ? webField.results
+              : Array.isArray(fc?.data?.web) ? fc.data.web
+              : [];
+            const raw = rawList.slice(0, 5);
             sources = raw.map((r: { url?: string; title?: string; description?: string }) => ({
               title: r.title || "",
               url: r.url || "",
