@@ -453,6 +453,20 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div className="h-px flex-1 bg-border" />
       </div>
 
+      {/* PRESET: 2026 Superflex cheat sheet (350 players, Josh Allen $69 anchor) */}
+      <div className="rounded-md border border-border/60 bg-secondary/20 p-3">
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={loadCheatSheet2026}
+        >
+          <Sparkles className="mr-2 h-4 w-4" /> Load 2026 Superflex cheat sheet (350 players)
+        </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          Replaces all current prices. 12-team, $225, 4pt-passTD, 0.5 PPR. Allen $69 anchor.
+        </p>
+      </div>
+
       {/* FALLBACK: Upload CSV / XLSX / PDF / image */}
       <div className="rounded-md border border-dashed border-border/60 bg-secondary/20 p-3">
         <input
@@ -474,9 +488,45 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
           {uploading ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Importing...</>
           ) : (
-            <><Upload className="mr-2 h-4 w-4" /> Upload CSV / Excel / PDF / screenshot</>
+            <><Upload className="mr-2 h-4 w-4" /> Upload your own PDF / CSV / Excel / screenshot</>
           )}
         </Button>
+        <p className="mt-1.5 text-[10px] text-muted-foreground">
+          PDFs are AI-parsed and replace the current prices.
+        </p>
+      </div>
+
+      {/* Quick add — type a name, price auto-fills from the sheet (or use "Name - 25" syntax) */}
+      <div className="rounded-md border border-border/60 bg-secondary/10 p-2">
+        <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">
+          Quick add / update — type "Player Name" (auto-fills $) or "Player Name - 25"
+        </p>
+        <div className="flex items-center gap-1.5">
+          <PlayerAutocomplete
+            value={quickName}
+            onChange={setQuickName}
+            onSelect={(p) => {
+              const hit = prices.find((x) => x.name.toLowerCase() === p.full_name.toLowerCase());
+              if (hit) setQuickPrice(String(hit.price));
+            }}
+            onEnter={addQuick}
+            placeholder="Player name…"
+            className="flex-1"
+          />
+          <span className="text-xs text-muted-foreground">$</span>
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={quickPrice}
+            onChange={(e) => setQuickPrice(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") addQuick(); }}
+            className="h-9 w-16 text-right font-mono text-xs"
+            placeholder="$"
+          />
+          <Button size="sm" onClick={addQuick} className="h-9 px-2">
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Filter / list */}
