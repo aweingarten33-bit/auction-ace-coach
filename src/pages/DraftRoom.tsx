@@ -82,33 +82,33 @@ export default function DraftRoom() {
     setPrices,
   } = useDraftStore();
 
-  // Auto-load blended SF auction values when no price sheet is loaded.
-  // Sources: Matthew Berry (Fantasy Life) + Sleeper + DraftSharks, SF-tuned.
+  // Auto-load the 2026 Superflex cheat sheet (350 players, Allen $69 anchor)
+  // when no price sheet is loaded. This is the source of truth for the app.
   useEffect(() => {
     if (prices.length > 0) return;
-    let cancelled = false;
     (async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("blended-values", {
-          body: {
-            superflex: settings.leagueType !== "Standard",
-            teams: settings.numTeams,
-            budget: settings.totalBudget,
-          },
-        });
-        if (cancelled || error || !data?.values) return;
-        const rows: PriceEstimate[] = Object.values(data.values as Record<string, {
-          name: string; position: string; blended: number;
-        }>).map((v) => ({
-          name: v.name,
-          price: v.blended,
-          position: (v.position === "D/ST" ? "DST" : v.position) as Position,
-        }));
-        if (rows.length) setPrices(rows);
-      } catch { /* ignore */ }
-    })();
-    return () => { cancelled = true; };
-  }, [prices.length, settings.leagueType, settings.numTeams, settings.totalBudget, setPrices]);
+      const mod = await import("@/assets/cheat-sheet-2026.json");
+      const sheet = (mod.default ?? mod) as { name: string; position?: string; price: number }[];
+      const rows: PriceEstimate[] = sheet.map((p) => ({
+        name: p.name,
+        price: p.price,
+        position: (p.position as Position | undefined) ?? undefined,
+      }));
+      if (rows.length) setPrices(rows);
+    })().catch(() => { /* ignore */ });
+  }, [prices.length, setPrices]);
+
+  const loadCheatSheet2026 = async () => {
+    const mod = await import("@/assets/cheat-sheet-2026.json");
+    const sheet = (mod.default ?? mod) as { name: string; position?: string; price: number }[];
+    const rows: PriceEstimate[] = sheet.map((p) => ({
+      name: p.name,
+      price: p.price,
+      position: (p.position as Position | undefined) ?? undefined,
+    }));
+    setPrices(rows);
+    toast.success(`Loaded 2026 cheat sheet — ${rows.length} players`);
+  };
 
 
 
