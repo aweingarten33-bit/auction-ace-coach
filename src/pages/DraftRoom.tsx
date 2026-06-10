@@ -161,6 +161,7 @@ export default function DraftRoom() {
   }, []);
 
   const { map: anchorMap } = useAnchorMap();
+  const { lookup: lookupRank } = usePlayerRanks();
 
   // ── Computed ────────────────────────────────────────────────────────────
   const budget = useMemo(
