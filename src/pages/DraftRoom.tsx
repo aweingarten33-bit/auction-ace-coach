@@ -347,7 +347,7 @@ export default function DraftRoom() {
         className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-sm"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="flex items-center justify-center gap-6 px-3 py-2">
+        <div className="flex items-center justify-center gap-12 px-3 py-2">
           <button
             onClick={() => setPanel("calc")}
             aria-label="Auction calculator"
