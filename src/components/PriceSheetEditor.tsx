@@ -311,7 +311,8 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         throw new Error(t.error || `Parse failed (${resp.status})`);
       }
       const { players } = await resp.json() as { players: { name: string; price: number }[] };
-      mergeImported(players || [], file.name);
+      // PDF/image is a full cheat sheet upload — REPLACE existing prices entirely
+      mergeImported(players || [], file.name, "replace");
     } catch (e: any) {
       console.error(e);
       toast.error(e?.message || "Upload failed");
