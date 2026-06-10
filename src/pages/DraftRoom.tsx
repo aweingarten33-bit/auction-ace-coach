@@ -52,6 +52,7 @@ import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
+import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
 
 import SyncStatusPill from "@/components/SyncStatusPill";
 
@@ -82,33 +83,22 @@ export default function DraftRoom() {
     setPrices,
   } = useDraftStore();
 
-  // Auto-load the 2026 Superflex cheat sheet (350 players, Allen $69 anchor)
-  // when no price sheet is loaded. This is the source of truth for the app.
+  // Auto-load the only auction values source: uploaded PDF sheet + DraftSharks SF.
   useEffect(() => {
-    if (prices.length > 0) return;
-    (async () => {
-      const mod = await import("@/assets/cheat-sheet-2026.json");
-      const sheet = (mod.default ?? mod) as { name: string; position?: string; price: number }[];
-      const rows: PriceEstimate[] = sheet.map((p) => ({
-        name: p.name,
-        price: p.price,
-        position: (p.position as Position | undefined) ?? undefined,
-      }));
-      if (rows.length) setPrices(rows);
-    })().catch(() => { /* ignore */ });
-  }, [prices.length, setPrices]);
-
-  const loadCheatSheet2026 = async () => {
-    const mod = await import("@/assets/cheat-sheet-2026.json");
-    const sheet = (mod.default ?? mod) as { name: string; position?: string; price: number }[];
-    const rows: PriceEstimate[] = sheet.map((p) => ({
-      name: p.name,
-      price: p.price,
-      position: (p.position as Position | undefined) ?? undefined,
-    }));
-    setPrices(rows);
-    toast.success(`Loaded 2026 cheat sheet — ${rows.length} players`);
-  };
+    let cancelled = false;
+    const sourceKey = `${PRICE_SOURCE_VERSION}-${settings.totalBudget}`;
+    try {
+      if (prices.length > 0 && localStorage.getItem("auction-price-source") === sourceKey) return;
+    } catch { /* ignore */ }
+    loadBlendedAuctionPrices(settings.totalBudget)
+      .then((rows) => {
+        if (cancelled || rows.length === 0) return;
+        setPrices(rows);
+        try { localStorage.setItem("auction-price-source", sourceKey); } catch { /* ignore */ }
+      })
+      .catch(() => { /* keep app usable if DraftSharks is temporarily unavailable */ });
+    return () => { cancelled = true; };
+  }, [prices.length, setPrices, settings.totalBudget]);
 
 
 
