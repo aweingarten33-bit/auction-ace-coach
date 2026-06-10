@@ -115,6 +115,7 @@ export default function PlayerDetailsOverlay({
   anchor,
   posRank,
   totalAtPos,
+  overallRank,
 }: Props) {
   const [meta, setMeta] = useState<SleeperPlayer | null | undefined>(undefined);
   const [loading, setLoading] = useState(false);
