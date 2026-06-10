@@ -21,6 +21,7 @@ interface Props {
   anchor?: AnchorEntry;
   posRank?: number;
   totalAtPos?: number;
+  overallRank?: number;
   // Unused legacy props (kept so call sites don't break) — overlay is intentionally simple now.
   remaining?: number;
   maxBid?: number;
@@ -114,6 +115,7 @@ export default function PlayerDetailsOverlay({
   anchor,
   posRank,
   totalAtPos,
+  overallRank,
 }: Props) {
   const [meta, setMeta] = useState<SleeperPlayer | null | undefined>(undefined);
   const [loading, setLoading] = useState(false);
@@ -184,7 +186,20 @@ export default function PlayerDetailsOverlay({
             <Tile label="Value" value={price != null ? `$${price}` : "—"} />
             <Tile
               label="Pos rank"
-              value={posRank ? `#${posRank}${totalAtPos ? ` / ${totalAtPos}` : ""}` : "—"}
+              value={
+                posRank ? (
+                  <span>
+                    {pos ? `${pos === "DST" ? "DEF" : pos}${posRank}` : `#${posRank}`}
+                    {overallRank ? (
+                      <span className="ml-1 text-[10px] font-normal text-muted-foreground">
+                        · #{overallRank} ovr
+                      </span>
+                    ) : null}
+                  </span>
+                ) : (
+                  "—"
+                )
+              }
             />
             <Tile
               label="Status"
