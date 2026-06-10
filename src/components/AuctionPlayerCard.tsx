@@ -288,7 +288,7 @@ export default function AuctionPlayerCard({
         <div className="flex flex-col justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-[#d2691e]">
-              Berry + Sleeper value
+              Blended cheat-sheet value
             </p>
             {headlinePrice != null ? (
               <p className="font-serif text-[42px] font-black leading-none">
@@ -300,20 +300,14 @@ export default function AuctionPlayerCard({
               </p>
             )}
             <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[#1b2238]/60">
-              blended research price
+              PDF + DraftSharks blend
             </p>
           </div>
 
-          {/* Compact price stack — every input that drives the headline */}
+          {/* Compact price stack */}
           <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
-            {berryVal != null && (
-              <PriceLine label="Matthew Berry" value={`$${Math.round(berryVal)}`} />
-            )}
-            {sleeperVal != null && (
-              <PriceLine label="Sleeper" value={`$${Math.round(sleeperVal)}`} />
-            )}
-            {analystAvg != null && (
-              <PriceLine label="Berry/Sleeper avg" value={`$${analystAvg}`} />
+            {sheetPrice != null && (
+              <PriceLine label="Cheat sheet" value={`$${Math.round(sheetPrice)}`} />
             )}
             {leagueVal != null && (
               <PriceLine label="League 3yr avg" value={`$${Math.round(leagueVal)}`} />
@@ -330,6 +324,7 @@ export default function AuctionPlayerCard({
           </div>
         </div>
       </div>
+
 
       {/* Mobile quick-read strip: keep recommendation visible while scrolling */}
       <div className="sticky top-0 z-10 border-y border-[#1b2238]/20 bg-[#f5efe4]/95 px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-[#f5efe4]/80">
