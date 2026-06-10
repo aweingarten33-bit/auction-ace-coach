@@ -300,14 +300,26 @@ export default function DraftRoom() {
             <TabsTrigger value="planner">Budget Planner</TabsTrigger>
             <TabsTrigger value="top100">Top 100</TabsTrigger>
           </TabsList>
-          {selectedTeam && (() => {
+          {(() => {
             const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
-            const moneyLeft = budget.totalBudget - allocated;
+            const moneyLeft = settings.totalBudget - allocated;
             return (
               <div className="flex items-baseline justify-between gap-4 pr-[52px]">
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-xs uppercase tracking-wide text-muted-foreground">Budget</span>
-                  <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
+                  <span className="text-2xl font-bold tabular-nums">$</span>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    value={settings.totalBudget}
+                    onChange={(e) => {
+                      const v = Math.max(1, Math.floor(Number(e.target.value) || 0));
+                      useDraftStore.getState().setSettings({ totalBudget: v });
+                    }}
+                    className="w-20 bg-transparent text-2xl font-bold tabular-nums outline-none focus:ring-0 border-b border-transparent focus:border-border"
+                    aria-label="Total auction budget"
+                  />
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
