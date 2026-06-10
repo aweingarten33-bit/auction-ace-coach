@@ -238,9 +238,6 @@ export default function DraftRoom() {
           <p className="truncate text-lg font-bold leading-tight">
             Auction Draft Assistant
           </p>
-          <div className="mt-0.5 flex items-center gap-1.5">
-            <span className="text-[10px] text-muted-foreground">Manual mode</span>
-          </div>
         </div>
 
       </header>
