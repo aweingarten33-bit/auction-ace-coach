@@ -208,8 +208,9 @@ export default function AuctionPlayerCard({
     if (need === "critical" || need === "need") {
       bottomParts.push(`${needLabel[need]}: ${math}. If you tap him, the key is whether ${fmt(afterRemaining ?? 0)} for ${slotsAfter ?? 0} slots still fits your build.`);
     } else if (need === "depth") {
-      bottomParts.push(`Depth only: ${math}. Better if he falls below the blended Berry/Sleeper number.`);
+      bottomParts.push(`Depth only: ${math}. Better if he falls below the blended cheat-sheet number.`);
     } else {
+
       bottomParts.push(`Position filled: ${math}. This has to be a clear discount, not another spend slot.`);
     }
   }
