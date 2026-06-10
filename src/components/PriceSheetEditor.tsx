@@ -238,26 +238,25 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
   };
 
   // FIX: accept optional position so auto-fill and future imports can carry it through
-  const mergeImported = (incoming: { name: string; price: number; position?: Position }[], filename: string) => {
+  const mergeImported = (incoming: { name: string; price: number; position?: Position }[], filename: string, mode: "merge" | "replace" = "merge") => {
     if (!incoming.length) {
       toast.error("No players found in file");
       return;
     }
     const map = new Map<string, PriceEstimate>();
-    for (const p of prices) map.set(p.name.toLowerCase(), p);
+    if (mode === "merge") for (const p of prices) map.set(p.name.toLowerCase(), p);
     for (const p of incoming) {
       const existing = map.get(p.name.toLowerCase());
       map.set(p.name.toLowerCase(), {
         name: p.name,
         price: p.price,
-        // Prefer incoming position if provided; keep existing position as fallback
         position: p.position ?? existing?.position,
       });
     }
     const merged = Array.from(map.values());
     setPrices(merged);
     setPricesText(merged.map((p) => `${p.name} - ${p.price}`).join("\n"));
-    toast.success(`Imported ${incoming.length} players from ${filename}`);
+    toast.success(`${mode === "replace" ? "Replaced with" : "Imported"} ${incoming.length} players from ${filename}`);
   };
 
   const handleUpload = async (file: File) => {
