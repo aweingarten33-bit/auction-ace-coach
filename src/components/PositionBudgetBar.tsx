@@ -45,11 +45,12 @@ export default function PositionBudgetBar() {
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
 
 
-  // Auto-fill / rebalance. If the user has touched any slot, redistribute
-  // proportionally to current values so every other unlocked slot moves
-  // (not just the high-weight ones). Otherwise use the strategy preset fill.
+  // Auto-fill / rebalance. In manual mode, never auto-fill — every slot is
+  // user-driven. Otherwise: if the user has touched any slot, redistribute
+  // proportionally; if not, use the strategy preset.
   const anyTouched = Object.keys(touchedSlots).some((k) => touchedSlots[k]);
   useEffect(() => {
+    if (plannerStrategy === "manual") return;
     const computed = anyTouched
       ? rebalanceProportional(plannerStrategy, settings, {
           touchedSlots,
@@ -73,6 +74,7 @@ export default function PositionBudgetBar() {
     if (changed) setSlotAllocations(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plannerStrategy, settings, touchedSlots, lockedSlots, slotAllocations, anyTouched]);
+
 
   const valueFor = (slot: PlannerSlot) =>
     slot.id in slotAllocations ? slotAllocations[slot.id] : 0;
