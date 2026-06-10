@@ -343,16 +343,16 @@ export default function DraftRoom() {
 
       {/* ── BOTTOM BAR (fixed/frozen) ──────────────────────── */}
       <div
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 backdrop-blur-sm"
+        className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#050d1c]/90 backdrop-blur-sm"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
-        <div className="flex items-center justify-center gap-20 px-3 py-2">
+        <div className="flex items-center justify-center gap-16 px-3 py-2">
           <Sheet open={panel === "calc"} onOpenChange={(o) => setPanel(o ? "calc" : null)}>
             <SheetTrigger asChild>
               <button
                 type="button"
                 aria-label="Auction calculator"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-secondary/30 text-muted-foreground shadow-lg hover:bg-secondary/50 hover:text-foreground active:scale-95 transition"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#c9a14a]/40 bg-white/5 text-[#c9a14a] shadow-[0_0_14px_rgba(201,161,74,0.25)] hover:bg-[#c9a14a]/10 active:scale-95 transition"
               >
                 <Calculator className="h-4 w-4" />
               </button>
@@ -379,9 +379,9 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Ask the Coach"
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground text-background shadow-lg active:scale-95 transition"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-red-700 text-white shadow-[0_0_18px_rgba(239,68,68,0.55)] active:scale-95 transition hover:from-red-400 hover:to-red-600"
               >
-                <Sparkles className="h-4 w-4" strokeWidth={1.5} />
+                <Sparkles className="h-4 w-4" strokeWidth={1.75} />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
