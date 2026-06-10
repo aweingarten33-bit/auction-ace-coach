@@ -83,6 +83,47 @@ function fcCacheSet(key: string, results: WebSource[]) {
   }
 }
 
+// ---------- Firecrawl v2 response parser (exported for tests) ----------
+// v2 has been seen returning results under several shapes:
+//   { data: [ ... ] }                 (legacy)
+//   { data: { web: [ ... ] } }
+//   { web: [ ... ] }
+//   { web: { results: [ ... ] } }
+//   { data: { web: { results: [...] } } }
+// We accept all of them and never throw.
+export function parseFirecrawlResults(fc: unknown): WebSource[] {
+  if (!fc || typeof fc !== "object") return [];
+  const root = fc as Record<string, unknown>;
+  const data = root.data as Record<string, unknown> | unknown[] | undefined;
+  const webField = root.web as Record<string, unknown> | unknown[] | undefined;
+  const dataWeb = (data && !Array.isArray(data) ? (data as Record<string, unknown>).web : undefined) as
+    | Record<string, unknown>
+    | unknown[]
+    | undefined;
+
+  const candidates: unknown[] = [
+    Array.isArray(data) ? data : undefined,
+    Array.isArray(webField) ? webField : undefined,
+    webField && !Array.isArray(webField) && Array.isArray((webField as Record<string, unknown>).results)
+      ? (webField as Record<string, unknown>).results
+      : undefined,
+    Array.isArray(dataWeb) ? dataWeb : undefined,
+    dataWeb && !Array.isArray(dataWeb) && Array.isArray((dataWeb as Record<string, unknown>).results)
+      ? (dataWeb as Record<string, unknown>).results
+      : undefined,
+  ];
+  const rawList = (candidates.find((c) => Array.isArray(c) && (c as unknown[]).length > 0) as unknown[] | undefined) ?? [];
+  return rawList
+    .map((r): WebSource => {
+      const o = (r && typeof r === "object" ? r : {}) as Record<string, unknown>;
+      return {
+        title: typeof o.title === "string" ? o.title : "",
+        url: typeof o.url === "string" ? o.url : "",
+        description: typeof o.description === "string" ? o.description : "",
+      };
+    })
+    .filter((s) => s.url);
+
 // ---------- Web search policy ----------
 // PDF price sheet is the primary source of truth, but we ALWAYS pull fresh web
 // context too so answers reflect current news/injuries/depth-chart moves.
