@@ -241,11 +241,27 @@ export default function DraftRoom() {
         className="flex shrink-0 items-center gap-2 border-b border-border/60 bg-background px-2 pt-1 pb-2"
       >
         <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" aria-label="Menu">
-              <Menu className="h-5 w-5" strokeWidth={2} />
-            </Button>
-          </SheetTrigger>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            aria-label="Menu"
+            onClick={() => {
+              if (sessionStorage.getItem("menu_unlocked") === "1") {
+                setDrawerOpen(true);
+                return;
+              }
+              const pw = window.prompt("Enter password to open menu");
+              if (pw === "33Superman33") {
+                sessionStorage.setItem("menu_unlocked", "1");
+                setDrawerOpen(true);
+              } else if (pw !== null) {
+                toast.error("Incorrect password");
+              }
+            }}
+          >
+            <Menu className="h-5 w-5" strokeWidth={2} />
+          </Button>
           <SettingsDrawer
             onClose={() => setDrawerOpen(false)}
             onSignOut={async () => { await signOut(); navigate("/auth"); }}
