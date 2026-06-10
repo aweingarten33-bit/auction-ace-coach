@@ -296,13 +296,19 @@ export default function DraftRoom() {
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-24 pt-3">
         <div className="space-y-4">
           {/* Budget summary */}
-          {selectedTeam && (
-            <div className="flex items-center gap-3 text-sm">
-              <span className="font-semibold">{selectedTeam.name}</span>
-              <span className="text-muted-foreground">${budget.remaining} left</span>
-              <span className="text-muted-foreground">Max ${budget.maxBid}</span>
-            </div>
-          )}
+          {selectedTeam && (() => {
+            const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
+            const moneyLeft = budget.totalBudget - allocated;
+            return (
+              <div className="flex items-center gap-3 text-sm">
+                <span className="font-semibold">{selectedTeam.name}</span>
+                <span className="text-muted-foreground">Budget ${budget.totalBudget}</span>
+                <span className={moneyLeft >= 0 ? "text-muted-foreground" : "text-destructive"}>
+                  Money left ${moneyLeft}
+                </span>
+              </div>
+            );
+          })()}
           {/* Strategy picker + per-slot budget allocations */}
           <PositionBudgetBar />
           {/* Last pick delta */}
