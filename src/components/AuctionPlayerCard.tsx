@@ -1,6 +1,7 @@
 // Magazine cheat-sheet style player card — research-only.
 // Cream bg, navy banner, BYE badge, headshot, team logo, roster math,
-// and blended Matthew Berry/Fantasy Life + Sleeper market context.
+// and the blended PDF cheat sheet + DraftSharks Superflex price.
+
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
