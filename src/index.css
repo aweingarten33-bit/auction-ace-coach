@@ -34,7 +34,7 @@
     --secondary:         216 32% 24%;
     --secondary-foreground: 40 35% 95%;
 
-    --accent:            42 58% 54%;          /* restrained antique gold */
+    --accent:            40 35% 96%;          /* white / parchment */
     --accent-foreground: 216 42% 12%;
     --accent-secondary:  350 55% 38%;
 
@@ -44,15 +44,15 @@
     --destructive:       350 55% 42%;
     --destructive-foreground: 40 35% 95%;
 
-    --warning:           42 65% 56%;
+    --warning:           40 35% 96%;
     --warning-foreground: 216 42% 12%;
 
-    --success:           42 55% 50%;
+    --success:           40 35% 96%;
     --success-foreground: 216 42% 12%;
 
     --border:            40 35% 95% / 0.18;
     --input:             216 32% 19%;
-    --ring:              42 58% 54%;
+    --ring:              40 35% 96%;
 
     --radius: 0.375rem;
 
@@ -79,23 +79,23 @@
     --steel-blue:        220 40% 28%;
     --blood:             0 78% 58%;
     --signal-red:        0 78% 58%;
-    --dirty-gold:        42 78% 58%;
-    --warning-yellow:    42 90% 60%;
-    --signal:            42 78% 58%;
-    --brass:             42 78% 58%;
-    --brass-light:       42 85% 68%;
-    --brass-dark:        42 70% 42%;
-    --crimson:           0 78% 55%;
-    --crimson-spatter:   0 78% 55%;
-    --parchment:         40 25% 96%;
-    --ink-faded:         220 15% 60%;
-    --wood-grain:        220 38% 14%;
-    --bloodred:          0 78% 55%;
-    --steel:             220 15% 65%;
-    --sungold:           42 78% 58%;
-    --sungold-2:         42 85% 68%;
-    --krypton:           220 38% 14%;
-    --kryptonite:        42 78% 58%;
+    --dirty-gold:        40 35% 96%;
+    --warning-yellow:    40 35% 96%;
+    --signal:            40 35% 96%;
+    --brass:             40 35% 96%;
+    --brass-light:       40 40% 99%;
+    --brass-dark:        40 20% 78%;
+    --crimson:           350 55% 42%;
+    --crimson-spatter:   350 55% 42%;
+    --parchment:         40 35% 96%;
+    --ink-faded:         216 14% 72%;
+    --wood-grain:        216 36% 18%;
+    --bloodred:          350 55% 42%;
+    --steel:             216 12% 70%;
+    --sungold:           40 35% 96%;
+    --sungold-2:         40 40% 99%;
+    --krypton:           216 36% 18%;
+    --kryptonite:        40 35% 96%;
 
     --shadow-card:       var(--neu-extruded);
     --shadow-floating:   var(--neu-extruded-hover);
