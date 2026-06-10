@@ -310,9 +310,8 @@ export default function DraftRoom() {
                   <span className="text-2xl font-bold tabular-nums">${budget.totalBudget}</span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground">Money left</span>
                   <span className={`text-2xl font-bold tabular-nums ${moneyLeft >= 0 ? "" : "text-destructive"}`}>
-                    ${moneyLeft}
+                    ${moneyLeft} left
                   </span>
                 </div>
               </div>
