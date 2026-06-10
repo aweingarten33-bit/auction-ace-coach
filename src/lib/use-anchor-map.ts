@@ -361,10 +361,14 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
         if (cancelled) return;
 
-        // 4) Build the anchor map — SINGLE SOURCE OF TRUTH: blended-values
-        //    (Berry + Sleeper + DraftSharks, SF-adjusted, scaled to league budget).
-        //    Same source the Auction Calculator uses. League history is ignored
-        //    for pricing — produced inflated/inconsistent numbers vs the calculator.
+        // 4) Build the anchor map — PRIMARY = blended-values (same as calculator).
+        //    PERSONALIZATION: if this player has league history, blend 50/50 with
+        //    the recency-weighted league price, but CAP the result at ±25% of the
+        //    pure market price. This nudges values toward what your league actually
+        //    pays (e.g. SF QBs go a bit higher) without ever exploding like the
+        //    old league-tier overlay did.
+        const PERSONAL_WEIGHT = 0.5;
+        const PERSONAL_CAP = 0.25; // max 25% deviation from market
         const out: Record<string, AnchorEntry> = {};
         const allMarketKeys = new Set<string>([
           ...blendedMap.keys(),
@@ -373,13 +377,23 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           ...Object.keys(vorpMap),
         ]);
         for (const k of allMarketKeys) {
-          const mv = marketConsensus(k); // blendedMap first, then ESPN/Sleeper fallback
+          const mv = marketConsensus(k);
           const vv = vorpMap[k];
           let basePrice = 0;
           if (mv && mv.val > 0) basePrice = mv.val;
           else if (vv && vv.price > 0) basePrice = vv.price;
           if (basePrice <= 0) continue;
-          const preInjury = Math.max(1, Math.round(basePrice));
+
+          const lv = leagueAgg.get(k);
+          const leaguePrice = lv ? weightedLeague(lv.bySeason) : 0;
+          let blended = basePrice;
+          if (leaguePrice > 0 && mv && mv.val > 0) {
+            const raw = mv.val * (1 - PERSONAL_WEIGHT) + leaguePrice * PERSONAL_WEIGHT;
+            const lo = mv.val * (1 - PERSONAL_CAP);
+            const hi = mv.val * (1 + PERSONAL_CAP);
+            blended = Math.min(hi, Math.max(lo, raw));
+          }
+          const preInjury = Math.max(1, Math.round(blended));
           const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
           const lv = leagueAgg.get(k);
