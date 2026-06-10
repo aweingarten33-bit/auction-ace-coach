@@ -14,7 +14,6 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
