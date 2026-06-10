@@ -31,9 +31,9 @@ import {
   recentRuns,
 } from "@/lib/draft-math";
 
-import { useAnchorMap } from "@/lib/use-anchor-map";
 import { usePlayerRanks } from "@/lib/league-tier-prices";
 import { Position, PriceEstimate } from "@/lib/draft-types";
+import type { AnchorEntry } from "@/lib/decision-engine";
 import { POS_COLORS } from "@/lib/positions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,7 +151,6 @@ export default function DraftRoom() {
     })();
   }, []);
 
-  const { map: anchorMap } = useAnchorMap();
   const { lookup: lookupRank } = usePlayerRanks();
 
   // ── Computed ────────────────────────────────────────────────────────────
@@ -186,6 +185,21 @@ export default function DraftRoom() {
   
   // Re-price undrafted players in real time as players come off the board.
   const adjustedPrices = useMemo(() => adjustPricesForDrafted(prices, events), [prices, events]);
+  const anchorMap = useMemo<Record<string, AnchorEntry>>(() => {
+    const out: Record<string, AnchorEntry> = {};
+    for (const p of adjustedPrices) {
+      const row = p as PriceEstimate & { pdfPrice?: number; draftSharksPrice?: number };
+      if (row.price > 0) {
+        out[norm(row.name)] = {
+          price: row.price,
+          source: "sheet",
+          marketPrice: row.price,
+          marketSources: { pdf: row.pdfPrice, draftSharks: row.draftSharksPrice },
+        };
+      }
+    }
+    return out;
+  }, [adjustedPrices]);
 
   const requiredCount = {
     QB: settings.roster.QB + (settings.leagueType !== "Standard" ? settings.roster.SUPERFLEX : 0),
