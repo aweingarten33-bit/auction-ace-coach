@@ -282,6 +282,7 @@ export default function DraftRoom() {
                     aria-label="Total auction budget"
                   />
                 </div>
+                <FootballIcon size={20} spin className="opacity-80" />
                 <div className="flex items-baseline gap-1">
                   <span
                     className={`text-xl font-bold tabular-nums ${moneyLeft >= 0 ? "text-accent" : "text-destructive"}`}
