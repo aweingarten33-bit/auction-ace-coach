@@ -33,7 +33,7 @@ type WeightTable = Partial<Record<SlotGroup, number[]>>;
 //     the rest.
 //   - Razzball B_Don 2024 SF Auction Values, Draft Sharks SF auction values
 //     (price tiers cross-checked).
-const STRATEGIES: Record<StrategyId, WeightTable> = {
+const STRATEGIES: Record<Exclude<StrategyId, "manual">, WeightTable> = {
   // Two elite QBs — QB1 + SF both get star money, QB3 is a dart throw.
   "hero-qb": {
     QB:        [42, 3],
