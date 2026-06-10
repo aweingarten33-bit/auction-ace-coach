@@ -51,6 +51,8 @@ import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
 import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
+import HelmetIcon from "@/components/HelmetIcon";
+import FootballIcon from "@/components/FootballIcon";
 
 
 
@@ -232,7 +234,8 @@ export default function DraftRoom() {
           />
         </Sheet>
 
-        <div className="min-w-0 flex-1 leading-tight">
+        <div className="min-w-0 flex-1 leading-tight flex items-center gap-2">
+          <HelmetIcon size={24} className="shrink-0 drop-shadow-[0_0_6px_hsl(var(--primary)/0.4)]" />
           <p className="truncate font-bebas text-lg tracking-wider leading-tight">
             <span className="text-foreground">Auction Draft</span>{" "}
             <span className="text-accent">Assistant</span>
@@ -279,6 +282,7 @@ export default function DraftRoom() {
                     aria-label="Total auction budget"
                   />
                 </div>
+                <FootballIcon size={20} spin className="opacity-80" />
                 <div className="flex items-baseline gap-1">
                   <span
                     className={`text-xl font-bold tabular-nums ${moneyLeft >= 0 ? "text-accent" : "text-destructive"}`}
