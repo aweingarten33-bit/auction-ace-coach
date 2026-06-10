@@ -14,7 +14,6 @@ import {
   Sparkles,
   ChevronLeft,
   ChevronRight,
-  Clock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDraftStore } from "@/lib/draft-store";
@@ -59,7 +58,7 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "recent" | "calc";
+type PanelId = "calc";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -359,13 +358,6 @@ export default function DraftRoom() {
             <Calculator className="h-5 w-5" />
             <span className="text-xs font-medium">Auction calculator</span>
           </button>
-          <button
-            onClick={() => setPanel("recent")}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-          >
-            <Clock className="h-4 w-4" />
-            <span className="text-xs font-medium">Recent</span>
-          </button>
 
           {/* Coach FAB */}
           <Sheet open={aiOpen} onOpenChange={setAiOpen}>
@@ -443,7 +435,6 @@ export default function DraftRoom() {
               </button>
               <h2 className="text-base font-semibold">
                 {panel === "calc" && "Auction calculator"}
-                {panel === "recent" && "Recent picks"}
               </h2>
             </div>
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
@@ -453,64 +444,6 @@ export default function DraftRoom() {
                     prices={adjustedPrices}
                     onShowDetails={(name, position) => setDetailFor({ name, position })}
                   />
-                </div>
-              )}
-              {panel === "recent" && (
-                <div className="space-y-4">
-                  {events.length === 0 ? (
-                    <p className="py-8 text-center text-sm text-muted-foreground">No picks yet.</p>
-                  ) : (
-                    <RecentPicksList
-                      events={events.slice(-20).reverse()}
-                      onPick={(n, p) => { setPanel(null); openDetails(n, p); }}
-                    />
-                  )}
-                  {myItems.length > 0 && (
-                    <section>
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Your roster ({myItems.length})
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {myItems.map((it) => (
-                          <button
-                            key={it.player}
-                            type="button"
-                            onClick={() => { setPanel(null); openDetails(it.player, it.position); }}
-                            className="flex items-center gap-1.5 rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs hover:bg-secondary/60"
-                          >
-                            {it.position && (
-                              <span className={`text-[9px] font-semibold ${POS_COLORS[it.position] ?? ""}`}>
-                                {it.position}
-                              </span>
-                            )}
-                            <span className="font-medium">{it.player}</span>
-                            {it.price != null && (
-                              <span className="font-mono text-[10px] text-muted-foreground">${it.price}</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                  {watchlist.length > 0 && (
-                    <section>
-                      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                        Pinned ({watchlist.length})
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {watchlist.map((name) => (
-                          <button
-                            key={name}
-                            type="button"
-                            onClick={() => { setPanel(null); openDetails(name); }}
-                            className="rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-xs font-medium hover:bg-secondary/60"
-                          >
-                            {name}
-                          </button>
-                        ))}
-                      </div>
-                    </section>
-                  )}
                 </div>
               )}
             </div>
