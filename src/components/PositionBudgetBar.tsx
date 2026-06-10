@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "@/lib/planner-slots";
 import {
   computeSlotDollars,
+  rebalanceProportional,
   maxBid,
   STRATEGY_LABELS,
   type StrategyId,
