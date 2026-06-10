@@ -155,16 +155,9 @@ export default function PlayerDetailsOverlay({
 
         <div className="p-4 space-y-3">
           {/* Header: name + pos badge + tier */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 className="text-xl font-bold leading-tight text-foreground truncate">{name}</h2>
-              <p className="mt-0.5 text-xs text-muted-foreground">
-                {team ?? "FA"}
-                {bye ? ` · Bye W${bye}` : ""}
-                {meta?.age != null ? ` · Age ${meta.age}` : ""}
-              </p>
-            </div>
-            <div className="flex shrink-0 flex-col items-end gap-1">
+          <div className="pr-8">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-xl font-bold leading-tight text-foreground">{name}</h2>
               {pos && (
                 <Badge
                   variant="outline"
@@ -179,6 +172,11 @@ export default function PlayerDetailsOverlay({
                 </span>
               )}
             </div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {team ?? "FA"}
+              {bye ? ` · Bye W${bye}` : ""}
+              {meta?.age != null ? ` · Age ${meta.age}` : ""}
+            </p>
           </div>
 
           {/* Value + tier rank row */}
