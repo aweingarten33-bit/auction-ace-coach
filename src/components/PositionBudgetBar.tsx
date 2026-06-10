@@ -142,7 +142,8 @@ export default function PositionBudgetBar() {
               <div key={slot.id} className="flex items-center gap-2">
                 <span
                   className={cn(
-                    "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center text-[10px] font-bold",
+                    "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center font-bold",
+                    slot.label === "Superflex" ? "text-[8px]" : "text-[10px]",
                     GROUP_COLOR[slot.group],
                     isLocked && "opacity-60",
                   )}
