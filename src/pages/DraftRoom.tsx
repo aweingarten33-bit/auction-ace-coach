@@ -56,7 +56,7 @@ import SyncStatusPill from "@/components/SyncStatusPill";
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-type PanelId = "top50" | "recent" | "calc";
+type PanelId = "recent" | "calc";
 
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -297,12 +297,7 @@ export default function DraftRoom() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="flex items-center px-3 py-2">
-          <button
-            onClick={() => setPanel("top50")}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
-          >
-            <span className="text-xs font-medium">Top 50</span>
-          </button>
+        
           <button
             onClick={() => setPanel("calc")}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-muted-foreground hover:bg-secondary/40 hover:text-foreground"
@@ -392,7 +387,6 @@ export default function DraftRoom() {
                 <ChevronLeft className="h-5 w-5" strokeWidth={2} />
               </button>
               <h2 className="text-base font-semibold">
-              {panel === "top50" && (leagueName ? `${leagueName}'s Top 50` : "Top 50")}
                 {panel === "calc" && "Auction calculator"}
                 {panel === "recent" && "Recent picks"}
               </h2>
@@ -402,14 +396,6 @@ export default function DraftRoom() {
                 <AuctionCalculator
                   prices={adjustedPrices}
                   onShowDetails={(name, position) => setDetailFor({ name, position })}
-                />
-              )}
-              {panel === "top50" && (
-                <Top100List
-                  prices={adjustedPrices}
-                  anchorMap={anchorMap}
-                  events={events}
-                  onPick={openDetails}
                 />
               )}
               {panel === "recent" && (
