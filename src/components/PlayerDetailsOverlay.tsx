@@ -9,15 +9,7 @@ import {
   byeWeekForTeam,
   SleeperPlayer,
 } from "@/lib/sleeper";
-import { Activity, Calendar, MapPin, User, Hash, Layers, AlertTriangle } from "lucide-react";
-import AuctionPlayerCard from "@/components/AuctionPlayerCard";
 import type { AnchorEntry } from "@/lib/decision-engine";
-
-interface RosterGap {
-  pos: string;
-  starterShort: number;
-  severity: "critical" | "need" | "depth" | "done";
-}
 
 interface Props {
   open: boolean;
@@ -25,24 +17,41 @@ interface Props {
   name: string;
   position?: Position;
   leagueName?: string;
-  // Auction research data
   sheetPrice?: number;
   anchor?: AnchorEntry;
   posRank?: number;
   totalAtPos?: number;
-  // Roster context — drives personalized card copy
+  // Unused legacy props (kept so call sites don't break) — overlay is intentionally simple now.
   remaining?: number;
   maxBid?: number;
   slotsLeft?: number;
-  gaps?: RosterGap[];
-  // AI-derived enrichment we already have
+  gaps?: unknown;
   matchPct?: number;
   reason?: string;
   dossier?: string;
   worstCase?: string;
-  knockoff?: { name: string; price: number };
+  knockoff?: unknown;
   knockoffNote?: string;
   grade?: number;
+}
+
+// Position tier label: rank 1-12 = WR1, 13-24 = WR2, etc.
+// QB tier uses 12-team starter SF assumption (top 24 = QB1).
+function tierLabel(pos?: string, rank?: number): string | null {
+  if (!pos || !rank) return null;
+  const base = pos === "DST" ? "DEF" : pos;
+  // SF league: top 24 QBs are starter-tier, so QB1 spans rank 1-12, QB2 = 13-24...
+  const slot = pos === "K" || pos === "DST" ? 12 : 12;
+  const tier = Math.ceil(rank / slot);
+  return `${base}${tier}`;
+}
+
+function tierTone(rank?: number): string {
+  if (!rank) return "border-border bg-secondary/40 text-muted-foreground";
+  if (rank <= 12) return "border-success/50 bg-success/15 text-success";
+  if (rank <= 24) return "border-primary/50 bg-primary/15 text-primary";
+  if (rank <= 36) return "border-warning/40 bg-warning/10 text-warning";
+  return "border-border bg-secondary/40 text-muted-foreground";
 }
 
 const INJURY_TONE: Record<string, string> = {
@@ -60,30 +69,55 @@ function injuryTone(s?: string | null) {
   return INJURY_TONE[s] ?? "border-warning/40 bg-warning/10 text-warning";
 }
 
+// Build a one-line projected stat line per position.
+function statLine(pos: string | undefined, p?: SleeperPlayer["projection"]): Array<{ label: string; value: string }> {
+  if (!p) return [];
+  const fmt = (n: number | null | undefined) =>
+    n == null || !Number.isFinite(n) ? "—" : Math.round(n).toLocaleString();
+  const out: Array<{ label: string; value: string }> = [];
+  switch (pos) {
+    case "QB":
+      out.push({ label: "Pass yds", value: fmt(p.pass_yd) });
+      out.push({ label: "Pass TD", value: fmt(p.pass_td) });
+      out.push({ label: "INT", value: fmt(p.pass_int) });
+      out.push({ label: "Rush yds", value: fmt(p.rush_yd) });
+      out.push({ label: "Rush TD", value: fmt(p.rush_td) });
+      break;
+    case "RB":
+      out.push({ label: "Rush yds", value: fmt(p.rush_yd) });
+      out.push({ label: "Rush TD", value: fmt(p.rush_td) });
+      out.push({ label: "Rec", value: fmt(p.rec) });
+      out.push({ label: "Rec yds", value: fmt(p.rec_yd) });
+      out.push({ label: "Rec TD", value: fmt(p.rec_td) });
+      break;
+    case "WR":
+    case "TE":
+      out.push({ label: "Rec", value: fmt(p.rec) });
+      out.push({ label: "Rec yds", value: fmt(p.rec_yd) });
+      out.push({ label: "Rec TD", value: fmt(p.rec_td) });
+      if ((p.rush_yd ?? 0) > 50) {
+        out.push({ label: "Rush yds", value: fmt(p.rush_yd) });
+      }
+      break;
+    default:
+      break;
+  }
+  return out;
+}
+
 export default function PlayerDetailsOverlay({
   open,
   onOpenChange,
   name,
   position,
-  leagueName,
   sheetPrice,
   anchor,
   posRank,
   totalAtPos,
-  remaining,
-  maxBid,
-  slotsLeft,
-  gaps,
-  matchPct,
-  reason,
-  dossier,
-  worstCase,
-  knockoff,
-  knockoffNote,
-  grade,
 }: Props) {
   const [meta, setMeta] = useState<SleeperPlayer | null | undefined>(undefined);
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (!open || !name) return;
     let cancelled = false;
@@ -102,164 +136,118 @@ export default function PlayerDetailsOverlay({
   const bye = byeWeekForTeam(team);
   const pos = (meta?.position as Position | undefined) ?? position;
   const injury = meta?.injury_status ?? meta?.status;
-  const showInjury = injury && injury !== "Active";
+  const tier = tierLabel(pos, posRank);
+  const proj = meta?.projection ?? null;
+  const stats = statLine(pos, proj);
+  const projPts = proj?.pts_ppr;
+  const projGames = proj?.games;
+  const ppg = projPts != null && projGames != null && projGames > 0
+    ? (projPts / projGames).toFixed(1)
+    : null;
+  const price = anchor?.price ?? sheetPrice;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[calc(100vw-12px)] max-w-md max-h-[94vh] overflow-y-auto overscroll-contain p-0 bg-[#f5efe4] border-none">
-        {/* Visually-hidden title for a11y; real header is inside the card */}
         <DialogHeader className="sr-only">
           <DialogTitle>{name}</DialogTitle>
         </DialogHeader>
 
-        <AuctionPlayerCard
-          name={name}
-          position={pos}
-          leagueName={leagueName}
-          sheetPrice={sheetPrice}
-          anchor={anchor}
-          posRank={posRank}
-          totalAtPos={totalAtPos}
-          remaining={remaining}
-          maxBid={maxBid}
-          slotsLeft={slotsLeft}
-          gaps={gaps}
-        />
-
-        {/* Sleeper meta grid */}
-        <div className="mx-2 rounded-md border border-border/60 bg-secondary/30 p-3">
-          <p className="mb-2 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Player Info {loading && <span className="ml-1 normal-case opacity-60">· loading…</span>}
-          </p>
-          {meta === null && !loading && (
-            <p className="text-[11px] text-muted-foreground italic">
-              No metadata found for this name. AI recs only.
-            </p>
-          )}
-          {meta && (
-            <div className="grid grid-cols-2 gap-2 text-[11px]">
-              <Stat icon={MapPin} label="Team" value={team ?? "FA"} />
-              <Stat icon={Calendar} label="Bye" value={bye ? `Week ${bye}` : "—"} />
-              <Stat icon={User} label="Age" value={meta.age != null ? String(meta.age) : "—"} />
-              <Stat icon={Hash} label="Exp" value={meta.years_exp != null ? `${meta.years_exp} yr` : "—"} />
-              {meta.depth_chart_position && (
-                <Stat
-                  icon={Layers}
-                  label="Depth"
-                  value={`${meta.depth_chart_position}${meta.depth_chart_order ? ` #${meta.depth_chart_order}` : ""}`}
-                />
-              )}
-              <Stat
-                icon={Activity}
-                label="Status"
-                value={
-                  <span
-                    className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${injuryTone(injury)}`}
-                  >
-                    {injury || "Healthy"}
-                  </span>
-                }
-              />
+        <div className="p-4 space-y-3">
+          {/* Header: name + pos badge + tier */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-xl font-bold leading-tight text-foreground truncate">{name}</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {team ?? "FA"}
+                {bye ? ` · Bye W${bye}` : ""}
+                {meta?.age != null ? ` · Age ${meta.age}` : ""}
+              </p>
             </div>
-          )}
-          {showInjury && meta?.injury_body_part && (
-            <p className="mt-2 flex items-start gap-1 text-[10px] text-warning">
-              <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
-              <span>
-                <span className="font-semibold">{meta.injury_body_part}</span>
-                {meta.injury_notes ? ` — ${meta.injury_notes}` : ""}
-              </span>
-            </p>
-          )}
-        </div>
-
-        {/* AI enrichment */}
-        <div className="space-y-2 px-2 pb-2 text-[12px] leading-snug">
-          {(matchPct != null || maxBid != null || grade != null) && (
-            <div className="flex items-center gap-2">
-              {matchPct != null && (
-                <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 font-bold text-primary">
-                  {matchPct}% fit
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              {pos && (
+                <Badge
+                  variant="outline"
+                  className={`${POS_COLORS[pos as keyof typeof POS_COLORS] || ""} text-[10px] px-1.5 py-0`}
+                >
+                  {pos}
+                </Badge>
+              )}
+              {tier && (
+                <span className={`rounded border px-2 py-0.5 text-[11px] font-bold ${tierTone(posRank)}`}>
+                  {tier}
                 </span>
               )}
-              {maxBid != null && (
-                <span className="font-mono text-foreground">
-                  Max bid: <span className="font-bold">${maxBid}</span>
+            </div>
+          </div>
+
+          {/* Value + tier rank row */}
+          <div className="grid grid-cols-3 gap-2">
+            <Tile label="Value" value={price != null ? `$${price}` : "—"} />
+            <Tile
+              label="Pos rank"
+              value={posRank ? `#${posRank}${totalAtPos ? ` / ${totalAtPos}` : ""}` : "—"}
+            />
+            <Tile
+              label="Status"
+              value={
+                <span className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${injuryTone(injury)}`}>
+                  {injury || "Healthy"}
                 </span>
+              }
+            />
+          </div>
+
+          {/* Projections */}
+          <div className="rounded-md border border-border/60 bg-secondary/30 p-3">
+            <div className="mb-2 flex items-baseline justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                2025 Projections{loading && <span className="ml-1 normal-case opacity-60">· loading…</span>}
+              </p>
+              {projPts != null && (
+                <p className="font-mono text-xs">
+                  <span className="font-bold text-foreground">{Math.round(projPts)}</span>
+                  <span className="text-muted-foreground"> pts</span>
+                  {ppg && <span className="text-muted-foreground"> · {ppg}/g</span>}
+                </p>
               )}
-              {grade != null && (
-                <span className="ml-auto text-warning">★ {grade}/5</span>
+            </div>
+            {stats.length > 0 ? (
+              <div className="grid grid-cols-3 gap-x-3 gap-y-1.5 text-[11px]">
+                {stats.map((s) => (
+                  <div key={s.label} className="min-w-0">
+                    <p className="text-[9px] uppercase tracking-wide text-muted-foreground">{s.label}</p>
+                    <p className="font-mono font-semibold tabular-nums">{s.value}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[11px] italic text-muted-foreground">
+                {loading ? "Loading projections…" : "No projections available."}
+              </p>
+            )}
+          </div>
+
+          {/* Injury note if anything beyond status */}
+          {injury && injury !== "Healthy" && injury !== "Active" && (meta?.injury_body_part || meta?.injury_notes) && (
+            <div className="rounded-md border border-warning/30 bg-warning/5 p-2.5 text-[11px] text-warning">
+              {meta?.injury_body_part && <span className="font-semibold">{meta.injury_body_part}</span>}
+              {meta?.injury_notes && (
+                <span> — {meta.injury_notes}</span>
               )}
             </div>
           )}
-          {reason && (
-            <Block label="Why now">{reason}</Block>
-          )}
-          {dossier && (
-            <Block label="About this player">{dossier}</Block>
-          )}
-          {worstCase && (
-            <Block label="If you pass" tone="warning">{worstCase}</Block>
-          )}
-          {knockoff ? (
-            <Block label="Cheaper option" tone="success">
-              {knockoff.name} — <span className="font-mono">${knockoff.price}</span>
-              {maxBid != null && (
-                <span className="ml-1 opacity-70">(saves ${Math.max(0, maxBid - knockoff.price)})</span>
-              )}
-            </Block>
-          ) : knockoffNote ? (
-            <Block label="Cheaper option">
-              <span className="italic text-muted-foreground">{knockoffNote}</span>
-            </Block>
-          ) : null}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-function Stat({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: React.ReactNode;
-}) {
+function Tile({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-1.5">
-      <Icon className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
-      <div className="min-w-0">
-        <p className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p className="truncate font-semibold">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-function Block({
-  label,
-  children,
-  tone,
-}: {
-  label: string;
-  children: React.ReactNode;
-  tone?: "warning" | "success";
-}) {
-  const toneCls =
-    tone === "warning"
-      ? "border-warning/30 bg-warning/5"
-      : tone === "success"
-      ? "border-success/30 bg-success/5"
-      : "border-border bg-secondary/30";
-  return (
-    <div className={`rounded-md border px-2.5 py-1.5 ${toneCls}`}>
-      <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">
-        {label}
-      </p>
-      <p className="leading-snug">{children}</p>
+    <div className="rounded-md border border-border/60 bg-background/60 p-2">
+      <p className="text-[9px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="mt-0.5 font-mono text-sm font-semibold tabular-nums">{value}</p>
     </div>
   );
 }
