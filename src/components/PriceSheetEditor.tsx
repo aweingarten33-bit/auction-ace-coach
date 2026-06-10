@@ -12,6 +12,7 @@ import { PriceEstimate, Position } from "@/lib/draft-types";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { buildTierPrices, tierForPosRank, injuryMultiplier, type AuctionRow } from "@/lib/league-tier-prices";
+import cheatSheet2026 from "@/assets/cheat-sheet-2026.json";
 
 const PARSE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/parse-price-sheet`;
 
@@ -366,18 +367,54 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
     setPrices(next);
     setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
   };
+  // Accepts "Name", "Name - 25", "Name $25", "Name 25"
+  const parseQuickInput = (raw: string): { name: string; price?: number } => {
+    const s = raw.trim();
+    const m = s.match(/^(.+?)\s*[-–:]?\s*\$?(\d+)\s*$/);
+    if (m && m[1] && !/\d/.test(m[1].trim())) {
+      return { name: m[1].trim(), price: parseInt(m[2], 10) };
+    }
+    return { name: s };
+  };
+
+  // Auto-fill price from existing sheet when the typed name matches
+  useEffect(() => {
+    const { name, price } = parseQuickInput(quickName);
+    if (price != null) {
+      setQuickPrice(String(price));
+      return;
+    }
+    if (!name || name.length < 2) return;
+    const k = name.toLowerCase();
+    const hit = prices.find((p) => p.name.toLowerCase() === k);
+    if (hit) setQuickPrice(String(hit.price));
+  }, [quickName, prices]);
+
   const addQuick = () => {
-    const name = quickName.trim();
-    const price = parseInt(quickPrice, 10);
+    const { name, price: parsedPrice } = parseQuickInput(quickName);
+    const price = parsedPrice ?? parseInt(quickPrice, 10);
     if (!name) return toast.error("Player name required");
     if (!Number.isFinite(price) || price <= 0) return toast.error("Valid price required");
-    if (prices.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
-      return toast.error("Already in your sheet");
-    }
-    const next = [...prices, { name, price }];
+    const existing = prices.find((p) => p.name.toLowerCase() === name.toLowerCase());
+    const next = existing
+      ? prices.map((p) => (p.name.toLowerCase() === name.toLowerCase() ? { ...p, price } : p))
+      : [...prices, { name, price }];
     setPrices(next);
     setPricesText(next.map((p) => `${p.name} - ${p.price}`).join("\n"));
     setQuickName(""); setQuickPrice("");
+    toast.success(`${existing ? "Updated" : "Added"} ${name} — $${price}`);
+  };
+
+  const loadCheatSheet2026 = () => {
+    const sheet = cheatSheet2026 as { name: string; position?: string; team?: string; price: number }[];
+    const incoming = sheet.map((p) => ({
+      name: p.name,
+      price: p.price,
+      position: (p.position as Position | undefined) ?? undefined,
+    }));
+    setPrices(incoming);
+    setPricesText(incoming.map((p) => `${p.name} - ${p.price}`).join("\n"));
+    toast.success(`Loaded 2026 cheat sheet — ${incoming.length} players ($${incoming.reduce((a, b) => a + b.price, 0)} total)`);
   };
 
   return (
