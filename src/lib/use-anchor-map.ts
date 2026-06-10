@@ -361,105 +361,32 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
         }
         if (cancelled) return;
 
-        // 4) Build the anchor map
-        //    Cascade: LEAGUE history (blended w/ VORP) → VORP → market consensus → none
+        // 4) Build the anchor map — SINGLE SOURCE OF TRUTH: blended-values
+        //    (Berry + Sleeper + DraftSharks, SF-adjusted, scaled to league budget).
+        //    Same source the Auction Calculator uses. League history is ignored
+        //    for pricing — produced inflated/inconsistent numbers vs the calculator.
         const out: Record<string, AnchorEntry> = {};
-        for (const [k, v] of leagueAgg) {
-          if (v.bySeason.size === 0) continue;
-          // Skip players who no longer exist in any current-season source
-          // (retired, cut, out of the league — e.g. Cam Akers). If they have
-          // zero presence in market AND zero projections, drop them entirely
-          // so old keeper bids don't anchor a ghost player.
-          const inMarket = blendedMap.has(k) || espnMap.has(k) || sleeperMap.has(k) || berryMap.has(k);
-          const inProjections = !!vorpMap[k];
-          if (!inMarket && !inProjections) continue;
-          const leaguePrice = weightedLeague(v.bySeason);
-          const mv = marketConsensus(k);
+        const allMarketKeys = new Set<string>([
+          ...blendedMap.keys(),
+          ...espnMap.keys(),
+          ...sleeperMap.keys(),
+          ...Object.keys(vorpMap),
+        ]);
+        for (const k of allMarketKeys) {
+          const mv = marketConsensus(k); // blendedMap first, then ESPN/Sleeper fallback
           const vv = vorpMap[k];
-
-
-          // ─── Tier-first pricing ──────────────────────────────────────────
-          // Primary anchor = what your league has historically paid for THIS TIER
-          // (e.g. "QB Tier 1 costs $52"), not what they paid for this specific player.
-          // Player history nudges the tier price (30%) rather than dominating it.
-          //
-          // This fixes the core problem: a player like Jaxson Dart with no league
-          // history gets priced correctly because the tier IS the anchor.
-          // A player like Mahomes, if injury drops him to a Tier-2 rank this year,
-          // automatically prices closer to the Tier-2 curve.
-          //
-          // When no tier data is available (thin history at the position), we fall
-          // back to the previous variance-aware blending — same behavior as before.
-          const seasonsCount = v.bySeason.size;
-          const tierPrice = tierAnchor(k, v.pos ?? mv?.pos ?? null);
-
-          let final: number;
-          if (tierPrice > 0) {
-            // PURE TIER PRICING — what your league pays for this rank slot,
-            // regardless of what they paid for this specific player in the past
-            // (keeper contracts, etc. shouldn't drag a player's current value down).
-            final = tierPrice;
-          } else {
-            // No current market rank (washed-up player no longer in projections).
-            // Fall back to market consensus first, then league history.
-            if (mv && mv.val > 0) {
-              final = mv.val;
-            } else {
-              const baseLeagueWeight = seasonsCount >= 3 ? 0.85 : seasonsCount === 2 ? 0.6 : 0.4;
-              final = leaguePrice;
-              if (vv && vv.price > 0) {
-                final = leaguePrice * baseLeagueWeight + vv.price * (1 - baseLeagueWeight);
-              }
-            }
-          }
-          // Market-crash override: if BOTH ESPN and Sleeper have dropped this player
-          // to < $5 but our league history says > $20, the market knows something
-          // (season-ender, suspension, retirement). Trust the market — 75% off league.
-          const eRaw = espnMap.get(k)?.val ?? null;
-          const sRaw = sleeperMap.get(k)?.val ?? null;
-          const bothCrashed = eRaw !== null && sRaw !== null && eRaw < 5 && sRaw < 5;
-          let crashReason: string | null = null;
-          if (bothCrashed && leaguePrice >= 20) {
-            final = Math.max(1, leaguePrice * 0.25);
-            crashReason = "Market collapse";
-          }
-          const preInjury = Math.max(1, Math.round(final));
+          let basePrice = 0;
+          if (mv && mv.val > 0) basePrice = mv.val;
+          else if (vv && vv.price > 0) basePrice = vv.price;
+          if (basePrice <= 0) continue;
+          const preInjury = Math.max(1, Math.round(basePrice));
           const inj = combinedFactor(k, llmMap.get(k));
-          // If market crash already gutted the price, take whichever is harsher
-          const effectiveFactor = crashReason && !inj.reason
-            ? { factor: 1, reason: crashReason }
-            : inj;
-          const finalPrice = Math.max(1, Math.round(preInjury * effectiveFactor.factor));
-          out[k] = {
-            price: finalPrice,
-            source: "league",
-            leaguePrice: Math.max(1, Math.round(leaguePrice)),
-            marketPrice: mv ? Math.max(1, Math.round(mv.val)) : undefined,
-            marketSources: {
-              espn: espnMap.get(k)?.val,
-              sleeper: sleeperMap.get(k)?.val,
-              berry: berryMap.get(k)?.val,
-            },
-            injuryDiscount: inj.reason
-              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
-              : crashReason
-                ? { factor: 1, reason: crashReason, preInjuryPrice: Math.round(leaguePrice) }
-                : undefined,
-          };
-        }
-
-        // 5) Players with projections but no league history.
-        //    Tier price (if available) → VORP fallback.
-        for (const [k, v] of Object.entries(vorpMap)) {
-          if (out[k]) continue;
-          const pos = espnMap.get(k)?.pos ?? sleeperMap.get(k)?.pos ?? null;
-          const tp = tierAnchor(k, pos);
-          const basePrice = tp > 0 ? tp : v.price;
-          const inj = combinedFactor(k, llmMap.get(k));
-          const finalPrice = Math.max(1, Math.round(basePrice * inj.factor));
+          const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
+          const lv = leagueAgg.get(k);
           out[k] = {
             price: finalPrice,
             source: "espn",
+            leaguePrice: lv ? Math.max(1, Math.round(weightedLeague(lv.bySeason))) : undefined,
             marketPrice: Math.max(1, Math.round(basePrice)),
             marketSources: {
               espn: espnMap.get(k)?.val,
@@ -467,41 +394,7 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
               berry: berryMap.get(k)?.val,
             },
             injuryDiscount: inj.reason
-              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: Math.round(basePrice) }
-              : undefined,
-          };
-        }
-
-        // 6) Market consensus — last fallback (K, DST, players with only market data).
-        //    Tier price (if available) → position-scaled market fallback.
-        const allMarketKeys = new Set([...espnMap.keys(), ...sleeperMap.keys(), ...berryMap.keys(), ...blendedMap.keys()]);
-        for (const k of allMarketKeys) {
-          if (out[k]) continue;
-          const mv = marketConsensus(k);
-          if (!mv) continue;
-          const tp = tierAnchor(k, mv.pos);
-          let adj: number;
-          if (tp > 0) {
-            adj = Math.max(1, Math.round(tp));
-          } else {
-            const rawScale = (mv.pos && scales[mv.pos]) || 1;
-            const fade = Math.max(0, Math.min(1, (mv.val - 8) / 12));
-            const effScale = 1 + (rawScale - 1) * fade;
-            adj = Math.max(1, Math.round(mv.val * effScale));
-          }
-          const inj = combinedFactor(k, llmMap.get(k));
-          const finalPrice = Math.max(1, Math.round(adj * inj.factor));
-          out[k] = {
-            price: finalPrice,
-            source: "espn",
-            marketPrice: Math.max(1, Math.round(mv.val)),
-            marketSources: {
-              espn: espnMap.get(k)?.val,
-              sleeper: sleeperMap.get(k)?.val,
-              berry: berryMap.get(k)?.val,
-            },
-            injuryDiscount: inj.reason
-              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: adj }
+              ? { factor: inj.factor, reason: inj.reason, preInjuryPrice: preInjury }
               : undefined,
           };
         }
