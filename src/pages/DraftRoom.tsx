@@ -31,9 +31,9 @@ import {
   recentRuns,
 } from "@/lib/draft-math";
 
-import { useAnchorMap } from "@/lib/use-anchor-map";
 import { usePlayerRanks } from "@/lib/league-tier-prices";
 import { Position, PriceEstimate } from "@/lib/draft-types";
+import type { AnchorEntry } from "@/lib/decision-engine";
 import { POS_COLORS } from "@/lib/positions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,6 +52,7 @@ import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
+import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
 
 import SyncStatusPill from "@/components/SyncStatusPill";
 
@@ -82,33 +83,22 @@ export default function DraftRoom() {
     setPrices,
   } = useDraftStore();
 
-  // Auto-load the 2026 Superflex cheat sheet (350 players, Allen $69 anchor)
-  // when no price sheet is loaded. This is the source of truth for the app.
+  // Auto-load the only auction values source: uploaded PDF sheet + DraftSharks SF.
   useEffect(() => {
-    if (prices.length > 0) return;
-    (async () => {
-      const mod = await import("@/assets/cheat-sheet-2026.json");
-      const sheet = (mod.default ?? mod) as { name: string; position?: string; price: number }[];
-      const rows: PriceEstimate[] = sheet.map((p) => ({
-        name: p.name,
-        price: p.price,
-        position: (p.position as Position | undefined) ?? undefined,
-      }));
-      if (rows.length) setPrices(rows);
-    })().catch(() => { /* ignore */ });
-  }, [prices.length, setPrices]);
-
-  const loadCheatSheet2026 = async () => {
-    const mod = await import("@/assets/cheat-sheet-2026.json");
-    const sheet = (mod.default ?? mod) as { name: string; position?: string; price: number }[];
-    const rows: PriceEstimate[] = sheet.map((p) => ({
-      name: p.name,
-      price: p.price,
-      position: (p.position as Position | undefined) ?? undefined,
-    }));
-    setPrices(rows);
-    toast.success(`Loaded 2026 cheat sheet — ${rows.length} players`);
-  };
+    let cancelled = false;
+    const sourceKey = `${PRICE_SOURCE_VERSION}-${settings.totalBudget}`;
+    try {
+      if (prices.length > 0 && localStorage.getItem("auction-price-source") === sourceKey) return;
+    } catch { /* ignore */ }
+    loadBlendedAuctionPrices(settings.totalBudget)
+      .then((rows) => {
+        if (cancelled || rows.length === 0) return;
+        setPrices(rows);
+        try { localStorage.setItem("auction-price-source", sourceKey); } catch { /* ignore */ }
+      })
+      .catch(() => { /* keep app usable if DraftSharks is temporarily unavailable */ });
+    return () => { cancelled = true; };
+  }, [prices.length, setPrices, settings.totalBudget]);
 
 
 
@@ -161,7 +151,6 @@ export default function DraftRoom() {
     })();
   }, []);
 
-  const { map: anchorMap } = useAnchorMap();
   const { lookup: lookupRank } = usePlayerRanks();
 
   // ── Computed ────────────────────────────────────────────────────────────
@@ -196,6 +185,21 @@ export default function DraftRoom() {
   
   // Re-price undrafted players in real time as players come off the board.
   const adjustedPrices = useMemo(() => adjustPricesForDrafted(prices, events), [prices, events]);
+  const anchorMap = useMemo<Record<string, AnchorEntry>>(() => {
+    const out: Record<string, AnchorEntry> = {};
+    for (const p of adjustedPrices) {
+      const row = p as PriceEstimate & { pdfPrice?: number; draftSharksPrice?: number };
+      if (row.price > 0) {
+        out[norm(row.name)] = {
+          price: row.price,
+          source: "sheet",
+          marketPrice: row.price,
+          marketSources: { pdf: row.pdfPrice, draftSharks: row.draftSharksPrice },
+        };
+      }
+    }
+    return out;
+  }, [adjustedPrices]);
 
   const requiredCount = {
     QB: settings.roster.QB + (settings.leagueType !== "Standard" ? settings.roster.SUPERFLEX : 0),
@@ -413,15 +417,6 @@ export default function DraftRoom() {
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
               {panel === "calc" && (
                 <div className="space-y-3">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full"
-                    onClick={loadCheatSheet2026}
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Reload 2026 Superflex cheat sheet (350 players)
-                  </Button>
                   <AuctionCalculator
                     prices={adjustedPrices}
                     onShowDetails={(name, position) => setDetailFor({ name, position })}
@@ -706,7 +701,7 @@ function Top100List({
   onPick,
 }: {
   prices: PriceEstimate[];
-  anchorMap: Record<string, import("@/lib/decision-engine").AnchorEntry>;
+  anchorMap: Record<string, AnchorEntry>;
   events: ReturnType<typeof useDraftStore.getState>["events"];
   onPick: (name: string, position?: Position) => void;
 }) {
@@ -722,42 +717,7 @@ function Top100List({
     }
     return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 100);
   }, [prices, anchorMap]);
-
-  // Fallback to Sleeper consensus (Superflex-tuned) when no price sheet is loaded.
-  const [fallback, setFallback] = useState<
-    { name: string; position?: Position; team?: string | null }[]
-  >([]);
-  useEffect(() => {
-    if (top.length > 0) return;
-    let cancelled = false;
-    import("@/lib/sleeper").then(({ loadSleeperPlayers }) => {
-      loadSleeperPlayers()
-        .then((players) => {
-          if (cancelled) return;
-          // SF tuning: boost QBs by treating their search_rank as ~45% of value.
-          const scored = players
-            .filter((p) => p.position && p.search_rank && p.search_rank < 9e8)
-            .map((p) => ({
-              name: p.full_name,
-              position: (p.position as Position) || undefined,
-              team: p.team,
-              score: (p.search_rank ?? 9e9) * (p.position === "QB" ? 0.45 : 1.0),
-            }))
-            .sort((a, b) => a.score - b.score)
-            .slice(0, 100);
-          setFallback(scored);
-        })
-        .catch(() => {});
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [top.length]);
-
-  const usingFallback = top.length === 0;
-  const rows = usingFallback
-    ? fallback.map((r) => ({ name: r.name, position: r.position, price: null as number | null }))
-    : top.map((r) => ({ name: r.name, position: r.position, price: r.price as number | null }));
+  const rows = top.map((r) => ({ name: r.name, position: r.position, price: r.price as number | null }));
 
   if (rows.length === 0) {
     return (
@@ -769,11 +729,6 @@ function Top100List({
 
   return (
     <div className="space-y-1">
-      {usingFallback && (
-        <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-          Superflex consensus (no price sheet loaded)
-        </p>
-      )}
       {rows.map((p, i) => {
         const isPicked = drafted.has(norm(p.name));
         const isFiftyDivider = i === 50;

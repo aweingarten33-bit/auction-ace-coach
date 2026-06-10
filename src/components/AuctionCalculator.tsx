@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
-import { loadSleeperPlayers, searchPlayers, type SleeperPlayer } from "@/lib/sleeper";
 import type { PriceEstimate, Position } from "@/lib/draft-types";
 import { useDraftStore } from "@/lib/draft-store";
 
@@ -24,13 +23,11 @@ export default function AuctionCalculator({
   const [baseline, setBaseline] = useState<number>(0);
   const [risk, setRisk] = useState<number>(0);
   const [touched, setTouched] = useState(false); // user manually edited baseline
-  const [players, setPlayers] = useState<SleeperPlayer[]>([]);
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { loadSleeperPlayers().then(setPlayers).catch(() => {}); }, []);
   useEffect(() => {
     const h = (e: MouseEvent) => { if (!wrapRef.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener("mousedown", h);
@@ -44,14 +41,22 @@ export default function AuctionCalculator({
   }, [prices]);
 
   const suggestions = useMemo(() => {
-    if (name.trim().length < 2) return [];
-    return searchPlayers(players, name, 8);
-  }, [players, name]);
+    const q = norm(name.trim());
+    if (q.length < 2) return [];
+    return prices
+      .filter((p) => norm(p.name).includes(q))
+      .sort((a, b) => {
+        const ak = norm(a.name).startsWith(q) ? 0 : 1;
+        const bk = norm(b.name).startsWith(q) ? 0 : 1;
+        return ak - bk || b.price - a.price;
+      })
+      .slice(0, 8);
+  }, [prices, name]);
 
-  const choose = (p: SleeperPlayer) => {
-    setName(p.full_name);
-    setPosition((p.position as Position) || undefined);
-    const hit = priceByName.get(norm(p.full_name));
+  const choose = (p: PriceEstimate) => {
+    setName(p.name);
+    setPosition(p.position);
+    const hit = priceByName.get(norm(p.name));
     if (hit && !touched) setBaseline(hit.price);
     else if (!touched) setBaseline(0);
     setOpen(false);
@@ -98,18 +103,17 @@ export default function AuctionCalculator({
         {open && suggestions.length > 0 && (
           <div className="absolute left-0 right-0 z-50 mt-1 max-h-72 overflow-auto rounded-md border border-border bg-popover shadow-lg">
             {suggestions.map((p, i) => {
-              const hit = priceByName.get(norm(p.full_name));
+              const hit = priceByName.get(norm(p.name));
               return (
                 <button
-                  key={p.player_id}
+                    key={p.name}
                   type="button"
                   onMouseDown={(e) => { e.preventDefault(); choose(p); }}
                   onMouseEnter={() => setHighlight(i)}
                   className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm hover:bg-accent/40 ${i === highlight ? "bg-accent/30" : ""}`}
                 >
-                  <span className="min-w-0 truncate font-medium">{p.full_name}</span>
+                  <span className="min-w-0 truncate font-medium">{p.name}</span>
                   <span className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
-                    {p.team && <span>{p.team}</span>}
                     {p.position && (
                       <Badge variant="outline" className={`${POS_COLORS[p.position as keyof typeof POS_COLORS] || ""} px-1.5 py-0 text-[10px]`}>
                         {p.position}
