@@ -396,11 +396,10 @@ export function useAnchorMap(): { map: Record<string, AnchorEntry>; posScale: Po
           const preInjury = Math.max(1, Math.round(blended));
           const inj = combinedFactor(k, llmMap.get(k));
           const finalPrice = Math.max(1, Math.round(preInjury * inj.factor));
-          const lv = leagueAgg.get(k);
           out[k] = {
             price: finalPrice,
             source: "espn",
-            leaguePrice: lv ? Math.max(1, Math.round(weightedLeague(lv.bySeason))) : undefined,
+            leaguePrice: leaguePrice > 0 ? Math.max(1, Math.round(leaguePrice)) : undefined,
             marketPrice: Math.max(1, Math.round(basePrice)),
             marketSources: {
               espn: espnMap.get(k)?.val,
