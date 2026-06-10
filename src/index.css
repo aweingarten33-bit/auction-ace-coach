@@ -207,65 +207,70 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     width: 100%; max-width: 100%; overflow-x: hidden;
     font-family: "Inter", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.5;
-    background-color: hsl(var(--background));
-    /* Returns suit splashes — blue suit, burgundy cape, shield gold,
-       organic painterly pools that bleed into one another. */
-    background-image:
-      /* hot gold flash, top-right */
-      radial-gradient(ellipse 55% 40% at 78% 18%,
-        hsl(38 78% 58% / 0.55) 0%,
-        hsl(38 65% 50% / 0.30) 35%,
-        transparent 70%),
-      /* gold echo, lower-left */
-      radial-gradient(ellipse 40% 28% at 18% 78%,
-        hsl(38 70% 55% / 0.30) 0%,
-        transparent 65%),
-      /* burgundy cape pool, bottom-right */
-      radial-gradient(ellipse 70% 55% at 88% 92%,
-        hsl(350 65% 40% / 0.65) 0%,
-        hsl(350 55% 32% / 0.35) 40%,
-        transparent 75%),
-      /* burgundy splash, mid-left */
-      radial-gradient(ellipse 45% 35% at 8% 42%,
-        hsl(350 60% 38% / 0.45) 0%,
-        transparent 70%),
-      /* deep suit-blue swell, center-left */
-      radial-gradient(ellipse 75% 60% at 22% 28%,
-        hsl(222 70% 32% / 0.75) 0%,
-        hsl(222 60% 24% / 0.45) 40%,
-        transparent 75%),
-      /* blue echo, lower-right */
-      radial-gradient(ellipse 50% 40% at 68% 62%,
-        hsl(222 65% 28% / 0.55) 0%,
-        transparent 70%),
-      /* base navy wash */
-      linear-gradient(160deg,
-        hsl(222 55% 14%) 0%,
-        hsl(222 50% 10%) 50%,
-        hsl(222 55% 12%) 100%);
-    background-attachment: fixed;
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
+    background-color: hsl(222 65% 5%);
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    /* film grain + soft glow flecks to meld the splashes */
+  /* BADASS background — applied to every .bg-background surface so the
+     look survives page wrappers. Blacked-out carbon base, with a hot
+     gold edge slashing across burgundy and a counter-streak of
+     electric blue. Built for a guy. */
+  .bg-background {
+    background-color: hsl(222 65% 5%) !important;
     background-image:
-      radial-gradient(circle at 45% 35%, hsl(38 80% 60% / 0.10) 0%, transparent 8%),
-      radial-gradient(circle at 62% 70%, hsl(350 70% 45% / 0.10) 0%, transparent 9%),
-      radial-gradient(circle at 30% 80%, hsl(222 70% 38% / 0.12) 0%, transparent 10%);
-    mix-blend-mode: screen;
-    filter: blur(40px);
+      /* electric blue counter-streak */
+      linear-gradient(-62deg,
+        transparent 0%,
+        transparent 62%,
+        hsl(212 100% 55% / 0) 66%,
+        hsl(212 100% 60% / 0.18) 71%,
+        hsl(212 100% 70% / 0.28) 73%,
+        hsl(212 100% 60% / 0.18) 75%,
+        hsl(212 100% 55% / 0) 80%,
+        transparent 100%),
+      /* hot gold rim slash */
+      linear-gradient(118deg,
+        transparent 0%,
+        transparent 40%,
+        hsl(38 100% 60% / 0) 42%,
+        hsl(38 100% 65% / 0.35) 45%,
+        hsl(45 100% 75% / 0.55) 46.5%,
+        hsl(38 100% 65% / 0.35) 48%,
+        hsl(38 100% 60% / 0) 51%,
+        transparent 100%),
+      /* burgundy core slash under the gold */
+      linear-gradient(118deg,
+        transparent 0%,
+        transparent 32%,
+        hsl(350 70% 30% / 0) 36%,
+        hsl(350 80% 42% / 0.40) 44%,
+        hsl(350 85% 48% / 0.55) 47%,
+        hsl(350 80% 42% / 0.40) 50%,
+        hsl(350 70% 30% / 0) 58%,
+        transparent 100%),
+      /* carbon-fiber weave grit */
+      repeating-linear-gradient(45deg,
+        hsl(222 40% 9% / 0.55) 0px,
+        hsl(222 40% 9% / 0.55) 1px,
+        transparent 1px,
+        transparent 3px),
+      repeating-linear-gradient(-45deg,
+        hsl(222 40% 9% / 0.45) 0px,
+        hsl(222 40% 9% / 0.45) 1px,
+        transparent 1px,
+        transparent 3px),
+      /* vignette */
+      radial-gradient(ellipse 100% 80% at 50% 40%,
+        hsl(222 55% 11%) 0%,
+        hsl(222 65% 6%) 65%,
+        hsl(222 75% 3%) 100%) !important;
+    background-attachment: fixed !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 6px 6px, 6px 6px, 100% 100% !important;
+    background-repeat: no-repeat, no-repeat, no-repeat, repeat, repeat, no-repeat !important;
   }
 
 
