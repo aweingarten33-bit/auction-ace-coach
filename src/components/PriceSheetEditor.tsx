@@ -423,49 +423,11 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div>
           <p className="text-sm font-medium">Player Values</p>
           <p className="text-[11px] text-muted-foreground">
-            Auto-fill from your ESPN league (last 3 drafts × this year's ranks). Upload/paste only if you want to override.
+            Blended from your PDF cheat sheet + DraftSharks Superflex values. Upload a new PDF to override.
           </p>
         </div>
       </div>
 
-      {/* PRIMARY: Auto-fill from ESPN */}
-      <div className="rounded-md border border-primary/50 bg-primary/10 p-3">
-        <Button
-          className="w-full bg-gradient-primary text-primary-foreground"
-          onClick={autoFillFromEspn}
-          disabled={autoBusy}
-        >
-          {autoBusy ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Pulling from ESPN...</>
-          ) : (
-            <><Zap className="mr-2 h-4 w-4" /> Auto-fill from ESPN (last 3 drafts)</>
-          )}
-        </Button>
-        <p className="mt-1.5 text-[10px] text-muted-foreground">
-          Uses your league's actual auction history + ESPN's current positional ranks. Requires ESPN connected on the ESPN page.
-        </p>
-      </div>
-
-      {/* OR divider */}
-      <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-        <div className="h-px flex-1 bg-border" />
-        OR
-        <div className="h-px flex-1 bg-border" />
-      </div>
-
-      {/* PRESET: 2026 Superflex cheat sheet (350 players, Josh Allen $69 anchor) */}
-      <div className="rounded-md border border-border/60 bg-secondary/20 p-3">
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={loadCheatSheet2026}
-        >
-          <Sparkles className="mr-2 h-4 w-4" /> Load 2026 Superflex cheat sheet (350 players)
-        </Button>
-        <p className="mt-1.5 text-[10px] text-muted-foreground">
-          Replaces all current prices. 12-team, $225, 4pt-passTD, 0.5 PPR. Allen $69 anchor.
-        </p>
-      </div>
 
       {/* FALLBACK: Upload CSV / XLSX / PDF / image */}
       <div className="rounded-md border border-dashed border-border/60 bg-secondary/20 p-3">

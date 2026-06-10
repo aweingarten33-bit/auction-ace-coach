@@ -1,6 +1,7 @@
 // Magazine cheat-sheet style player card — research-only.
 // Cream bg, navy banner, BYE badge, headshot, team logo, roster math,
-// and blended Matthew Berry/Fantasy Life + Sleeper market context.
+// and the blended PDF cheat sheet + DraftSharks Superflex price.
+
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -147,7 +148,7 @@ export default function AuctionPlayerCard({
   const whyParts: string[] = [rosterLine];
   if (suggested != null && marketAvg != null) {
     const roundedMarket = Math.round(marketAvg);
-    const math = `${fmt(suggested)} price vs ${fmt(roundedMarket)} Berry/Sleeper value = ${delta! >= 0 ? "+" : "-"}${fmt(Math.abs(delta!))}`;
+    const math = `${fmt(suggested)} price vs ${fmt(roundedMarket)} blended value = ${delta! >= 0 ? "+" : "-"}${fmt(Math.abs(delta!))}`;
     if (delta! < 0) {
       whyParts.push(`${math}; discount if you still need ${position ?? "this position"}.`);
     } else if (delta! > 0) {
@@ -156,9 +157,6 @@ export default function AuctionPlayerCard({
       whyParts.push(`${math}; fair blend, not generic app pricing.`);
     }
   }
-  if (berryVal != null || sleeperVal != null) {
-    whyParts.push(`Analyst blend uses Matthew Berry/Fantasy Life${berryVal != null ? ` ${fmt(berryVal)}` : ""} + Sleeper${sleeperVal != null ? ` ${fmt(sleeperVal)}` : ""}.`);
-  }
   if (posRank && totalAtPos) {
     whyParts.push(`${position}${posRank} of ${totalAtPos} by auction value, so compare him to your remaining ${position} need.`);
   }
@@ -166,18 +164,19 @@ export default function AuctionPlayerCard({
     whyParts.push(`You still need ${myGap.starterShort} starting ${position}; this card is judging him against that hole.`);
   }
 
-  // Path-to-smash: based on rank + Fantasy Life/Sleeper context
+  // Path-to-smash: based on rank + blended value context
   const pathParts: string[] = [];
   if (posRank && posRank <= 6) {
-    pathParts.push(`Top-${posRank} ${position} profile; Berry/Fantasy Life + Sleeper value says ceiling is already priced like a difference-maker.`);
+    pathParts.push(`Top-${posRank} ${position} profile; the blended value already prices him like a difference-maker.`);
   } else if (posRank && posRank <= 15) {
     pathParts.push(`Mid-tier ${position}; payoff is beating the blended ${marketAvg ? fmt(marketAvg) : "market"} number while your expensive slots stay intact.`);
   } else if (posRank) {
-    pathParts.push(`Late ${position}; path is cheap depth, injury-away upside, or Sleeper depth-chart movement.`);
+    pathParts.push(`Late ${position}; path is cheap depth or injury-away upside.`);
   }
   if (lastSold && marketAvg != null && lastSold.bid < marketAvg - 2) {
     pathParts.push(`Your league last paid ${fmt(lastSold.bid)} in '${String(lastSold.season).slice(2)}, below today's ${fmt(marketAvg)} blend.`);
   }
+
 
   // Risk: injury status from anchor + price-vs-budget
   const riskParts: string[] = [];
@@ -209,8 +208,9 @@ export default function AuctionPlayerCard({
     if (need === "critical" || need === "need") {
       bottomParts.push(`${needLabel[need]}: ${math}. If you tap him, the key is whether ${fmt(afterRemaining ?? 0)} for ${slotsAfter ?? 0} slots still fits your build.`);
     } else if (need === "depth") {
-      bottomParts.push(`Depth only: ${math}. Better if he falls below the blended Berry/Sleeper number.`);
+      bottomParts.push(`Depth only: ${math}. Better if he falls below the blended cheat-sheet number.`);
     } else {
+
       bottomParts.push(`Position filled: ${math}. This has to be a clear discount, not another spend slot.`);
     }
   }
@@ -288,7 +288,7 @@ export default function AuctionPlayerCard({
         <div className="flex flex-col justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-[#d2691e]">
-              Berry + Sleeper value
+              Blended cheat-sheet value
             </p>
             {headlinePrice != null ? (
               <p className="font-serif text-[42px] font-black leading-none">
@@ -300,20 +300,14 @@ export default function AuctionPlayerCard({
               </p>
             )}
             <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[#1b2238]/60">
-              blended research price
+              PDF + DraftSharks blend
             </p>
           </div>
 
-          {/* Compact price stack — every input that drives the headline */}
+          {/* Compact price stack */}
           <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-1 text-[11px]">
-            {berryVal != null && (
-              <PriceLine label="Matthew Berry" value={`$${Math.round(berryVal)}`} />
-            )}
-            {sleeperVal != null && (
-              <PriceLine label="Sleeper" value={`$${Math.round(sleeperVal)}`} />
-            )}
-            {analystAvg != null && (
-              <PriceLine label="Berry/Sleeper avg" value={`$${analystAvg}`} />
+            {sheetPrice != null && (
+              <PriceLine label="Cheat sheet" value={`$${Math.round(sheetPrice)}`} />
             )}
             {leagueVal != null && (
               <PriceLine label="League 3yr avg" value={`$${Math.round(leagueVal)}`} />
@@ -330,6 +324,7 @@ export default function AuctionPlayerCard({
           </div>
         </div>
       </div>
+
 
       {/* Mobile quick-read strip: keep recommendation visible while scrolling */}
       <div className="sticky top-0 z-10 border-y border-[#1b2238]/20 bg-[#f5efe4]/95 px-3 py-2 backdrop-blur supports-[backdrop-filter]:bg-[#f5efe4]/80">
@@ -383,7 +378,7 @@ export default function AuctionPlayerCard({
 
       {/* ── FOOTER ─────────────────────────────────────── */}
       <div className="bg-[#1b2238] px-3 py-1.5 text-center text-[9px] font-bold uppercase tracking-[0.2em] text-[#f5efe4]/70">
-        Research only · Matthew Berry/Fantasy Life + Sleeper blend
+        Research only · PDF cheat sheet + DraftSharks blend
       </div>
     </div>
   );
