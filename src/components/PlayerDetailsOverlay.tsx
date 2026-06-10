@@ -146,7 +146,7 @@ export default function PlayerDetailsOverlay({
   const ppg = projPts != null && projGames != null && projGames > 0
     ? (projPts / projGames).toFixed(1)
     : null;
-  const price = anchor?.price ?? sheetPrice;
+  const price = sheetPrice ?? anchor?.price;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
