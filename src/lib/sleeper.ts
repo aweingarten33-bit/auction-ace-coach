@@ -1,5 +1,21 @@
 // Sleeper public API — no auth needed.
 // Players endpoint is ~5MB; we fetch once per day and cache in localStorage.
+// Season projections (yds/TDs/rec/PPR pts) are merged onto each player.
+
+export interface SleeperProjection {
+  games?: number | null;
+  pts_ppr?: number | null;
+  pts_half_ppr?: number | null;
+  pass_yd?: number | null;
+  pass_td?: number | null;
+  pass_int?: number | null;
+  rush_att?: number | null;
+  rush_yd?: number | null;
+  rush_td?: number | null;
+  rec?: number | null;
+  rec_yd?: number | null;
+  rec_td?: number | null;
+}
 
 export interface SleeperPlayer {
   player_id: string;
@@ -21,15 +37,47 @@ export interface SleeperPlayer {
   depth_chart_position?: string | null;
   fantasy_positions?: string[] | null;
   search_rank?: number | null;
+  projection?: SleeperProjection | null;
 }
 
-const CACHE_KEY = "sleeper_players_v2";
-const CACHE_TS_KEY = "sleeper_players_ts_v2";
+const CACHE_KEY = "sleeper_players_v3"; // bumped: now includes projections
+const CACHE_TS_KEY = "sleeper_players_ts_v3";
 const ONE_DAY = 24 * 60 * 60 * 1000;
 const FANTASY_POS = new Set(["QB", "RB", "WR", "TE", "K", "DEF"]);
 
 let memCache: SleeperPlayer[] | null = null;
 let inflight: Promise<SleeperPlayer[]> | null = null;
+
+async function fetchProjectionsByPlayerId(): Promise<Map<string, SleeperProjection>> {
+  try {
+    const resp = await fetch(
+      "https://api.sleeper.com/projections/nfl/2025?season_type=regular&order_by=ppr",
+    );
+    if (!resp.ok) return new Map();
+    const raw: Array<{ player_id: string; stats?: Record<string, number | null> }> = await resp.json();
+    const m = new Map<string, SleeperProjection>();
+    for (const row of raw) {
+      const s = row.stats || {};
+      m.set(row.player_id, {
+        games: s.gp ?? null,
+        pts_ppr: s.pts_ppr ?? null,
+        pts_half_ppr: s.pts_half_ppr ?? null,
+        pass_yd: s.pass_yd ?? null,
+        pass_td: s.pass_td ?? null,
+        pass_int: s.pass_int ?? null,
+        rush_att: s.rush_att ?? null,
+        rush_yd: s.rush_yd ?? null,
+        rush_td: s.rush_td ?? null,
+        rec: s.rec ?? null,
+        rec_yd: s.rec_yd ?? null,
+        rec_td: s.rec_td ?? null,
+      });
+    }
+    return m;
+  } catch {
+    return new Map();
+  }
+}
 
 export async function loadSleeperPlayers(): Promise<SleeperPlayer[]> {
   if (memCache) return memCache;
@@ -46,7 +94,10 @@ export async function loadSleeperPlayers(): Promise<SleeperPlayer[]> {
   } catch {}
 
   inflight = (async () => {
-    const resp = await fetch("https://api.sleeper.app/v1/players/nfl");
+    const [resp, projMap] = await Promise.all([
+      fetch("https://api.sleeper.app/v1/players/nfl"),
+      fetchProjectionsByPlayerId(),
+    ]);
     if (!resp.ok) throw new Error("Sleeper fetch failed");
     const raw = await resp.json();
     const list: SleeperPlayer[] = [];
@@ -55,7 +106,6 @@ export async function loadSleeperPlayers(): Promise<SleeperPlayer[]> {
       if (!p) continue;
       const pos = p.position;
       if (!pos || !FANTASY_POS.has(pos)) continue;
-      // Skip retired/inactive players with no team unless they have a search_rank
       const name = p.full_name || `${p.first_name || ""} ${p.last_name || ""}`.trim();
       if (!name) continue;
       list.push({
@@ -78,6 +128,7 @@ export async function loadSleeperPlayers(): Promise<SleeperPlayer[]> {
         depth_chart_position: p.depth_chart_position,
         fantasy_positions: p.fantasy_positions,
         search_rank: p.search_rank ?? 999999,
+        projection: projMap.get(id) ?? null,
       });
     }
     list.sort((a, b) => (a.search_rank ?? 9e9) - (b.search_rank ?? 9e9));
