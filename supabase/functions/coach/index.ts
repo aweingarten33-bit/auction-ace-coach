@@ -307,34 +307,82 @@ Deno.serve(async (req: Request) => {
     const payload = (await req.json()) as CoachPayload;
 
     // ---------- Optional live web search via Firecrawl ----------
-    let webContext = "";
     const q = (payload.userQuestion || "").trim();
-    const shouldSearch = !!FIRECRAWL_API_KEY && q.length > 0;
-    if (shouldSearch) {
-      try {
-        const searchQuery = `${q} fantasy football 2026 ESPN OR FantasyPros OR "Matthew Berry"`;
-        const fcRes = await fetch("https://api.firecrawl.dev/v2/search", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ query: searchQuery, limit: 5, tbs: "qdr:w" }),
-        });
-        if (fcRes.ok) {
-          const fc = await fcRes.json();
-          const results = (fc?.data ?? fc?.web ?? []).slice(0, 5);
-          if (results.length) {
-            webContext = results
-              .map((r: { url?: string; title?: string; description?: string }, i: number) =>
-                `[${i + 1}] ${r.title || ""}\n${r.description || ""}\nSource: ${r.url || ""}`,
-              )
-              .join("\n\n");
+    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const knownNames = new Set<string>((payload.prices ?? []).map((r) => norm(r.name)).filter(Boolean));
+    const pricesCount = (payload.prices ?? []).filter((r) => Number(r.price) > 0).length;
+    const decision = FIRECRAWL_API_KEY
+      ? decideWebSearch(q, pricesCount, knownNames)
+      : { search: false, reason: "Firecrawl not configured" };
+
+    let sources: WebSource[] = [];
+    let webContext = "";
+    let fcCacheStatus: "hit" | "miss" | "skip" | "error" = "skip";
+    const searchQuery = decision.search
+      ? `${q} fantasy football 2026 ESPN OR FantasyPros OR "Matthew Berry"`
+      : "";
+
+    if (decision.search && FIRECRAWL_API_KEY) {
+      const fcKey = searchQuery.toLowerCase().trim();
+      const cached = fcCacheGet(fcKey);
+      if (cached) {
+        sources = cached;
+        fcCacheStatus = "hit";
+      } else {
+        try {
+          const fcRes = await fetch("https://api.firecrawl.dev/v2/search", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({ query: searchQuery, limit: 5, tbs: "qdr:w" }),
+          });
+          if (fcRes.ok) {
+            const fc = await fcRes.json();
+            const raw = (fc?.data ?? fc?.web ?? []).slice(0, 5);
+            sources = raw.map((r: { url?: string; title?: string; description?: string }) => ({
+              title: r.title || "",
+              url: r.url || "",
+              description: r.description || "",
+            })).filter((s: WebSource) => s.url);
+            fcCacheStatus = "miss";
+            if (sources.length) fcCacheSet(fcKey, sources);
+          } else {
+            console.warn("Firecrawl search failed", fcRes.status, await fcRes.text());
+            fcCacheStatus = "error";
           }
-        } else {
-          console.warn("Firecrawl search failed", fcRes.status, await fcRes.text());
+        } catch (err) {
+          console.warn("Firecrawl error", err);
+          fcCacheStatus = "error";
         }
-      } catch (err) {
-        console.warn("Firecrawl error", err);
+      }
+      if (sources.length) {
+        webContext = sources
+          .map((r, i) => `[${i + 1}] ${r.title}\n${r.description}\nSource: ${r.url}`)
+          .join("\n\n");
       }
     }
+
+    // Confidence: how much the answer leans on PDF vs web.
+    const draftedCount = (payload.draftedPlayers?.length ?? 0)
+      + (payload.events?.length ?? 0)
+      + (payload.myRoster?.length ?? 0);
+    const pdfWeight = pricesCount > 0 ? (decision.search ? 0.65 : 1.0) : 0;
+    const webWeight = decision.search ? Math.min(1, sources.length / 5) : 0;
+    const blendedScore = pdfWeight * 0.7 + webWeight * 0.3;
+    const confidenceLabel: "high" | "medium" | "low" =
+      pricesCount >= 50 && (decision.search ? sources.length >= 2 || !decision.search : true)
+        ? "high"
+        : pricesCount > 0
+          ? "medium"
+          : "low";
+    const confidence = {
+      label: confidenceLabel,
+      pdf: Number(pdfWeight.toFixed(2)),
+      web: Number(webWeight.toFixed(2)),
+      score: Number(blendedScore.toFixed(2)),
+      basis: decision.search
+        ? `${pricesCount} PDF prices + ${sources.length} web source${sources.length === 1 ? "" : "s"}`
+        : `${pricesCount} PDF prices, no web call`,
+    };
 
     const sysBase = SYSTEM_PROMPT + (payload.showMath ? MATH_ADDENDUM : "");
     const strategyAddendum = payload.strategy && payload.strategy.id !== "none"
@@ -354,11 +402,33 @@ Deno.serve(async (req: Request) => {
     const userMsg = buildUserMessage(payload);
     messages.push({ role: "user", content: userMsg });
 
+    // Meta envelope sent as the first SSE event so the client can render
+    // sources / confidence / debug regardless of whether the body is cached.
+    const meta = {
+      meta: {
+        searched: decision.search,
+        searchReason: decision.reason,
+        searchQuery,
+        firecrawlCache: fcCacheStatus,
+        sources,
+        confidence,
+        debug: {
+          undraftedPriceCount: pricesCount,
+          draftedCount,
+          historyTurns: payload.history?.length ?? 0,
+          systemPromptChars: sysPrompt.length,
+          userMessageChars: userMsg.length,
+          webSnippets: sources.map((s, i) => ({ idx: i + 1, title: s.title, url: s.url, description: s.description })),
+        },
+      },
+    };
+    const metaSse = `data: ${JSON.stringify(meta)}\n\n`;
+
     // 60s response cache keyed by full message stack
     const cacheKey = await hashKey(JSON.stringify(messages));
     const cached = cacheGet(cacheKey);
     if (cached) {
-      const sse = `data: ${JSON.stringify({ choices: [{ delta: { content: cached } }] })}\n\ndata: [DONE]\n\n`;
+      const sse = metaSse + `data: ${JSON.stringify({ choices: [{ delta: { content: cached } }] })}\n\ndata: [DONE]\n\n`;
       return new Response(sse, { headers: { ...cors, "Content-Type": "text/event-stream", "X-Cache": "HIT" } });
     }
 
@@ -417,7 +487,26 @@ Deno.serve(async (req: Request) => {
       }
     })();
 
-    return new Response(forwardStream, { headers: { ...cors, "Content-Type": "text/event-stream", "X-Cache": "MISS" } });
+    // Prepend meta SSE event then pipe model stream.
+    const encoder = new TextEncoder();
+    const combined = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        controller.enqueue(encoder.encode(metaSse));
+        const reader = forwardStream.getReader();
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            controller.enqueue(value);
+          }
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(combined, { headers: { ...cors, "Content-Type": "text/event-stream", "X-Cache": "MISS" } });
+
   } catch (e) {
     console.error("coach error", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
