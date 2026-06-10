@@ -204,35 +204,6 @@ export default function PositionBudgetBar() {
         </div>
       </div>
 
-      <div className="border-t border-border/50 px-4 py-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Planned</span>
-            <span className="font-mono font-semibold">${planned}</span>
-            <span className="text-muted-foreground">/ ${settings.totalBudget}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span
-              className="rounded-full border border-border bg-secondary/40 px-2.5 py-0.5 text-[11px] font-semibold text-foreground"
-              title="Most you could bid on any one player and still afford $1 per remaining slot (reserve held back)"
-            >
-              Max bid ${bidCeiling}
-            </span>
-            <span
-              className={cn(
-                "rounded-full border px-2.5 py-0.5 text-[11px] font-semibold",
-                remaining === 0
-                  ? "border-success/40 bg-success/10 text-success"
-                  : remaining > 0
-                    ? "border-primary/40 bg-primary/10 text-primary"
-                    : "border-destructive/40 bg-destructive/10 text-destructive",
-              )}
-            >
-              {remaining >= 0 ? `$${remaining} left` : `$${Math.abs(remaining)} over`}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
