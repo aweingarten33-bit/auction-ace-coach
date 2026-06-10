@@ -51,8 +51,6 @@ import { buildPlannerBoard } from "@/lib/planner-slots";
 import LastPickImpact from "@/components/LastPickImpact";
 import AuctionCalculator from "@/components/AuctionCalculator";
 import { loadBlendedAuctionPrices, PRICE_SOURCE_VERSION } from "@/lib/price-blend";
-import shieldAsset from "@/assets/shield.jpeg.asset.json";
-import footballAsset from "@/assets/football.jpeg.asset.json";
 
 
 
@@ -234,13 +232,7 @@ export default function DraftRoom() {
           />
         </Sheet>
 
-        <div className="min-w-0 flex-1 flex items-center gap-2 leading-tight">
-          <img
-            src={shieldAsset.url}
-            alt=""
-            aria-hidden
-            className="h-11 w-11 shrink-0 object-contain drop-shadow-[0_0_8px_rgba(255,180,40,0.55)]"
-          />
+        <div className="min-w-0 flex-1 leading-tight">
           <p className="truncate font-bebas text-lg tracking-wider leading-tight">
             <span className="text-foreground">Auction Draft</span>{" "}
             <span className="text-accent">Assistant</span>
@@ -287,13 +279,7 @@ export default function DraftRoom() {
                     aria-label="Total auction budget"
                   />
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <img
-                    src={footballAsset.url}
-                    alt=""
-                    aria-hidden
-                    className="h-7 w-7 shrink-0 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
-                  />
+                <div className="flex items-baseline gap-1">
                   <span
                     className={`text-xl font-bold tabular-nums ${moneyLeft >= 0 ? "text-accent" : "text-destructive"}`}
                     style={moneyLeft >= 0 ? { textShadow: "0 0 12px hsl(var(--accent) / 0.4)" } : undefined}
