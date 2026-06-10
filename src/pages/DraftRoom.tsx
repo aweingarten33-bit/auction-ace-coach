@@ -403,15 +403,6 @@ export default function DraftRoom() {
             <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
               {panel === "calc" && (
                 <div className="space-y-3">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="w-full"
-                    onClick={loadCheatSheet2026}
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Reload 2026 Superflex cheat sheet (350 players)
-                  </Button>
                   <AuctionCalculator
                     prices={adjustedPrices}
                     onShowDetails={(name, position) => setDetailFor({ name, position })}
