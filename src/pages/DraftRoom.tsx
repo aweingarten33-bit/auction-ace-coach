@@ -348,13 +348,31 @@ export default function DraftRoom() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <div className="flex items-center justify-center gap-20 px-3 py-2">
-          <button
-            onClick={() => setPanel("calc")}
-            aria-label="Auction calculator"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
-          >
-            <Calculator className="h-4 w-4" />
-          </button>
+          <Sheet open={panel === "calc"} onOpenChange={(o) => setPanel(o ? "calc" : null)}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                aria-label="Auction calculator"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-secondary/30 text-muted-foreground shadow-lg hover:bg-secondary/50 hover:text-foreground active:scale-95 transition"
+              >
+                <Calculator className="h-4 w-4" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
+              <SheetHeader className="border-b border-border/60 px-4 py-3">
+                <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
+                  <Calculator className="h-4 w-4 text-primary" />
+                  Auction calculator
+                </SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto px-3 pb-24 pt-3">
+                <AuctionCalculator
+                  prices={adjustedPrices}
+                  onShowDetails={(name, position) => setDetailFor({ name, position })}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
 
           {/* Coach FAB */}
           <Sheet open={aiOpen} onOpenChange={setAiOpen}>
