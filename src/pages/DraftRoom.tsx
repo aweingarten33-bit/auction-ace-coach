@@ -31,6 +31,7 @@ import {
 } from "@/lib/draft-math";
 
 import { useAnchorMap } from "@/lib/use-anchor-map";
+import { usePlayerRanks } from "@/lib/league-tier-prices";
 import { Position, PriceEstimate } from "@/lib/draft-types";
 import { POS_COLORS } from "@/lib/positions";
 import { Button } from "@/components/ui/button";
