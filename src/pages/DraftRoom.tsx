@@ -237,7 +237,7 @@ export default function DraftRoom() {
           <img
             src={auctionDraftBadge}
             alt="Auction Draft Assist"
-            className="h-10 w-auto object-contain dark:invert"
+            className="h-20 w-auto object-contain invert brightness-200"
           />
         </div>
       </header>
