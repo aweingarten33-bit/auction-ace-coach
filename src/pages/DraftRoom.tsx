@@ -258,7 +258,7 @@ export default function DraftRoom() {
         <div className="shrink-0 space-y-2 border-b border-border bg-background/95 px-2.5 pb-2 pt-2 backdrop-blur-sm">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="planner">Budget Planner</TabsTrigger>
-            <TabsTrigger value="top100">Top 100</TabsTrigger>
+            <TabsTrigger value="top100">Top 350</TabsTrigger>
           </TabsList>
           {(() => {
             const allocated = Object.values(slotAllocations).reduce((a, b) => a + (Number(b) || 0), 0);
@@ -638,7 +638,7 @@ function Top100List({
       const finalPrice = anchor && anchor > 0 ? anchor : p.price;
       if (finalPrice > 0) byName.set(key, { name: p.name, price: finalPrice, position: p.position });
     }
-    return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 100);
+    return Array.from(byName.values()).sort((a, b) => b.price - a.price).slice(0, 350);
   }, [prices, anchorMap]);
 
   const filtered = useMemo(() => {
@@ -719,18 +719,9 @@ function Top100List({
         )}
         {rows.map((p, i) => {
           const isPicked = drafted.has(norm(p.name));
-          const isFiftyDivider = i === 50 && search.trim() === "" && posFilter === "ALL";
           return (
             <div key={p.name}>
-              {isFiftyDivider && (
-                <div className="my-2 flex items-center gap-2">
-                  <div className="h-[3px] flex-1 bg-foreground" />
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-foreground">
-                    Next 50
-                  </span>
-                  <div className="h-[3px] flex-1 bg-foreground" />
-                </div>
-              )}
+
               <button
                 type="button"
                 disabled={isPicked}

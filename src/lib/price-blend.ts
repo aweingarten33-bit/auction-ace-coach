@@ -32,7 +32,6 @@ function toPosition(pos?: string | null): Position | undefined {
 export async function loadBlendedAuctionPrices(totalBudget = PDF_BASE_BUDGET): Promise<BlendedPrice[]> {
   const budget = Number.isFinite(totalBudget) && totalBudget > 0 ? totalBudget : PDF_BASE_BUDGET;
   const pdfScale = budget / PDF_BASE_BUDGET;
-  const draftSharksScale = budget / DRAFTSHARKS_BASE_BUDGET;
   const rows = new Map<string, BlendedPrice>();
 
   for (const p of cheatSheet2026 as CheatSheetRow[]) {
@@ -46,34 +45,6 @@ export async function loadBlendedAuctionPrices(totalBudget = PDF_BASE_BUDGET): P
       price: pdfPrice,
       pdfPrice,
     });
-  }
-
-  const { data } = await supabase
-    .from("draftsharks_sf_values")
-    .select("player_name, position, team, value_200");
-
-  for (const p of (data ?? []) as DraftSharksRow[]) {
-    if (!p.player_name || !Number.isFinite(Number(p.value_200)) || Number(p.value_200) <= 0) continue;
-    const key = normalizePlayerName(p.player_name);
-    const draftSharksPrice = Math.max(1, Math.round(Number(p.value_200) * draftSharksScale));
-    const existing = rows.get(key);
-    if (existing?.pdfPrice) {
-      rows.set(key, {
-        ...existing,
-        position: existing.position ?? toPosition(p.position),
-        team: existing.team ?? p.team ?? undefined,
-        draftSharksPrice,
-        price: Math.max(1, Math.round((existing.pdfPrice + draftSharksPrice) / 2)),
-      });
-    } else {
-      rows.set(key, {
-        name: p.player_name,
-        position: toPosition(p.position),
-        team: p.team ?? undefined,
-        price: draftSharksPrice,
-        draftSharksPrice,
-      });
-    }
   }
 
   return Array.from(rows.values()).sort((a, b) => b.price - a.price || a.name.localeCompare(b.name));
