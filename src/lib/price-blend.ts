@@ -5,7 +5,7 @@ import type { Position, PriceEstimate } from "@/lib/draft-types";
 const PDF_BASE_BUDGET = 225;
 const DRAFTSHARKS_BASE_BUDGET = 200;
 
-export const PRICE_SOURCE_VERSION = "pdf-draftsharks-2026-v1";
+export const PRICE_SOURCE_VERSION = "pdf-only-2026-v1";
 
 type CheatSheetRow = { name: string; position?: string; team?: string; price: number };
 type DraftSharksRow = {
