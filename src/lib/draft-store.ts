@@ -309,7 +309,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 7,
+      version: 8,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -349,7 +349,8 @@ export const useDraftStore = create<DraftState>()(
           persisted.touchedSlots = {};
         }
         // v7: replace all cached old-source values with the PDF + DraftSharks blend.
-        if (persisted && version < 7) {
+        // v8: drop DraftSharks — prices come from PDF only.
+        if (persisted && version < 8) {
           persisted.prices = [];
         }
         return persisted;
