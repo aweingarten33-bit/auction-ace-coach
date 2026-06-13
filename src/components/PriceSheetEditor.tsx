@@ -423,7 +423,7 @@ export default function PriceSheetEditor({ prices, setPrices, pricesText, setPri
         <div>
           <p className="text-sm font-medium">Player Values</p>
           <p className="text-[11px] text-muted-foreground">
-            Blended from your PDF cheat sheet + DraftSharks Superflex values. Upload a new PDF to override.
+            Pulled from your PDF cheat sheet. Upload a new PDF to override.
           </p>
         </div>
       </div>
