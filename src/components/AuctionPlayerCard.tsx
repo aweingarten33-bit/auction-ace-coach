@@ -1,6 +1,6 @@
 // Magazine cheat-sheet style player card — research-only.
 // Cream bg, navy banner, BYE badge, headshot, team logo, roster math,
-// and the blended PDF cheat sheet + DraftSharks Superflex price.
+// and the PDF cheat sheet price.
 
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
@@ -300,7 +300,7 @@ export default function AuctionPlayerCard({
               </p>
             )}
             <p className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-[#1b2238]/60">
-              PDF + DraftSharks blend
+              PDF cheat sheet
             </p>
           </div>
 
@@ -378,7 +378,7 @@ export default function AuctionPlayerCard({
 
       {/* ── FOOTER ─────────────────────────────────────── */}
       <div className="bg-[#1b2238] px-3 py-1.5 text-center text-[9px] font-bold uppercase tracking-[0.2em] text-[#f5efe4]/70">
-        Research only · PDF cheat sheet + DraftSharks blend
+        Research only · PDF cheat sheet
       </div>
     </div>
   );

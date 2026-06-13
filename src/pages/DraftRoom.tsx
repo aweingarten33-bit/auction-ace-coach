@@ -81,7 +81,7 @@ export default function DraftRoom() {
     setPrices,
   } = useDraftStore();
 
-  // Auto-load the only auction values source: uploaded PDF sheet + DraftSharks SF.
+  // Auto-load the only auction values source: uploaded PDF sheet.
   useEffect(() => {
     let cancelled = false;
     const sourceKey = `${PRICE_SOURCE_VERSION}-${settings.totalBudget}`;
@@ -94,7 +94,7 @@ export default function DraftRoom() {
         setPrices(rows);
         try { localStorage.setItem("auction-price-source", sourceKey); } catch { /* ignore */ }
       })
-      .catch(() => { /* keep app usable if DraftSharks is temporarily unavailable */ });
+      .catch(() => { /* keep app usable if the price sheet is unavailable */ });
     return () => { cancelled = true; };
   }, [prices.length, setPrices, settings.totalBudget]);
 

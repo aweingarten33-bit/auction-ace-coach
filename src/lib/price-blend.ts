@@ -1,24 +1,15 @@
-import { supabase } from "@/integrations/supabase/client";
 import cheatSheet2026 from "@/assets/cheat-sheet-2026.json";
 import type { Position, PriceEstimate } from "@/lib/draft-types";
 
 const PDF_BASE_BUDGET = 225;
-const DRAFTSHARKS_BASE_BUDGET = 200;
 
 export const PRICE_SOURCE_VERSION = "pdf-only-2026-v1";
 
 type CheatSheetRow = { name: string; position?: string; team?: string; price: number };
-type DraftSharksRow = {
-  player_name: string | null;
-  position: string | null;
-  team: string | null;
-  value_200: number | null;
-};
 
 export type BlendedPrice = PriceEstimate & {
   team?: string;
   pdfPrice?: number;
-  draftSharksPrice?: number;
 };
 
 export const normalizePlayerName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
