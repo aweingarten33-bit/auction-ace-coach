@@ -521,27 +521,25 @@ export default function AiQuickPanel({ coachContext }: Props) {
       </div>
 
       <div className="border-t border-border/60 px-3 pb-3 pt-2">
-        {!hasMessages && (
-          <div className="mb-2 flex flex-wrap gap-1.5">
-            {quickPrompts.map((p: QuickPrompt) => (
-              <Button
-                key={p.id}
-                size="sm"
-                variant="outline"
-                disabled={streaming}
-                onClick={() => ask(p.prompt)}
-                className="h-7 rounded-full px-2.5 text-[11px] font-normal"
-              >
-                {p.label}
-              </Button>
-            ))}
-            <QuickPromptsEditor
-              prompts={quickPrompts}
-              onSave={setQuickPrompts}
-              onReset={resetQuickPrompts}
-            />
-          </div>
-        )}
+        <div className="mb-2 flex max-h-24 flex-wrap gap-1.5 overflow-y-auto pr-1">
+          {quickPrompts.map((p: QuickPrompt) => (
+            <Button
+              key={p.id}
+              size="sm"
+              variant="outline"
+              disabled={streaming}
+              onClick={() => ask(p.prompt)}
+              className="h-7 rounded-full px-2.5 text-[11px] font-normal"
+            >
+              {p.label}
+            </Button>
+          ))}
+          <QuickPromptsEditor
+            prompts={quickPrompts}
+            onSave={setQuickPrompts}
+            onReset={resetQuickPrompts}
+          />
+        </div>
         <div className="flex items-center gap-2 rounded-2xl border-2 border-primary/40 bg-background px-3 py-1.5 focus-within:border-primary">
           <Input
             ref={inputRef}
