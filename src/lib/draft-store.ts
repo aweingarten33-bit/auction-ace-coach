@@ -31,11 +31,11 @@ export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   { id: "qp-wr3",      label: "How much for WR3?",      prompt: "How much should I plan to spend on my WR3 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-te1",      label: "How much for TE1?",      prompt: "How much should I plan to spend on my TE1 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-plan",     label: "Build me a $225 plan",   prompt: "Build me a complete $225 auction budget plan for this Superflex league. Show how much to spend on each starting position and bench, and explain the strategy." },
-  { id: "qp-value",    label: "Best value left?",       prompt: "Who is the single best value still available based on the price sheet, and why?" },
-  { id: "qp-sleep-qb", label: "Top 3 sleeper QBs?",     prompt: "Who are the top 3 sleeper quarterbacks still available and what should I expect to pay?" },
-  { id: "qp-sleep-rb", label: "Top 3 sleeper RBs?",     prompt: "Who are the top 3 sleeper running backs still available and what should I expect to pay?" },
-  { id: "qp-sleep-wr", label: "Top 3 sleeper WRs?",     prompt: "Who are the top 3 sleeper wide receivers still available and what should I expect to pay?" },
-  { id: "qp-sleep-te", label: "Top 3 sleeper TEs?",     prompt: "Who are the top 3 sleeper tight ends still available and what should I expect to pay?" },
+  { id: "qp-value",    label: "Best value left?",       prompt: "Who is the single best value left based on the price sheet, and why?" },
+  { id: "qp-sleep-qb", label: "Top 3 sleeper QBs?",     prompt: "Who are the top 3 sleeper quarterbacks on the price sheet and what should I expect to pay?" },
+  { id: "qp-sleep-rb", label: "Top 3 sleeper RBs?",     prompt: "Who are the top 3 sleeper running backs on the price sheet and what should I expect to pay?" },
+  { id: "qp-sleep-wr", label: "Top 3 sleeper WRs?",     prompt: "Who are the top 3 sleeper wide receivers on the price sheet and what should I expect to pay?" },
+  { id: "qp-sleep-te", label: "Top 3 sleeper TEs?",     prompt: "Who are the top 3 sleeper tight ends on the price sheet and what should I expect to pay?" },
 ];
 
 
