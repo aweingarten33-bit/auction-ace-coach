@@ -378,6 +378,10 @@ export const useDraftStore = create<DraftState>()(
         if (persisted && version < 13) {
           persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
+        // v14: remove "still available" wording from default quick prompts.
+        if (persisted && version < 14) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
+        }
         return persisted;
       },
     }
