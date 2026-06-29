@@ -200,11 +200,7 @@ HOW TO ANSWER EVERYTHING ELSE:
 - Lead with the answer. One or two sentences max before the reasoning.
 - Be direct and opinionated — the user wants a take, not a hedge. ("Love him at that price." "Hard pass." "I'd pivot to RB here.")
 - Keep it tight. 3-6 short sentences or a few bullets is the sweet spot. Never write a wall of text.
-- When recommending a player or giving budget advice, end with a one-line math anchor on its own line:
-  *(Bank $X · max bid $Y · N slots left)*
-  Pull X, Y, N from the Budget block. Use "·" (U+00B7) as separator. Example: *(Bank $117 · max bid $41 · 14 slots left)*
-  Include the anchor when you: name a target, recommend spending, or answer a bid/value question.
-  Emit it ONCE at the end of the message, even if you name multiple players.
+- Do NOT print a math anchor line (no "Bank $X · max bid $Y · N slots left"). The app shows budget separately — don't repeat it.
 - If the user asks a general fantasy question (not draft-specific), just answer it like Berry would on the podcast.
 - Markdown is fine (bold, bullets). No headers like "Verdict/Why/Targets" unless the user asks for that format.
 
@@ -362,7 +358,7 @@ Deno.serve(async (req: Request) => {
     let webContext = "";
     let fcCacheStatus: "hit" | "miss" | "skip" | "error" = "skip";
     const searchQuery = decision.search
-      ? `${q} fantasy football 2026 ESPN OR FantasyPros OR "Matthew Berry"`
+      ? `${q} fantasy football 2026 superflex`
       : "";
 
     if (decision.search && FIRECRAWL_API_KEY) {
@@ -376,7 +372,7 @@ Deno.serve(async (req: Request) => {
           const fcRes = await fetch("https://api.firecrawl.dev/v2/search", {
             method: "POST",
             headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ query: searchQuery, limit: 5, tbs: "qdr:w" }),
+            body: JSON.stringify({ query: searchQuery, limit: 10, tbs: "qdr:m" }),
           });
           if (fcRes.ok) {
             let fc: unknown = null;
@@ -384,7 +380,7 @@ Deno.serve(async (req: Request) => {
               console.warn("Firecrawl JSON parse failed", parseErr);
             }
             try {
-              sources = parseFirecrawlResults(fc).slice(0, 5);
+              sources = parseFirecrawlResults(fc).slice(0, 8);
               fcCacheStatus = "miss";
               if (sources.length) fcCacheSet(fcKey, sources);
             } catch (shapeErr) {
@@ -408,19 +404,15 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    // Confidence: how much the answer leans on PDF vs web.
+    // Confidence: PDF is always source of truth. Web is a bonus.
     const draftedCount = (payload.draftedPlayers?.length ?? 0)
       + (payload.events?.length ?? 0)
       + (payload.myRoster?.length ?? 0);
-    const pdfWeight = pricesCount > 0 ? (decision.search ? 0.65 : 1.0) : 0;
-    const webWeight = decision.search ? Math.min(1, sources.length / 5) : 0;
-    const blendedScore = pdfWeight * 0.7 + webWeight * 0.3;
+    const pdfWeight = pricesCount > 0 ? 1.0 : 0;
+    const webWeight = decision.search ? Math.min(1, sources.length / 3) : 0;
+    const blendedScore = Math.min(1, pdfWeight * 0.8 + webWeight * 0.2);
     const confidenceLabel: "high" | "medium" | "low" =
-      pricesCount >= 50 && (decision.search ? sources.length >= 2 || !decision.search : true)
-        ? "high"
-        : pricesCount > 0
-          ? "medium"
-          : "low";
+      pricesCount >= 50 ? "high" : pricesCount > 0 ? "medium" : "low";
     const confidence = {
       label: confidenceLabel,
       pdf: Number(pdfWeight.toFixed(2)),
@@ -430,6 +422,7 @@ Deno.serve(async (req: Request) => {
         ? `${pricesCount} PDF prices + ${sources.length} web source${sources.length === 1 ? "" : "s"}`
         : `${pricesCount} PDF prices, no web call`,
     };
+
 
     const sysBase = SYSTEM_PROMPT + (payload.showMath ? MATH_ADDENDUM : "");
     const strategyAddendum = payload.strategy && payload.strategy.id !== "none"

@@ -2,7 +2,7 @@
 // for a single coach reply. All data comes from the edge function meta event;
 // nothing is persisted (intentionally session-only).
 import { useState } from "react";
-import { ChevronDown, ChevronRight, ExternalLink, Bug, FileText, Globe } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, FileText, Globe } from "lucide-react";
 import type { CoachMeta } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +22,7 @@ function hostOf(url: string) {
 
 export default function CoachMeta({ meta }: Props) {
   const [showSources, setShowSources] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
-  const { confidence, sources, searched, searchReason, firecrawlCache, debug, searchQuery } = meta;
+  const { confidence, sources, searched, firecrawlCache } = meta;
   const pdfPct = Math.round(confidence.pdf * 100);
   const webPct = Math.round(confidence.web * 100);
 
@@ -95,51 +94,6 @@ export default function CoachMeta({ meta }: Props) {
         </div>
       )}
 
-      {/* Debug panel */}
-      <div className="rounded-lg border border-dashed border-border/60">
-        <button
-          type="button"
-          onClick={() => setShowDebug((v) => !v)}
-          className="flex w-full items-center gap-1.5 rounded-lg px-2.5 py-1 text-left text-[10px] uppercase tracking-wider text-muted-foreground hover:bg-muted/40"
-        >
-          {showDebug ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-          <Bug className="h-3 w-3" /> Debug
-        </button>
-        {showDebug && (
-          <div className="space-y-1.5 px-2.5 pb-2 font-mono text-[10px] leading-snug text-muted-foreground">
-            <div>
-              <span className="text-foreground">Web search:</span> {searched ? "yes" : "no"} — {searchReason}
-              {firecrawlCache !== "skip" && <> · firecrawl: {firecrawlCache}</>}
-            </div>
-            {searchQuery && (
-              <div className="truncate"><span className="text-foreground">Query:</span> {searchQuery}</div>
-            )}
-            <div>
-              <span className="text-foreground">PDF filter:</span> {debug.undraftedPriceCount} undrafted prices · {debug.draftedCount} drafted excluded
-            </div>
-            <div>
-              <span className="text-foreground">Prompt:</span> sys {debug.systemPromptChars}c · user {debug.userMessageChars}c · history {debug.historyTurns} turns
-            </div>
-            <div>
-              <span className="text-foreground">Confidence:</span> {confidence.label} · pdf={confidence.pdf} web={confidence.web} score={confidence.score}
-            </div>
-            {debug.webSnippets.length > 0 && (
-              <details className="mt-1">
-                <summary className="cursor-pointer text-foreground">Web snippets sent to coach</summary>
-                <ul className="mt-1 space-y-1">
-                  {debug.webSnippets.map((w) => (
-                    <li key={w.idx} className="rounded border border-border/40 bg-background/60 p-1.5">
-                      <div className="font-semibold text-foreground">[{w.idx}] {w.title}</div>
-                      <div className="truncate text-primary">{w.url}</div>
-                      <div className="mt-0.5 whitespace-pre-wrap">{w.description}</div>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
