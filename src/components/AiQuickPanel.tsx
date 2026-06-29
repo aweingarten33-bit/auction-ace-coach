@@ -4,7 +4,7 @@
 //   renders them as cards with a one-tap "Apply to planner" button.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, Send, Plus, Check, X, RotateCcw } from "lucide-react";
+import { Sparkles, Send, Plus, Check, X, RotateCcw, Square, AlertTriangle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -101,8 +101,28 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const [input, setInput] = useState("");
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [stepIdx, setStepIdx] = useState(0);
+  const [lastError, setLastError] = useState<{ message: string; question: string } | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const ANALYSIS_STEPS = [
+    "Checking roster + needs…",
+    "Running budget math…",
+    "Scanning price sheet for value…",
+    "Pulling fresh notes from the web…",
+    "Drafting recommendation…",
+  ];
+
+  useEffect(() => {
+    if (!streaming || streamingText) return;
+    setStepIdx(0);
+    const t = setInterval(() => {
+      setStepIdx((i) => (i + 1) % ANALYSIS_STEPS.length);
+    }, 1400);
+    return () => clearInterval(t);
+  }, [streaming, streamingText]);
 
   // Load saved messages once when an authed user is available.
   useEffect(() => {
@@ -154,6 +174,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const ask = useCallback(
     async (question: string) => {
       if (!question.trim() || streaming) return;
+      setLastError(null);
       const userMsg: ChatMessage = {
         id: `local-${Date.now()}-u`,
         role: "user",
@@ -165,24 +186,32 @@ export default function AiQuickPanel({ coachContext }: Props) {
       setStreaming(true);
       setStreamingText("");
       setStreamingMeta(null);
-      // Fire-and-forget persistence.
       persistMessage(userMsg).then((id) => {
         if (id) setHistory((h) => h.map((m) => (m === userMsg ? { ...m, id } : m)));
       });
 
+      const controller = new AbortController();
+      abortRef.current = controller;
+      let gotFirstToken = false;
+      // Stall timeout — 30s with zero output → auto-abort with retry.
+      const stallTimer = setTimeout(() => {
+        if (!gotFirstToken) controller.abort("stall");
+      }, 30000);
+
       let acc = "";
       let capturedMeta: CoachMetaT | null = null;
+      let aborted = false;
+      let stalled = false;
       try {
         const ctx = coachContext();
         await streamCoach(
           {
             ...ctx,
             userQuestion: question,
-            history: history
-              .slice(-6)
-              .map((m) => ({ role: m.role, content: m.content })),
+            history: history.slice(-6).map((m) => ({ role: m.role, content: m.content })),
           },
           (chunk) => {
+            if (!gotFirstToken) gotFirstToken = true;
             acc += chunk;
             setStreamingText(extractProposal(acc).clean);
             scrollRef.current?.scrollTo({ top: 1e9 });
@@ -191,15 +220,31 @@ export default function AiQuickPanel({ coachContext }: Props) {
             capturedMeta = meta;
             setStreamingMeta(meta);
           },
+          controller.signal,
         );
       } catch (e) {
-        const msg = e instanceof ApiError ? e.message : "Coach unavailable.";
-        toast.error(msg);
-        acc = acc || "⚠️ Coach unavailable — try again.";
+        if (controller.signal.aborted) {
+          aborted = true;
+          stalled = (controller.signal.reason as string) === "stall" || !gotFirstToken;
+        } else {
+          const msg = e instanceof ApiError ? e.message : "Coach unavailable.";
+          toast.error(msg);
+          setLastError({ message: msg, question });
+        }
       } finally {
+        clearTimeout(stallTimer);
+        abortRef.current = null;
         setStreaming(false);
-        if (acc) {
-          const { clean, proposal } = extractProposal(acc);
+        if (stalled && !acc) {
+          setLastError({
+            message: "Coach didn't respond within 30s. Network or AI gateway may be slow.",
+            question,
+          });
+        } else if (aborted && !acc) {
+          // user-stopped, no output — just clean up silently
+        } else if (acc) {
+          const tail = aborted ? "\n\n_Stopped._" : "";
+          const { clean, proposal } = extractProposal(acc + tail);
           const assistantMsg: ChatMessage = {
             id: `local-${Date.now()}-a`,
             role: "assistant",
@@ -232,6 +277,10 @@ export default function AiQuickPanel({ coachContext }: Props) {
 
     [coachContext, history, persistMessage, streaming],
   );
+
+  const stop = useCallback(() => {
+    abortRef.current?.abort("user");
+  }, []);
 
   const newChat = useCallback(async () => {
     if (streaming) return;
@@ -401,6 +450,12 @@ export default function AiQuickPanel({ coachContext }: Props) {
               <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
             </div>
             <div className="min-w-0 flex-1">
+              <div className="mb-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+                <span className="relative inline-flex h-1 w-16 overflow-hidden rounded-full bg-muted">
+                  <span className="absolute inset-y-0 left-0 w-1/3 animate-pulse bg-primary" />
+                </span>
+                Writing answer…
+              </div>
               <CoachMessage content={streamingText} />
               {streamingMeta && <CoachMeta meta={streamingMeta} />}
             </div>
@@ -411,8 +466,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
               <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[13px] text-muted-foreground">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="text-[13px] font-medium text-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary [animation-delay:0.15s]" />
@@ -420,7 +475,54 @@ export default function AiQuickPanel({ coachContext }: Props) {
                   Coach is thinking
                 </span>
               </div>
+              <ul className="space-y-0.5 text-[12px]">
+                {ANALYSIS_STEPS.map((step, i) => {
+                  const done = i < stepIdx;
+                  const active = i === stepIdx;
+                  return (
+                    <li
+                      key={step}
+                      className={cn(
+                        "flex items-center gap-1.5 transition-opacity",
+                        done && "text-muted-foreground opacity-70",
+                        active && "text-foreground",
+                        !done && !active && "text-muted-foreground/50",
+                      )}
+                    >
+                      {done ? (
+                        <Check className="h-3 w-3 text-primary" />
+                      ) : active ? (
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                      ) : (
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
+                      )}
+                      {step}
+                    </li>
+                  );
+                })}
+              </ul>
               {streamingMeta && <CoachMeta meta={streamingMeta} />}
+            </div>
+          </div>
+        )}
+        {lastError && !streaming && (
+          <div className="flex gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-destructive/20">
+              <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+            </div>
+            <div className="min-w-0 flex-1 rounded-lg border border-destructive/40 bg-destructive/5 p-2.5">
+              <p className="text-[12px] font-medium text-foreground">{lastError.message}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                Check your connection or try a simpler question.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => ask(lastError.question)}
+                className="mt-2 h-7 gap-1 rounded-lg text-[11px]"
+              >
+                <RotateCcw className="h-3 w-3" /> Retry
+              </Button>
             </div>
           </div>
         )}
@@ -454,14 +556,26 @@ export default function AiQuickPanel({ coachContext }: Props) {
             disabled={streaming}
             className="h-9 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
           />
-          <Button
-            onClick={() => ask(input)}
-            disabled={streaming || !input.trim()}
-            size="sm"
-            className="h-8 w-8 shrink-0 rounded-full p-0"
-          >
-            <Send className="h-3.5 w-3.5" />
-          </Button>
+          {streaming ? (
+            <Button
+              onClick={stop}
+              size="sm"
+              variant="destructive"
+              className="h-8 w-8 shrink-0 rounded-full p-0"
+              title="Stop Coach"
+            >
+              <Square className="h-3.5 w-3.5 fill-current" />
+            </Button>
+          ) : (
+            <Button
+              onClick={() => ask(input)}
+              disabled={!input.trim()}
+              size="sm"
+              className="h-8 w-8 shrink-0 rounded-full p-0"
+            >
+              <Send className="h-3.5 w-3.5" />
+            </Button>
+          )}
         </div>
       </div>
     </div>
