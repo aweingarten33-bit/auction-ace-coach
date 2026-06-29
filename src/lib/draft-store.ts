@@ -366,6 +366,13 @@ export const useDraftStore = create<DraftState>()(
         if (persisted && version < 11) {
           persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
+        // v12: strip any standalone "FLEX" quick prompts (user-edited or cached).
+        if (persisted && persisted.quickPrompts) {
+          const flexRe = /\bFLEX\b/i;
+          persisted.quickPrompts = persisted.quickPrompts.filter(
+            (p: QuickPrompt) => !flexRe.test(p.label) && !flexRe.test(p.prompt),
+          );
+        }
         return persisted;
       },
     }
