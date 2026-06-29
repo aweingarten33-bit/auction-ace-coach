@@ -239,6 +239,20 @@
   }
   ::placeholder { color: rgba(255,255,255,0.65) !important; }
   input, textarea, select { color: #ffffff !important; caret-color: #ffffff; }
+
+  .coach-ai-mark {
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: 0 0 18px rgba(255,255,255,0.72), 0 0 34px rgba(255,255,255,0.34) !important;
+  }
+
+  .coach-ai-mark-icon,
+  .coach-ai-mark-icon *,
+  .coach-ai-mark svg,
+  .coach-ai-mark svg * {
+    color: #000000 !important;
+    stroke: #000000 !important;
+  }
 }
 
 /* =====================================================================
