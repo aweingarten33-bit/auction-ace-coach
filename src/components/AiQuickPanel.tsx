@@ -399,7 +399,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
   return (
     <div className="flex h-full flex-col overflow-hidden overflow-x-hidden overscroll-x-none">
 
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3 text-sm">
+      <div ref={scrollRef} className="flex-1 min-w-0 space-y-3 overflow-y-auto overflow-x-hidden px-3 py-3 text-sm overscroll-x-none">
         {loading && (
           <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5 animate-pulse" /> Loading your chat…
