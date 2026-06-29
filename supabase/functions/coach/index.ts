@@ -374,9 +374,6 @@ Deno.serve(async (req: Request) => {
     }
 
     // Confidence: PDF is always source of truth. Web is a bonus.
-    const draftedCount = (payload.draftedPlayers?.length ?? 0)
-      + (payload.events?.length ?? 0)
-      + (payload.myRoster?.length ?? 0);
     const pdfWeight = pricesCount > 0 ? 1.0 : 0;
     const webWeight = decision.search ? Math.min(1, sources.length / 3) : 0;
     const blendedScore = Math.min(1, pdfWeight * 0.8 + webWeight * 0.2);
