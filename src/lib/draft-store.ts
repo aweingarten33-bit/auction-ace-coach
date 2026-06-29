@@ -22,20 +22,19 @@ export interface QuickPrompt {
 }
 
 export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
-  { id: "qp-bid",       label: "Should I bid?",            prompt: "Should I bid on the player who was just nominated? Give me a max bid and a one-line take." },
-  { id: "qp-nominate",  label: "Who should I nominate?",   prompt: "Who should I nominate next to drain other teams' budgets without overcommitting myself?" },
-  { id: "qp-next",      label: "What's my next move?",     prompt: "Based on my roster, budget, and what's still available, what's my next move and how much should I be willing to pay?" },
-  { id: "qp-value",     label: "Best value left?",         prompt: "What's the single best value still on the board right now and why?" },
-  { id: "qp-qb-value",  label: "Best QB value left?",      prompt: "Who's the best quarterback value still available and what should I pay?" },
-  { id: "qp-rb-value",  label: "Best RB value left?",      prompt: "Who's the best running back value still available and what should I pay?" },
-  { id: "qp-wr-value",  label: "Best WR value left?",      prompt: "Who's the best wide receiver value still available and what should I pay?" },
-  { id: "qp-te-value",  label: "Best TE value left?",      prompt: "Who's the best tight end value still available and what should I pay?" },
-  { id: "qp-rb-spend",  label: "How much for my RB1?",     prompt: "Given my budget and what's left, how much should I allocate for my starting RB and my backup RBs?" },
-  { id: "qp-strategy",  label: "Stars or balanced?",       prompt: "Should I pivot to a stars-and-scrubs build or stay balanced given how the draft is going?" },
-  { id: "qp-sleepers-te", label: "Top 3 sleeper TEs?",      prompt: "Who are the top 3 sleeper tight ends still available and what should I expect to pay?" },
-  { id: "qp-sleepers-qb", label: "Top 3 sleeper QBs?",      prompt: "Who are the top 3 sleeper quarterbacks still available and what should I expect to pay?" },
-  { id: "qp-sleepers-rb", label: "Top 3 sleeper RBs?",      prompt: "Who are the top 3 sleeper running backs still available and what should I expect to pay?" },
-  { id: "qp-sleepers-wr", label: "Top 3 sleeper WRs?",      prompt: "Who are the top 3 sleeper wide receivers still available and what should I expect to pay?" },
+  { id: "qp-qb1",      label: "How much for QB1?",      prompt: "How much should I plan to spend on my QB1 in this Superflex auction draft? Use the price sheet and my budget." },
+  { id: "qp-qb2",      label: "How much for QB2?",      prompt: "How much should I plan to spend on my QB2 in this Superflex auction draft? Use the price sheet and my budget." },
+  { id: "qp-rb1",      label: "How much for RB1?",      prompt: "How much should I plan to spend on my RB1 in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-rb2",      label: "How much for RB2?",      prompt: "How much should I plan to spend on my RB2 in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-wr1",      label: "How much for WR1?",      prompt: "How much should I plan to spend on my WR1 in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-wr2",      label: "How much for WR2?",      prompt: "How much should I plan to spend on my WR2 in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-te1",      label: "How much for TE1?",      prompt: "How much should I plan to spend on my TE1 in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-flex",     label: "How much for FLEX?",     prompt: "How much should I plan to spend on my FLEX spot in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-value",    label: "Best value left?",       prompt: "Who is the single best value still available based on the price sheet, and why?" },
+  { id: "qp-sleep-qb", label: "Top 3 sleeper QBs?",     prompt: "Who are the top 3 sleeper quarterbacks still available and what should I expect to pay?" },
+  { id: "qp-sleep-rb", label: "Top 3 sleeper RBs?",     prompt: "Who are the top 3 sleeper running backs still available and what should I expect to pay?" },
+  { id: "qp-sleep-wr", label: "Top 3 sleeper WRs?",     prompt: "Who are the top 3 sleeper wide receivers still available and what should I expect to pay?" },
+  { id: "qp-sleep-te", label: "Top 3 sleeper TEs?",     prompt: "Who are the top 3 sleeper tight ends still available and what should I expect to pay?" },
 ];
 
 
