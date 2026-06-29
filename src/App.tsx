@@ -67,7 +67,7 @@ function AppRoutes() {
             <Route path="/" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/index" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
-            <Route path="/team" element={<TeamPicker />} />
+            <Route path="/team" element={<Navigate to="/draft-room" replace />} />
             <Route path="/auth" element={<Navigate to="/espn" replace />} />
             <Route path="/draft-room" element={<PublicGate><DraftRoom /></PublicGate>} />
             <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
