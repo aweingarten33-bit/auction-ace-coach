@@ -450,6 +450,12 @@ export default function AiQuickPanel({ coachContext }: Props) {
               <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
             </div>
             <div className="min-w-0 flex-1">
+              <div className="mb-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+                <span className="relative inline-flex h-1 w-16 overflow-hidden rounded-full bg-muted">
+                  <span className="absolute inset-y-0 left-0 w-1/3 animate-pulse bg-primary" />
+                </span>
+                Writing answer…
+              </div>
               <CoachMessage content={streamingText} />
               {streamingMeta && <CoachMeta meta={streamingMeta} />}
             </div>
@@ -460,8 +466,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
               <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[13px] text-muted-foreground">
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="text-[13px] font-medium text-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary [animation-delay:0.15s]" />
@@ -469,7 +475,54 @@ export default function AiQuickPanel({ coachContext }: Props) {
                   Coach is thinking
                 </span>
               </div>
+              <ul className="space-y-0.5 text-[12px]">
+                {ANALYSIS_STEPS.map((step, i) => {
+                  const done = i < stepIdx;
+                  const active = i === stepIdx;
+                  return (
+                    <li
+                      key={step}
+                      className={cn(
+                        "flex items-center gap-1.5 transition-opacity",
+                        done && "text-muted-foreground opacity-70",
+                        active && "text-foreground",
+                        !done && !active && "text-muted-foreground/50",
+                      )}
+                    >
+                      {done ? (
+                        <Check className="h-3 w-3 text-primary" />
+                      ) : active ? (
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                      ) : (
+                        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/30" />
+                      )}
+                      {step}
+                    </li>
+                  );
+                })}
+              </ul>
               {streamingMeta && <CoachMeta meta={streamingMeta} />}
+            </div>
+          </div>
+        )}
+        {lastError && !streaming && (
+          <div className="flex gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-destructive/20">
+              <AlertTriangle className="h-3.5 w-3.5 text-destructive" />
+            </div>
+            <div className="min-w-0 flex-1 rounded-lg border border-destructive/40 bg-destructive/5 p-2.5">
+              <p className="text-[12px] font-medium text-foreground">{lastError.message}</p>
+              <p className="mt-0.5 text-[11px] text-muted-foreground">
+                Check your connection or try a simpler question.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => ask(lastError.question)}
+                className="mt-2 h-7 gap-1 rounded-lg text-[11px]"
+              >
+                <RotateCcw className="h-3 w-3" /> Retry
+              </Button>
             </div>
           </div>
         )}
