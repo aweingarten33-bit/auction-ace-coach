@@ -11,7 +11,7 @@ import SetupWizard from "./pages/SetupWizard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
-import TeamPicker from "./pages/TeamPicker.tsx";
+
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 import Preloader from "@/components/Preloader";
