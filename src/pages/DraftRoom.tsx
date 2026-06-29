@@ -355,19 +355,16 @@ export default function DraftRoom() {
               <button
                 type="button"
                 aria-label="Ask the Coach"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-accent to-accent/70 text-accent-foreground shadow-[0_0_18px_hsl(var(--accent)/0.55)] active:scale-95 transition hover:brightness-110"
+                className="coach-ai-mark flex h-10 w-10 shrink-0 items-center justify-center rounded-full active:scale-95 transition hover:brightness-110"
               >
-                <Sparkles className="h-4 w-4 !text-black" strokeWidth={1.75} />
+                <Sparkles className="coach-ai-mark-icon h-4 w-4" strokeWidth={1.75} />
               </button>
             </SheetTrigger>
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
               <SheetHeader className="border-b border-border/60 px-4 py-3">
                 <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <span
-                    className="flex h-9 w-9 items-center justify-center rounded-full"
-                    style={{ backgroundColor: "#ffffff", boxShadow: "0 0 18px hsl(var(--accent) / 0.55)" }}
-                  >
-                    <Sparkles size={18} strokeWidth={1.75} style={{ color: "#000000" }} />
+                  <span className="coach-ai-mark flex h-9 w-9 items-center justify-center rounded-full">
+                    <Sparkles className="coach-ai-mark-icon" size={18} strokeWidth={1.75} />
                   </span>
                   Ask the Coach
                 </SheetTitle>
