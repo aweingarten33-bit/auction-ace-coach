@@ -176,25 +176,23 @@ Borderline cases that ARE allowed: NFL news, player off-field stuff that affects
 
 You can answer ANY fantasy football question: draft strategy, player takes, sleepers, busts, start/sit logic, dynasty vs redraft, trade ideas, injury impact, schedule, coaching changes, anything. Use real player knowledge.
 
-You ALSO have access to live draft state when available (budget, roster, drafted players, price sheet). Use it when relevant.
+You have the user's budget settings and the full price sheet. You do NOT have access to live roster or drafted-player data, so never write as if you do.
 
 HOW TO ANSWER "WHAT ARE MY OPTIONS AT [POSITION]?":
 This is the most important question type. When the user asks about their options at a position (e.g. "what are my RB options?", "who can I get at WR?", "what QBs fit my budget?"), give them BOTH:
-1. **Strategic paths** — name 2 distinct approaches with tradeoffs. Examples: "Spend $40+ on an elite RB now (Stars & Scrubs) vs. wait for $15-20 RBs later (Zero RB)." Be specific to their budget and what's left on the board.
-2. **Specific players** — for each path, name 2-3 actual players from the Undrafted Price Sheet that fit the budget. Format: "**Player Name** (~$Y) — one-line reason." Use the projected/going price only — do NOT print the raw "sheet $X" token.
-Always filter against the "Drafted Players" list — never name a player who's gone.
+1. **Strategic paths** — name 2 distinct approaches with tradeoffs. Examples: "Spend $40+ on an elite RB now (Stars & Scrubs) vs. wait for $15-20 RBs later (Zero RB)." Be specific to their budget.
+2. **Specific players** — for each path, name 2-3 actual players from the Price Sheet that fit the budget. Format: "**Player Name** (~$Y) — one-line reason." Use the projected price only — do NOT print the raw "sheet $X" token.
 
 HOW TO ANSWER FILTERED LIST QUESTIONS (e.g. "top 5 RBs starting at $15", "best WRs under $10", "cheapest QBs", "sleepers at RB"):
-- The "Undrafted Price Sheet" block below is your SOURCE OF TRUTH for who is available and what they cost. Do NOT name players from memory for these questions — pull them from that list only.
+- The "Price Sheet" block below is your SOURCE OF TRUTH for player values. Do NOT name players from memory for these questions — pull them from that list only.
 - Parse the filter precisely:
-  - "starting at $X" or "around $X" → going$ within roughly $X-2 to $X+5 (lean to players whose going$ is >= $X).
-  - "under $X" / "below $X" → going$ <= X.
+  - "starting at $X" or "around $X" → sheet$ within roughly $X-2 to $X+5 (lean to players whose sheet$ is >= $X).
+  - "under $X" / "below $X" → sheet$ <= X.
   - "at position P" → only rows tagged (P). For "FLEX", include RB/WR/TE.
 - Then sort by sheet$ descending (that's the projection rank) and list EXACTLY the number requested.
-- Format each line: "1. **Name** (POS, ~$Y) — short reason." Use the projected/going price only. Never print "sheet$X" or "going$X" tokens — those are internal labels.
-- If fewer than N players match, say so and list what's there. Never pad with drafted players or made-up names.
-- For "sleepers": pull from the Undrafted Price Sheet where going$ is cheap (≤ $8) but sheet$ is meaningfully higher than going$ (value gap), OR a clear upside role (rookie RB1, new WR1, ascending TE). Always name 3-5 real undrafted players from the sheet.
-- Double-check every player you name is NOT in the Drafted Players list before sending.
+- Format each line: "1. **Name** (POS, ~$Y) — short reason." Use the sheet price only. Never print "sheet$X" tokens — those are internal labels.
+- If fewer than N players match, say so and list what's there. Never pad with made-up names.
+- For "sleepers": pull from the Price Sheet where sheet$ is cheap (≤ $8) but the projected role has clear upside (rookie RB1, new WR1, ascending TE). Always name 3-5 real players from the sheet.
 
 HOW TO ANSWER EVERYTHING ELSE:
 - Lead with the answer. One or two sentences max before the reasoning.
@@ -205,9 +203,9 @@ HOW TO ANSWER EVERYTHING ELSE:
 - Markdown is fine (bold, bullets). No headers like "Verdict/Why/Targets" unless the user asks for that format.
 
 HARD RULES:
-- NEVER recommend a player who appears in the "Drafted Players" list — they're gone.
 - NEVER recommend a max bid that leaves <$1 per remaining slot.
-- NEVER use the phrase "still available" or imply you can see the user's live roster. If the draft is not connected, answer from the price sheet without roster-context language.
+- NEVER use the phrase "still available" or imply you can see the user's live roster. Answer from the price sheet only.
+- NEVER use roster-aware phrases like "left on the board", "on your roster", or "available in your draft".
 - If you genuinely don't know something current (recent injury, trade, depth chart change), say so instead of guessing.
 - No "good luck!", no closing sign-offs, no emojis.
 
@@ -272,44 +270,17 @@ interface CoachPayload {
 const MATH_ADDENDUM = ``;
 
 function buildUserMessage(p: CoachPayload): string {
-  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  const draftedSet = new Set<string>([
-    ...(p.draftedPlayers ?? []),
-    ...(p.events ?? []).map((e) => e.player),
-    ...(p.myRoster ?? []).map((m) => m.player),
-    ...(p.keepers ?? []).map((k) => k.player),
-  ].map((n) => norm(String(n))).filter(Boolean));
-
-  // Market multiplier
-  const sheetMap = new Map<string, number>();
-  for (const r of (p.prices ?? [])) sheetMap.set(norm(r.name), Number(r.price) || 0);
-  let paid = 0, sheet = 0, n = 0;
-  for (const e of (p.events ?? [])) {
-    const ref = sheetMap.get(norm(e.player));
-    if (!ref || ref <= 0) continue;
-    paid += Number(e.price) || 0; sheet += ref; n++;
-  }
-  const mult = n >= 3 && sheet > 0 ? paid / sheet : 1;
-
-  // Undrafted price sheet — full, sorted by sheet $ desc
-  const undrafted = (p.prices ?? [])
-    .filter((r) => Number(r.price) > 0 && !draftedSet.has(norm(r.name)))
+  // Price sheet — full, sorted by sheet $ desc
+  const priceSheet = (p.prices ?? [])
+    .filter((r) => Number(r.price) > 0)
     .sort((a, b) => Number(b.price) - Number(a.price))
-    .map((r) => `${r.name}${r.position ? ` (${r.position})` : ""} sheet$${r.price} going$${Math.max(1, Math.round(Number(r.price) * mult))}`);
+    .map((r) => `${r.name}${r.position ? ` (${r.position})` : ""} sheet$${r.price}`);
 
   const parts: string[] = [];
 
   parts.push(`## Settings\n${JSON.stringify(p.settings)}`);
   parts.push(`## Budget\n${JSON.stringify(p.budget)}`);
-  parts.push(`## Roster (you)\nfilled=${JSON.stringify(p.rosterFilled)}\nrequired=${JSON.stringify(p.rosterRequired)}`);
-  if (p.myRoster?.length) {
-    parts.push(`## My Roster\n${p.myRoster.map((x) => `${x.player}${x.position ? ` (${x.position})` : ""} $${x.price}`).join("\n")}`);
-  }
-  parts.push(`## Spend by Position\n${JSON.stringify(p.spendByPosition)}`);
-  parts.push(`## Recent picks (last ${p.recentRuns?.window})\n${JSON.stringify(p.recentRuns?.counts)}`);
-  parts.push(`## Market Multiplier\nx${mult.toFixed(3)} (samples=${n}) — convert sheet $ to going $`);
-  parts.push(`## Drafted Players (FORBIDDEN — never name any of these)\n${Array.from(draftedSet).join(", ") || "(none yet)"}`);
-  parts.push(`## Undrafted Price Sheet (FULL list from user's PDF, sorted by sheet $ desc — sleepers/$1-$3 guys are at the bottom)\n${undrafted.join("\n") || "(empty)"}`);
+  parts.push(`## Price Sheet (FULL list from user's PDF, sorted by sheet $ desc — sleepers/$1-$3 guys are at the bottom)\n${priceSheet.join("\n") || "(empty)"}`);
   if (p.budgetBoard) {
     const bb = p.budgetBoard;
     const rows = bb.slots.map((s) =>
@@ -317,9 +288,6 @@ function buildUserMessage(p: CoachPayload): string {
     ).join("\n");
     const total = bb.slots.reduce((a, b) => a + b.dollars, 0);
     parts.push(`## Budget Board (live planner snapshot)\ntotalBudget=$${bb.totalBudget}\nplanned=$${total}\nremaining=$${bb.totalBudget - total}\nid\tlabel\t$\ttarget\n${rows}`);
-  }
-  if (p.latestEvent) {
-    parts.push(`## Latest Event\n${p.latestEvent.drafter === "me" ? "[ME]" : "[OTHER]"} ${p.latestEvent.player}${p.latestEvent.position ? ` (${p.latestEvent.position})` : ""} $${p.latestEvent.price}`);
   }
   if (p.userQuestion) parts.push(`## Question\n${p.userQuestion}`);
   else parts.push(`## Task\nGive verdict for the latest event.`);
@@ -406,9 +374,6 @@ Deno.serve(async (req: Request) => {
     }
 
     // Confidence: PDF is always source of truth. Web is a bonus.
-    const draftedCount = (payload.draftedPlayers?.length ?? 0)
-      + (payload.events?.length ?? 0)
-      + (payload.myRoster?.length ?? 0);
     const pdfWeight = pricesCount > 0 ? 1.0 : 0;
     const webWeight = decision.search ? Math.min(1, sources.length / 3) : 0;
     const blendedScore = Math.min(1, pdfWeight * 0.8 + webWeight * 0.2);
@@ -454,8 +419,7 @@ Deno.serve(async (req: Request) => {
         sources,
         confidence,
         debug: {
-          undraftedPriceCount: pricesCount,
-          draftedCount,
+          priceCount,
           historyTurns: payload.history?.length ?? 0,
           systemPromptChars: sysPrompt.length,
           userMessageChars: userMsg.length,
