@@ -32,8 +32,8 @@ export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   { id: "qp-te-value",  label: "Best TE value left?",      prompt: "Who's the best tight end value still available and what should I pay?" },
   { id: "qp-rb-spend",  label: "How much for my RB1?",     prompt: "Given my budget and what's left, how much should I allocate for my starting RB and my backup RBs?" },
   { id: "qp-strategy",  label: "Stars or balanced?",       prompt: "Should I pivot to a stars-and-scrubs build or stay balanced given how the draft is going?" },
-  { id: "qp-target",    label: "Best player left?",        prompt: "Who is the best overall player still available and what should I expect to pay?" },
-  { id: "qp-steal",     label: "Who is a steal?",          prompt: "Which player is the biggest bargain left relative to their price sheet value and why?" },
+  { id: "qp-sleepers",  label: "Best sleepers left?",      prompt: "Who are the best sleeper or undervalued players still available, and what should I expect to pay?" },
+  { id: "qp-sleeper-target", label: "Which sleeper to target?", prompt: "Based on my roster and budget, which sleeper player should I target next and why?" },
 ];
 
 
