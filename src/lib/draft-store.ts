@@ -28,6 +28,7 @@ export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   { id: "qp-rb2",      label: "How much for RB2?",      prompt: "How much should I plan to spend on my RB2 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-wr1",      label: "How much for WR1?",      prompt: "How much should I plan to spend on my WR1 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-wr2",      label: "How much for WR2?",      prompt: "How much should I plan to spend on my WR2 in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-wr3",      label: "How much for WR3?",      prompt: "How much should I plan to spend on my WR3 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-te1",      label: "How much for TE1?",      prompt: "How much should I plan to spend on my TE1 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-plan",     label: "Build me a $225 plan",   prompt: "Build me a complete $225 auction budget plan for this Superflex league. Show how much to spend on each starting position and bench, and explain the strategy." },
   { id: "qp-value",    label: "Best value left?",       prompt: "Who is the single best value still available based on the price sheet, and why?" },
@@ -310,7 +311,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 12,
+      version: 13,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -372,6 +373,10 @@ export const useDraftStore = create<DraftState>()(
           persisted.quickPrompts = persisted.quickPrompts.filter(
             (p: QuickPrompt) => !flexRe.test(p.label) && !flexRe.test(p.prompt),
           );
+        }
+        // v13: add "How much for WR3?" to defaults.
+        if (persisted && version < 13) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
         return persisted;
       },
