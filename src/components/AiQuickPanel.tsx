@@ -397,9 +397,9 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const hasMessages = history.length > 0;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="flex h-full flex-col overflow-hidden overflow-x-hidden overscroll-x-none">
 
-      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3 text-sm">
+      <div ref={scrollRef} className="flex-1 min-w-0 space-y-3 overflow-y-auto overflow-x-hidden px-3 py-3 text-sm overscroll-x-none">
         {loading && (
           <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
             <Sparkles className="h-3.5 w-3.5 animate-pulse" /> Loading your chat…
@@ -410,7 +410,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
             <div className="coach-ai-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
               <Sparkles className="coach-ai-mark-icon" size={16} strokeWidth={1.75} />
             </div>
-            <div className="text-[12px] text-muted-foreground">
+            <div className="min-w-0 flex-1 text-[12px] text-muted-foreground">
               I can see your budget board. Ask me to build a plan, swap a player, or sanity-check your $225 — I'll show you the math and offer to update the planner with one tap.
             </div>
           </div>
@@ -418,7 +418,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
         {history.map((m) =>
           m.role === "user" ? (
             <div key={m.id} className="flex justify-end">
-              <div className="max-w-[85%] rounded-2xl rounded-br-md bg-secondary px-3 py-1.5 text-[13px]">
+              <div className="max-w-[85%] break-words rounded-2xl rounded-br-md bg-secondary px-3 py-1.5 text-[13px]">
                 <ReactMarkdown>{m.content}</ReactMarkdown>
               </div>
             </div>

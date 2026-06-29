@@ -360,7 +360,7 @@ export default function DraftRoom() {
                 <Sparkles className="coach-ai-mark-icon h-4 w-4" strokeWidth={1.75} />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
+            <SheetContent side="right" className="ai-sheet-frozen flex flex-col p-0">
               <SheetHeader className="border-b border-border/60 px-4 py-3">
                 <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
                   <span className="coach-ai-mark flex h-9 w-9 items-center justify-center rounded-full">
