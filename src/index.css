@@ -251,7 +251,9 @@
   .text-warning-foreground,
   .text-success-foreground,
   [class*="bg-foreground"]:not([class*="bg-foreground/"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
+  [class*="bg-primary"]:not([class*="bg-primary/"]):not([class*="bg-primary-foreground"]),
   [class*="bg-accent"]:not([class*="bg-accent/"]):not([class*="bg-accent-foreground"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
+
   [class*="bg-warning"]:not([class*="bg-warning/"]):not([class*="bg-warning-foreground"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
   [class*="bg-success"]:not([class*="bg-success/"]):not([class*="bg-success-foreground"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
   [class*="text-accent-foreground"]:is(:focus, :focus-visible, [data-state="on"]),
