@@ -865,3 +865,23 @@
 
 /* Bebas display util */
 .font-bebas { font-family: "Bebas Neue", "Anton", "Oswald", sans-serif; letter-spacing: 0.04em; }
+
+/* Freeze horizontal movement on mobile sheets / chat panels */
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+.ai-sheet-frozen {
+  width: 360px !important;
+  max-width: 360px !important;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none !important;
+}
+@media (min-width: 640px) {
+  .ai-sheet-frozen {
+    width: 420px !important;
+    max-width: 420px !important;
+  }
+}
