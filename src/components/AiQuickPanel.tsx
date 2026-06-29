@@ -556,14 +556,26 @@ export default function AiQuickPanel({ coachContext }: Props) {
             disabled={streaming}
             className="h-9 flex-1 border-0 bg-transparent p-0 text-sm shadow-none focus-visible:ring-0"
           />
-          <Button
-            onClick={() => ask(input)}
-            disabled={streaming || !input.trim()}
-            size="sm"
-            className="h-8 w-8 shrink-0 rounded-full p-0"
-          >
-            <Send className="h-3.5 w-3.5" />
-          </Button>
+          {streaming ? (
+            <Button
+              onClick={stop}
+              size="sm"
+              variant="destructive"
+              className="h-8 w-8 shrink-0 rounded-full p-0"
+              title="Stop Coach"
+            >
+              <Square className="h-3.5 w-3.5 fill-current" />
+            </Button>
+          ) : (
+            <Button
+              onClick={() => ask(input)}
+              disabled={!input.trim()}
+              size="sm"
+              className="h-8 w-8 shrink-0 rounded-full p-0"
+            >
+              <Send className="h-3.5 w-3.5" />
+            </Button>
+          )}
         </div>
       </div>
     </div>
