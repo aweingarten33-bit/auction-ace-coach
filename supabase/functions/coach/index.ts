@@ -270,44 +270,17 @@ interface CoachPayload {
 const MATH_ADDENDUM = ``;
 
 function buildUserMessage(p: CoachPayload): string {
-  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
-  const draftedSet = new Set<string>([
-    ...(p.draftedPlayers ?? []),
-    ...(p.events ?? []).map((e) => e.player),
-    ...(p.myRoster ?? []).map((m) => m.player),
-    ...(p.keepers ?? []).map((k) => k.player),
-  ].map((n) => norm(String(n))).filter(Boolean));
-
-  // Market multiplier
-  const sheetMap = new Map<string, number>();
-  for (const r of (p.prices ?? [])) sheetMap.set(norm(r.name), Number(r.price) || 0);
-  let paid = 0, sheet = 0, n = 0;
-  for (const e of (p.events ?? [])) {
-    const ref = sheetMap.get(norm(e.player));
-    if (!ref || ref <= 0) continue;
-    paid += Number(e.price) || 0; sheet += ref; n++;
-  }
-  const mult = n >= 3 && sheet > 0 ? paid / sheet : 1;
-
-  // Undrafted price sheet — full, sorted by sheet $ desc
-  const undrafted = (p.prices ?? [])
-    .filter((r) => Number(r.price) > 0 && !draftedSet.has(norm(r.name)))
+  // Price sheet — full, sorted by sheet $ desc
+  const priceSheet = (p.prices ?? [])
+    .filter((r) => Number(r.price) > 0)
     .sort((a, b) => Number(b.price) - Number(a.price))
-    .map((r) => `${r.name}${r.position ? ` (${r.position})` : ""} sheet$${r.price} going$${Math.max(1, Math.round(Number(r.price) * mult))}`);
+    .map((r) => `${r.name}${r.position ? ` (${r.position})` : ""} sheet$${r.price}`);
 
   const parts: string[] = [];
 
   parts.push(`## Settings\n${JSON.stringify(p.settings)}`);
   parts.push(`## Budget\n${JSON.stringify(p.budget)}`);
-  parts.push(`## Roster (you)\nfilled=${JSON.stringify(p.rosterFilled)}\nrequired=${JSON.stringify(p.rosterRequired)}`);
-  if (p.myRoster?.length) {
-    parts.push(`## My Roster\n${p.myRoster.map((x) => `${x.player}${x.position ? ` (${x.position})` : ""} $${x.price}`).join("\n")}`);
-  }
-  parts.push(`## Spend by Position\n${JSON.stringify(p.spendByPosition)}`);
-  parts.push(`## Recent picks (last ${p.recentRuns?.window})\n${JSON.stringify(p.recentRuns?.counts)}`);
-  parts.push(`## Market Multiplier\nx${mult.toFixed(3)} (samples=${n}) — convert sheet $ to going $`);
-  parts.push(`## Drafted Players (FORBIDDEN — never name any of these)\n${Array.from(draftedSet).join(", ") || "(none yet)"}`);
-  parts.push(`## Undrafted Price Sheet (FULL list from user's PDF, sorted by sheet $ desc — sleepers/$1-$3 guys are at the bottom)\n${undrafted.join("\n") || "(empty)"}`);
+  parts.push(`## Price Sheet (FULL list from user's PDF, sorted by sheet $ desc — sleepers/$1-$3 guys are at the bottom)\n${priceSheet.join("\n") || "(empty)"}`);
   if (p.budgetBoard) {
     const bb = p.budgetBoard;
     const rows = bb.slots.map((s) =>
@@ -315,9 +288,6 @@ function buildUserMessage(p: CoachPayload): string {
     ).join("\n");
     const total = bb.slots.reduce((a, b) => a + b.dollars, 0);
     parts.push(`## Budget Board (live planner snapshot)\ntotalBudget=$${bb.totalBudget}\nplanned=$${total}\nremaining=$${bb.totalBudget - total}\nid\tlabel\t$\ttarget\n${rows}`);
-  }
-  if (p.latestEvent) {
-    parts.push(`## Latest Event\n${p.latestEvent.drafter === "me" ? "[ME]" : "[OTHER]"} ${p.latestEvent.player}${p.latestEvent.position ? ` (${p.latestEvent.position})` : ""} $${p.latestEvent.price}`);
   }
   if (p.userQuestion) parts.push(`## Question\n${p.userQuestion}`);
   else parts.push(`## Task\nGive verdict for the latest event.`);
