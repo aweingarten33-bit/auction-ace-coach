@@ -29,7 +29,7 @@ export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   { id: "qp-wr1",      label: "How much for WR1?",      prompt: "How much should I plan to spend on my WR1 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-wr2",      label: "How much for WR2?",      prompt: "How much should I plan to spend on my WR2 in this auction draft? Use the price sheet and my budget." },
   { id: "qp-te1",      label: "How much for TE1?",      prompt: "How much should I plan to spend on my TE1 in this auction draft? Use the price sheet and my budget." },
-  { id: "qp-flex",     label: "How much for FLEX?",     prompt: "How much should I plan to spend on my FLEX spot in this auction draft? Use the price sheet and my budget." },
+  { id: "qp-plan",     label: "Build me a $225 plan",   prompt: "Build me a complete $225 auction budget plan for this Superflex league. Show how much to spend on each starting position and bench, and explain the strategy." },
   { id: "qp-value",    label: "Best value left?",       prompt: "Who is the single best value still available based on the price sheet, and why?" },
   { id: "qp-sleep-qb", label: "Top 3 sleeper QBs?",     prompt: "Who are the top 3 sleeper quarterbacks still available and what should I expect to pay?" },
   { id: "qp-sleep-rb", label: "Top 3 sleeper RBs?",     prompt: "Who are the top 3 sleeper running backs still available and what should I expect to pay?" },
@@ -310,7 +310,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 10,
+      version: 11,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -360,6 +360,10 @@ export const useDraftStore = create<DraftState>()(
         }
         // v10: refresh default quick prompts to the spend-focused set.
         if (persisted && version < 10) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
+        }
+        // v11: add "build me a $225 plan" prompt to defaults.
+        if (persisted && version < 11) {
           persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
         return persisted;
