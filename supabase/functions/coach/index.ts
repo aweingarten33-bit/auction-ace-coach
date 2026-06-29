@@ -419,8 +419,7 @@ Deno.serve(async (req: Request) => {
         sources,
         confidence,
         debug: {
-          undraftedPriceCount: pricesCount,
-          draftedCount,
+          priceCount,
           historyTurns: payload.history?.length ?? 0,
           systemPromptChars: sysPrompt.length,
           userMessageChars: userMsg.length,
