@@ -363,8 +363,11 @@ export default function DraftRoom() {
             <SheetContent side="right" className="flex w-[92%] max-w-md flex-col p-0 sm:w-[420px]">
               <SheetHeader className="border-b border-border/60 px-4 py-3">
                 <SheetTitle className="flex items-center gap-2 text-sm font-semibold">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-[0_0_12px_hsl(var(--accent)/0.45)]">
-                    <Sparkles className="h-4 w-4 !text-black" strokeWidth={1.75} />
+                  <span
+                    className="flex h-9 w-9 items-center justify-center rounded-full"
+                    style={{ backgroundColor: "#ffffff", boxShadow: "0 0 18px hsl(var(--accent) / 0.55)" }}
+                  >
+                    <Sparkles size={18} strokeWidth={1.75} style={{ color: "#000000" }} />
                   </span>
                   Ask the Coach
                 </SheetTitle>
