@@ -397,7 +397,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const hasMessages = history.length > 0;
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="flex h-full flex-col overflow-hidden overflow-x-hidden overscroll-x-none">
 
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-3 py-3 text-sm">
         {loading && (
