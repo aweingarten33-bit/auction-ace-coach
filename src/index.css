@@ -230,7 +230,15 @@
   }
   h1 { font-weight: 700; letter-spacing: -0.02em; }
 
-  ::selection { background: hsl(var(--primary) / 0.35); color: hsl(var(--foreground)); }
+  ::selection { background: hsl(var(--primary) / 0.35); color: hsl(0 0% 100%); }
+
+  /* ---------- ALL TEXT WHITE (user request) ----------
+     Backgrounds keep their colors; every word renders pure white. */
+  html, body, body * {
+    color: #ffffff !important;
+  }
+  ::placeholder { color: rgba(255,255,255,0.65) !important; }
+  input, textarea, select { color: #ffffff !important; caret-color: #ffffff; }
 }
 
 /* =====================================================================
