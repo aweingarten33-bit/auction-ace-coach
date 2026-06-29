@@ -310,7 +310,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 11,
+      version: 12,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -365,6 +365,13 @@ export const useDraftStore = create<DraftState>()(
         // v11: add "build me a $225 plan" prompt to defaults.
         if (persisted && version < 11) {
           persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
+        }
+        // v12: strip any standalone "FLEX" quick prompts (user-edited or cached).
+        if (persisted && persisted.quickPrompts) {
+          const flexRe = /\bFLEX\b/i;
+          persisted.quickPrompts = persisted.quickPrompts.filter(
+            (p: QuickPrompt) => !flexRe.test(p.label) && !flexRe.test(p.prompt),
+          );
         }
         return persisted;
       },
