@@ -374,6 +374,10 @@ export const useDraftStore = create<DraftState>()(
             (p: QuickPrompt) => !flexRe.test(p.label) && !flexRe.test(p.prompt),
           );
         }
+        // v13: add "How much for WR3?" to defaults.
+        if (persisted && version < 13) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
+        }
         return persisted;
       },
     }
