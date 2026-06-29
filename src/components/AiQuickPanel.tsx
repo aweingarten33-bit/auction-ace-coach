@@ -4,7 +4,7 @@
 //   renders them as cards with a one-tap "Apply to planner" button.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, Send, Plus, Check, X, RotateCcw } from "lucide-react";
+import { Sparkles, Send, Plus, Check, X, RotateCcw, Square, AlertTriangle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
