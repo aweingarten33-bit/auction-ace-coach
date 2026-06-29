@@ -406,6 +406,24 @@ export default function AiQuickPanel({ coachContext }: Props) {
             </div>
           </div>
         )}
+        {streaming && !streamingText && (
+          <div className="flex gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
+              <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary [animation-delay:0.15s]" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary [animation-delay:0.3s]" />
+                  Coach is thinking
+                </span>
+              </div>
+              {streamingMeta && <CoachMeta meta={streamingMeta} />}
+            </div>
+          </div>
+        )}
 
       </div>
 
