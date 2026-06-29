@@ -237,6 +237,12 @@
   html, body, body * {
     color: #ffffff !important;
   }
+
+  /* Text that is meant to sit on a light surface must stay dark. */
+  .text-background {
+    color: hsl(var(--background)) !important;
+  }
+
   ::placeholder { color: rgba(255,255,255,0.65) !important; }
   input, textarea, select { color: #ffffff !important; caret-color: #ffffff; }
 
