@@ -11,7 +11,7 @@ import SetupWizard from "./pages/SetupWizard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import EspnSettings from "./pages/EspnSettings.tsx";
 import Admin from "./pages/Admin.tsx";
-import TeamPicker from "./pages/TeamPicker.tsx";
+
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { LockProvider, useLock } from "@/hooks/useLock";
 import Preloader from "@/components/Preloader";
@@ -67,7 +67,7 @@ function AppRoutes() {
             <Route path="/" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/index" element={<PublicGate><Landing /></PublicGate>} />
             <Route path="/landing" element={<PublicGate><Landing /></PublicGate>} />
-            <Route path="/team" element={<TeamPicker />} />
+            <Route path="/team" element={<Navigate to="/draft-room" replace />} />
             <Route path="/auth" element={<Navigate to="/espn" replace />} />
             <Route path="/draft-room" element={<PublicGate><DraftRoom /></PublicGate>} />
             <Route path="/setup" element={<Protected><SetupWizard /></Protected>} />
