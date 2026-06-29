@@ -372,7 +372,7 @@ Deno.serve(async (req: Request) => {
           const fcRes = await fetch("https://api.firecrawl.dev/v2/search", {
             method: "POST",
             headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ query: searchQuery, limit: 10, tbs: "qdr:m" }),
+            body: JSON.stringify({ query: searchQuery, limit: 10, tbs: "qdr:w" }),
           });
           if (fcRes.ok) {
             let fc: unknown = null;
