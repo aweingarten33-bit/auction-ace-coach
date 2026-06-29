@@ -174,6 +174,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const ask = useCallback(
     async (question: string) => {
       if (!question.trim() || streaming) return;
+      setLastError(null);
       const userMsg: ChatMessage = {
         id: `local-${Date.now()}-u`,
         role: "user",
@@ -185,24 +186,32 @@ export default function AiQuickPanel({ coachContext }: Props) {
       setStreaming(true);
       setStreamingText("");
       setStreamingMeta(null);
-      // Fire-and-forget persistence.
       persistMessage(userMsg).then((id) => {
         if (id) setHistory((h) => h.map((m) => (m === userMsg ? { ...m, id } : m)));
       });
 
+      const controller = new AbortController();
+      abortRef.current = controller;
+      let gotFirstToken = false;
+      // Stall timeout — 30s with zero output → auto-abort with retry.
+      const stallTimer = setTimeout(() => {
+        if (!gotFirstToken) controller.abort("stall");
+      }, 30000);
+
       let acc = "";
       let capturedMeta: CoachMetaT | null = null;
+      let aborted = false;
+      let stalled = false;
       try {
         const ctx = coachContext();
         await streamCoach(
           {
             ...ctx,
             userQuestion: question,
-            history: history
-              .slice(-6)
-              .map((m) => ({ role: m.role, content: m.content })),
+            history: history.slice(-6).map((m) => ({ role: m.role, content: m.content })),
           },
           (chunk) => {
+            if (!gotFirstToken) gotFirstToken = true;
             acc += chunk;
             setStreamingText(extractProposal(acc).clean);
             scrollRef.current?.scrollTo({ top: 1e9 });
@@ -211,15 +220,31 @@ export default function AiQuickPanel({ coachContext }: Props) {
             capturedMeta = meta;
             setStreamingMeta(meta);
           },
+          controller.signal,
         );
       } catch (e) {
-        const msg = e instanceof ApiError ? e.message : "Coach unavailable.";
-        toast.error(msg);
-        acc = acc || "⚠️ Coach unavailable — try again.";
+        if (controller.signal.aborted) {
+          aborted = true;
+          stalled = (controller.signal.reason as string) === "stall" || !gotFirstToken;
+        } else {
+          const msg = e instanceof ApiError ? e.message : "Coach unavailable.";
+          toast.error(msg);
+          setLastError({ message: msg, question });
+        }
       } finally {
+        clearTimeout(stallTimer);
+        abortRef.current = null;
         setStreaming(false);
-        if (acc) {
-          const { clean, proposal } = extractProposal(acc);
+        if (stalled && !acc) {
+          setLastError({
+            message: "Coach didn't respond within 30s. Network or AI gateway may be slow.",
+            question,
+          });
+        } else if (aborted && !acc) {
+          // user-stopped, no output — just clean up silently
+        } else if (acc) {
+          const tail = aborted ? "\n\n_Stopped._" : "";
+          const { clean, proposal } = extractProposal(acc + tail);
           const assistantMsg: ChatMessage = {
             id: `local-${Date.now()}-a`,
             role: "assistant",
@@ -252,6 +277,10 @@ export default function AiQuickPanel({ coachContext }: Props) {
 
     [coachContext, history, persistMessage, streaming],
   );
+
+  const stop = useCallback(() => {
+    abortRef.current?.abort("user");
+  }, []);
 
   const newChat = useCallback(async () => {
     if (streaming) return;
