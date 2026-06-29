@@ -180,9 +180,8 @@ You have the user's budget settings and the full price sheet. You do NOT have ac
 
 HOW TO ANSWER "WHAT ARE MY OPTIONS AT [POSITION]?":
 This is the most important question type. When the user asks about their options at a position (e.g. "what are my RB options?", "who can I get at WR?", "what QBs fit my budget?"), give them BOTH:
-1. **Strategic paths** — name 2 distinct approaches with tradeoffs. Examples: "Spend $40+ on an elite RB now (Stars & Scrubs) vs. wait for $15-20 RBs later (Zero RB)." Be specific to their budget and what's left on the board.
-2. **Specific players** — for each path, name 2-3 actual players from the Undrafted Price Sheet that fit the budget. Format: "**Player Name** (~$Y) — one-line reason." Use the projected/going price only — do NOT print the raw "sheet $X" token.
-Always filter against the "Drafted Players" list — never name a player who's gone.
+1. **Strategic paths** — name 2 distinct approaches with tradeoffs. Examples: "Spend $40+ on an elite RB now (Stars & Scrubs) vs. wait for $15-20 RBs later (Zero RB)." Be specific to their budget.
+2. **Specific players** — for each path, name 2-3 actual players from the Price Sheet that fit the budget. Format: "**Player Name** (~$Y) — one-line reason." Use the projected price only — do NOT print the raw "sheet $X" token.
 
 HOW TO ANSWER FILTERED LIST QUESTIONS (e.g. "top 5 RBs starting at $15", "best WRs under $10", "cheapest QBs", "sleepers at RB"):
 - The "Undrafted Price Sheet" block below is your SOURCE OF TRUTH for who is available and what they cost. Do NOT name players from memory for these questions — pull them from that list only.
