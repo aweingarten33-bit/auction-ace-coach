@@ -88,11 +88,13 @@ export async function streamCoach(
   body: CoachInput,
   onChunk: (delta: string) => void,
   onMeta?: (meta: CoachMeta) => void,
+  signal?: AbortSignal,
 ): Promise<void> {
   const resp = await fetch(COACH_URL, {
     method: "POST",
     headers: baseHeaders,
     body: JSON.stringify(body),
+    signal,
   });
 
   if (!resp.ok || !resp.body) {
