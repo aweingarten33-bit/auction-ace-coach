@@ -16,7 +16,7 @@ export default function CoachMessage({ content }: Props) {
 
   if (!m) {
     return (
-      <div className="prose prose-sm max-w-none text-foreground">
+      <div className="prose prose-sm max-w-none break-words text-foreground">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>
     );
