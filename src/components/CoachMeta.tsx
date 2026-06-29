@@ -2,7 +2,7 @@
 // for a single coach reply. All data comes from the edge function meta event;
 // nothing is persisted (intentionally session-only).
 import { useState } from "react";
-import { ChevronDown, ChevronRight, ExternalLink, Bug, FileText, Globe } from "lucide-react";
+import { ChevronDown, ChevronRight, ExternalLink, FileText, Globe } from "lucide-react";
 import type { CoachMeta } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
@@ -22,8 +22,7 @@ function hostOf(url: string) {
 
 export default function CoachMeta({ meta }: Props) {
   const [showSources, setShowSources] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
-  const { confidence, sources, searched, searchReason, firecrawlCache, debug, searchQuery } = meta;
+  const { confidence, sources, searched, firecrawlCache } = meta;
   const pdfPct = Math.round(confidence.pdf * 100);
   const webPct = Math.round(confidence.web * 100);
 
