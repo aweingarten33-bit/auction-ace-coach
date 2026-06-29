@@ -26,22 +26,22 @@
     --popover:           216 24% 32%;         /* even lighter popover */
     --popover-foreground:40 35% 97%;
 
-    /* ---------- ACCENTS — Burgundy seal + White ---------- */
-    --primary:           350 55% 42%;         /* oxblood burgundy */
+    /* ---------- ACCENTS — Bright red + White ---------- */
+    --primary:           0 90% 55%;         /* bright signal red */
     --primary-foreground: 40 35% 97%;
-    --primary-glow:      350 58% 52%;
+    --primary-glow:      0 95% 60%;
 
     --secondary:         216 22% 36%;         /* lifted secondary surface */
     --secondary-foreground: 40 35% 97%;
 
     --accent:            40 35% 97%;
     --accent-foreground: 216 42% 12%;
-    --accent-secondary:  350 55% 42%;
+    --accent-secondary:  0 90% 55%;
 
     --muted:             216 22% 32%;
     --muted-foreground:  216 14% 82%;
 
-    --destructive:       350 55% 45%;
+    --destructive:       0 90% 55%;
     --destructive-foreground: 40 35% 97%;
 
     --warning:           40 35% 97%;
@@ -85,12 +85,12 @@
     --brass:             40 35% 96%;
     --brass-light:       40 40% 99%;
     --brass-dark:        40 20% 78%;
-    --crimson:           350 55% 42%;
-    --crimson-spatter:   350 55% 42%;
+    --crimson:           0 90% 55%;
+    --crimson-spatter:   0 90% 55%;
     --parchment:         40 35% 96%;
     --ink-faded:         216 14% 72%;
     --wood-grain:        216 36% 18%;
-    --bloodred:          350 55% 42%;
+    --bloodred:          0 90% 55%;
     --steel:             216 12% 70%;
     --sungold:           40 35% 96%;
     --sungold-2:         40 40% 99%;

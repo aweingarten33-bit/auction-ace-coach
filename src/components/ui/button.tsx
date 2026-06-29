@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 /**
  * Neumorphism (Soft UI) — Button.
  * Same-surface pillows. Dual opposing shadows. Soft press on active.
- * Suit palette: navy primary, ochre gold, maroon destructive.
+ * Suit palette: navy primary, white accent, bright red destructive.
  */
 const buttonVariants = cva(
   [
