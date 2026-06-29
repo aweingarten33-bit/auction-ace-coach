@@ -238,9 +238,24 @@
     color: #ffffff !important;
   }
 
-  /* Text that is meant to sit on a light surface must stay dark. */
-  .text-background {
-    color: hsl(var(--background)) !important;
+  /* Dark text on light/glowing surfaces so white text never blends in. */
+  .bg-foreground,
+  .bg-white,
+  .bg-accent,
+  .bg-warning,
+  .bg-success,
+  .text-background,
+  .text-accent-foreground,
+  .text-warning-foreground,
+  .text-success-foreground,
+  [class*="bg-foreground"]:not([class*="bg-foreground/"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
+  [class*="bg-accent"]:not([class*="bg-accent/"]):not([class*="bg-accent-foreground"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
+  [class*="bg-warning"]:not([class*="bg-warning/"]):not([class*="bg-warning-foreground"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
+  [class*="bg-success"]:not([class*="bg-success/"]):not([class*="bg-success-foreground"]):is(:focus, :focus-visible, :hover, [data-state="on"], [data-state="open"]),
+  [class*="text-accent-foreground"]:is(:focus, :focus-visible, [data-state="on"]),
+  [class*="text-warning-foreground"]:is(:focus, :focus-visible, [data-state="on"]),
+  [class*="text-success-foreground"]:is(:focus, :focus-visible, [data-state="on"]) {
+    color: #000000 !important;
   }
 
   ::placeholder { color: rgba(255,255,255,0.65) !important; }
