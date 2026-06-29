@@ -101,8 +101,28 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const [input, setInput] = useState("");
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [stepIdx, setStepIdx] = useState(0);
+  const [lastError, setLastError] = useState<{ message: string; question: string } | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const ANALYSIS_STEPS = [
+    "Checking roster + needs…",
+    "Running budget math…",
+    "Scanning price sheet for value…",
+    "Pulling fresh notes from the web…",
+    "Drafting recommendation…",
+  ];
+
+  useEffect(() => {
+    if (!streaming || streamingText) return;
+    setStepIdx(0);
+    const t = setInterval(() => {
+      setStepIdx((i) => (i + 1) % ANALYSIS_STEPS.length);
+    }, 1400);
+    return () => clearInterval(t);
+  }, [streaming, streamingText]);
 
   // Load saved messages once when an authed user is available.
   useEffect(() => {
