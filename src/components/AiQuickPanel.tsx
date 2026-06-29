@@ -571,7 +571,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
               onClick={() => ask(input)}
               disabled={!input.trim()}
               size="sm"
-              className="h-8 w-8 shrink-0 rounded-full p-0"
+              className="h-8 w-8 shrink-0 rounded-full border border-white/20 !bg-black p-0 !text-white hover:!bg-black/90"
             >
               <Send className="h-3.5 w-3.5" />
             </Button>
