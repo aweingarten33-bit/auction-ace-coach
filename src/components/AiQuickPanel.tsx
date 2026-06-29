@@ -416,8 +416,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
         )}
         {!loading && !hasMessages && !streaming && (
           <div className="flex gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
-              <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_0_10px_hsl(var(--accent)/0.4)]">
+              <Sparkles className="h-3.5 w-3.5 !text-black" strokeWidth={1.75} />
             </div>
             <div className="text-[12px] text-muted-foreground">
               I can see your budget board. Ask me to build a plan, swap a player, or sanity-check your $225 — I'll show you the math and offer to update the planner with one tap.
@@ -433,8 +433,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
             </div>
           ) : (
             <div key={m.id} className="flex gap-2">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
-                <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_0_10px_hsl(var(--accent)/0.4)]">
+                <Sparkles className="h-3.5 w-3.5 !text-black" strokeWidth={1.75} />
               </div>
               <div className="min-w-0 flex-1">
                 <CoachMessage content={m.content} />
@@ -446,8 +446,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
         )}
         {streaming && streamingText && (
           <div className="flex gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
-              <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_0_10px_hsl(var(--accent)/0.4)]">
+              <Sparkles className="h-3.5 w-3.5 animate-pulse !text-black" strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -463,8 +463,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
         )}
         {streaming && !streamingText && (
           <div className="flex gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted">
-              <Sparkles className="h-3.5 w-3.5 animate-pulse text-muted-foreground" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_0_10px_hsl(var(--accent)/0.4)]">
+              <Sparkles className="h-3.5 w-3.5 animate-pulse !text-black" strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="text-[13px] font-medium text-foreground">
