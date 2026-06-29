@@ -358,6 +358,10 @@ export const useDraftStore = create<DraftState>()(
         if (persisted && version < 9) {
           persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
+        // v10: refresh default quick prompts to the spend-focused set.
+        if (persisted && version < 10) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
+        }
         return persisted;
       },
     }
