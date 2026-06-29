@@ -191,7 +191,7 @@ export default function Landing() {
           style={{ animation: "fade-in 0.6s 1.2s ease-out both" }}
         >
           <Link
-            to="/team"
+            to="/draft-room"
             className="group relative flex w-full items-center justify-center gap-3 overflow-hidden border border-red-400 bg-gradient-to-b from-red-500 to-red-600 py-4 text-center font-bebas text-xl tracking-[0.3em] text-white transition hover:from-red-400 hover:to-red-500"
             style={{ animation: "cta-glow 2.4s ease-in-out infinite" }}
           >
