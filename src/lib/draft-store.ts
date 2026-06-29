@@ -311,7 +311,7 @@ export const useDraftStore = create<DraftState>()(
     }),
     {
       name: "auction-draft-coach-v1",
-      version: 8,
+      version: 9,
       migrate: (persisted: any, version: number) => {
         if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
@@ -354,6 +354,10 @@ export const useDraftStore = create<DraftState>()(
         // v8: drop DraftSharks — prices come from PDF only.
         if (persisted && version < 8) {
           persisted.prices = [];
+        }
+        // v9: refresh default quick prompts to the new sleeper-focused set.
+        if (persisted && version < 9) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
         return persisted;
       },

@@ -4,7 +4,7 @@
 //   renders them as cards with a one-tap "Apply to planner" button.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Sparkles, Send, Plus, Check, X, RotateCcw, Square, AlertTriangle } from "lucide-react";
+import { Sparkles, Send, Plus, Check, X, RotateCcw, Square, AlertTriangle, Pencil } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CoachMessage from "@/components/CoachMessage";
 import CoachMeta from "@/components/CoachMeta";
+import QuickPromptsEditor from "@/components/QuickPromptsEditor";
 import { ApiError, streamCoach, type CoachMeta as CoachMetaT } from "@/lib/api";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useDraftStore } from "@/lib/draft-store";
+import { useDraftStore, type QuickPrompt } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -42,19 +43,6 @@ interface ChatMessage {
   proposal: PlannerProposal | null;
 }
 
-const QUICK_PROMPTS = [
-  "Does my current build fit $225?",
-  "Find me a cheap backup QB",
-  "Where am I weakest?",
-  "Build me a $225 plan",
-  "Best QB value left?",
-  "Best RB value left?",
-  "Best WR value left?",
-  "Best TE value left?",
-  "What's running dry at each position?",
-  "How much should I spend on RB1?",
-  "Stars-and-scrubs or balanced build?",
-];
 
 const PROPOSAL_OPEN = "<<<PLANNER_PROPOSAL>>>";
 const PROPOSAL_CLOSE = "<<<END>>>";
@@ -92,6 +80,9 @@ export default function AiQuickPanel({ coachContext }: Props) {
   const slotAllocations = useDraftStore((s) => s.slotAllocations);
   const slotNotes = useDraftStore((s) => s.slotNotes);
   const lockedSlots = useDraftStore((s) => s.lockedSlots);
+  const quickPrompts = useDraftStore((s) => s.quickPrompts);
+  const setQuickPrompts = useDraftStore((s) => s.setQuickPrompts);
+  const resetQuickPrompts = useDraftStore((s) => s.resetQuickPrompts);
 
   const [history, setHistory] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -532,18 +523,23 @@ export default function AiQuickPanel({ coachContext }: Props) {
       <div className="border-t border-border/60 px-3 pb-3 pt-2">
         {!hasMessages && (
           <div className="mb-2 flex flex-wrap gap-1.5">
-            {QUICK_PROMPTS.map((p) => (
+            {quickPrompts.map((p: QuickPrompt) => (
               <Button
-                key={p}
+                key={p.id}
                 size="sm"
                 variant="outline"
                 disabled={streaming}
-                onClick={() => ask(p)}
+                onClick={() => ask(p.prompt)}
                 className="h-7 rounded-full px-2.5 text-[11px] font-normal"
               >
-                {p}
+                {p.label}
               </Button>
             ))}
+            <QuickPromptsEditor
+              prompts={quickPrompts}
+              onSave={setQuickPrompts}
+              onReset={resetQuickPrompts}
+            />
           </div>
         )}
         <div className="flex items-center gap-2 rounded-2xl border-2 border-primary/40 bg-background px-3 py-1.5 focus-within:border-primary">
