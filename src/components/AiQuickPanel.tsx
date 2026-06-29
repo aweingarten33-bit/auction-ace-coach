@@ -370,11 +370,12 @@ export default function AiQuickPanel({ coachContext }: Props) {
             <div className="flex gap-2">
               <Button
                 size="sm"
-                className="h-7 flex-1 gap-1 rounded-lg text-[11px]"
+                className="h-7 flex-1 gap-1 rounded-lg bg-primary text-[11px] !text-primary-foreground hover:bg-primary/90"
                 onClick={() => applyProposal(proposal, messageId)}
               >
-                <Check className="h-3 w-3" /> Apply to planner
+                <Check className="h-3 w-3 !text-primary-foreground" /> <span className="!text-primary-foreground">Apply to planner</span>
               </Button>
+
               <Button
                 size="sm"
                 variant="outline"
