@@ -416,8 +416,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
         )}
         {!loading && !hasMessages && !streaming && (
           <div className="flex gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#ffffff", boxShadow: "0 0 14px hsl(var(--accent) / 0.5)" }}>
-              <Sparkles size={16} strokeWidth={1.75} style={{ color: "#000000" }} />
+            <div className="coach-ai-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+              <Sparkles className="coach-ai-mark-icon" size={16} strokeWidth={1.75} />
             </div>
             <div className="text-[12px] text-muted-foreground">
               I can see your budget board. Ask me to build a plan, swap a player, or sanity-check your $225 — I'll show you the math and offer to update the planner with one tap.
@@ -433,8 +433,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
             </div>
           ) : (
             <div key={m.id} className="flex gap-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#ffffff", boxShadow: "0 0 14px hsl(var(--accent) / 0.5)" }}>
-                <Sparkles size={16} strokeWidth={1.75} style={{ color: "#000000" }} />
+              <div className="coach-ai-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+                <Sparkles className="coach-ai-mark-icon" size={16} strokeWidth={1.75} />
               </div>
               <div className="min-w-0 flex-1">
                 <CoachMessage content={m.content} />
@@ -446,8 +446,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
         )}
         {streaming && streamingText && (
           <div className="flex gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#ffffff", boxShadow: "0 0 14px hsl(var(--accent) / 0.5)" }}>
-              <Sparkles size={16} strokeWidth={1.75} className="animate-pulse" style={{ color: "#000000" }} />
+            <div className="coach-ai-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+              <Sparkles className="coach-ai-mark-icon animate-pulse" size={16} strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -463,8 +463,8 @@ export default function AiQuickPanel({ coachContext }: Props) {
         )}
         {streaming && !streamingText && (
           <div className="flex gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full" style={{ backgroundColor: "#ffffff", boxShadow: "0 0 14px hsl(var(--accent) / 0.5)" }}>
-              <Sparkles size={16} strokeWidth={1.75} className="animate-pulse" style={{ color: "#000000" }} />
+            <div className="coach-ai-mark flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+              <Sparkles className="coach-ai-mark-icon animate-pulse" size={16} strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1 space-y-1.5">
               <div className="text-[13px] font-medium text-foreground">
