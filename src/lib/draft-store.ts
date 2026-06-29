@@ -32,8 +32,10 @@ export const DEFAULT_QUICK_PROMPTS: QuickPrompt[] = [
   { id: "qp-te-value",  label: "Best TE value left?",      prompt: "Who's the best tight end value still available and what should I pay?" },
   { id: "qp-rb-spend",  label: "How much for my RB1?",     prompt: "Given my budget and what's left, how much should I allocate for my starting RB and my backup RBs?" },
   { id: "qp-strategy",  label: "Stars or balanced?",       prompt: "Should I pivot to a stars-and-scrubs build or stay balanced given how the draft is going?" },
-  { id: "qp-sleepers",  label: "Best sleepers left?",      prompt: "Who are the best sleeper or undervalued players still available, and what should I expect to pay?" },
-  { id: "qp-sleeper-target", label: "Which sleeper to target?", prompt: "Based on my roster and budget, which sleeper player should I target next and why?" },
+  { id: "qp-sleepers-te", label: "Top 3 sleeper TEs?",      prompt: "Who are the top 3 sleeper tight ends still available and what should I expect to pay?" },
+  { id: "qp-sleepers-qb", label: "Top 3 sleeper QBs?",      prompt: "Who are the top 3 sleeper quarterbacks still available and what should I expect to pay?" },
+  { id: "qp-sleepers-rb", label: "Top 3 sleeper RBs?",      prompt: "Who are the top 3 sleeper running backs still available and what should I expect to pay?" },
+  { id: "qp-sleepers-wr", label: "Top 3 sleeper WRs?",      prompt: "Who are the top 3 sleeper wide receivers still available and what should I expect to pay?" },
 ];
 
 
