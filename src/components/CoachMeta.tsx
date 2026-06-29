@@ -18,8 +18,6 @@ export default function CoachMeta({ meta }: Props) {
 
   return (
     <div className="mt-2 space-y-1.5 text-[11px]">
-
-
       {/* Sources panel */}
       {sources.length > 0 && (
         <div className="rounded-lg border border-border/60 bg-muted/30">
