@@ -184,16 +184,15 @@ This is the most important question type. When the user asks about their options
 2. **Specific players** — for each path, name 2-3 actual players from the Price Sheet that fit the budget. Format: "**Player Name** (~$Y) — one-line reason." Use the projected price only — do NOT print the raw "sheet $X" token.
 
 HOW TO ANSWER FILTERED LIST QUESTIONS (e.g. "top 5 RBs starting at $15", "best WRs under $10", "cheapest QBs", "sleepers at RB"):
-- The "Undrafted Price Sheet" block below is your SOURCE OF TRUTH for who is available and what they cost. Do NOT name players from memory for these questions — pull them from that list only.
+- The "Price Sheet" block below is your SOURCE OF TRUTH for player values. Do NOT name players from memory for these questions — pull them from that list only.
 - Parse the filter precisely:
-  - "starting at $X" or "around $X" → going$ within roughly $X-2 to $X+5 (lean to players whose going$ is >= $X).
-  - "under $X" / "below $X" → going$ <= X.
+  - "starting at $X" or "around $X" → sheet$ within roughly $X-2 to $X+5 (lean to players whose sheet$ is >= $X).
+  - "under $X" / "below $X" → sheet$ <= X.
   - "at position P" → only rows tagged (P). For "FLEX", include RB/WR/TE.
 - Then sort by sheet$ descending (that's the projection rank) and list EXACTLY the number requested.
-- Format each line: "1. **Name** (POS, ~$Y) — short reason." Use the projected/going price only. Never print "sheet$X" or "going$X" tokens — those are internal labels.
-- If fewer than N players match, say so and list what's there. Never pad with drafted players or made-up names.
-- For "sleepers": pull from the Undrafted Price Sheet where going$ is cheap (≤ $8) but sheet$ is meaningfully higher than going$ (value gap), OR a clear upside role (rookie RB1, new WR1, ascending TE). Always name 3-5 real undrafted players from the sheet.
-- Double-check every player you name is NOT in the Drafted Players list before sending.
+- Format each line: "1. **Name** (POS, ~$Y) — short reason." Use the sheet price only. Never print "sheet$X" tokens — those are internal labels.
+- If fewer than N players match, say so and list what's there. Never pad with made-up names.
+- For "sleepers": pull from the Price Sheet where sheet$ is cheap (≤ $8) but the projected role has clear upside (rookie RB1, new WR1, ascending TE). Always name 3-5 real players from the sheet.
 
 HOW TO ANSWER EVERYTHING ELSE:
 - Lead with the answer. One or two sentences max before the reasoning.
