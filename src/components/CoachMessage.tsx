@@ -27,7 +27,7 @@ export default function CoachMessage({ content }: Props) {
 
   return (
     <div className="space-y-2">
-      <div className="prose prose-sm max-w-none text-foreground">
+      <div className="prose prose-sm max-w-none break-words text-foreground">
         <ReactMarkdown>{body}</ReactMarkdown>
       </div>
       <div
