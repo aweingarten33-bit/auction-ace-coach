@@ -697,7 +697,7 @@ function Top100List({
               onClick={() => setPosFilter(pos)}
               className={`flex-1 px-1 py-1.5 text-[10px] font-semibold uppercase tracking-wide transition ${
                 posFilter === pos
-                  ? "bg-foreground text-background"
+                  ? "bg-foreground text-black shadow-[0_0_12px_hsl(var(--foreground)/0.45)]"
                   : "text-muted-foreground hover:bg-secondary/40"
               }`}
             >
