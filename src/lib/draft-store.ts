@@ -362,6 +362,10 @@ export const useDraftStore = create<DraftState>()(
         if (persisted && version < 10) {
           persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
         }
+        // v11: add "build me a $225 plan" prompt to defaults.
+        if (persisted && version < 11) {
+          persisted.quickPrompts = DEFAULT_QUICK_PROMPTS;
+        }
         return persisted;
       },
     }
