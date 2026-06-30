@@ -112,7 +112,7 @@ export default function PositionBudgetBar() {
             className={cn(
               "rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
               plannerStrategy === s
-                ? "border-primary bg-primary text-primary-foreground"
+                ? "border-primary bg-primary !text-white"
                 : "border-border bg-secondary/40 text-muted-foreground hover:text-foreground",
             )}
           >
