@@ -72,9 +72,6 @@ export default function DraftRoom() {
     events,
     prices,
     setupComplete,
-    watchlist,
-    pinPlayer,
-    unpinPlayer,
     slotAllocations,
     slotNotes,
     lockedSlots,
@@ -498,42 +495,6 @@ export default function DraftRoom() {
           />
         );
       })()}
-
-      {/* Pin controls */}
-      {detailFor && (
-        <PinControls
-          name={detailFor.name}
-          isPinned={watchlist.includes(detailFor.name)}
-          onPin={pinPlayer}
-          onUnpin={unpinPlayer}
-        />
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-function PinControls({
-  name,
-  isPinned,
-  onPin,
-  onUnpin,
-}: {
-  name: string;
-  isPinned: boolean;
-  onPin: (n: string) => void;
-  onUnpin: (n: string) => void;
-}) {
-  return (
-    <div className="fixed bottom-24 left-1/2 z-[60] -translate-x-1/2" style={{ pointerEvents: "auto" }}>
-      <Button
-        size="sm"
-        variant={isPinned ? "secondary" : "default"}
-        onClick={() => (isPinned ? onUnpin(name) : onPin(name))}
-        className="shadow-lg"
-      >
-        {isPinned ? "Unpin" : "Pin to watchlist"}
-      </Button>
     </div>
   );
 }
