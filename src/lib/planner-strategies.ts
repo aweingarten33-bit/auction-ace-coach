@@ -224,6 +224,10 @@ export function rebalanceProportional(
   const slots = buildPlannerSlots(settings);
   const out: Record<string, number> = {};
 
+  // Only locked slots and fixed-dollar slots (K/DST/BENCH) are held constant.
+  // Every other starter slot — including ones the user manually edited —
+  // participates in the proportional rebalance so the plan always fits the
+  // budget when a new lock is applied.
   let reserved = 0;
   const open: PlannerSlot[] = [];
   for (const slot of slots) {
@@ -236,7 +240,7 @@ export function rebalanceProportional(
       reserved += v;
       continue;
     }
-    if (lockedSlots[slot.id] || touchedSlots[slot.id]) {
+    if (lockedSlots[slot.id]) {
       const v = Math.max(0, Number.isFinite(currentAllocations[slot.id]) ? currentAllocations[slot.id] : 0);
       out[slot.id] = v;
       reserved += v;
