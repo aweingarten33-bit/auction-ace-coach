@@ -256,9 +256,8 @@ export default function DraftRoom() {
 
       <Tabs defaultValue="planner" className="flex min-h-0 flex-1 flex-col">
         <div className="shrink-0 space-y-2 border-b border-border bg-background/95 px-2.5 pb-2 pt-2 backdrop-blur-sm">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="planner">Planner</TabsTrigger>
-            <TabsTrigger value="watchlist">Watchlist</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="planner">Budget Planner</TabsTrigger>
             <TabsTrigger value="top100">Top 350</TabsTrigger>
           </TabsList>
           {(() => {
@@ -302,14 +301,6 @@ export default function DraftRoom() {
             {events.length > 0 && (
               <LastPickImpact settings={settings} keepers={keepers} events={events} />
             )}
-          </TabsContent>
-
-          <TabsContent value="watchlist" className="mt-0">
-            <WatchlistList
-              prices={adjustedPrices}
-              events={events}
-              onPick={(name, position) => openDetails(name, position)}
-            />
           </TabsContent>
 
           <TabsContent value="top100" className="mt-0">
@@ -620,78 +611,6 @@ function SettingsDrawer({
   );
 }
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-function WatchlistList({
-  prices,
-  events,
-  onPick,
-}: {
-  prices: PriceEstimate[];
-  events: ReturnType<typeof useDraftStore.getState>["events"];
-  onPick: (name: string, position?: Position) => void;
-}) {
-  const watchlist = useDraftStore((s) => s.watchlist);
-  const unpinPlayer = useDraftStore((s) => s.unpinPlayer);
-  const drafted = useMemo(() => new Set(events.map((e) => norm(e.player))), [events]);
-  const pinned = useMemo(() => {
-    const rows = watchlist
-      .map((name) => {
-        const key = norm(name);
-        const p = prices.find((pp) => norm(pp.name) === key);
-        return p ? { name: p.name, position: p.position, price: p.price } : null;
-      })
-      .filter(Boolean) as { name: string; position?: Position; price: number }[];
-    return rows.sort((a, b) => b.price - a.price);
-  }, [watchlist, prices]);
-
-  if (watchlist.length === 0) {
-    return (
-      <div className="py-10 text-center space-y-2">
-        <p className="text-xs text-muted-foreground">Your watchlist is empty.</p>
-        <p className="text-[10px] text-muted-foreground/70">Tap a player and hit “Pin to watchlist” to add them.</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-1">
-      {pinned.length === 0 && (
-        <p className="py-6 text-center text-xs text-muted-foreground">Loading watchlist players…</p>
-      )}
-      {pinned.map((p, i) => {
-        const isPicked = drafted.has(norm(p.name));
-        return (
-          <div key={p.name} className="flex items-center gap-2">
-            <button
-              type="button"
-              disabled={isPicked}
-              onClick={() => !isPicked && onPick(p.name, p.position)}
-              className={`flex flex-1 items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isPicked ? "opacity-50" : ""}`}
-            >
-              <span className="w-6 text-right font-mono text-[10px] text-muted-foreground">{i + 1}</span>
-              {p.position && (
-                <Badge variant="outline" className={`${POS_COLORS[p.position] ?? ""} text-[10px] px-1.5 py-0`}>
-                  {p.position}
-                </Badge>
-              )}
-              <span className={`flex-1 truncate font-medium ${isPicked ? "line-through" : ""}`}>{p.name}</span>
-              <span className="font-mono tabular-nums">${p.price}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => unpinPlayer(p.name)}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-border/40 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-              aria-label={`Remove ${p.name} from watchlist`}
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 const POSITION_FILTER_OPTIONS: (Position | "ALL")[] = [
