@@ -65,9 +65,10 @@ export default function PositionBudgetBar() {
     const next: Record<string, number> = { ...slotAllocations };
     let changed = false;
     for (const id of Object.keys(computed)) {
-      if (touchedSlots[id] || lockedSlots[id]) continue;
-      if (next[id] !== computed[id]) {
-        next[id] = computed[id];
+      // Locked slots stay put. Touched slots are allowed to be rebalanced so
+      // the plan always reconciles to the total budget after a new lock.
+      if (lockedSlots[id]) continue;
+      if (!anyTouched && touchedSlots[id]) continue;
         changed = true;
       }
     }
