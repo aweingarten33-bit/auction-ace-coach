@@ -256,8 +256,9 @@ export default function DraftRoom() {
 
       <Tabs defaultValue="planner" className="flex min-h-0 flex-1 flex-col">
         <div className="shrink-0 space-y-2 border-b border-border bg-background/95 px-2.5 pb-2 pt-2 backdrop-blur-sm">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="planner">Budget Planner</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="planner">Planner</TabsTrigger>
+            <TabsTrigger value="watchlist">Watchlist</TabsTrigger>
             <TabsTrigger value="top100">Top 350</TabsTrigger>
           </TabsList>
           {(() => {
@@ -301,6 +302,14 @@ export default function DraftRoom() {
             {events.length > 0 && (
               <LastPickImpact settings={settings} keepers={keepers} events={events} />
             )}
+          </TabsContent>
+
+          <TabsContent value="watchlist" className="mt-0">
+            <WatchlistList
+              prices={adjustedPrices}
+              events={events}
+              onPick={(name, position) => openDetails(name, position)}
+            />
           </TabsContent>
 
           <TabsContent value="top100" className="mt-0">
