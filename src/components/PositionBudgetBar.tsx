@@ -90,11 +90,6 @@ export default function PositionBudgetBar() {
   }, [settings.totalBudget]);
 
   const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
-  const lockedSpend = slots
-    .filter((slot) => lockedSlots[slot.id])
-    .reduce((sum, slot) => sum + Math.max(0, Number(slotAllocations[slot.id] ?? 0)), 0);
-  const lockedCount = slots.filter((slot) => lockedSlots[slot.id]).length;
-  const budgetLeft = Math.max(0, settings.totalBudget - lockedSpend);
 
   // Pick a reference card — informational only, never touches the board.
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
@@ -177,21 +172,6 @@ export default function PositionBudgetBar() {
               Leaves roughly ${qbLeavesLow}–${qbLeavesHigh} for everything else. {summary.description}
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2 border-b border-border/50 bg-secondary/20 px-3 py-2 text-center">
-        <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Locked</div>
-          <div className="font-mono text-sm font-bold">{lockedCount}</div>
-        </div>
-        <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Spent</div>
-          <div className="font-mono text-sm font-bold">${lockedSpend}</div>
-        </div>
-        <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Budget left</div>
-          <div className="font-mono text-sm font-bold text-accent">${budgetLeft}</div>
         </div>
       </div>
 
