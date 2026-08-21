@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { CheckCircle2, DownloadCloud, Undo2 } from "lucide-react";
+import { CheckCircle2, Undo2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
@@ -9,7 +9,6 @@ import {
   computeSlotDollars,
   getStrategySummary,
   rebalanceProportional,
-  maxBid,
   STRATEGY_LABELS,
   type StrategyId,
 } from "@/lib/planner-strategies";
@@ -28,8 +27,7 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
 
 // The planner is a single always-editable board. These are reference cards
 // only — picking one just swaps the QB-target guidance shown below; it never
-// touches your numbers. "Load these numbers" is the one explicit action that
-// writes a strategy's dollars into your plan.
+// touches your numbers.
 const STRATEGIES: StrategyId[] = [
   "double-elite-qb",
   "hero-qb",
@@ -61,8 +59,8 @@ export default function PositionBudgetBar() {
   // Strategy cards above are reference-only (QB targets + spend band); the
   // only way their numbers reach the board is the explicit "Load" action.
   // The two exceptions, both explicit and predictable: correcting a locked
-  // (Drafted) price rescales the rest of the plan around it, and changing
-  // the total budget rescales the whole plan proportionally.
+  // price rescales the rest of the plan around it, and changing the total
+  // budget rescales the whole plan proportionally.
   const displayedAllocations = slotAllocations;
 
   // First time this league's plan has ever been opened, seed it from the
@@ -92,27 +90,14 @@ export default function PositionBudgetBar() {
   }, [settings.totalBudget]);
 
   const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
-  const slotsPlanned = slots.reduce((sum, slot) => sum + valueFor(slot), 0);
-  const draftedSpend = slots
+  const lockedSpend = slots
     .filter((slot) => lockedSlots[slot.id])
     .reduce((sum, slot) => sum + Math.max(0, Number(slotAllocations[slot.id] ?? 0)), 0);
-  const draftedCount = slots.filter((slot) => lockedSlots[slot.id]).length;
-  const budgetLeft = Math.max(0, settings.totalBudget - draftedSpend);
-  const openSlots = slots.filter((slot) => !lockedSlots[slot.id]).length;
-  const bidCeiling = maxBid(budgetLeft, openSlots);
+  const lockedCount = slots.filter((slot) => lockedSlots[slot.id]).length;
+  const budgetLeft = Math.max(0, settings.totalBudget - lockedSpend);
 
   // Pick a reference card — informational only, never touches the board.
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
-
-  // The one explicit action that writes a strategy's numbers into the board,
-  // preserving actual drafted spend on any slot already locked in.
-  const handleLoadStrategy = () => {
-    setSlotAllocations(computeSlotDollars(plannerStrategy, settings, {
-      lockedSlots,
-      currentAllocations: slotAllocations,
-      prices,
-    }));
-  };
 
   const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
@@ -120,7 +105,7 @@ export default function PositionBudgetBar() {
     const isLocked = !!lockedSlots[slot.id];
 
     if (isLocked) {
-      // Correcting an already-drafted price: keep it locked, rescale the
+      // Correcting an already-locked price: stays locked, rescale the
       // remaining open slots around the corrected actual spend.
       const nextCurrent = { ...slotAllocations, [slot.id]: amount };
       const rebalanced = rebalanceProportional("manual", settings, {
@@ -134,7 +119,7 @@ export default function PositionBudgetBar() {
     setSlotAllocation(slot.id, amount);
   };
 
-  const handleDraftedToggle = (slot: PlannerSlot, fixedDollar: boolean) => {
+  const handleLockToggle = (slot: PlannerSlot, fixedDollar: boolean) => {
     const isLocked = !!lockedSlots[slot.id];
     if (isLocked) {
       toggleSlotLock(slot.id);
@@ -165,23 +150,18 @@ export default function PositionBudgetBar() {
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Strategy reference</span>
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto pb-1">
+        <select
+          value={plannerStrategy}
+          onChange={(e) => selectStrategy(e.target.value as StrategyId)}
+          className="w-full rounded-md border border-border bg-secondary/40 px-2.5 py-1.5 text-[12px] font-medium text-foreground outline-none focus:border-accent"
+          aria-label="Strategy reference"
+        >
           {STRATEGIES.map((strategy) => (
-            <button
-              key={strategy}
-              type="button"
-              onClick={() => selectStrategy(strategy)}
-              className={cn(
-                "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
-                plannerStrategy === strategy
-                  ? "border-primary bg-primary !text-white"
-                  : "border-border bg-secondary/40 text-muted-foreground hover:text-foreground",
-              )}
-            >
+            <option key={strategy} value={strategy}>
               {STRATEGY_LABELS[strategy]}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
 
         <div className="mt-2 rounded-lg border border-border/50 bg-secondary/20 px-3 py-2">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -197,25 +177,17 @@ export default function PositionBudgetBar() {
               Leaves roughly ${qbLeavesLow}–${qbLeavesHigh} for everything else. {summary.description}
             </div>
           )}
-          <button
-            type="button"
-            onClick={handleLoadStrategy}
-            className="mt-2 flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] font-semibold text-primary transition hover:bg-primary/20"
-          >
-            <DownloadCloud className="h-3.5 w-3.5" />
-            Load these numbers into my plan
-          </button>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2 border-b border-border/50 bg-secondary/20 px-3 py-2 text-center">
         <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Drafted</div>
-          <div className="font-mono text-sm font-bold">{draftedCount}</div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Locked</div>
+          <div className="font-mono text-sm font-bold">{lockedCount}</div>
         </div>
         <div>
           <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Spent</div>
-          <div className="font-mono text-sm font-bold">${draftedSpend}</div>
+          <div className="font-mono text-sm font-bold">${lockedSpend}</div>
         </div>
         <div>
           <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Budget left</div>
@@ -225,7 +197,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          These numbers are yours to edit anytime. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Drafted</span>, then fix the $ to what he actually cost — the rest of your plan rescales to match. Changing your total budget above rescales everything too.
+          These numbers are yours to edit anytime. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Lock</span>, then fix the $ to what he actually cost — the rest of your plan rescales to match. Changing your total budget above rescales everything too.
         </div>
 
         <div className="space-y-1.5">
@@ -252,8 +224,8 @@ export default function PositionBudgetBar() {
                   value={note}
                   onChange={(val) => setSlotNote(slot.id, val)}
                   group={slot.group}
-                  placeholder={isLocked ? "drafted player" : "targets…"}
-                  ariaLabel={isLocked ? `${slot.label} drafted player` : `${slot.label} target players`}
+                  placeholder={isLocked ? "player name" : "targets…"}
+                  ariaLabel={isLocked ? `${slot.label} player name` : `${slot.label} target players`}
                 />
 
                 <div className="flex shrink-0 items-center gap-0.5">
@@ -273,27 +245,22 @@ export default function PositionBudgetBar() {
 
                 <button
                   type="button"
-                  onClick={() => handleDraftedToggle(slot, fixedDollar)}
+                  onClick={() => handleLockToggle(slot, fixedDollar)}
                   className={cn(
                     "flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-[10px] font-semibold transition-colors",
                     isLocked
                       ? "bg-success/15 text-success hover:bg-success/25"
                       : "border border-border text-muted-foreground hover:bg-secondary hover:text-foreground",
                   )}
-                  aria-label={isLocked ? `Undo drafted ${slot.label}` : `Mark ${slot.label} drafted at $${fixedDollar ? 1 : value}`}
-                  title={isLocked ? "Undo drafted purchase" : "Freeze this actual purchase and recalculate remaining budget"}
+                  aria-label={isLocked ? `Unlock ${slot.label}` : `Lock ${slot.label} at $${fixedDollar ? 1 : value}`}
+                  title={isLocked ? "Unlock — edit this slot's target again" : "Lock in this actual price and rescale the rest of your plan"}
                 >
                   {isLocked ? <Undo2 className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                  <span>{isLocked ? "Undo" : "Drafted"}</span>
+                  <span>{isLocked ? "Unlock" : "Lock"}</span>
                 </button>
               </div>
             );
           })}
-        </div>
-
-        <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 text-[10px] text-muted-foreground">
-          <span>Planned total: ${slotsPlanned}</span>
-          <span>Max legal single bid now: ${bidCeiling}</span>
         </div>
       </div>
     </div>

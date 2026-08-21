@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { POS_COLORS } from "@/lib/positions";
@@ -9,8 +9,6 @@ import {
   byeWeekForTeam,
   SleeperPlayer,
 } from "@/lib/sleeper";
-import { useDraftStore } from "@/lib/draft-store";
-import { buildPlannerSlots, type SlotGroup } from "@/lib/planner-slots";
 import type { AnchorEntry } from "@/lib/decision-engine";
 
 interface Props {
@@ -36,8 +34,6 @@ interface Props {
   knockoffNote?: string;
   grade?: number;
 }
-
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
 function tierTone(rank?: number): string {
   if (!rank) return "border-border bg-secondary/40 text-muted-foreground";
@@ -94,15 +90,6 @@ function statLine(pos: string | undefined, p?: SleeperPlayer["projection"]): Arr
   return out;
 }
 
-function slotAccepts(group: SlotGroup, pos?: Position): boolean {
-  if (!pos) return false;
-  if (group === pos) return true;
-  if (group === "SUPERFLEX") return pos === "QB" || pos === "RB" || pos === "WR" || pos === "TE";
-  if (group === "FLEX") return pos === "RB" || pos === "WR" || pos === "TE";
-  if (group === "BENCH") return true;
-  return false;
-}
-
 export default function PlayerDetailsOverlay({
   open,
   onOpenChange,
@@ -111,17 +98,9 @@ export default function PlayerDetailsOverlay({
   sheetPrice,
   posRank,
   overallRank,
-  remaining,
-  maxBid,
-  slotsLeft,
 }: Props) {
   const [meta, setMeta] = useState<SleeperPlayer | null | undefined>(undefined);
   const [loading, setLoading] = useState(false);
-
-  const settings = useDraftStore((s) => s.settings);
-  const slotAllocations = useDraftStore((s) => s.slotAllocations);
-  const slotNotes = useDraftStore((s) => s.slotNotes);
-  const lockedSlots = useDraftStore((s) => s.lockedSlots);
 
   useEffect(() => {
     if (!open || !name) return;
@@ -147,52 +126,6 @@ export default function PlayerDetailsOverlay({
   const projGames = proj?.games;
   const ppg = projPts != null && projGames != null && projGames > 0 ? (projPts / projGames).toFixed(1) : null;
   const expectedPrice = sheetPrice;
-
-  // Which open roster slot this player would fill, and what you budgeted for it.
-  const planMatch = useMemo(() => {
-    if (!pos) return null;
-    const slots = buildPlannerSlots(settings).filter((s) => !lockedSlots[s.id] && slotAccepts(s.group, pos));
-    if (!slots.length) return null;
-    const key = norm(name);
-    const named = slots.find((s) => norm(slotNotes[s.id] ?? "").includes(key));
-    const slot = named ?? slots[0];
-    return {
-      label: slot.label,
-      dollars: Number(slotAllocations[slot.id] ?? 0),
-    };
-  }, [lockedSlots, name, pos, settings, slotAllocations, slotNotes]);
-
-  // One plain-English verdict: does the expected price fit what you budgeted
-  // for the roster spot this player would fill?
-  const verdict = useMemo(() => {
-    if (expectedPrice == null) return { tone: "neutral" as const, headline: "No expected price yet" };
-    if (!planMatch || planMatch.dollars <= 0) {
-      return { tone: "neutral" as const, headline: "No budget set for this spot yet" };
-    }
-    const delta = expectedPrice - planMatch.dollars;
-    if (delta <= 0) return { tone: "good" as const, headline: `Fits your ${planMatch.label} budget ($${planMatch.dollars})` };
-    if (delta <= 3) return { tone: "warn" as const, headline: `$${delta} over your ${planMatch.label} budget ($${planMatch.dollars})` };
-    return { tone: "bad" as const, headline: `$${delta} over your ${planMatch.label} budget ($${planMatch.dollars})` };
-  }, [expectedPrice, planMatch]);
-
-  const verdictBoxTone = verdict.tone === "good"
-    ? "border-success/40 bg-success/10"
-    : verdict.tone === "warn"
-      ? "border-warning/40 bg-warning/10"
-      : verdict.tone === "bad"
-        ? "border-destructive/40 bg-destructive/10"
-        : "border-border/60 bg-secondary/30";
-
-  const verdictTextTone = verdict.tone === "good"
-    ? "text-success"
-    : verdict.tone === "warn"
-      ? "text-warning"
-      : verdict.tone === "bad"
-        ? "text-destructive"
-        : "text-foreground";
-
-  const afterExpected = expectedPrice != null && remaining != null ? remaining - expectedPrice : null;
-  const legal = expectedPrice == null || maxBid == null || expectedPrice <= maxBid;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -228,19 +161,6 @@ export default function PlayerDetailsOverlay({
                 </>
               ) : "—"}
             />
-          </div>
-
-          <div className={`rounded-md border p-3 text-[11px] ${verdictBoxTone}`}>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Budget fit</p>
-            <p className={`text-sm font-bold ${verdictTextTone}`}>{verdict.headline}</p>
-            {expectedPrice != null && remaining != null && (
-              <p className="mt-1 text-foreground/80">
-                Win him for ${expectedPrice} and you'd have ${Math.max(0, afterExpected ?? 0)} left{slotsLeft != null ? ` for ${Math.max(0, slotsLeft - 1)} more roster spots` : ""}.
-              </p>
-            )}
-            {!legal && maxBid != null && (
-              <p className="mt-1 font-semibold text-destructive">That's above the most you can legally bid right now (${maxBid}).</p>
-            )}
           </div>
 
           <div className="rounded-md border border-border/60 bg-secondary/30 p-3">

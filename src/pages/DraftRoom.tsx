@@ -432,7 +432,7 @@ function Top350List({
     <div className="space-y-2">
       <div className="rounded-lg border border-border/50 bg-secondary/20 px-3 py-2">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Your league Expected Price</div>
-        <div className="mt-0.5 text-[11px] text-muted-foreground">One number per player. Drafted players come directly from the Budget Planner.</div>
+        <div className="mt-0.5 text-[11px] text-muted-foreground">One number per player. Locked players come directly from the Budget Planner.</div>
       </div>
 
       <div className="relative">
@@ -472,14 +472,14 @@ function Top350List({
       <div className="space-y-1">
         {!filtered.length && <p className="py-6 text-center text-xs text-muted-foreground">No players match.</p>}
         {filtered.map((p) => {
-          const isDrafted = draftedNames.has(norm(p.name));
+          const isLocked = draftedNames.has(norm(p.name));
           return (
             <button
               key={p.name}
               type="button"
-              disabled={isDrafted}
-              onClick={() => !isDrafted && onPick(p.name, p.position)}
-              className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isDrafted ? "opacity-45" : ""}`}
+              disabled={isLocked}
+              onClick={() => !isLocked && onPick(p.name, p.position)}
+              className={`flex w-full items-center gap-2 rounded border border-border/40 bg-secondary/20 px-2 py-1.5 text-left text-xs hover:bg-secondary/40 ${isLocked ? "opacity-45" : ""}`}
             >
               <span className="w-7 text-right font-mono text-[10px] text-muted-foreground">{p.overallRank}</span>
               {p.position && (
@@ -487,8 +487,8 @@ function Top350List({
                   {p.position}
                 </Badge>
               )}
-              <span className={`min-w-0 flex-1 truncate font-medium ${isDrafted ? "line-through" : ""}`}>{p.name}</span>
-              {isDrafted && <span className="text-[9px] font-semibold uppercase text-muted-foreground">Drafted</span>}
+              <span className={`min-w-0 flex-1 truncate font-medium ${isLocked ? "line-through" : ""}`}>{p.name}</span>
+              {isLocked && <span className="text-[9px] font-semibold uppercase text-muted-foreground">Locked</span>}
               <span className="font-mono font-semibold tabular-nums">${p.price}</span>
             </button>
           );
