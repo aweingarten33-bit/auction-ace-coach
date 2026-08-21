@@ -61,8 +61,8 @@ export default function PositionBudgetBar() {
   // Strategy cards above are reference-only (QB targets + spend band); the
   // only way their numbers reach the board is the explicit "Load" action.
   // The two exceptions, both explicit and predictable: correcting a locked
-  // (Drafted) price rescales the rest of the plan around it, and changing
-  // the total budget rescales the whole plan proportionally.
+  // price rescales the rest of the plan around it, and changing the total
+  // budget rescales the whole plan proportionally.
   const displayedAllocations = slotAllocations;
 
   // First time this league's plan has ever been opened, seed it from the
@@ -93,11 +93,11 @@ export default function PositionBudgetBar() {
 
   const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
   const slotsPlanned = slots.reduce((sum, slot) => sum + valueFor(slot), 0);
-  const draftedSpend = slots
+  const lockedSpend = slots
     .filter((slot) => lockedSlots[slot.id])
     .reduce((sum, slot) => sum + Math.max(0, Number(slotAllocations[slot.id] ?? 0)), 0);
-  const draftedCount = slots.filter((slot) => lockedSlots[slot.id]).length;
-  const budgetLeft = Math.max(0, settings.totalBudget - draftedSpend);
+  const lockedCount = slots.filter((slot) => lockedSlots[slot.id]).length;
+  const budgetLeft = Math.max(0, settings.totalBudget - lockedSpend);
   const openSlots = slots.filter((slot) => !lockedSlots[slot.id]).length;
   const bidCeiling = maxBid(budgetLeft, openSlots);
 
@@ -105,7 +105,7 @@ export default function PositionBudgetBar() {
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
 
   // The one explicit action that writes a strategy's numbers into the board,
-  // preserving actual drafted spend on any slot already locked in.
+  // preserving actual locked-in spend on any slot already locked.
   const handleLoadStrategy = () => {
     setSlotAllocations(computeSlotDollars(plannerStrategy, settings, {
       lockedSlots,
@@ -120,7 +120,7 @@ export default function PositionBudgetBar() {
     const isLocked = !!lockedSlots[slot.id];
 
     if (isLocked) {
-      // Correcting an already-drafted price: keep it locked, rescale the
+      // Correcting an already-locked price: stays locked, rescale the
       // remaining open slots around the corrected actual spend.
       const nextCurrent = { ...slotAllocations, [slot.id]: amount };
       const rebalanced = rebalanceProportional("manual", settings, {
@@ -134,7 +134,7 @@ export default function PositionBudgetBar() {
     setSlotAllocation(slot.id, amount);
   };
 
-  const handleDraftedToggle = (slot: PlannerSlot, fixedDollar: boolean) => {
+  const handleLockToggle = (slot: PlannerSlot, fixedDollar: boolean) => {
     const isLocked = !!lockedSlots[slot.id];
     if (isLocked) {
       toggleSlotLock(slot.id);
@@ -210,12 +210,12 @@ export default function PositionBudgetBar() {
 
       <div className="grid grid-cols-3 gap-2 border-b border-border/50 bg-secondary/20 px-3 py-2 text-center">
         <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Drafted</div>
-          <div className="font-mono text-sm font-bold">{draftedCount}</div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Locked</div>
+          <div className="font-mono text-sm font-bold">{lockedCount}</div>
         </div>
         <div>
           <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Spent</div>
-          <div className="font-mono text-sm font-bold">${draftedSpend}</div>
+          <div className="font-mono text-sm font-bold">${lockedSpend}</div>
         </div>
         <div>
           <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Budget left</div>
@@ -225,7 +225,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          These numbers are yours to edit anytime. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Drafted</span>, then fix the $ to what he actually cost — the rest of your plan rescales to match. Changing your total budget above rescales everything too.
+          These numbers are yours to edit anytime. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Lock</span>, then fix the $ to what he actually cost — the rest of your plan rescales to match. Changing your total budget above rescales everything too.
         </div>
 
         <div className="space-y-1.5">
@@ -252,8 +252,8 @@ export default function PositionBudgetBar() {
                   value={note}
                   onChange={(val) => setSlotNote(slot.id, val)}
                   group={slot.group}
-                  placeholder={isLocked ? "drafted player" : "targets…"}
-                  ariaLabel={isLocked ? `${slot.label} drafted player` : `${slot.label} target players`}
+                  placeholder={isLocked ? "player name" : "targets…"}
+                  ariaLabel={isLocked ? `${slot.label} player name` : `${slot.label} target players`}
                 />
 
                 <div className="flex shrink-0 items-center gap-0.5">
@@ -273,18 +273,18 @@ export default function PositionBudgetBar() {
 
                 <button
                   type="button"
-                  onClick={() => handleDraftedToggle(slot, fixedDollar)}
+                  onClick={() => handleLockToggle(slot, fixedDollar)}
                   className={cn(
                     "flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-[10px] font-semibold transition-colors",
                     isLocked
                       ? "bg-success/15 text-success hover:bg-success/25"
                       : "border border-border text-muted-foreground hover:bg-secondary hover:text-foreground",
                   )}
-                  aria-label={isLocked ? `Undo drafted ${slot.label}` : `Mark ${slot.label} drafted at $${fixedDollar ? 1 : value}`}
-                  title={isLocked ? "Undo drafted purchase" : "Freeze this actual purchase and recalculate remaining budget"}
+                  aria-label={isLocked ? `Unlock ${slot.label}` : `Lock ${slot.label} at $${fixedDollar ? 1 : value}`}
+                  title={isLocked ? "Unlock — edit this slot's target again" : "Lock in this actual price and rescale the rest of your plan"}
                 >
                   {isLocked ? <Undo2 className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                  <span>{isLocked ? "Undo" : "Drafted"}</span>
+                  <span>{isLocked ? "Unlock" : "Lock"}</span>
                 </button>
               </div>
             );

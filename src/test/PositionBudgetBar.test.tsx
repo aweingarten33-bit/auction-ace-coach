@@ -78,14 +78,14 @@ describe("PositionBudgetBar live interactions", () => {
     fireEvent.change(qb, { target: { value: "74" } });
     expect(qb.value).toBe("74");
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark QB drafted at $74" }));
+    fireEvent.click(screen.getByRole("button", { name: "Lock QB at $74" }));
 
     expect(screen.getByText("$74")).toBeInTheDocument();
     expect(screen.getByText("$151")).toBeInTheDocument();
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
 
-    // Drafted no longer freezes the box — the actual price can be corrected
-    // without hitting Undo first, and the plan rescales around the correction.
+    // Locking no longer freezes the box — the actual price can be corrected
+    // without unlocking first, and the plan rescales around the correction.
     const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
     expect(actual).not.toBeDisabled();
     fireEvent.change(actual, { target: { value: "80" } });
