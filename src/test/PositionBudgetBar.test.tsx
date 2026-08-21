@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { useDraftStore } from "@/lib/draft-store";
@@ -25,22 +25,53 @@ describe("PositionBudgetBar live interactions", () => {
     });
   });
 
-  it("switches presets immediately and lets a typed preset amount stay fixed", () => {
+  it("seeds a starting plan on first load instead of showing a blank board", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    const balancedValue = Number(qb.value);
-
-    fireEvent.click(screen.getByRole("button", { name: "Hero QB" }));
-    const heroValue = Number(qb.value);
-    expect(heroValue).not.toBe(balancedValue);
-
-    fireEvent.change(qb, { target: { value: "70" } });
-    expect(qb.value).toBe("70");
+    expect(Number(qb.value)).toBeGreaterThan(0);
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
   });
 
-  it("locks actual spend and recalculates the real bank", () => {
+  it("strategy cards are reference-only: picking one changes the guidance text, not the board", () => {
+    render(<PositionBudgetBar />);
+
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const before = qb.value;
+
+    fireEvent.click(screen.getByRole("button", { name: "Hero QB" }));
+
+    expect(screen.getByText(/QB1–4 \+ QB15–20/)).toBeInTheDocument();
+    expect(qb.value).toBe(before);
+  });
+
+  it("typing a $ amount edits just that slot, with no other rebalancing", () => {
+    render(<PositionBudgetBar />);
+
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const originalQb = Number(qb.value);
+    fireEvent.change(qb, { target: { value: "70" } });
+    expect(qb.value).toBe("70");
+    // A plain edit only changes this one number — total shifts by the delta,
+    // it isn't silently redistributed like a budget change or a locked
+    // correction would.
+    expect(screen.getByText(`Planned total: $${225 - originalQb + 70}`)).toBeInTheDocument();
+  });
+
+  it('"Load these numbers into my plan" writes the selected strategy into the board', () => {
+    render(<PositionBudgetBar />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Double Elite" }));
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const beforeLoad = qb.value;
+
+    fireEvent.click(screen.getByRole("button", { name: /Load these numbers into my plan/i }));
+
+    expect(qb.value).not.toBe(beforeLoad);
+    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+  });
+
+  it("locks actual spend and recalculates the real bank, and stays editable afterward", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
@@ -51,8 +82,32 @@ describe("PositionBudgetBar live interactions", () => {
 
     expect(screen.getByText("$74")).toBeInTheDocument();
     expect(screen.getByText("$151")).toBeInTheDocument();
-    expect(screen.getByLabelText("QB actual spend")).toBeDisabled();
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+
+    // Drafted no longer freezes the box — the actual price can be corrected
+    // without hitting Undo first, and the plan rescales around the correction.
+    const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
+    expect(actual).not.toBeDisabled();
+    fireEvent.change(actual, { target: { value: "80" } });
+    expect(actual.value).toBe("80");
+    expect(screen.getByText("$80")).toBeInTheDocument();
+    expect(screen.getByText("$145")).toBeInTheDocument();
+    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+  });
+
+  it("rescales the whole plan when the total budget changes", () => {
+    render(<PositionBudgetBar />);
+
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const before = Number(qb.value);
+    expect(before).toBeGreaterThan(0);
+
+    act(() => {
+      useDraftStore.getState().setSettings({ totalBudget: 300 });
+    });
+
+    expect(Number(qb.value)).not.toBe(before);
+    expect(screen.getByText("Planned total: $300")).toBeInTheDocument();
   });
 
   it("supports the new v2 strategy buttons instead of only the legacy four", () => {

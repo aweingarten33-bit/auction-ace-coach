@@ -12,6 +12,9 @@ import {
   mergeVetriIntoPrices,
   VetriRanking,
 } from "./vetri-tiers";
+import { STRATEGY_LABELS, type StrategyId } from "./planner-strategies";
+
+const VALID_STRATEGY_IDS = Object.keys(STRATEGY_LABELS);
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
@@ -65,7 +68,7 @@ interface DraftState {
   // Slots the user has manually edited — never auto-overwrite these.
   touchedSlots: Record<string, boolean>;
   // Active budget-planner strategy preset.
-  plannerStrategy: "hero-qb" | "balanced-qbs" | "bargain-qb" | "manual";
+  plannerStrategy: StrategyId;
   // Anchor players — named "must-have" targets w/ pre-allocated $.
   // Subtracted from pool before slots are distributed.
   anchors: { id: string; name: string; price: number }[];
@@ -109,7 +112,7 @@ interface DraftState {
   clearSlotNotes: () => void;
   markSlotTouched: (id: string) => void;
   clearTouchedSlots: () => void;
-  setPlannerStrategy: (s: "hero-qb" | "balanced-qbs" | "bargain-qb" | "manual") => void;
+  setPlannerStrategy: (s: StrategyId) => void;
   addAnchor: () => void;
   updateAnchor: (id: string, patch: Partial<{ name: string; price: number }>) => void;
   removeAnchor: (id: string) => void;
@@ -313,7 +316,7 @@ export const useDraftStore = create<DraftState>()(
       name: "auction-draft-coach-v1",
       version: 14,
       migrate: (persisted: any, version: number) => {
-        if (persisted && !["hero-qb", "balanced-qbs", "bargain-qb", "manual"].includes(persisted.plannerStrategy)) {
+        if (persisted && !VALID_STRATEGY_IDS.includes(persisted.plannerStrategy)) {
           persisted.plannerStrategy = "balanced-qbs";
 
           persisted.touchedSlots = {};

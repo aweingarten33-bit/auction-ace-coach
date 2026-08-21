@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { CheckCircle2, RotateCcw, Undo2 } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
+import { CheckCircle2, DownloadCloud, Undo2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
@@ -26,6 +26,10 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   BENCH: "bg-secondary text-white border-border",
 };
 
+// The planner is a single always-editable board. These are reference cards
+// only — picking one just swaps the QB-target guidance shown below; it never
+// touches your numbers. "Load these numbers" is the one explicit action that
+// writes a strategy's dollars into your plan.
 const STRATEGIES: StrategyId[] = [
   "double-elite-qb",
   "hero-qb",
@@ -34,7 +38,6 @@ const STRATEGIES: StrategyId[] = [
   "value-qb",
   "bargain-qb",
   "punt-qb",
-  "manual",
 ];
 
 export default function PositionBudgetBar() {
@@ -47,29 +50,46 @@ export default function PositionBudgetBar() {
   const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
   const slotNotes = useDraftStore((s) => s.slotNotes);
   const setSlotNote = useDraftStore((s) => s.setSlotNote);
-  const touchedSlots = useDraftStore((s) => s.touchedSlots);
-  const markSlotTouched = useDraftStore((s) => s.markSlotTouched);
-  const clearTouchedSlots = useDraftStore((s) => s.clearTouchedSlots);
-  const plannerStrategy = useDraftStore((s) => s.plannerStrategy) as StrategyId;
-  const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy) as unknown as (s: StrategyId) => void;
+  const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
+  const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy);
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
   const summary = useMemo(() => getStrategySummary(plannerStrategy, prices), [plannerStrategy, prices]);
 
-  // Single source of truth:
-  // - preset mode stores only user overrides + actual drafted spend
-  // - all other displayed dollars are derived from strategy/market state
-  // There is deliberately NO effect that writes calculated values back into
-  // the same state controlled by these inputs.
-  const displayedAllocations = useMemo(() => {
-    if (plannerStrategy === "manual") return slotAllocations;
-    return computeSlotDollars(plannerStrategy, settings, {
-      touchedSlots,
+  // The board is a single source of truth: whatever is in slotAllocations is
+  // what's shown, full stop. Nothing derives or silently overwrites it.
+  // Strategy cards above are reference-only (QB targets + spend band); the
+  // only way their numbers reach the board is the explicit "Load" action.
+  // The two exceptions, both explicit and predictable: correcting a locked
+  // (Drafted) price rescales the rest of the plan around it, and changing
+  // the total budget rescales the whole plan proportionally.
+  const displayedAllocations = slotAllocations;
+
+  // First time this league's plan has ever been opened, seed it from the
+  // selected strategy so it isn't a wall of blank/zero inputs. After this,
+  // the board is fully manual — nothing re-seeds it automatically again.
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (seededRef.current) return;
+    seededRef.current = true;
+    if (Object.keys(slotAllocations).length > 0) return;
+    setSlotAllocations(computeSlotDollars(plannerStrategy, settings, { lockedSlots, prices }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const prevBudgetRef = useRef(settings.totalBudget);
+  useEffect(() => {
+    const prevBudget = prevBudgetRef.current;
+    prevBudgetRef.current = settings.totalBudget;
+    if (prevBudget === settings.totalBudget) return;
+    setSlotAllocations(rebalanceProportional("manual", settings, {
       lockedSlots,
       currentAllocations: slotAllocations,
       prices,
-    });
-  }, [lockedSlots, plannerStrategy, prices, settings, slotAllocations, touchedSlots]);
+    }));
+    // Only re-run when the budget itself changes — not on every allocation edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.totalBudget]);
 
   const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
   const slotsPlanned = slots.reduce((sum, slot) => sum + valueFor(slot), 0);
@@ -81,47 +101,37 @@ export default function PositionBudgetBar() {
   const openSlots = slots.filter((slot) => !lockedSlots[slot.id]).length;
   const bidCeiling = maxBid(budgetLeft, openSlots);
 
-  const keepOnlyDraftedSpend = () => {
-    const kept: Record<string, number> = {};
-    for (const slot of slots) {
-      if (lockedSlots[slot.id]) kept[slot.id] = Math.max(0, Number(slotAllocations[slot.id] ?? 0));
-    }
-    return kept;
-  };
+  // Pick a reference card — informational only, never touches the board.
+  const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
 
-  const applyStrategy = (strategy: StrategyId) => {
-    if (strategy === "manual") {
-      // Manual starts from exactly what is currently visible, then the user owns it.
-      setSlotAllocations({ ...displayedAllocations });
-      setPlannerStrategy("manual");
-      return;
-    }
-
-    // A new preset is a clean blueprint. Preserve only actual drafted purchases;
-    // stale overrides from another strategy must not bleed into the new one.
-    setSlotAllocations(keepOnlyDraftedSpend());
-    setPlannerStrategy(strategy);
+  // The one explicit action that writes a strategy's numbers into the board,
+  // preserving actual drafted spend on any slot already locked in.
+  const handleLoadStrategy = () => {
+    setSlotAllocations(computeSlotDollars(plannerStrategy, settings, {
+      lockedSlots,
+      currentAllocations: slotAllocations,
+      prices,
+    }));
   };
 
   const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
     const amount = digits === "" ? 0 : Math.max(0, Math.min(999, Number(digits)));
+    const isLocked = !!lockedSlots[slot.id];
 
-    if (plannerStrategy === "manual") {
-      setSlotAllocation(slot.id, amount);
+    if (isLocked) {
+      // Correcting an already-drafted price: keep it locked, rescale the
+      // remaining open slots around the corrected actual spend.
+      const nextCurrent = { ...slotAllocations, [slot.id]: amount };
+      const rebalanced = rebalanceProportional("manual", settings, {
+        lockedSlots,
+        currentAllocations: nextCurrent,
+        prices,
+      });
+      setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: amount });
       return;
     }
-
-    // No background effect can overwrite this. The typed amount is stored as
-    // an override and the rest of the displayed plan is derived around it.
     setSlotAllocation(slot.id, amount);
-    markSlotTouched(slot.id);
-  };
-
-  const handleReset = () => {
-    if (plannerStrategy === "manual") return;
-    clearTouchedSlots();
-    setSlotAllocations(keepOnlyDraftedSpend());
   };
 
   const handleDraftedToggle = (slot: PlannerSlot, fixedDollar: boolean) => {
@@ -133,24 +143,15 @@ export default function PositionBudgetBar() {
 
     const actual = fixedDollar ? 1 : valueFor(slot);
 
-    if (plannerStrategy === "manual") {
-      // Freeze the purchase and proportionally rescale the remaining manual plan.
-      const nextCurrent = { ...slotAllocations, [slot.id]: actual };
-      const nextLocks = { ...lockedSlots, [slot.id]: true };
-      const rebalanced = rebalanceProportional("manual", settings, {
-        touchedSlots,
-        lockedSlots: nextLocks,
-        currentAllocations: nextCurrent,
-        prices,
-      });
-      setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: actual });
-      toggleSlotLock(slot.id);
-      return;
-    }
-
-    // In preset mode only the real purchase is persisted. Locking it changes
-    // every remaining displayed slot on the next render.
-    setSlotAllocation(slot.id, actual);
+    // Freeze the purchase and proportionally rescale the rest of the plan.
+    const nextCurrent = { ...slotAllocations, [slot.id]: actual };
+    const nextLocks = { ...lockedSlots, [slot.id]: true };
+    const rebalanced = rebalanceProportional("manual", settings, {
+      lockedSlots: nextLocks,
+      currentAllocations: nextCurrent,
+      prices,
+    });
+    setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: actual });
     toggleSlotLock(slot.id);
   };
 
@@ -161,17 +162,7 @@ export default function PositionBudgetBar() {
     <div className="overflow-hidden rounded-xl border border-border bg-card">
       <div className="border-b border-border/50 px-3 py-2.5">
         <div className="mb-2 flex items-center gap-2">
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Strategy</span>
-          <button
-            type="button"
-            onClick={handleReset}
-            disabled={plannerStrategy === "manual"}
-            title={plannerStrategy === "manual" ? "Manual plans are not auto-reset" : "Reset to strategy values"}
-            className="ml-auto flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground/70 hover:bg-secondary hover:text-foreground disabled:opacity-30"
-            aria-label="Reset budget plan"
-          >
-            <RotateCcw className="h-3.5 w-3.5" />
-          </button>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Strategy reference</span>
         </div>
 
         <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -179,7 +170,7 @@ export default function PositionBudgetBar() {
             <button
               key={strategy}
               type="button"
-              onClick={() => applyStrategy(strategy)}
+              onClick={() => selectStrategy(strategy)}
               className={cn(
                 "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
                 plannerStrategy === strategy
@@ -206,9 +197,14 @@ export default function PositionBudgetBar() {
               Leaves roughly ${qbLeavesLow}–${qbLeavesHigh} for everything else. {summary.description}
             </div>
           )}
-          {plannerStrategy === "manual" && (
-            <div className="mt-0.5 text-[10px] text-muted-foreground">{summary.description}</div>
-          )}
+          <button
+            type="button"
+            onClick={handleLoadStrategy}
+            className="mt-2 flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] font-semibold text-primary transition hover:bg-primary/20"
+          >
+            <DownloadCloud className="h-3.5 w-3.5" />
+            Load these numbers into my plan
+          </button>
         </div>
       </div>
 
@@ -229,7 +225,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          Change any open $ amount and that number stays fixed while the other open slots recalculate. After you win a player, enter his name, replace the target with the actual price, then tap <span className="font-semibold text-foreground">Drafted</span>.
+          These numbers are yours to edit anytime. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Drafted</span>, then fix the $ to what he actually cost — the rest of your plan rescales to match. Changing your total budget above rescales everything too.
         </div>
 
         <div className="space-y-1.5">
@@ -265,11 +261,11 @@ export default function PositionBudgetBar() {
                   <Input
                     inputMode="numeric"
                     value={String(value)}
-                    disabled={isLocked || fixedDollar}
+                    disabled={fixedDollar}
                     onChange={(event) => handleAllocationChange(slot, event.target.value)}
                     className={cn(
                       "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
-                      isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                      isLocked && "border-success/40 bg-success/5 text-success",
                     )}
                     aria-label={isLocked ? `${slot.label} actual spend` : `${slot.label} planned allocation`}
                   />

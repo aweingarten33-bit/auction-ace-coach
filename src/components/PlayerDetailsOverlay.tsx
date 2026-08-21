@@ -39,12 +39,6 @@ interface Props {
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-function tierLabel(pos?: string, rank?: number): string | null {
-  if (!pos || !rank) return null;
-  const base = pos === "DST" ? "DEF" : pos;
-  return `${base}${Math.ceil(rank / 12)}`;
-}
-
 function tierTone(rank?: number): string {
   if (!rank) return "border-border bg-secondary/40 text-muted-foreground";
   if (rank <= 12) return "border-success/50 bg-success/15 text-success";
@@ -147,7 +141,6 @@ export default function PlayerDetailsOverlay({
   const bye = byeWeekForTeam(team);
   const pos = (meta?.position as Position | undefined) ?? position;
   const injury = meta?.injury_status ?? meta?.status;
-  const tier = tierLabel(pos, posRank);
   const proj = meta?.projection ?? null;
   const stats = statLine(pos, proj);
   const projPts = proj?.pts_ppr;
@@ -155,6 +148,7 @@ export default function PlayerDetailsOverlay({
   const ppg = projPts != null && projGames != null && projGames > 0 ? (projPts / projGames).toFixed(1) : null;
   const expectedPrice = sheetPrice;
 
+  // Which open roster slot this player would fill, and what you budgeted for it.
   const planMatch = useMemo(() => {
     if (!pos) return null;
     const slots = buildPlannerSlots(settings).filter((s) => !lockedSlots[s.id] && slotAccepts(s.group, pos));
@@ -165,25 +159,37 @@ export default function PlayerDetailsOverlay({
     return {
       label: slot.label,
       dollars: Number(slotAllocations[slot.id] ?? 0),
-      specificallyTargeted: !!named,
     };
   }, [lockedSlots, name, pos, settings, slotAllocations, slotNotes]);
 
-  const fit = useMemo(() => {
-    if (expectedPrice == null || !planMatch || planMatch.dollars <= 0) return { label: "No plan", tone: "neutral" as const };
+  // One plain-English verdict: does the expected price fit what you budgeted
+  // for the roster spot this player would fill?
+  const verdict = useMemo(() => {
+    if (expectedPrice == null) return { tone: "neutral" as const, headline: "No expected price yet" };
+    if (!planMatch || planMatch.dollars <= 0) {
+      return { tone: "neutral" as const, headline: "No budget set for this spot yet" };
+    }
     const delta = expectedPrice - planMatch.dollars;
-    if (delta <= 0) return { label: "Fits", tone: "good" as const };
-    if (delta <= 3) return { label: "Stretch", tone: "warn" as const };
-    return { label: `+$${delta} over`, tone: "bad" as const };
+    if (delta <= 0) return { tone: "good" as const, headline: `Fits your ${planMatch.label} budget ($${planMatch.dollars})` };
+    if (delta <= 3) return { tone: "warn" as const, headline: `$${delta} over your ${planMatch.label} budget ($${planMatch.dollars})` };
+    return { tone: "bad" as const, headline: `$${delta} over your ${planMatch.label} budget ($${planMatch.dollars})` };
   }, [expectedPrice, planMatch]);
 
-  const fitTone = fit.tone === "good"
-    ? "border-success/50 bg-success/15 text-success"
-    : fit.tone === "warn"
-      ? "border-warning/50 bg-warning/10 text-warning"
-      : fit.tone === "bad"
-        ? "border-destructive/50 bg-destructive/10 text-destructive"
-        : "border-border bg-secondary/40 text-muted-foreground";
+  const verdictBoxTone = verdict.tone === "good"
+    ? "border-success/40 bg-success/10"
+    : verdict.tone === "warn"
+      ? "border-warning/40 bg-warning/10"
+      : verdict.tone === "bad"
+        ? "border-destructive/40 bg-destructive/10"
+        : "border-border/60 bg-secondary/30";
+
+  const verdictTextTone = verdict.tone === "good"
+    ? "text-success"
+    : verdict.tone === "warn"
+      ? "text-warning"
+      : verdict.tone === "bad"
+        ? "text-destructive"
+        : "text-foreground";
 
   const afterExpected = expectedPrice != null && remaining != null ? remaining - expectedPrice : null;
   const legal = expectedPrice == null || maxBid == null || expectedPrice <= maxBid;
@@ -202,7 +208,6 @@ export default function PlayerDetailsOverlay({
                   {pos}
                 </Badge>
               )}
-              {tier && <span className={`rounded border px-2 py-0.5 text-[11px] font-bold ${tierTone(posRank)}`}>{tier}</span>}
               <span className={`rounded border px-2 py-0.5 text-[10px] font-semibold ${injuryTone(injury)}`}>{injury || "Healthy"}</span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -212,26 +217,29 @@ export default function PlayerDetailsOverlay({
 
           <div className="grid grid-cols-2 gap-2">
             <Tile label="Expected price" value={expectedPrice != null ? `$${expectedPrice}` : "—"} />
-            <Tile label={planMatch ? `${planMatch.label} plan` : "Plan"} value={planMatch && planMatch.dollars > 0 ? `$${planMatch.dollars}` : "—"} />
             <Tile
               label="Pos rank"
-              value={posRank ? <span>{pos ? `${pos === "DST" ? "DEF" : pos}${posRank}` : `#${posRank}`}{overallRank ? <span className="ml-1 text-[10px] font-normal text-muted-foreground">· #{overallRank} ovr</span> : null}</span> : "—"}
+              value={posRank ? (
+                <>
+                  <span className={`rounded px-1 ${tierTone(posRank)}`}>
+                    {pos ? `${pos === "DST" ? "DEF" : pos}${posRank}` : `#${posRank}`}
+                  </span>
+                  {overallRank ? <span className="ml-1 text-[10px] font-normal text-muted-foreground">· #{overallRank} ovr</span> : null}
+                </>
+              ) : "—"}
             />
-            <Tile label="Plan fit" value={<span className={`rounded border px-1.5 py-0.5 text-[10px] font-semibold ${fitTone}`}>{fit.label}</span>} />
           </div>
 
-          <div className="rounded-md border border-border/60 bg-secondary/30 p-3 text-[11px]">
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Draft impact</p>
-            {expectedPrice != null && remaining != null ? (
-              <p>
-                At the <span className="font-semibold">${expectedPrice} expected price</span>, you would have <span className="font-semibold">${Math.max(0, afterExpected ?? 0)}</span> left{slotsLeft != null ? ` for ${Math.max(0, slotsLeft - 1)} roster spots` : ""}.
-                {planMatch?.specificallyTargeted ? ` You specifically listed ${name} in ${planMatch.label}.` : planMatch ? ` The first open ${pos} fit is ${planMatch.label}.` : ""}
+          <div className={`rounded-md border p-3 text-[11px] ${verdictBoxTone}`}>
+            <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Budget fit</p>
+            <p className={`text-sm font-bold ${verdictTextTone}`}>{verdict.headline}</p>
+            {expectedPrice != null && remaining != null && (
+              <p className="mt-1 text-foreground/80">
+                Win him for ${expectedPrice} and you'd have ${Math.max(0, afterExpected ?? 0)} left{slotsLeft != null ? ` for ${Math.max(0, slotsLeft - 1)} more roster spots` : ""}.
               </p>
-            ) : (
-              <p>Expected-price impact will appear once the board and budget are loaded.</p>
             )}
             {!legal && maxBid != null && (
-              <p className="mt-1 font-semibold text-destructive">Expected price is above your current legal max bid of ${maxBid}.</p>
+              <p className="mt-1 font-semibold text-destructive">That's above the most you can legally bid right now (${maxBid}).</p>
             )}
           </div>
 
