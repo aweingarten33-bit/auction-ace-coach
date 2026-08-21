@@ -1,11 +1,11 @@
-name: TypeScript Typecheck
+name: Validate
 
 on:
   push:
   pull_request:
 
 jobs:
-  typecheck:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,3 +16,9 @@ jobs:
         run: bun install --frozen-lockfile
       - name: Type check
         run: bunx tsc --noEmit
+      - name: Unit tests
+        run: bun test
+      - name: Lint
+        run: bun run lint
+      - name: Production build
+        run: bun run build
