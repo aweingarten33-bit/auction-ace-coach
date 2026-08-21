@@ -65,7 +65,7 @@ describe("PositionBudgetBar live interactions", () => {
     expect(sumOfDisplayedAllocations()).toBe(225 - originalQb + 70);
   });
 
-  it("locks actual spend and recalculates the real bank, and stays editable afterward", () => {
+  it("locking freezes the box; unlocking is required to edit it again", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
@@ -78,12 +78,14 @@ describe("PositionBudgetBar live interactions", () => {
     expect(actual.value).toBe("74");
     expect(sumOfDisplayedAllocations()).toBe(225);
 
-    // Locking no longer freezes the box — the actual price can be corrected
-    // without unlocking first, and the plan rescales around the correction.
-    expect(actual).not.toBeDisabled();
-    fireEvent.change(actual, { target: { value: "80" } });
-    expect(actual.value).toBe("80");
-    expect(sumOfDisplayedAllocations()).toBe(225);
+    // Locked means locked — the box is disabled until you unlock it.
+    expect(actual).toBeDisabled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Unlock QB" }));
+    const reopened = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    expect(reopened).not.toBeDisabled();
+    fireEvent.change(reopened, { target: { value: "80" } });
+    expect(reopened.value).toBe("80");
   });
 
   it("rescales the whole plan when the total budget changes", () => {

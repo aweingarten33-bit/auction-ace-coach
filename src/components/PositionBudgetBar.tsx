@@ -56,11 +56,10 @@ export default function PositionBudgetBar() {
 
   // The board is a single source of truth: whatever is in slotAllocations is
   // what's shown, full stop. Nothing derives or silently overwrites it.
-  // Strategy cards above are reference-only (QB targets + spend band); the
-  // only way their numbers reach the board is the explicit "Load" action.
-  // The two exceptions, both explicit and predictable: correcting a locked
-  // price rescales the rest of the plan around it, and changing the total
-  // budget rescales the whole plan proportionally.
+  // Strategy cards above are reference-only (QB targets + spend band) and
+  // never touch the board. A locked slot is frozen — its $ box is disabled
+  // and can't be edited until you Unlock it again. The one exception:
+  // changing the total budget rescales the whole plan proportionally.
   const displayedAllocations = slotAllocations;
 
   // First time this league's plan has ever been opened, seed it from the
@@ -94,23 +93,11 @@ export default function PositionBudgetBar() {
   // Pick a reference card — informational only, never touches the board.
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
 
+  // Locked slots are disabled in the UI, so this only ever fires for open
+  // slots — a plain edit that changes just this one number.
   const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
     const amount = digits === "" ? 0 : Math.max(0, Math.min(999, Number(digits)));
-    const isLocked = !!lockedSlots[slot.id];
-
-    if (isLocked) {
-      // Correcting an already-locked price: stays locked, rescale the
-      // remaining open slots around the corrected actual spend.
-      const nextCurrent = { ...slotAllocations, [slot.id]: amount };
-      const rebalanced = rebalanceProportional("manual", settings, {
-        lockedSlots,
-        currentAllocations: nextCurrent,
-        prices,
-      });
-      setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: amount });
-      return;
-    }
     setSlotAllocation(slot.id, amount);
   };
 
@@ -177,7 +164,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          These numbers are yours to edit anytime. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Lock</span>, then fix the $ to what he actually cost — the rest of your plan rescales to match. Changing your total budget above rescales everything too.
+          Edit any open $ amount anytime. After you win a player, enter his name and the actual price, then tap <span className="font-semibold text-foreground">Lock</span> — that box freezes until you <span className="font-semibold text-foreground">Unlock</span> it again. Changing your total budget above rescales everything.
         </div>
 
         <div className="space-y-1.5">
@@ -213,7 +200,7 @@ export default function PositionBudgetBar() {
                   <Input
                     inputMode="numeric"
                     value={String(value)}
-                    disabled={fixedDollar}
+                    disabled={isLocked || fixedDollar}
                     onChange={(event) => handleAllocationChange(slot, event.target.value)}
                     className={cn(
                       "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
