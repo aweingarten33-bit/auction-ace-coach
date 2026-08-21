@@ -72,7 +72,7 @@ describe("PositionBudgetBar live interactions", () => {
     fireEvent.change(qb, { target: { value: "74" } });
     expect(qb.value).toBe("74");
 
-    fireEvent.click(screen.getByRole("button", { name: "Lock QB at $74" }));
+    fireEvent.click(screen.getByRole("button", { name: "QB is editable — tap to lock in $74" }));
 
     const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
     expect(actual.value).toBe("74");
@@ -81,7 +81,7 @@ describe("PositionBudgetBar live interactions", () => {
     // Locked means locked — the box is disabled until you unlock it.
     expect(actual).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: "Unlock QB" }));
+    fireEvent.click(screen.getByRole("button", { name: "QB is locked — tap to unlock and edit again" }));
     const reopened = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
     expect(reopened).not.toBeDisabled();
     // Unlocking must not wipe the number — it just re-opens the box.
