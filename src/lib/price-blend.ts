@@ -9,7 +9,7 @@ import {
 
 const BASE_BUDGET = 225;
 
-export const PRICE_SOURCE_VERSION = "league-expected-2026-v2";
+export const PRICE_SOURCE_VERSION = "league-expected-2026-v3";
 
 type CheatSheetRow = { name: string; position?: string; team?: string; price: number };
 
@@ -29,9 +29,9 @@ function toPosition(pos?: string | null): Position | undefined {
 /**
  * Returns ONE price per player: Expected Price for the user's league.
  *
- * The old implementation merely scaled the AI-generated sheet by budget.
- * This version uses the sheet as the player pool/fallback ordering, then runs
- * the league-calibrated Superflex expected-price model and economy checksum.
+ * The legacy JSON remains only as the player pool and as fallback ordering for
+ * deep names that are not in the curated current-2026 tier lists. Its old AI
+ * dollar guesses are never surfaced as a second value.
  */
 export async function loadBlendedAuctionPrices(
   totalBudget = BASE_BUDGET,
@@ -54,16 +54,13 @@ export async function loadBlendedAuctionPrices(
       name: p.name,
       position: toPosition(p.position),
       team: p.team,
-      // The legacy price is retained ONLY as fallback rank ordering below the
-      // curated 2026 tiers. It is not surfaced as a second value.
+      // Fallback rank signal only. Final prices are rebuilt below.
       price: Math.max(1, Number(p.price) || 1),
     }));
 
   const modeled = buildExpectedPrices(input, settings);
   const economy = expectedPriceEconomy(modeled, settings);
-  if (!economy.reconciled) {
-    console.warn("Expected-price economy did not reconcile", economy);
-  }
+  if (!economy.reconciled) console.warn("Expected-price economy did not reconcile", economy);
 
   return modeled.map((p) => ({
     name: p.name,
