@@ -42,15 +42,19 @@ describe("computeSlotDollars (superflex-only)", () => {
       expect(out["DST-1"]).toBe(1);
       for (let i = 1; i <= 6; i += 1) expect(out[`BENCH-${i}`]).toBe(1);
     });
-    it(`${strat}: QB position is intentional (hero/balanced premium, bargain punt)`, () => {
-      const out = computeSlotDollars(strat, SETTINGS_SF);
-      if (strat === "bargain-qb") {
-        expect(out["QB-1"]).toBeLessThanOrEqual(15);
-      } else {
-        expect(out["QB-1"]).toBeGreaterThanOrEqual(15);
-      }
-    });
   }
+
+  it("QB presets get progressively cheaper from Hero to Balanced to Bargain", () => {
+    const hero = computeSlotDollars("hero-qb", SETTINGS_SF);
+    const balanced = computeSlotDollars("balanced-qbs", SETTINGS_SF);
+    const bargain = computeSlotDollars("bargain-qb", SETTINGS_SF);
+
+    expect(hero["QB-1"]).toBeGreaterThan(balanced["QB-1"]);
+    expect(balanced["QB-1"]).toBeGreaterThan(bargain["QB-1"]);
+    expect(hero["QB-1"] + hero["SUPERFLEX-1"]).toBeGreaterThan(
+      bargain["QB-1"] + bargain["SUPERFLEX-1"],
+    );
+  });
 
   it("bargain-qb: RB1 is the biggest slot", () => {
     const out = computeSlotDollars("bargain-qb", SETTINGS_SF);
