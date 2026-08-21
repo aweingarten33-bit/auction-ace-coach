@@ -73,7 +73,7 @@ export interface CoachMeta {
   confidence: CoachConfidence;
   debug: {
     undraftedPriceCount: number;
-    draftedCount: number;
+    lockedCount: number;
     historyTurns: number;
     systemPromptChars: number;
     userMessageChars: number;
@@ -87,21 +87,22 @@ function withAuctionAceContext(body: CoachInput): CoachInput {
     const strategyId = state.plannerStrategy;
     const summary = getStrategySummary(strategyId, state.prices);
     const locked = Object.entries(state.lockedSlots).filter(([, v]) => v).map(([id]) => id);
-    const draftedSpend = locked.reduce((sum, id) => sum + Number(state.slotAllocations[id] ?? 0), 0);
-    const bank = Math.max(0, state.settings.totalBudget - draftedSpend);
+    const lockedSpend = locked.reduce((sum, id) => sum + Number(state.slotAllocations[id] ?? 0), 0);
+    const bank = Math.max(0, state.settings.totalBudget - lockedSpend);
 
     const semantics = [
       "AUCTION ACE LIVE CONTEXT (treat this as authoritative app state):",
       "- Every number in the Price Sheet is a SINGLE EXPECTED SALE PRICE for this user's league. It is not a PDF value, blended value, fair value, or max bid.",
       "- Compare the user's ESPN-observed current bid to Expected Price, but do not confuse Expected Price with a recommendation to keep bidding regardless of roster construction.",
-      `- Selected planner strategy: ${summary.label}. QB targets: ${summary.qbTargets}.`,
+      `- Strategy reference card the user currently has open (informational only — QB targets: ${summary.qbTargets}, ${summary.label}).`,
       summary.qbSpendLow != null && summary.qbSpendHigh != null
-        ? `- Expected QB spend band for that strategy: $${summary.qbSpendLow}-$${summary.qbSpendHigh}.`
-        : "- Manual strategy: use the user's current slot allocations as the plan.",
-      `- Planner actual drafted spend: $${draftedSpend}. Real bank remaining: $${bank}.`,
-      "- [LOCKED-DRAFTED] Budget Board rows are actual purchases at actual prices; unlocked rows are the recalibrated plan.",
+        ? `- That reference card's QB spend band: $${summary.qbSpendLow}-$${summary.qbSpendHigh}. This is NOT necessarily what the user's actual Budget Board reflects.`
+        : "",
+      "- The Budget Board's dollar amounts are the user's real, directly-edited plan. They are independent of whichever strategy reference card is open — never assume the board follows the card's targets.",
+      `- Locked spend so far: $${lockedSpend}. Real bank remaining: $${bank}.`,
+      "- [LOCKED] Budget Board rows are actual purchases at actual prices and are frozen — never propose changing them. Unlocked rows are the open, still-editable plan, not money spent yet.",
       "- If the user tells you a live ESPN bid, lead with a direct BID / PASS / KEEP GOING TO $X answer using Expected Price + the current planner + legal budget math.",
-    ].join("\n");
+    ].filter(Boolean).join("\n");
 
     return {
       ...body,
