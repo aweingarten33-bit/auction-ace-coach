@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { CheckCircle2, RotateCcw, Undo2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SlotTargetsInput from "@/components/SlotTargetsInput";
@@ -60,7 +60,9 @@ export default function PositionBudgetBar() {
   // - preset mode stores only user overrides + actual drafted spend
   // - all other displayed dollars are derived from strategy/market state
   // There is deliberately NO effect that writes calculated values back into
-  // the same state controlled by these inputs.
+  // the same state controlled by these inputs, with one exception below:
+  // Manual mode has no derivation step, so it needs an explicit rebalance
+  // whenever the total budget itself changes.
   const displayedAllocations = useMemo(() => {
     if (plannerStrategy === "manual") return slotAllocations;
     return computeSlotDollars(plannerStrategy, settings, {
@@ -70,6 +72,25 @@ export default function PositionBudgetBar() {
       prices,
     });
   }, [lockedSlots, plannerStrategy, prices, settings, slotAllocations, touchedSlots]);
+
+  // Manual mode stores raw dollars with no derivation step, so a change to
+  // the total budget would otherwise leave every slot exactly where it was.
+  // Rescale the plan proportionally around its current shape, the same way
+  // a real drafted purchase already does.
+  const prevBudgetRef = useRef(settings.totalBudget);
+  useEffect(() => {
+    const prevBudget = prevBudgetRef.current;
+    prevBudgetRef.current = settings.totalBudget;
+    if (plannerStrategy !== "manual" || prevBudget === settings.totalBudget) return;
+    setSlotAllocations(rebalanceProportional("manual", settings, {
+      touchedSlots,
+      lockedSlots,
+      currentAllocations: slotAllocations,
+      prices,
+    }));
+    // Only re-run when the budget itself changes — not on every allocation edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.totalBudget, plannerStrategy]);
 
   const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
   const slotsPlanned = slots.reduce((sum, slot) => sum + valueFor(slot), 0);
@@ -106,16 +127,31 @@ export default function PositionBudgetBar() {
   const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
     const amount = digits === "" ? 0 : Math.max(0, Math.min(999, Number(digits)));
+    const isLocked = !!lockedSlots[slot.id];
 
     if (plannerStrategy === "manual") {
+      if (isLocked) {
+        // Correcting an already-drafted price: keep it locked, rescale the
+        // remaining open slots around the corrected actual spend.
+        const nextCurrent = { ...slotAllocations, [slot.id]: amount };
+        const rebalanced = rebalanceProportional("manual", settings, {
+          touchedSlots,
+          lockedSlots,
+          currentAllocations: nextCurrent,
+          prices,
+        });
+        setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: amount });
+        return;
+      }
       setSlotAllocation(slot.id, amount);
       return;
     }
 
     // No background effect can overwrite this. The typed amount is stored as
-    // an override and the rest of the displayed plan is derived around it.
+    // an override (or, if locked, a corrected actual spend) and the rest of
+    // the displayed plan is derived around it.
     setSlotAllocation(slot.id, amount);
-    markSlotTouched(slot.id);
+    if (!isLocked) markSlotTouched(slot.id);
   };
 
   const handleReset = () => {
@@ -229,7 +265,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          Change any open $ amount and that number stays fixed while the other open slots recalculate. After you win a player, enter his name, replace the target with the actual price, then tap <span className="font-semibold text-foreground">Drafted</span>.
+          Change any $ amount and that number stays fixed while the other open slots recalculate. After you win a player, enter his name, tap <span className="font-semibold text-foreground">Drafted</span>, then fix the $ to what he actually cost — the rest of your plan adjusts to match.
         </div>
 
         <div className="space-y-1.5">
@@ -265,11 +301,11 @@ export default function PositionBudgetBar() {
                   <Input
                     inputMode="numeric"
                     value={String(value)}
-                    disabled={isLocked || fixedDollar}
+                    disabled={fixedDollar}
                     onChange={(event) => handleAllocationChange(slot, event.target.value)}
                     className={cn(
                       "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
-                      isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
+                      isLocked && "border-success/40 bg-success/5 text-success",
                     )}
                     aria-label={isLocked ? `${slot.label} actual spend` : `${slot.label} planned allocation`}
                   />

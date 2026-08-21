@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { useDraftStore } from "@/lib/draft-store";
@@ -40,7 +40,7 @@ describe("PositionBudgetBar live interactions", () => {
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
   });
 
-  it("locks actual spend and recalculates the real bank", () => {
+  it("locks actual spend and recalculates the real bank, and stays editable afterward", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
@@ -51,8 +51,33 @@ describe("PositionBudgetBar live interactions", () => {
 
     expect(screen.getByText("$74")).toBeInTheDocument();
     expect(screen.getByText("$151")).toBeInTheDocument();
-    expect(screen.getByLabelText("QB actual spend")).toBeDisabled();
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+
+    // Drafted no longer freezes the box — the actual price can be corrected
+    // without hitting Undo first, and the plan rescales around the correction.
+    const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
+    expect(actual).not.toBeDisabled();
+    fireEvent.change(actual, { target: { value: "80" } });
+    expect(actual.value).toBe("80");
+    expect(screen.getByText("$80")).toBeInTheDocument();
+    expect(screen.getByText("$145")).toBeInTheDocument();
+    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+  });
+
+  it("rescales the manual plan when the total budget changes", () => {
+    render(<PositionBudgetBar />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Manual" }));
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const before = Number(qb.value);
+    expect(before).toBeGreaterThan(0);
+
+    act(() => {
+      useDraftStore.getState().setSettings({ totalBudget: 300 });
+    });
+
+    expect(Number(qb.value)).not.toBe(before);
+    expect(screen.getByText("Planned total: $300")).toBeInTheDocument();
   });
 
   it("supports the new v2 strategy buttons instead of only the legacy four", () => {
