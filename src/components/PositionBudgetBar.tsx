@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { CheckCircle2, DownloadCloud, Undo2 } from "lucide-react";
+import { CheckCircle2, Undo2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
@@ -27,8 +27,7 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
 
 // The planner is a single always-editable board. These are reference cards
 // only — picking one just swaps the QB-target guidance shown below; it never
-// touches your numbers. "Load these numbers" is the one explicit action that
-// writes a strategy's dollars into your plan.
+// touches your numbers.
 const STRATEGIES: StrategyId[] = [
   "double-elite-qb",
   "hero-qb",
@@ -100,16 +99,6 @@ export default function PositionBudgetBar() {
   // Pick a reference card — informational only, never touches the board.
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
 
-  // The one explicit action that writes a strategy's numbers into the board,
-  // preserving actual locked-in spend on any slot already locked.
-  const handleLoadStrategy = () => {
-    setSlotAllocations(computeSlotDollars(plannerStrategy, settings, {
-      lockedSlots,
-      currentAllocations: slotAllocations,
-      prices,
-    }));
-  };
-
   const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
     const amount = digits === "" ? 0 : Math.max(0, Math.min(999, Number(digits)));
@@ -161,23 +150,18 @@ export default function PositionBudgetBar() {
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Strategy reference</span>
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto pb-1">
+        <select
+          value={plannerStrategy}
+          onChange={(e) => selectStrategy(e.target.value as StrategyId)}
+          className="w-full rounded-md border border-border bg-secondary/40 px-2.5 py-1.5 text-[12px] font-medium text-foreground outline-none focus:border-accent"
+          aria-label="Strategy reference"
+        >
           {STRATEGIES.map((strategy) => (
-            <button
-              key={strategy}
-              type="button"
-              onClick={() => selectStrategy(strategy)}
-              className={cn(
-                "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
-                plannerStrategy === strategy
-                  ? "border-primary bg-primary !text-white"
-                  : "border-border bg-secondary/40 text-muted-foreground hover:text-foreground",
-              )}
-            >
+            <option key={strategy} value={strategy}>
               {STRATEGY_LABELS[strategy]}
-            </button>
+            </option>
           ))}
-        </div>
+        </select>
 
         <div className="mt-2 rounded-lg border border-border/50 bg-secondary/20 px-3 py-2">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
@@ -193,14 +177,6 @@ export default function PositionBudgetBar() {
               Leaves roughly ${qbLeavesLow}–${qbLeavesHigh} for everything else. {summary.description}
             </div>
           )}
-          <button
-            type="button"
-            onClick={handleLoadStrategy}
-            className="mt-2 flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] font-semibold text-primary transition hover:bg-primary/20"
-          >
-            <DownloadCloud className="h-3.5 w-3.5" />
-            Load these numbers into my plan
-          </button>
         </div>
       </div>
 

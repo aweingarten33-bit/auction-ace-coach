@@ -40,13 +40,13 @@ describe("PositionBudgetBar live interactions", () => {
     expect(sumOfDisplayedAllocations()).toBe(225);
   });
 
-  it("strategy cards are reference-only: picking one changes the guidance text, not the board", () => {
+  it("strategy dropdown is reference-only: picking one changes the guidance text, not the board", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
     const before = qb.value;
 
-    fireEvent.click(screen.getByRole("button", { name: "Hero QB" }));
+    fireEvent.change(screen.getByLabelText("Strategy reference"), { target: { value: "hero-qb" } });
 
     expect(screen.getByText(/QB1–4 \+ QB15–20/)).toBeInTheDocument();
     expect(qb.value).toBe(before);
@@ -63,19 +63,6 @@ describe("PositionBudgetBar live interactions", () => {
     // it isn't silently redistributed like a budget change or a locked
     // correction would.
     expect(sumOfDisplayedAllocations()).toBe(225 - originalQb + 70);
-  });
-
-  it('"Load these numbers into my plan" writes the selected strategy into the board', () => {
-    render(<PositionBudgetBar />);
-
-    fireEvent.click(screen.getByRole("button", { name: "Double Elite" }));
-    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    const beforeLoad = qb.value;
-
-    fireEvent.click(screen.getByRole("button", { name: /Load these numbers into my plan/i }));
-
-    expect(qb.value).not.toBe(beforeLoad);
-    expect(sumOfDisplayedAllocations()).toBe(225);
   });
 
   it("locks actual spend and recalculates the real bank, and stays editable afterward", () => {
@@ -117,13 +104,15 @@ describe("PositionBudgetBar live interactions", () => {
     expect(sumOfDisplayedAllocations()).toBe(300);
   });
 
-  it("supports the new v2 strategy buttons instead of only the legacy four", () => {
+  it("supports the new v2 strategy options instead of only the legacy four", () => {
     render(<PositionBudgetBar />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Double Elite" }));
+    const dropdown = screen.getByLabelText("Strategy reference");
+
+    fireEvent.change(dropdown, { target: { value: "double-elite-qb" } });
     expect(screen.getByText(/QB1–5 \+ QB4–8/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Value QB" }));
+    fireEvent.change(dropdown, { target: { value: "value-qb" } });
     expect(screen.getByText(/QB11–16 \+ QB17–22/)).toBeInTheDocument();
   });
 });
