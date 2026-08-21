@@ -2,7 +2,7 @@
 // Centralizes URLs, auth headers, SSE parsing, and error handling.
 
 import { useDraftStore } from "@/lib/draft-store";
-import { getStrategySummary, type StrategyId } from "@/lib/planner-strategies";
+import { getStrategySummary } from "@/lib/planner-strategies";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
@@ -84,7 +84,7 @@ export interface CoachMeta {
 function withAuctionAceContext(body: CoachInput): CoachInput {
   try {
     const state = useDraftStore.getState();
-    const strategyId = state.plannerStrategy as StrategyId;
+    const strategyId = state.plannerStrategy;
     const summary = getStrategySummary(strategyId, state.prices);
     const locked = Object.entries(state.lockedSlots).filter(([, v]) => v).map(([id]) => id);
     const draftedSpend = locked.reduce((sum, id) => sum + Number(state.slotAllocations[id] ?? 0), 0);

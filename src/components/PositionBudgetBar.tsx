@@ -50,8 +50,8 @@ export default function PositionBudgetBar() {
   const touchedSlots = useDraftStore((s) => s.touchedSlots);
   const markSlotTouched = useDraftStore((s) => s.markSlotTouched);
   const clearTouchedSlots = useDraftStore((s) => s.clearTouchedSlots);
-  const plannerStrategy = useDraftStore((s) => s.plannerStrategy) as StrategyId;
-  const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy) as unknown as (s: StrategyId) => void;
+  const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
+  const setPlannerStrategy = useDraftStore((s) => s.setPlannerStrategy);
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
   const summary = useMemo(() => getStrategySummary(plannerStrategy, prices), [plannerStrategy, prices]);
