@@ -139,9 +139,10 @@ CORE MODEL
 
 LIVE PLANNER
 - The Budget block contains REAL spend, REAL remaining bank, current legal max bid, and slots left. Use it for affordability.
-- Budget Board rows tagged [LOCKED-DRAFTED] are actual purchases at the exact amount paid. They are the roster truth.
-- Unlocked rows are future planned allocations, not money already spent.
+- Budget Board rows tagged [LOCKED] are actual purchases at the exact amount paid, frozen by the user. They are the roster truth.
+- Unlocked rows are the open, still-editable plan — the user can change these anytime, not money already spent.
 - Never overwrite or propose changes to a locked row.
+- The Strategy Reference (if present) is a card the user is browsing for QB-target guidance. It is informational only and does NOT describe or drive the Budget Board — the board is whatever dollar amounts the user actually typed in, independent of which reference card is open. Don't assume the board follows the reference card's targets.
 - When a purchase is above/below plan, explain where the remaining plan has room to contract/expand.
 
 EXPECTED PRICE
@@ -189,8 +190,8 @@ function buildUserMessage(p: CoachPayload): string {
   parts.push(`## League Settings\n${JSON.stringify(p.settings)}`);
   parts.push(`## Live Budget (REAL money, not planned allocation)\n${JSON.stringify(p.budget)}`);
 
-  if (p.strategy) parts.push(`## Active Strategy\n${JSON.stringify(p.strategy)}`);
-  if (p.myRoster?.length) parts.push(`## Drafted Roster\n${JSON.stringify(p.myRoster)}`);
+  if (p.strategy) parts.push(`## Strategy Reference (informational only — does not describe or drive the Budget Board below)\n${JSON.stringify(p.strategy)}`);
+  if (p.myRoster?.length) parts.push(`## Locked Roster\n${JSON.stringify(p.myRoster)}`);
   if (p.rosterRequired) parts.push(`## Roster Requirements\n${JSON.stringify(p.rosterRequired)}`);
   if (p.spendByPosition) parts.push(`## Actual Spend By Position\n${JSON.stringify(p.spendByPosition)}`);
 
@@ -202,9 +203,9 @@ function buildUserMessage(p: CoachPayload): string {
     const plannedTotal = bb.slots.reduce((sum, s) => sum + numberFrom(s.dollars, 0), 0);
     const budgetRemaining = numberFrom(p.budget?.remaining, Math.max(0, bb.totalBudget - lockedSpend));
     const rows = bb.slots.map((s) =>
-      `${s.id}\t${s.label}\t$${s.dollars}\t${s.target || "(no target)"}${s.locked ? "\t[LOCKED-DRAFTED]" : "\t[PLANNED]"}`,
+      `${s.id}\t${s.label}\t$${s.dollars}\t${s.target || "(no target)"}${s.locked ? "\t[LOCKED]" : "\t[UNLOCKED]"}`,
     ).join("\n");
-    parts.push(`## Budget Board\ntotalBudget=$${bb.totalBudget}\nactualDraftedSpend=$${lockedSpend}\nrealRemaining=$${budgetRemaining}\nfullPlanTotal=$${plannedTotal}\nid\tlabel\t$\ttarget\tstate\n${rows}`);
+    parts.push(`## Budget Board (unlocked rows are the user's own directly-edited numbers, not derived from any strategy)\ntotalBudget=$${bb.totalBudget}\nactualLockedSpend=$${lockedSpend}\nrealRemaining=$${budgetRemaining}\nfullPlanTotal=$${plannedTotal}\nid\tlabel\t$\ttarget\tstate\n${rows}`);
   }
 
   if (p.userQuestion) parts.push(`## Question\n${p.userQuestion}`);
@@ -232,7 +233,7 @@ Deno.serve(async (req: Request) => {
 
     const question = (payload.userQuestion ?? "").trim();
     const pricesCount = (payload.prices ?? []).filter((r) => Number(r.price) > 0).length;
-    const draftedCount = payload.budgetBoard?.slots.filter((s) => s.locked).length ?? 0;
+    const lockedCount = payload.budgetBoard?.slots.filter((s) => s.locked).length ?? 0;
 
     let sources: WebSource[] = [];
     let webContext = "";
@@ -271,7 +272,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const strategyAddendum = payload.strategy
-      ? `\n\nACTIVE USER STRATEGY: ${payload.strategy.label}. ${payload.strategy.guidance}`
+      ? `\n\nSTRATEGY REFERENCE CARD OPEN (informational only, does not describe the Budget Board): ${payload.strategy.label}. ${payload.strategy.guidance}`
       : "";
     const webAddendum = webContext
       ? `\n\nWEB SEARCH RESULTS — use only when relevant to current football context:\n${webContext}`
@@ -300,7 +301,7 @@ Deno.serve(async (req: Request) => {
       confidence,
       debug: {
         undraftedPriceCount: pricesCount,
-        draftedCount,
+        lockedCount,
         historyTurns: payload.history?.length ?? 0,
         systemPromptChars: systemPrompt.length,
         userMessageChars: userMessage.length,
