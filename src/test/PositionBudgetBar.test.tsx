@@ -25,18 +25,49 @@ describe("PositionBudgetBar live interactions", () => {
     });
   });
 
-  it("switches presets immediately and lets a typed preset amount stay fixed", () => {
+  it("seeds a starting plan on first load instead of showing a blank board", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    const balancedValue = Number(qb.value);
+    expect(Number(qb.value)).toBeGreaterThan(0);
+    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+  });
+
+  it("strategy cards are reference-only: picking one changes the guidance text, not the board", () => {
+    render(<PositionBudgetBar />);
+
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const before = qb.value;
 
     fireEvent.click(screen.getByRole("button", { name: "Hero QB" }));
-    const heroValue = Number(qb.value);
-    expect(heroValue).not.toBe(balancedValue);
 
+    expect(screen.getByText(/QB1–4 \+ QB15–20/)).toBeInTheDocument();
+    expect(qb.value).toBe(before);
+  });
+
+  it("typing a $ amount edits just that slot, with no other rebalancing", () => {
+    render(<PositionBudgetBar />);
+
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const originalQb = Number(qb.value);
     fireEvent.change(qb, { target: { value: "70" } });
     expect(qb.value).toBe("70");
+    // A plain edit only changes this one number — total shifts by the delta,
+    // it isn't silently redistributed like a budget change or a locked
+    // correction would.
+    expect(screen.getByText(`Planned total: $${225 - originalQb + 70}`)).toBeInTheDocument();
+  });
+
+  it('"Load these numbers into my plan" writes the selected strategy into the board', () => {
+    render(<PositionBudgetBar />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Double Elite" }));
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const beforeLoad = qb.value;
+
+    fireEvent.click(screen.getByRole("button", { name: /Load these numbers into my plan/i }));
+
+    expect(qb.value).not.toBe(beforeLoad);
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
   });
 
@@ -64,10 +95,9 @@ describe("PositionBudgetBar live interactions", () => {
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
   });
 
-  it("rescales the manual plan when the total budget changes", () => {
+  it("rescales the whole plan when the total budget changes", () => {
     render(<PositionBudgetBar />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Manual" }));
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
     const before = Number(qb.value);
     expect(before).toBeGreaterThan(0);
