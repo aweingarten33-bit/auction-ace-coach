@@ -28,30 +28,30 @@ describe("PositionBudgetBar live interactions", () => {
   it("switches presets immediately and lets a typed preset amount stay fixed", () => {
     render(<PositionBudgetBar />);
 
-    const qb1 = screen.getByLabelText("QB1 planned allocation") as HTMLInputElement;
-    const balancedValue = Number(qb1.value);
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    const balancedValue = Number(qb.value);
 
     fireEvent.click(screen.getByRole("button", { name: "Hero QB" }));
-    const heroValue = Number(qb1.value);
+    const heroValue = Number(qb.value);
     expect(heroValue).not.toBe(balancedValue);
 
-    fireEvent.change(qb1, { target: { value: "70" } });
-    expect(qb1.value).toBe("70");
+    fireEvent.change(qb, { target: { value: "70" } });
+    expect(qb.value).toBe("70");
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
   });
 
   it("locks actual spend and recalculates the real bank", () => {
     render(<PositionBudgetBar />);
 
-    const qb1 = screen.getByLabelText("QB1 planned allocation") as HTMLInputElement;
-    fireEvent.change(qb1, { target: { value: "74" } });
-    expect(qb1.value).toBe("74");
+    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
+    fireEvent.change(qb, { target: { value: "74" } });
+    expect(qb.value).toBe("74");
 
-    fireEvent.click(screen.getByRole("button", { name: "Mark QB1 drafted at $74" }));
+    fireEvent.click(screen.getByRole("button", { name: "Mark QB drafted at $74" }));
 
     expect(screen.getByText("$74")).toBeInTheDocument();
     expect(screen.getByText("$151")).toBeInTheDocument();
-    expect(screen.getByLabelText("QB1 actual spend")).toBeDisabled();
+    expect(screen.getByLabelText("QB actual spend")).toBeDisabled();
     expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
   });
 
