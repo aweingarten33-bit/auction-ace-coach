@@ -56,37 +56,33 @@ export default function PositionBudgetBar() {
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
   const summary = useMemo(() => getStrategySummary(plannerStrategy, prices), [plannerStrategy, prices]);
 
-  // Presets continuously adapt to the current Expected Price market and any
-  // actual drafted/locked spend. Manual remains user-driven while planning.
-  const anyTouched = Object.keys(touchedSlots).some((k) => touchedSlots[k]);
+  // Preset modes are editable. A user-edited slot becomes a hard planning
+  // constraint and the other OPEN slots are recalculated around that exact
+  // number. Crucially, slotAllocations is not a dependency here: this effect
+  // writes allocations, so depending on the value it writes causes the
+  // controlled inputs to fight the user and can create update loops.
   useEffect(() => {
     if (plannerStrategy === "manual") return;
-    const computed = anyTouched
-      ? rebalanceProportional(plannerStrategy, settings, {
-          touchedSlots,
-          lockedSlots,
-          currentAllocations: slotAllocations,
-          prices,
-        })
-      : computeSlotDollars(plannerStrategy, settings, {
-          touchedSlots,
-          lockedSlots,
-          currentAllocations: slotAllocations,
-          prices,
-        });
+    const computed = computeSlotDollars(plannerStrategy, settings, {
+      touchedSlots,
+      lockedSlots,
+      currentAllocations: slotAllocations,
+      prices,
+    });
     const next: Record<string, number> = { ...slotAllocations };
     let changed = false;
-    for (const id of Object.keys(computed)) {
+    for (const [id, amount] of Object.entries(computed)) {
       if (lockedSlots[id]) continue;
-      if (!anyTouched && touchedSlots[id]) continue;
-      if (next[id] !== computed[id]) {
-        next[id] = computed[id];
+      if (next[id] !== amount) {
+        next[id] = amount;
         changed = true;
       }
     }
     if (changed) setSlotAllocations(next);
+    // We intentionally do not depend on slotAllocations because this effect
+    // writes it. User edits are driven by touchedSlots; drafted spend by locks.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plannerStrategy, settings, touchedSlots, lockedSlots, slotAllocations, anyTouched, prices]);
+  }, [plannerStrategy, settings, touchedSlots, lockedSlots, prices]);
 
   // Manual mode: ordinary edits stay manual. A change to the drafted/locked
   // set is different — that is real spend, so remaining planned dollars scale
@@ -136,10 +132,53 @@ export default function PositionBudgetBar() {
   const remainingForBid = settings.totalBudget - draftedSpend;
   const bidCeiling = maxBid(remainingForBid, openSlots);
 
+  const applyPreset = (strategy: StrategyId) => {
+    setPlannerStrategy(strategy);
+    if (strategy === "manual") return;
+
+    // Strategy changes should be visible immediately, not one render/effect
+    // later. setPlannerStrategy clears touched slots, so calculate this preset
+    // with only actual drafted locks held fixed.
+    const fresh = computeSlotDollars(strategy, settings, {
+      touchedSlots: {},
+      lockedSlots,
+      currentAllocations: slotAllocations,
+      prices,
+    });
+    setSlotAllocations({ ...slotAllocations, ...fresh });
+  };
+
+  const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
+    const parsed = Number(raw.replace(/[^0-9]/g, ""));
+    const amount = Number.isFinite(parsed) ? Math.max(0, Math.min(999, parsed)) : 0;
+
+    if (plannerStrategy === "manual") {
+      setSlotAllocation(slot.id, amount);
+      markSlotTouched(slot.id);
+      return;
+    }
+
+    // Build the next state first so the exact number typed is treated as a
+    // hard constraint during this same interaction. This avoids the old race
+    // where the preset immediately overwrote the controlled input.
+    const nextTouched = { ...touchedSlots, [slot.id]: true };
+    const nextCurrent = { ...slotAllocations, [slot.id]: amount };
+    const rebalanced = computeSlotDollars(plannerStrategy, settings, {
+      touchedSlots: nextTouched,
+      lockedSlots,
+      currentAllocations: nextCurrent,
+      prices,
+    });
+
+    markSlotTouched(slot.id);
+    setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: amount });
+  };
+
   const handleReset = () => {
     clearTouchedSlots();
     if (plannerStrategy === "manual") return;
     const fresh = computeSlotDollars(plannerStrategy, settings, {
+      touchedSlots: {},
       lockedSlots,
       currentAllocations: slotAllocations,
       prices,
@@ -171,7 +210,7 @@ export default function PositionBudgetBar() {
             <button
               key={s}
               type="button"
-              onClick={() => setPlannerStrategy(s)}
+              onClick={() => applyPreset(s)}
               className={cn(
                 "shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition",
                 plannerStrategy === s
@@ -221,7 +260,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          Win a player in ESPN → put his name in the slot → replace the target $ with the actual price → tap <span className="font-semibold text-foreground">Drafted</span>. Actual spend freezes and the remaining plan recalibrates.
+          Preset numbers are editable — change any open $ amount and the other open slots rebalance around it. Win a player in ESPN → put his name in the slot → replace the target $ with the actual price → tap <span className="font-semibold text-foreground">Drafted</span>. Actual spend freezes and the remaining plan recalibrates.
         </div>
 
         <div className="space-y-1.5">
@@ -258,11 +297,7 @@ export default function PositionBudgetBar() {
                     inputMode="numeric"
                     value={String(value)}
                     disabled={isLocked || fixedDollar}
-                    onChange={(e) => {
-                      const n = Number(e.target.value.replace(/[^0-9]/g, ""));
-                      setSlotAllocation(slot.id, Number.isFinite(n) ? Math.max(0, Math.min(999, n)) : 0);
-                      markSlotTouched(slot.id);
-                    }}
+                    onChange={(e) => handleAllocationChange(slot, e.target.value)}
                     className={cn(
                       "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
                       isLocked && "border-success/40 bg-success/5 text-success disabled:opacity-100",
