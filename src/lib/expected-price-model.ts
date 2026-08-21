@@ -15,51 +15,70 @@ export interface ExpectedPriceEstimate extends PriceEstimate {
 const BASE_BUDGET = 225;
 const FIXED_POSITIONS = new Set<Position>(["K", "DST"]);
 
-// These curves describe the SHAPE of this specific league at a $225 budget.
-// They are not copied auction prices. They are calibrated for 12 teams,
-// 1 QB + 1 Superflex, 2 RB, 3 WR, 1 TE, 9 bench, Half PPR, $1 K/DST.
-// A league-economy reconciliation below scales the non-Allen premiums so the
-// board cannot imply more or less money than the room actually contains.
+// Expected-price SHAPE for this league at a $225 budget.
+//
+// These are not copied public auction prices. The shape is calibrated from the
+// current 2026 Superflex market/ranking relationship, then the economy checksum
+// below forces the full paid-player pool to fit the actual dollars in a
+// 12-team room. Josh Allen stays at the user's room-specific ~$69 anchor.
+//
+// The non-$1 curve lengths intentionally total 204 players:
+// 36 QB + 66 RB + 82 WR + 20 TE. With 12 K + 12 DST at $1, that represents the
+// 228 roster slots in the user's 12-team, 19-player league. Deeper names remain
+// on the Top 350 as $1 fliers rather than creating imaginary extra room money.
 const CURVES: Record<"QB" | "RB" | "WR" | "TE", number[]> = {
-  QB: [69, 60, 57, 51, 48, 45, 41, 38, 35, 33, 30, 28, 25, 23, 21, 19, 17, 15, 13, 12, 10, 9, 8, 7, 6, 5, 5, 4, 4, 3, 3, 2, 2, 2, 1, 1],
-  RB: [50, 49, 42, 40, 37, 34, 32, 30, 28, 26, 24, 22, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 10, 9, 9, 8, 8, 7, 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  WR: [47, 45, 43, 40, 38, 36, 34, 32, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 12, 11, 11, 10, 10, 9, 9, 8, 8, 8, 7, 7, 7, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-  TE: [29, 27, 18, 16, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 5, 4, 3, 2, 2, 1],
+  QB: [69, 66, 65, 57, 54, 48, 44, 39, 37, 35, 32, 30, 27, 25, 23, 21, 19, 17, 15, 14, 12, 11, 10, 9, 8, 7, 6, 5, 5, 4, 4, 3, 3, 2, 2, 2],
+  RB: [60, 58, 52, 48, 44, 41, 37, 34, 32, 30, 28, 26, 24, 22, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 10, 9, 9, 8, 8, 7, 7, 6, 6, 6, 5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  WR: [55, 53, 50, 45, 43, 40, 38, 36, 34, 32, 30, 29, 27, 25, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 11, 10, 10, 9, 9, 8, 8, 8, 7, 7, 7, 6, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  TE: [34, 28, 12, 10, 8, 7, 6, 5, 4, 3, 3, 3, 2, 2, 2, 2, 1, 1, 1, 1],
 };
 
-// Fresh 2026 ordering overrides for the meaningful-money portion of the board.
-// Lower tiers fall back to the existing sheet's within-position order. This
-// keeps the board current without pretending a public site's dollar values are
-// this league's dollar values.
+// 2026 ordering for the meaningful-money portion of the board. This is kept
+// separate from dollar values on purpose: public rankings/auction behavior help
+// identify tier order, while Auction Ace's league model owns the final dollars.
+// Lower tiers fall back to the legacy sheet's within-position ordering.
 const ORDER: Partial<Record<"QB" | "RB" | "WR" | "TE", string[]>> = {
   QB: [
-    "Josh Allen", "Drake Maye", "Lamar Jackson", "Joe Burrow", "Jalen Hurts",
-    "Jayden Daniels", "Justin Herbert", "Caleb Williams", "Trevor Lawrence",
-    "Dak Prescott", "Jaxson Dart", "Brock Purdy", "Patrick Mahomes", "Bo Nix",
-    "Matthew Stafford", "Jared Goff", "Jordan Love", "Baker Mayfield", "C.J. Stroud",
-    "Cam Ward", "Sam Darnold", "Bryce Young", "Tyler Shough", "Daniel Jones",
-    "Michael Penix Jr.", "Tua Tagovailoa", "Geno Smith", "Malik Willis",
+    "Josh Allen", "Jayden Daniels", "Lamar Jackson", "Drake Maye", "Jalen Hurts",
+    "Joe Burrow", "Jaxson Dart", "Trevor Lawrence", "Dak Prescott", "Bo Nix",
+    "Brock Purdy", "Matthew Stafford", "Caleb Williams", "Justin Herbert",
+    "Patrick Mahomes", "Kyler Murray", "Tyler Shough", "Jared Goff", "Daniel Jones",
+    "Baker Mayfield", "Malik Willis", "Jordan Love", "C.J. Stroud", "Sam Darnold",
+    "Bryce Young", "Cam Ward", "Jacoby Brissett", "Geno Smith", "Fernando Mendoza",
+    "Aaron Rodgers", "Deshaun Watson", "Tua Tagovailoa", "Shedeur Sanders",
+    "Kirk Cousins", "Michael Penix Jr.", "J.J. McCarthy", "Carson Beck",
+    "Justin Fields", "Joe Flacco", "Mac Jones",
   ],
   RB: [
     "Jahmyr Gibbs", "Bijan Robinson", "Christian McCaffrey", "Jonathan Taylor",
-    "Derrick Henry", "De'Von Achane", "James Cook", "Ashton Jeanty", "Chase Brown",
-    "Saquon Barkley", "Josh Jacobs", "Breece Hall", "Omarion Hampton", "Jeremiyah Love",
-    "Kyren Williams", "Cam Skattebo", "Javonte Williams", "Kenneth Walker III",
-    "Bucky Irving", "D'Andre Swift", "Quinshon Judkins", "TreVeyon Henderson",
-    "Travis Etienne", "David Montgomery",
+    "De'Von Achane", "James Cook", "Ashton Jeanty", "Jeremiyah Love",
+    "Saquon Barkley", "Derrick Henry", "Chase Brown", "Kenneth Walker III",
+    "Omarion Hampton", "Breece Hall", "Josh Jacobs", "Javonte Williams",
+    "Travis Etienne", "Kyren Williams", "Quinshon Judkins", "Cam Skattebo",
+    "Bucky Irving", "Bhayshul Tuten", "D'Andre Swift", "TreVeyon Henderson",
+    "David Montgomery", "Jadarian Price", "Rhamondre Stevenson", "Jaylen Warren",
+    "Rico Dowdle", "Tony Pollard", "Kenny Gainwell", "Jonathon Brooks",
+    "Chuba Hubbard", "J.K. Dobbins", "Kyle Monangai", "Jacory Croskey-Merritt",
+    "Rachaad White", "Aaron Jones", "Jordan Mason", "Blake Corum", "RJ Harvey",
+    "Woody Marks", "Zach Charbonnet", "Alvin Kamara", "Tyjae Spears",
   ],
   WR: [
-    "Puka Nacua", "Ja'Marr Chase", "Jaxon Smith-Njigba", "Amon-Ra St. Brown",
-    "CeeDee Lamb", "Drake London", "Justin Jefferson", "Rashee Rice", "George Pickens",
-    "A.J. Brown", "Nico Collins", "Zay Flowers", "Chris Olave", "Garrett Wilson",
-    "Tetairoa McMillan", "DeVonta Smith", "Tee Higgins", "Emeka Egbuka", "Ladd McConkey",
-    "Davante Adams", "Jameson Williams", "Terry McLaurin", "Malik Nabers", "Rome Odunze",
-    "Jaylen Waddle", "DJ Moore", "Brian Thomas Jr.", "DK Metcalf", "Marvin Harrison Jr.",
+    "Ja'Marr Chase", "Puka Nacua", "Jaxon Smith-Njigba", "Amon-Ra St. Brown",
+    "CeeDee Lamb", "Justin Jefferson", "Drake London", "Rashee Rice", "Nico Collins",
+    "Chris Olave", "Garrett Wilson", "A.J. Brown", "Malik Nabers", "George Pickens",
+    "Tetairoa McMillan", "Zay Flowers", "DeVonta Smith", "Emeka Egbuka",
+    "Davante Adams", "Ladd McConkey", "Terry McLaurin", "Tee Higgins", "Jaylen Waddle",
+    "Rome Odunze", "Jameson Williams", "DJ Moore", "Luther Burden III", "Carnell Tate",
+    "Courtland Sutton", "Marvin Harrison Jr.", "DK Metcalf", "Parker Washington",
+    "Alec Pierce", "Mike Evans", "Christian Watson", "Matthew Golden", "Michael Wilson",
+    "Brian Thomas Jr.", "Jakobi Meyers", "Wan'Dale Robinson", "Jordan Addison",
+    "Khalil Shakir", "Jayden Reed", "Xavier Worthy", "Josh Downs", "Quentin Johnston",
   ],
   TE: [
-    "Brock Bowers", "Trey McBride", "Tyler Warren", "Colston Loveland", "Harold Fannin Jr.",
-    "Sam LaPorta", "Kyle Pitts", "Travis Kelce", "George Kittle", "Tucker Kraft",
-    "Dallas Goedert", "Mark Andrews", "Jake Ferguson", "Hunter Henry",
+    "Trey McBride", "Brock Bowers", "Colston Loveland", "Tyler Warren", "Kyle Pitts",
+    "Harold Fannin Jr.", "Sam LaPorta", "Tucker Kraft", "George Kittle", "Travis Kelce",
+    "Dallas Goedert", "Jake Ferguson", "Mark Andrews", "T.J. Hockenson", "Isaiah Likely",
+    "Dalton Kincaid", "Kenyon Sadiq", "Hunter Henry", "Juwan Johnson", "Brenton Strange",
   ],
 };
 
@@ -111,12 +130,10 @@ function baseCurvePrice(position: Position, rank: number): number {
 /**
  * Build ONE number per player: Expected Price for this league.
  *
- * The model deliberately separates market SHAPE from league ECONOMY:
- *  - current rankings/order determine who occupies each scarcity tier;
- *  - position curves encode expected Superflex auction behavior;
- *  - an economy checksum forces the total discretionary dollars to reconcile
- *    to teams × budget minus the $1 minimum for every roster slot;
- *  - Josh Allen is held at the user's room-specific $69 anchor at $225.
+ * Rankings determine who occupies a tier. Position curves determine the shape
+ * of the expected auction market. The economy checksum then forces all premiums
+ * above $1 to equal the real discretionary money in the room. This prevents AI
+ * guesses from creating a fictional auction economy.
  */
 export function buildExpectedPrices(
   rows: ExpectedPriceInput[],
@@ -162,8 +179,8 @@ export function buildExpectedPrices(
     };
   });
 
-  // Rounding can move the room by a few dollars. Reconcile the premium pool
-  // exactly without ever moving K/DST or the Josh Allen anchor.
+  // Rounding can move the room by a few dollars. Reconcile exactly without
+  // moving K/DST or the Allen anchor.
   const roundedPremium = priced.reduce((sum, p) => sum + Math.max(0, p.price - 1), 0);
   let diff = Math.round(discretionaryTarget - roundedPremium);
   if (diff !== 0) {
@@ -193,11 +210,12 @@ export function expectedPriceEconomy(prices: ExpectedPriceEstimate[], settings: 
   const roomDollars = settings.numTeams * settings.totalBudget;
   const draftedSlots = settings.numTeams * rosterSize(settings);
   const premiumDollars = prices.reduce((sum, p) => sum + Math.max(0, p.price - 1), 0);
+  const expectedPremium = Math.max(0, roomDollars - draftedSlots);
   return {
     roomDollars,
     draftedSlots,
-    discretionaryTarget: Math.max(0, roomDollars - draftedSlots),
+    discretionaryTarget: expectedPremium,
     modeledPremiumDollars: premiumDollars,
-    reconciled: premiumDollars === Math.max(0, roomDollars - draftedSlots),
+    reconciled: premiumDollars === expectedPremium,
   };
 }
