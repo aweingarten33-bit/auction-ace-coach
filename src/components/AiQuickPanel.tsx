@@ -412,7 +412,7 @@ export default function AiQuickPanel({ coachContext }: Props) {
               <Sparkles className="coach-ai-mark-icon" size={16} strokeWidth={1.75} />
             </div>
             <div className="min-w-0 flex-1 text-[12px] text-muted-foreground">
-              I can see your budget board. Ask me to build a plan, swap a player, or sanity-check your $225 — I'll show you the math and offer to update the planner with one tap.
+              I can see your price sheet and your budget. Ask things like "how much for my RB2" or "is $34 too much for this guy" and I'll give you a straight answer.
             </div>
           </div>
         )}

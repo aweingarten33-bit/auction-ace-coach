@@ -167,15 +167,14 @@ export const useDraftStore = create<DraftState>()(
       toggleSlotLock: (id) =>
         set((s) => {
           const nextLocks = { ...s.lockedSlots };
-          const nextAllocs = { ...s.slotAllocations };
           if (nextLocks[id]) {
-            // Unlocking → release the value so the slot rejoins redistribute.
+            // Unlocking just re-opens the box for editing — the dollar
+            // amount stays exactly what it was.
             delete nextLocks[id];
-            delete nextAllocs[id];
           } else {
             nextLocks[id] = true;
           }
-          return { lockedSlots: nextLocks, slotAllocations: nextAllocs };
+          return { lockedSlots: nextLocks };
         }),
       clearSlotLocks: () => set({ lockedSlots: {} }),
       slotNotes: {},

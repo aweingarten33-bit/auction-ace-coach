@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef } from "react";
-import { CheckCircle2, Undo2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
@@ -164,7 +163,7 @@ export default function PositionBudgetBar() {
 
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          Edit any open $ amount anytime. After you win a player, enter his name and the actual price, then tap <span className="font-semibold text-foreground">Lock</span> — that box freezes until you <span className="font-semibold text-foreground">Unlock</span> it again. Changing your total budget above rescales everything.
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-green-500 align-[-1px]" /> green = editable. After you win a player, enter his name and the actual price, then tap the dot to turn it <span className="inline-block h-2.5 w-2.5 rounded-full bg-destructive align-[-1px]" /> red — that freezes the box until you tap it again. Changing your total budget above rescales everything.
         </div>
 
         <div className="space-y-1.5">
@@ -204,7 +203,7 @@ export default function PositionBudgetBar() {
                     onChange={(event) => handleAllocationChange(slot, event.target.value)}
                     className={cn(
                       "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
-                      isLocked && "border-success/40 bg-success/5 text-success",
+                      isLocked && "border-destructive/40 bg-destructive/5 text-destructive",
                     )}
                     aria-label={isLocked ? `${slot.label} actual spend` : `${slot.label} planned allocation`}
                   />
@@ -214,17 +213,14 @@ export default function PositionBudgetBar() {
                   type="button"
                   onClick={() => handleLockToggle(slot, fixedDollar)}
                   className={cn(
-                    "flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-[10px] font-semibold transition-colors",
+                    "h-5 w-5 shrink-0 rounded-full border-2 transition-colors",
                     isLocked
-                      ? "bg-success/15 text-success hover:bg-success/25"
-                      : "border border-border text-muted-foreground hover:bg-secondary hover:text-foreground",
+                      ? "border-destructive/50 bg-destructive"
+                      : "border-green-600/50 bg-green-500 hover:brightness-110",
                   )}
-                  aria-label={isLocked ? `Unlock ${slot.label}` : `Lock ${slot.label} at $${fixedDollar ? 1 : value}`}
-                  title={isLocked ? "Unlock — edit this slot's target again" : "Lock in this actual price and rescale the rest of your plan"}
-                >
-                  {isLocked ? <Undo2 className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
-                  <span>{isLocked ? "Unlock" : "Lock"}</span>
-                </button>
+                  aria-label={isLocked ? `${slot.label} is locked — tap to unlock and edit again` : `${slot.label} is editable — tap to lock in $${fixedDollar ? 1 : value}`}
+                  title={isLocked ? "Locked — tap to unlock" : "Editable — tap to lock in this price"}
+                />
               </div>
             );
           })}
