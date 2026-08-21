@@ -9,7 +9,6 @@ import {
   computeSlotDollars,
   getStrategySummary,
   rebalanceProportional,
-  maxBid,
   STRATEGY_LABELS,
   type StrategyId,
 } from "@/lib/planner-strategies";
@@ -92,14 +91,11 @@ export default function PositionBudgetBar() {
   }, [settings.totalBudget]);
 
   const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
-  const slotsPlanned = slots.reduce((sum, slot) => sum + valueFor(slot), 0);
   const lockedSpend = slots
     .filter((slot) => lockedSlots[slot.id])
     .reduce((sum, slot) => sum + Math.max(0, Number(slotAllocations[slot.id] ?? 0)), 0);
   const lockedCount = slots.filter((slot) => lockedSlots[slot.id]).length;
   const budgetLeft = Math.max(0, settings.totalBudget - lockedSpend);
-  const openSlots = slots.filter((slot) => !lockedSlots[slot.id]).length;
-  const bidCeiling = maxBid(budgetLeft, openSlots);
 
   // Pick a reference card — informational only, never touches the board.
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
@@ -289,11 +285,6 @@ export default function PositionBudgetBar() {
               </div>
             );
           })}
-        </div>
-
-        <div className="mt-3 flex items-center justify-between border-t border-border/50 pt-2 text-[10px] text-muted-foreground">
-          <span>Planned total: ${slotsPlanned}</span>
-          <span>Max legal single bid now: ${bidCeiling}</span>
         </div>
       </div>
     </div>

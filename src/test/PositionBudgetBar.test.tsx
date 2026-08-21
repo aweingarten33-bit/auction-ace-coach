@@ -4,6 +4,13 @@ import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { useDraftStore } from "@/lib/draft-store";
 import { DEFAULT_SETTINGS } from "@/lib/draft-types";
 
+function sumOfDisplayedAllocations() {
+  const inputs = document.querySelectorAll<HTMLInputElement>(
+    'input[aria-label$="planned allocation"], input[aria-label$="actual spend"]',
+  );
+  return Array.from(inputs).reduce((sum, el) => sum + Number(el.value || 0), 0);
+}
+
 describe("PositionBudgetBar live interactions", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -30,7 +37,7 @@ describe("PositionBudgetBar live interactions", () => {
 
     const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
     expect(Number(qb.value)).toBeGreaterThan(0);
-    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+    expect(sumOfDisplayedAllocations()).toBe(225);
   });
 
   it("strategy cards are reference-only: picking one changes the guidance text, not the board", () => {
@@ -55,7 +62,7 @@ describe("PositionBudgetBar live interactions", () => {
     // A plain edit only changes this one number — total shifts by the delta,
     // it isn't silently redistributed like a budget change or a locked
     // correction would.
-    expect(screen.getByText(`Planned total: $${225 - originalQb + 70}`)).toBeInTheDocument();
+    expect(sumOfDisplayedAllocations()).toBe(225 - originalQb + 70);
   });
 
   it('"Load these numbers into my plan" writes the selected strategy into the board', () => {
@@ -68,7 +75,7 @@ describe("PositionBudgetBar live interactions", () => {
     fireEvent.click(screen.getByRole("button", { name: /Load these numbers into my plan/i }));
 
     expect(qb.value).not.toBe(beforeLoad);
-    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+    expect(sumOfDisplayedAllocations()).toBe(225);
   });
 
   it("locks actual spend and recalculates the real bank, and stays editable afterward", () => {
@@ -82,7 +89,7 @@ describe("PositionBudgetBar live interactions", () => {
 
     expect(screen.getByText("$74")).toBeInTheDocument();
     expect(screen.getByText("$151")).toBeInTheDocument();
-    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+    expect(sumOfDisplayedAllocations()).toBe(225);
 
     // Locking no longer freezes the box — the actual price can be corrected
     // without unlocking first, and the plan rescales around the correction.
@@ -92,7 +99,7 @@ describe("PositionBudgetBar live interactions", () => {
     expect(actual.value).toBe("80");
     expect(screen.getByText("$80")).toBeInTheDocument();
     expect(screen.getByText("$145")).toBeInTheDocument();
-    expect(screen.getByText("Planned total: $225")).toBeInTheDocument();
+    expect(sumOfDisplayedAllocations()).toBe(225);
   });
 
   it("rescales the whole plan when the total budget changes", () => {
@@ -107,7 +114,7 @@ describe("PositionBudgetBar live interactions", () => {
     });
 
     expect(Number(qb.value)).not.toBe(before);
-    expect(screen.getByText("Planned total: $300")).toBeInTheDocument();
+    expect(sumOfDisplayedAllocations()).toBe(300);
   });
 
   it("supports the new v2 strategy buttons instead of only the legacy four", () => {
