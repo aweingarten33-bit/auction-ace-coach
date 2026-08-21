@@ -84,6 +84,8 @@ describe("PositionBudgetBar live interactions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Unlock QB" }));
     const reopened = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
     expect(reopened).not.toBeDisabled();
+    // Unlocking must not wipe the number — it just re-opens the box.
+    expect(reopened.value).toBe("74");
     fireEvent.change(reopened, { target: { value: "80" } });
     expect(reopened.value).toBe("80");
   });
