@@ -1,6 +1,9 @@
 // Single source of truth for backend endpoints.
 // Centralizes URLs, auth headers, SSE parsing, and error handling.
 
+import { useDraftStore } from "@/lib/draft-store";
+import { getStrategySummary, type StrategyId } from "@/lib/planner-strategies";
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -22,8 +25,6 @@ function explain(status: number): string {
   if (status === 402) return "AI credits exhausted. Add credits in workspace usage.";
   return "Service unavailable.";
 }
-
-// ---------- coach (streaming) ----------
 
 export interface CoachInput {
   settings: unknown;
@@ -80,26 +81,58 @@ export interface CoachMeta {
   };
 }
 
-/**
- * Streams the coach response token-by-token.
- * Throws ApiError on HTTP failure (caller can branch on .status).
- */
+function withAuctionAceContext(body: CoachInput): CoachInput {
+  try {
+    const state = useDraftStore.getState();
+    const strategyId = state.plannerStrategy as StrategyId;
+    const summary = getStrategySummary(strategyId, state.prices);
+    const locked = Object.entries(state.lockedSlots).filter(([, v]) => v).map(([id]) => id);
+    const draftedSpend = locked.reduce((sum, id) => sum + Number(state.slotAllocations[id] ?? 0), 0);
+    const bank = Math.max(0, state.settings.totalBudget - draftedSpend);
+
+    const semantics = [
+      "AUCTION ACE LIVE CONTEXT (treat this as authoritative app state):",
+      "- Every number in the Price Sheet is a SINGLE EXPECTED SALE PRICE for this user's league. It is not a PDF value, blended value, fair value, or max bid.",
+      "- Compare the user's ESPN-observed current bid to Expected Price, but do not confuse Expected Price with a recommendation to keep bidding regardless of roster construction.",
+      `- Selected planner strategy: ${summary.label}. QB targets: ${summary.qbTargets}.`,
+      summary.qbSpendLow != null && summary.qbSpendHigh != null
+        ? `- Expected QB spend band for that strategy: $${summary.qbSpendLow}-$${summary.qbSpendHigh}.`
+        : "- Manual strategy: use the user's current slot allocations as the plan.",
+      `- Planner actual drafted spend: $${draftedSpend}. Real bank remaining: $${bank}.`,
+      "- [LOCKED-DRAFTED] Budget Board rows are actual purchases at actual prices; unlocked rows are the recalibrated plan.",
+      "- If the user tells you a live ESPN bid, lead with a direct BID / PASS / KEEP GOING TO $X answer using Expected Price + the current planner + legal budget math.",
+    ].join("\n");
+
+    return {
+      ...body,
+      strategy: {
+        id: strategyId,
+        label: summary.label,
+        guidance: `${summary.qbTargets}. ${summary.description}`,
+      },
+      userQuestion: `${body.userQuestion ?? ""}\n\n${semantics}`.trim(),
+    };
+  } catch {
+    return body;
+  }
+}
+
+/** Streams the coach response token-by-token. */
 export async function streamCoach(
   body: CoachInput,
   onChunk: (delta: string) => void,
   onMeta?: (meta: CoachMeta) => void,
   signal?: AbortSignal,
 ): Promise<void> {
+  const outbound = withAuctionAceContext(body);
   const resp = await fetch(COACH_URL, {
     method: "POST",
     headers: baseHeaders,
-    body: JSON.stringify(body),
+    body: JSON.stringify(outbound),
     signal,
   });
 
-  if (!resp.ok || !resp.body) {
-    throw new ApiError(resp.status, explain(resp.status));
-  }
+  if (!resp.ok || !resp.body) throw new ApiError(resp.status, explain(resp.status));
 
   const reader = resp.body.getReader();
   const decoder = new TextDecoder();
