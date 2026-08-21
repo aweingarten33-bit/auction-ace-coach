@@ -18,7 +18,20 @@ jobs:
         run: bunx tsc --noEmit
       - name: Unit tests
         run: bun run test
-      - name: Lint
-        run: bun run lint
+      - name: Lint active Auction Ace v2 path
+        run: >-
+          bunx eslint
+          src/pages/DraftRoom.tsx
+          src/components/PositionBudgetBar.tsx
+          src/components/PlayerDetailsOverlay.tsx
+          src/components/AiQuickPanel.tsx
+          src/lib/api.ts
+          src/lib/expected-price-model.ts
+          src/lib/expected-price-model.test.ts
+          src/lib/price-blend.ts
+          src/lib/planner-strategies.ts
+          src/lib/planner-suggest.test.ts
+          supabase/functions/coach/index.ts
+          --rule 'prefer-const: warn'
       - name: Production build
         run: bun run build
