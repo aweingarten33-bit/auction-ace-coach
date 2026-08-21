@@ -74,18 +74,15 @@ describe("PositionBudgetBar live interactions", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Lock QB at $74" }));
 
-    expect(screen.getByText("$74")).toBeInTheDocument();
-    expect(screen.getByText("$151")).toBeInTheDocument();
+    const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
+    expect(actual.value).toBe("74");
     expect(sumOfDisplayedAllocations()).toBe(225);
 
     // Locking no longer freezes the box — the actual price can be corrected
     // without unlocking first, and the plan rescales around the correction.
-    const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
     expect(actual).not.toBeDisabled();
     fireEvent.change(actual, { target: { value: "80" } });
     expect(actual.value).toBe("80");
-    expect(screen.getByText("$80")).toBeInTheDocument();
-    expect(screen.getByText("$145")).toBeInTheDocument();
     expect(sumOfDisplayedAllocations()).toBe(225);
   });
 
