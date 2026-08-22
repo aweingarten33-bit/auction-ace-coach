@@ -129,7 +129,8 @@ export default function DraftRoom() {
   }, [draftedRows]);
 
   const draftedSpend = draftedRows.reduce((sum, row) => sum + row.price, 0);
-  const budgetLeft = Math.max(0, settings.totalBudget - draftedSpend);
+  const budgetLeftRaw = settings.totalBudget - draftedSpend;
+  const budgetLeft = Math.max(0, budgetLeftRaw);
   const openSlots = Math.max(0, plannerSlots.length - draftedRows.length);
   const legalMaxBid = maxBid(budgetLeft, openSlots);
   const spentPct = settings.totalBudget > 0
@@ -263,7 +264,9 @@ export default function DraftRoom() {
               />
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-bold tabular-nums text-accent">${budgetLeft}</span>
+              <span className={`text-xl font-bold tabular-nums ${budgetLeftRaw < 0 ? "text-force-destructive" : "text-accent"}`}>
+                {budgetLeftRaw < 0 ? `-$${Math.abs(budgetLeftRaw)}` : `$${budgetLeftRaw}`}
+              </span>
               <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">actual left</span>
             </div>
           </div>
