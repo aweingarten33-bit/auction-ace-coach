@@ -238,6 +238,11 @@
     color: #ffffff !important;
   }
 
+  /* Exception: over-budget warning text must actually render red. */
+  .text-force-destructive {
+    color: hsl(var(--destructive)) !important;
+  }
+
   /* Dark text on light/glowing surfaces so white text never blends in. */
   .bg-foreground,
   .bg-white,

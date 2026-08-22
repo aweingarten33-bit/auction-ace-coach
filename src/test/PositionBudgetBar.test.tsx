@@ -30,10 +30,8 @@ describe("PositionBudgetBar live interactions", () => {
 
     const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
     expect(qb.value).toBe("");
-    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$0");
-    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$225");
-    // 19 total slots, none filled: max bid = 225 - (19 - 1) = 207
-    expect(screen.getByText("Max bid").nextElementSibling?.textContent).toBe("$207");
+    const rb1 = screen.getByLabelText("RB1 price paid") as HTMLInputElement;
+    expect(rb1.value).toBe("");
   });
 
   it("strategy dropdown is reference-only: picking one changes the guidance text, not the roster", () => {
@@ -49,21 +47,17 @@ describe("PositionBudgetBar live interactions", () => {
     expect(qb.value).toBe("60");
   });
 
-  it("typing the actual price you paid updates spent/left/max bid live", () => {
+  it("typing the actual price you paid just sets that slot's value", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
     fireEvent.change(qb, { target: { value: "60" } });
     expect(qb.value).toBe("60");
-    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$60");
-    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$165");
-    // 18 slots still open after this one: 165 - (18 - 1) = 148
-    expect(screen.getByText("Max bid").nextElementSibling?.textContent).toBe("$148");
 
     const rb1 = screen.getByLabelText("RB1 price paid") as HTMLInputElement;
     fireEvent.change(rb1, { target: { value: "40" } });
-    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$100");
-    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$125");
+    expect(rb1.value).toBe("40");
+    expect(qb.value).toBe("60");
   });
 
   it("clamps a single price to the total budget instead of an arbitrary cap", () => {
@@ -74,17 +68,15 @@ describe("PositionBudgetBar live interactions", () => {
     expect(qb.value).toBe("225");
   });
 
-  it("clearing a price back to blank un-spends it", () => {
+  it("clearing a price back to blank leaves it blank", () => {
     render(<PositionBudgetBar />);
 
     const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
     fireEvent.change(qb, { target: { value: "60" } });
-    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$60");
+    expect(qb.value).toBe("60");
 
     fireEvent.change(qb, { target: { value: "" } });
     expect(qb.value).toBe("");
-    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$0");
-    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$225");
   });
 
   it("supports the new v2 strategy options instead of only the legacy four", () => {

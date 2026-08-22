@@ -48,12 +48,6 @@ export default function PositionBudgetBar() {
   // Every slot starts blank. Nothing is pre-filled or "planned" — you type
   // the real price only once you've actually won that player. A slot with
   // a price above $0 counts as spent; that's the only rule, no exceptions.
-  const spent = slots.reduce((sum, slot) => sum + Math.max(0, Number(slotAllocations[slot.id] ?? 0)), 0);
-  const budgetLeft = Math.max(0, settings.totalBudget - spent);
-  const filledCount = slots.filter((slot) => Number(slotAllocations[slot.id] ?? 0) > 0).length;
-  const openSlots = Math.max(0, slots.length - filledCount);
-  const maxBid = openSlots <= 0 ? budgetLeft : Math.max(0, budgetLeft - (openSlots - 1));
-
   const handlePriceChange = (slotId: string, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
     const amount = digits === "" ? 0 : Math.max(0, Math.min(settings.totalBudget, Number(digits)));
@@ -98,21 +92,6 @@ export default function PositionBudgetBar() {
               Leaves roughly ${qbLeavesLow}–${qbLeavesHigh} for everything else. {summary.description}
             </div>
           )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2 border-b border-border/50 bg-secondary/20 px-3 py-2 text-center">
-        <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Spent</div>
-          <div className="font-mono text-sm font-bold">${spent}</div>
-        </div>
-        <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Budget left</div>
-          <div className="font-mono text-sm font-bold text-accent">${budgetLeft}</div>
-        </div>
-        <div>
-          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Max bid</div>
-          <div className="font-mono text-sm font-bold">${maxBid}</div>
         </div>
       </div>
 
