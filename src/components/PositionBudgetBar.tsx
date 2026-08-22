@@ -1,16 +1,10 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import SlotTargetsInput from "@/components/SlotTargetsInput";
 import { useDraftStore } from "@/lib/draft-store";
 import { cn } from "@/lib/utils";
-import { buildPlannerSlots, type PlannerSlot, type SlotGroup } from "@/lib/planner-slots";
-import {
-  computeSlotDollars,
-  getStrategySummary,
-  rebalanceProportional,
-  STRATEGY_LABELS,
-  type StrategyId,
-} from "@/lib/planner-strategies";
+import { buildPlannerSlots, type SlotGroup } from "@/lib/planner-slots";
+import { getStrategySummary, STRATEGY_LABELS, type StrategyId } from "@/lib/planner-strategies";
 
 const GROUP_COLOR: Record<SlotGroup, string> = {
   QB: "bg-red-500/20 text-white border-red-500/30",
@@ -24,9 +18,8 @@ const GROUP_COLOR: Record<SlotGroup, string> = {
   BENCH: "bg-secondary text-white border-border",
 };
 
-// The planner is a single always-editable board. These are reference cards
-// only — picking one just swaps the QB-target guidance shown below; it never
-// touches your numbers.
+// Reference cards only — picking one just swaps the QB-target guidance
+// shown below; it never touches your roster.
 const STRATEGIES: StrategyId[] = [
   "double-elite-qb",
   "hero-qb",
@@ -42,9 +35,7 @@ export default function PositionBudgetBar() {
   const prices = useDraftStore((s) => s.prices);
   const slotAllocations = useDraftStore((s) => s.slotAllocations);
   const setSlotAllocation = useDraftStore((s) => s.setSlotAllocation);
-  const setSlotAllocations = useDraftStore((s) => s.setSlotAllocations);
-  const lockedSlots = useDraftStore((s) => s.lockedSlots);
-  const toggleSlotLock = useDraftStore((s) => s.toggleSlotLock);
+  const setSlotLocked = useDraftStore((s) => s.setSlotLocked);
   const slotNotes = useDraftStore((s) => s.slotNotes);
   const setSlotNote = useDraftStore((s) => s.setSlotNote);
   const plannerStrategy = useDraftStore((s) => s.plannerStrategy);
@@ -52,73 +43,22 @@ export default function PositionBudgetBar() {
 
   const slots = useMemo(() => buildPlannerSlots(settings), [settings]);
   const summary = useMemo(() => getStrategySummary(plannerStrategy, prices), [plannerStrategy, prices]);
-
-  // The board is a single source of truth: whatever is in slotAllocations is
-  // what's shown, full stop. Nothing derives or silently overwrites it.
-  // Strategy cards above are reference-only (QB targets + spend band) and
-  // never touch the board. A locked slot is frozen — its $ box is disabled
-  // and can't be edited until you Unlock it again. The one exception:
-  // changing the total budget rescales the whole plan proportionally.
-  const displayedAllocations = slotAllocations;
-
-  // First time this league's plan has ever been opened, seed it from the
-  // selected strategy so it isn't a wall of blank/zero inputs. After this,
-  // the board is fully manual — nothing re-seeds it automatically again.
-  const seededRef = useRef(false);
-  useEffect(() => {
-    if (seededRef.current) return;
-    seededRef.current = true;
-    if (Object.keys(slotAllocations).length > 0) return;
-    setSlotAllocations(computeSlotDollars(plannerStrategy, settings, { lockedSlots, prices }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const prevBudgetRef = useRef(settings.totalBudget);
-  useEffect(() => {
-    const prevBudget = prevBudgetRef.current;
-    prevBudgetRef.current = settings.totalBudget;
-    if (prevBudget === settings.totalBudget) return;
-    setSlotAllocations(rebalanceProportional("manual", settings, {
-      lockedSlots,
-      currentAllocations: slotAllocations,
-      prices,
-    }));
-    // Only re-run when the budget itself changes — not on every allocation edit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.totalBudget]);
-
-  const valueFor = (slot: PlannerSlot) => Math.max(0, Number(displayedAllocations[slot.id] ?? 0));
-
-  // Pick a reference card — informational only, never touches the board.
   const selectStrategy = (strategy: StrategyId) => setPlannerStrategy(strategy);
 
-  // Locked slots are disabled in the UI, so this only ever fires for open
-  // slots — a plain edit that changes just this one number.
-  const handleAllocationChange = (slot: PlannerSlot, raw: string) => {
+  // Every slot starts blank. Nothing is pre-filled or "planned" — you type
+  // the real price only once you've actually won that player. A slot with
+  // a price above $0 counts as spent; that's the only rule, no exceptions.
+  const spent = slots.reduce((sum, slot) => sum + Math.max(0, Number(slotAllocations[slot.id] ?? 0)), 0);
+  const budgetLeft = Math.max(0, settings.totalBudget - spent);
+  const filledCount = slots.filter((slot) => Number(slotAllocations[slot.id] ?? 0) > 0).length;
+  const openSlots = Math.max(0, slots.length - filledCount);
+  const maxBid = openSlots <= 0 ? budgetLeft : Math.max(0, budgetLeft - (openSlots - 1));
+
+  const handlePriceChange = (slotId: string, raw: string) => {
     const digits = raw.replace(/[^0-9]/g, "");
-    const amount = digits === "" ? 0 : Math.max(0, Math.min(999, Number(digits)));
-    setSlotAllocation(slot.id, amount);
-  };
-
-  const handleLockToggle = (slot: PlannerSlot, fixedDollar: boolean) => {
-    const isLocked = !!lockedSlots[slot.id];
-    if (isLocked) {
-      toggleSlotLock(slot.id);
-      return;
-    }
-
-    const actual = fixedDollar ? 1 : valueFor(slot);
-
-    // Freeze the purchase and proportionally rescale the rest of the plan.
-    const nextCurrent = { ...slotAllocations, [slot.id]: actual };
-    const nextLocks = { ...lockedSlots, [slot.id]: true };
-    const rebalanced = rebalanceProportional("manual", settings, {
-      lockedSlots: nextLocks,
-      currentAllocations: nextCurrent,
-      prices,
-    });
-    setSlotAllocations({ ...nextCurrent, ...rebalanced, [slot.id]: actual });
-    toggleSlotLock(slot.id);
+    const amount = digits === "" ? 0 : Math.max(0, Math.min(settings.totalBudget, Number(digits)));
+    setSlotAllocation(slotId, amount);
+    setSlotLocked(slotId, amount > 0);
   };
 
   const qbLeavesLow = summary.qbSpendHigh == null ? null : Math.max(0, settings.totalBudget - summary.qbSpendHigh);
@@ -161,17 +101,30 @@ export default function PositionBudgetBar() {
         </div>
       </div>
 
+      <div className="grid grid-cols-3 gap-2 border-b border-border/50 bg-secondary/20 px-3 py-2 text-center">
+        <div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Spent</div>
+          <div className="font-mono text-sm font-bold">${spent}</div>
+        </div>
+        <div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Budget left</div>
+          <div className="font-mono text-sm font-bold text-accent">${budgetLeft}</div>
+        </div>
+        <div>
+          <div className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">Max bid</div>
+          <div className="font-mono text-sm font-bold">${maxBid}</div>
+        </div>
+      </div>
+
       <div className="px-4 py-3">
         <div className="mb-2 text-[10px] leading-snug text-muted-foreground">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-green-500 align-[-1px]" /> green = editable. After you win a player, enter his name and the actual price, then tap the dot to turn it <span className="inline-block h-2.5 w-2.5 rounded-full bg-destructive align-[-1px]" /> red — that freezes the box until you tap it again. Changing your total budget above rescales everything.
+          Every slot starts blank. The moment you win a player, type his name and what you actually paid — that's it. Nothing is pre-filled or planned ahead, so what you see here is always real.
         </div>
 
         <div className="space-y-1.5">
           {slots.map((slot) => {
-            const value = valueFor(slot);
-            const isLocked = !!lockedSlots[slot.id];
+            const value = Math.max(0, Number(slotAllocations[slot.id] ?? 0));
             const note = slotNotes[slot.id] ?? "";
-            const fixedDollar = slot.group === "K" || slot.group === "DST";
 
             return (
               <div key={slot.id} className="flex items-center gap-2">
@@ -180,7 +133,6 @@ export default function PositionBudgetBar() {
                     "w-12 shrink-0 rounded-md border px-1.5 py-0.5 text-center font-bold",
                     slot.label === "Superflex" ? "text-[8px]" : "text-[10px]",
                     GROUP_COLOR[slot.group],
-                    isLocked && "opacity-60",
                   )}
                 >
                   {slot.label}
@@ -190,37 +142,21 @@ export default function PositionBudgetBar() {
                   value={note}
                   onChange={(val) => setSlotNote(slot.id, val)}
                   group={slot.group}
-                  placeholder={isLocked ? "player name" : "targets…"}
-                  ariaLabel={isLocked ? `${slot.label} player name` : `${slot.label} target players`}
+                  placeholder="player name"
+                  ariaLabel={`${slot.label} player name`}
                 />
 
                 <div className="flex shrink-0 items-center gap-0.5">
                   <span className="text-sm text-muted-foreground">$</span>
                   <Input
                     inputMode="numeric"
-                    value={String(value)}
-                    disabled={isLocked || fixedDollar}
-                    onChange={(event) => handleAllocationChange(slot, event.target.value)}
-                    className={cn(
-                      "h-8 w-14 rounded-lg px-2 text-right font-mono text-sm",
-                      isLocked && "border-destructive/40 bg-destructive/5 text-destructive",
-                    )}
-                    aria-label={isLocked ? `${slot.label} actual spend` : `${slot.label} planned allocation`}
+                    value={value === 0 ? "" : String(value)}
+                    placeholder="0"
+                    onChange={(event) => handlePriceChange(slot.id, event.target.value)}
+                    className="h-8 w-14 rounded-lg px-2 text-right font-mono text-sm"
+                    aria-label={`${slot.label} price paid`}
                   />
                 </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleLockToggle(slot, fixedDollar)}
-                  className={cn(
-                    "h-5 w-5 shrink-0 rounded-full border-2 transition-colors",
-                    isLocked
-                      ? "border-destructive/50 bg-destructive"
-                      : "border-green-600/50 bg-green-500 hover:brightness-110",
-                  )}
-                  aria-label={isLocked ? `${slot.label} is locked — tap to unlock and edit again` : `${slot.label} is editable — tap to lock in $${fixedDollar ? 1 : value}`}
-                  title={isLocked ? "Locked — tap to unlock" : "Editable — tap to lock in this price"}
-                />
               </div>
             );
           })}

@@ -106,7 +106,7 @@ interface DraftState {
   setSlotAllocation: (id: string, amount: number) => void;
   setSlotAllocations: (a: Record<string, number>) => void;
   clearSlotAllocations: () => void;
-  toggleSlotLock: (id: string) => void;
+  setSlotLocked: (id: string, locked: boolean) => void;
   clearSlotLocks: () => void;
   setSlotNote: (id: string, note: string) => void;
   clearSlotNotes: () => void;
@@ -164,16 +164,12 @@ export const useDraftStore = create<DraftState>()(
       setSlotAllocations: (a) => set({ slotAllocations: a }),
       clearSlotAllocations: () => set({ slotAllocations: {} }),
       lockedSlots: {},
-      toggleSlotLock: (id) =>
+      // A slot is "locked" the moment it has a real price — this is set
+      // automatically as the user types, never a separate manual toggle.
+      setSlotLocked: (id, locked) =>
         set((s) => {
           const nextLocks = { ...s.lockedSlots };
-          if (nextLocks[id]) {
-            // Unlocking just re-opens the box for editing — the dollar
-            // amount stays exactly what it was.
-            delete nextLocks[id];
-          } else {
-            nextLocks[id] = true;
-          }
+          if (locked) nextLocks[id] = true; else delete nextLocks[id];
           return { lockedSlots: nextLocks };
         }),
       clearSlotLocks: () => set({ lockedSlots: {} }),

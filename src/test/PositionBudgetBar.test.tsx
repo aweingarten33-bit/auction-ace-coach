@@ -1,15 +1,8 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import PositionBudgetBar from "@/components/PositionBudgetBar";
 import { useDraftStore } from "@/lib/draft-store";
 import { DEFAULT_SETTINGS } from "@/lib/draft-types";
-
-function sumOfDisplayedAllocations() {
-  const inputs = document.querySelectorAll<HTMLInputElement>(
-    'input[aria-label$="planned allocation"], input[aria-label$="actual spend"]',
-  );
-  return Array.from(inputs).reduce((sum, el) => sum + Number(el.value || 0), 0);
-}
 
 describe("PositionBudgetBar live interactions", () => {
   beforeEach(() => {
@@ -32,77 +25,66 @@ describe("PositionBudgetBar live interactions", () => {
     });
   });
 
-  it("seeds a starting plan on first load instead of showing a blank board", () => {
+  it("every slot starts blank — nothing pre-filled or planned", () => {
     render(<PositionBudgetBar />);
 
-    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    expect(Number(qb.value)).toBeGreaterThan(0);
-    expect(sumOfDisplayedAllocations()).toBe(225);
+    const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
+    expect(qb.value).toBe("");
+    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$0");
+    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$225");
+    // 19 total slots, none filled: max bid = 225 - (19 - 1) = 207
+    expect(screen.getByText("Max bid").nextElementSibling?.textContent).toBe("$207");
   });
 
-  it("strategy dropdown is reference-only: picking one changes the guidance text, not the board", () => {
+  it("strategy dropdown is reference-only: picking one changes the guidance text, not the roster", () => {
     render(<PositionBudgetBar />);
 
-    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    const before = qb.value;
+    const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
+    fireEvent.change(qb, { target: { value: "60" } });
+    expect(qb.value).toBe("60");
 
     fireEvent.change(screen.getByLabelText("Strategy reference"), { target: { value: "hero-qb" } });
 
     expect(screen.getByText(/QB1–4 \+ QB15–20/)).toBeInTheDocument();
-    expect(qb.value).toBe(before);
+    expect(qb.value).toBe("60");
   });
 
-  it("typing a $ amount edits just that slot, with no other rebalancing", () => {
+  it("typing the actual price you paid updates spent/left/max bid live", () => {
     render(<PositionBudgetBar />);
 
-    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    const originalQb = Number(qb.value);
-    fireEvent.change(qb, { target: { value: "70" } });
-    expect(qb.value).toBe("70");
-    // A plain edit only changes this one number — total shifts by the delta,
-    // it isn't silently redistributed like a budget change or a locked
-    // correction would.
-    expect(sumOfDisplayedAllocations()).toBe(225 - originalQb + 70);
+    const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
+    fireEvent.change(qb, { target: { value: "60" } });
+    expect(qb.value).toBe("60");
+    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$60");
+    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$165");
+    // 18 slots still open after this one: 165 - (18 - 1) = 148
+    expect(screen.getByText("Max bid").nextElementSibling?.textContent).toBe("$148");
+
+    const rb1 = screen.getByLabelText("RB1 price paid") as HTMLInputElement;
+    fireEvent.change(rb1, { target: { value: "40" } });
+    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$100");
+    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$125");
   });
 
-  it("locking freezes the box; unlocking is required to edit it again", () => {
+  it("clamps a single price to the total budget instead of an arbitrary cap", () => {
     render(<PositionBudgetBar />);
 
-    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    fireEvent.change(qb, { target: { value: "74" } });
-    expect(qb.value).toBe("74");
-
-    fireEvent.click(screen.getByRole("button", { name: "QB is editable — tap to lock in $74" }));
-
-    const actual = screen.getByLabelText("QB actual spend") as HTMLInputElement;
-    expect(actual.value).toBe("74");
-    expect(sumOfDisplayedAllocations()).toBe(225);
-
-    // Locked means locked — the box is disabled until you unlock it.
-    expect(actual).toBeDisabled();
-
-    fireEvent.click(screen.getByRole("button", { name: "QB is locked — tap to unlock and edit again" }));
-    const reopened = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    expect(reopened).not.toBeDisabled();
-    // Unlocking must not wipe the number — it just re-opens the box.
-    expect(reopened.value).toBe("74");
-    fireEvent.change(reopened, { target: { value: "80" } });
-    expect(reopened.value).toBe("80");
+    const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
+    fireEvent.change(qb, { target: { value: "9999" } });
+    expect(qb.value).toBe("225");
   });
 
-  it("rescales the whole plan when the total budget changes", () => {
+  it("clearing a price back to blank un-spends it", () => {
     render(<PositionBudgetBar />);
 
-    const qb = screen.getByLabelText("QB planned allocation") as HTMLInputElement;
-    const before = Number(qb.value);
-    expect(before).toBeGreaterThan(0);
+    const qb = screen.getByLabelText("QB price paid") as HTMLInputElement;
+    fireEvent.change(qb, { target: { value: "60" } });
+    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$60");
 
-    act(() => {
-      useDraftStore.getState().setSettings({ totalBudget: 300 });
-    });
-
-    expect(Number(qb.value)).not.toBe(before);
-    expect(sumOfDisplayedAllocations()).toBe(300);
+    fireEvent.change(qb, { target: { value: "" } });
+    expect(qb.value).toBe("");
+    expect(screen.getByText("Spent").nextElementSibling?.textContent).toBe("$0");
+    expect(screen.getByText("Budget left").nextElementSibling?.textContent).toBe("$225");
   });
 
   it("supports the new v2 strategy options instead of only the legacy four", () => {
